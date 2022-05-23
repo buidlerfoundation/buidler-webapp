@@ -1,0 +1,16 @@
+.empty-view__container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin: auto;
+  .empty-text {
+    color: var(--color-secondary-text);
+    font-size: 16px;
+    line-height: 26px;
+    font-weight: 500;
+  }
+  .normal-button__container {
+    width: fit-content;
+    margin-top: 50px;
+  }
+}

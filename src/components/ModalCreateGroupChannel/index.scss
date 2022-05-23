@@ -1,0 +1,35 @@
+.create-group-channel-modal {
+  display: flex;
+  justify-content: center;
+  padding-top: 200px;
+}
+
+.create-group-channel-view__container {
+  display: flex;
+  flex-direction: column;
+  width: 530px;
+  min-width: 300px;
+  border-radius: 5px;
+  border: 1px solid var(--color-stroke);
+  background-color: var(--color-lighter-background);
+  padding: 40px 25px 20px 25px;
+  .create-group-channel__title {
+    font-weight: 700;
+    font-size: 20px;
+    text-transform: capitalize;
+  }
+  .input-channel-item__container {
+    padding: 16px 20px;
+    background-color: var(--color-highlight);
+    border-radius: 5px;
+    border: 1px solid var(--color-stroke);
+  }
+  .group-channel__bottom {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 80px;
+  }
+  .MuiSwitch-root {
+    overflow: visible;
+  }
+}

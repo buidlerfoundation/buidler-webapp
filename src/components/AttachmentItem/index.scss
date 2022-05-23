@@ -1,0 +1,47 @@
+.message-attachment__item {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  .message-attachment__file {
+    display: flex;
+    width: 100%;
+    border-radius: 5px;
+    background-color: var(--color-highlight-action-high);
+    padding: 10px 0;
+    align-items: center;
+  }
+  .message-attachment__img {
+    height: 120px;
+    width: auto;
+    max-width: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  .attachment-delete {
+    display: none;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+  .attachment-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.75);
+  }
+  &:hover {
+    .attachment-delete {
+      display: block;
+    }
+  }
+}

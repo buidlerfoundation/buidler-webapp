@@ -1,0 +1,160 @@
+.team-modal {
+  display: flex;
+  justify-content: center;
+  padding-top: 200px;
+}
+
+.team-view__container {
+  display: flex;
+  flex-direction: column;
+  width: 530px;
+  min-width: 300px;
+  border-radius: 5px;
+  border: 1px solid var(--color-stroke);
+  background-color: var(--color-lighter-background);
+  padding: 25px;
+  height: 350px;
+  .label-wrapper {
+    display: flex;
+    align-items: flex-end;
+    .tab-item {
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 24px;
+      color: var(--color-highlight-action-high);
+      &.active {
+        color: var(--color-primary-text);
+      }
+      & + .tab-item {
+        margin-left: 30px;
+      }
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+  .view-body__wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    .view-body {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+  .team-body {
+    display: flex;
+    align-items: center;
+  }
+  .input-team-item__container {
+    flex: 1;
+    margin-left: 20px;
+  }
+  .input-team-name {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 19px;
+    color: var(--color-primary-text);
+    background-color: var(--color-highlight);
+    width: 100%;
+    &::placeholder {
+      color: var(--color-secondary-text);
+    }
+  }
+  .input-team-icon {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    position: relative;
+    background-color: var(--color-highlight);
+    border: 1px solid var(--color-stroke);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 19px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--color-secondary-text);
+    .icon-camera {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+    }
+  }
+  .team-icon__wrapper {
+    position: relative;
+    width: 90px;
+    height: 90px;
+  }
+  .team-icon {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+  }
+  .attachment-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.75);
+  }
+  .group-channel__bottom {
+    display: flex;
+    justify-content: flex-end;
+    .button-main {
+      width: 60px;
+      justify-content: center;
+    }
+  }
+  .MuiSwitch-root {
+    overflow: visible;
+  }
+  .server-link__wrapper {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    background-color: var(--color-highlight);
+    border: 1px solid var(--color-stroke);
+    border-radius: 5px;
+    width: 100%;
+    .tag-link {
+      width: 50px;
+      height: 50px;
+      background-color: var(--color-stroke);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .invite-link {
+      flex: 1;
+      font-size: 16px;
+      line-height: 26px;
+      font-weight: 600;
+      color: var(--color-primary-text);
+      margin-left: 20px;
+    }
+    .button-paste {
+      padding: 10px;
+      border-radius: 5px;
+      margin: 0 10px;
+      font-size: 16px;
+      line-height: 26px;
+      font-weight: 600;
+    }
+    .btn-copy {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

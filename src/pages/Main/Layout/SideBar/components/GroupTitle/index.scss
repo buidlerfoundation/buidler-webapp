@@ -1,0 +1,27 @@
+.group-title-container {
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+  .plus-button {
+    display: none;
+  }
+  .group-title__icon {
+    margin-left: 15px;
+    filter: brightness(0.5);
+  }
+  .group-title__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-secondary-text);
+    margin-left: 15px;
+  }
+  .rotate {
+    transform: rotate(-90deg);
+  }
+  &:hover {
+    border-radius: 0;
+    .plus-button {
+      display: block;
+    }
+  }
+}

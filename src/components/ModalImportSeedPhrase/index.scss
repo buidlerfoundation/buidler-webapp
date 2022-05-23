@@ -1,0 +1,50 @@
+.import-seed-modal {
+  display: flex;
+  justify-content: center;
+  padding-top: 200px;
+}
+
+.modal__container {
+  display: flex;
+  flex-direction: column;
+  width: 580px;
+  min-width: 300px;
+  border-radius: 5px;
+  border: 1px solid var(--color-stroke);
+  background-color: var(--color-lighter-background);
+  padding: 40px 25px 20px 25px;
+}
+
+.modal-state__container {
+  display: flex;
+  flex-direction: column;
+  .title {
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--color-primary-text);
+  }
+  .input-wrapper {
+    position: relative;
+    margin-top: 56px;
+    .button-paste {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      padding: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--color-secondary-text);
+    }
+    .app-input-highlight {
+      padding-right: 80px;
+      width: calc(100% - 100px);
+    }
+  }
+}
+
+.import__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 24px;
+}

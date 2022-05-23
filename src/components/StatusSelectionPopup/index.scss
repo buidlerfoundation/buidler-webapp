@@ -1,0 +1,26 @@
+.status-selection-popup__container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  border: 1px solid var(--color-stroke);
+  background-color: var(--color-darkest-background);
+  border-radius: 5px;
+  width: 275px;
+  .status-selection__header {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--color-stroke);
+    .status-search {
+      width: 100%;
+      background-color: transparent;
+    }
+  }
+  .status-selection__item {
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    .status__name {
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+}

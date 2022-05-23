@@ -1,0 +1,59 @@
+.normal-button__container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  width: fit-content;
+  min-width: 55px;
+  height: 40px;
+  border-radius: 5px;
+  background-color: var(--color-highlight);
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--color-secondary-text);
+  cursor: pointer;
+  transition: background 0.8s;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.loading-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.invisible {
+  opacity: 0;
+}
+
+.button-success {
+  background-color: var(--color-success);
+  color: var(--color-primary-text);
+  &:hover {
+    background-color: var(--color-success-hover);
+  }
+}
+
+.button-main {
+  background-color: var(--color-accent);
+  color: var(--color-primary-text);
+}
+
+.button-normal {
+  background-color: var(--color-lighter-background);
+  &:hover {
+    background-color: var(--color-highlight-action);
+  }
+}
+
+.button-danger {
+  background-color: var(--color-urgent);
+  color: var(--color-primary-text);
+}

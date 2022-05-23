@@ -1,0 +1,177 @@
+@font-face {
+  font-family: 'Helvetica';
+  src: url('/assets/fonts/Helvetica.otf');
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--color-primary-text);
+  font-weight: 500;
+}
+
+div {
+  &:focus {
+    outline: none;
+  }
+}
+
+video {
+  &:focus {
+    outline: none;
+  }
+}
+
+img {
+  user-select: none; /* standard syntax */
+  -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+  -moz-user-select: none; /* mozilla browsers */
+  -khtml-user-select: none; /* webkit (konqueror) browsers */
+  -ms-user-select: none; /* IE10+ */
+  &:focus {
+    outline: none;
+  }
+}
+
+span {
+  user-select: none; /* standard syntax */
+  -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+  -moz-user-select: none; /* mozilla browsers */
+  -khtml-user-select: none; /* webkit (konqueror) browsers */
+  -ms-user-select: none; /* IE10+ */
+  word-break: break-word;
+}
+
+.enable-user-select {
+  user-select: auto; /* standard syntax */
+  -webkit-user-select: auto; /* webkit (safari, chrome) browsers */
+  -moz-user-select: auto; /* mozilla browsers */
+  -khtml-user-select: auto; /* webkit (konqueror) browsers */
+  -ms-user-select: auto; /* IE10+ */
+}
+
+::-moz-selection {
+  /* Code for Firefox */
+  // background: var(--color-primary-text);
+}
+
+::selection {
+  // background: var(--color-primary-text);
+}
+
+input {
+  background-color: transparent;
+  color: var(--color-primary-text);
+  line-height: 22px;
+  font-size: 16px;
+  border: none;
+  &:focus {
+    outline: none;
+  }
+}
+
+textarea {
+  resize: none;
+  background-color: var(--color-lighter-background);
+  color: var(--color-primary-text);
+  line-height: 22px;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  border: none;
+  &:focus {
+    outline: none;
+  }
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+#app {
+  width: 100%;
+  font-size: 16px;
+  color: var(--color-primary-text);
+  position: relative;
+  background-color: var(--color-lighter-background);
+  overflow: hidden;
+}
+
+#title-bar {
+  height: 49px;
+  width: 100%;
+  background-color: var(--color-lighter-background);
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--color-stroke);
+  -webkit-app-region: drag;
+  &.hide {
+    height: 50px;
+    border-bottom: none;
+    background-color: var(--color-darkest-background);
+  }
+}
+
+#sidebar {
+  height: calc(100vh - 50px);
+  width: 275px;
+  background-color: var(--color-darkest-background);
+  border-right: 1px solid var(--color-stroke);
+}
+#team-view {
+  height: 100vh;
+  width: 70px;
+  background-color: var(--color-darkest-background);
+  border-right: 1px solid var(--color-stroke);
+}
+
+.row__space-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.row__center {
+  display: flex;
+  align-items: center;
+}
+
+.normal-button {
+  cursor: pointer;
+  transition: background 0.8s;
+  -webkit-tap-highlight-color: transparent;
+}
+.normal-button:hover {
+  border-radius: 5px;
+  background-color: var(--color-highlight-action);
+}
+.normal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+}
+.logo-app {
+  width: 50px;
+  height: 50px;
+}
+
+.app-input {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 19px;
+  color: var(--color-primary-text);
+  background-color: var(--color-highlight);
+  width: 100%;
+  &::placeholder {
+    color: var(--color-secondary-text);
+  }
+}

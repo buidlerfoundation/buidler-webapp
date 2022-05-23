@@ -1,0 +1,35 @@
+.member-child-container {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin: 0 10px;
+  border-radius: 5px;
+  color: var(--color-secondary-text);
+  opacity: 1;
+  transition: 200ms ease;
+  overflow: hidden;
+  &.collapsed {
+    height: 0;
+    opacity: 0;
+  }
+  .member-child__username {
+    font-weight: 600;
+    font-size: 16px;
+    color: inherit;
+  }
+  &:hover {
+    background-color: var(--color-stroke);
+    cursor: pointer;
+  }
+  &.un-seen {
+    color: var(--color-primary-text);
+    height: 40px;
+    opacity: 1;
+  }
+  &.active {
+    color: var(--color-primary-text);
+    background-color: var(--color-highlight-action-high);
+    height: 40px;
+    opacity: 1;
+  }
+}

@@ -1,0 +1,111 @@
+.sidebar-header {
+  height: 80px;
+  width: 275px;
+  border-bottom: 1px solid var(--color-stroke);
+  display: flex;
+  align-items: center;
+  .sidebar-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-left: 15px;
+  }
+  .team-logo::before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    height: 50px;
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-stroke);
+    border-radius: 10px;
+    background-color: var(--color-darkest-background);
+    background-repeat: no-repeat;
+    background-image: url('../../../../assets/images/ic_team_default.svg');
+  }
+}
+.sidebar-body {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  height: 100%;
+  .news-feed__container {
+    min-height: 60px;
+    max-height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    color: var(--color-secondary-text);
+    .border-news-feed {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      animation: fade-in-border 1.5s ease-in alternate infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 2px;
+    }
+    .circle-news-feed {
+      width: 10px;
+      height: 10px;
+      background-color: #00d33f;
+      border-radius: 50%;
+    }
+    @keyframes fade-in-border {
+      from {
+        border: 2px solid #00d33fa6;
+      }
+      to {
+        border: 2px solid #00d33f00;
+      }
+    }
+    .news-feed-text {
+      font-size: 16px;
+      margin-left: 12px;
+      font-weight: 700;
+      line-height: 19px;
+    }
+    .active {
+      color: var(--color-primary-text);
+    }
+    &:hover {
+      cursor: pointer;
+      background-color: var(--color-highlight-action);
+      color: var(--color-primary-text);
+    }
+  }
+  &::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background-color: var(--color-stroke);
+    display: none;
+  }
+  &::-webkit-scrollbar {
+    width: 12px;
+    display: none;
+  }
+  &::-webkit-scrollbar-thumb {
+    display: none;
+    width: 4px;
+    border-radius: 5px;
+    background-color: var(--color-lighter-background);
+  }
+}
+
+.app-setting {
+  height: 47px;
+  width: 275px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-secondary-text);
+  cursor: pointer;
+  transition: background 0.8s;
+  -webkit-tap-highlight-color: transparent;
+  &:hover {
+    background-color: var(--color-highlight-action);
+  }
+}

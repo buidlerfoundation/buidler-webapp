@@ -1,0 +1,39 @@
+.main-button {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  border-radius: 5px;
+  .title-button {
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+.popup__container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  border: 1px solid var(--color-stroke);
+  background-color: var(--color-darkest-background);
+  border-radius: 5px;
+  .popup__item {
+    min-width: 200px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .item__name {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .item__icon {
+      margin-right: 15px;
+    }
+    .default {
+      color: var(--color-text);
+    }
+    .destructive {
+      color: var(--color-urgent);
+    }
+  }
+}

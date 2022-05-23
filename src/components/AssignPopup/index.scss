@@ -1,0 +1,27 @@
+.assign-popup__container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  border: 1px solid var(--color-stroke);
+  background-color: var(--color-darkest-background);
+  border-radius: 5px;
+  width: 275px;
+  .assign__header {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--color-stroke);
+  }
+  .assign__item {
+    padding: 10px 12px 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .avatar-view {
+      margin-left: 0px;
+    }
+    .username {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--color-secondary-text);
+    }
+  }
+}

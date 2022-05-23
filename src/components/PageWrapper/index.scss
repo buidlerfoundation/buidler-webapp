@@ -1,0 +1,9 @@
+.page-wrapper-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: var(--color-darkest-background);
+  height: calc(100vh - 50px);
+  justify-content: center;
+  align-items: center;
+}

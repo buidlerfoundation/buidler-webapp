@@ -1,0 +1,26 @@
+.tag-view__container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  .tag-view__item {
+    padding: 6px 10px;
+    border-radius: 5px;
+    background-color: var(--color-highlight);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-secondary-text);
+    border: 1px solid var(--color-stroke);
+  }
+}
+
+.button-add-channel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  width: 30px;
+  height: 30px;
+  &:hover {
+    cursor: pointer;
+  }
+}

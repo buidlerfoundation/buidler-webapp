@@ -1,0 +1,80 @@
+.modal-otp {
+  display: flex;
+  justify-content: center;
+  padding-top: 200px;
+}
+
+.otp-view__container {
+  display: flex;
+  flex-direction: column;
+  width: 580px;
+  height: fit-content;
+  border-radius: 5px;
+  border: 1px solid var(--color-stroke);
+  background-color: var(--color-lighter-background);
+  padding: 40px 25px 20px 25px;
+  position: relative;
+  .otp__title {
+    font-weight: 700;
+    font-size: 20px;
+    text-transform: capitalize;
+  }
+  .resend-button {
+    position: absolute;
+    top: 30px;
+    right: 15px;
+    padding: 10px;
+    font-size: 16px;
+    line-height: 26px;
+    color: var(--color-secondary-text);
+    font-weight: 600;
+  }
+  .otp-input__wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 70px -10px 0 -10px;
+    .otp-item {
+      flex: 1;
+      margin: 0 10px;
+      height: 50px;
+      border-radius: 5px;
+      font-size: 20px;
+      line-height: 24px;
+      font-weight: 700;
+      color: var(--color-primary-text);
+      background-color: var(--color-stroke);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .otp-input {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      opacity: 0;
+      width: 100%;
+    }
+  }
+  .otp-des {
+    margin-top: 10px;
+    color: var(--color-secondary-text);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 22px;
+  }
+  .otp-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 70px;
+    .button-normal {
+      background-color: var(--color-stroke);
+      color: var(--color-primary-text);
+      padding: 7px 29px;
+      line-height: 26px;
+    }
+  }
+}

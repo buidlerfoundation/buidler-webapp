@@ -1,0 +1,13 @@
+.task-detail-field__container {
+  display: flex;
+  padding: 15px 0;
+  .task-detail-field__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-primary-text);
+    flex: 1;
+  }
+  .task-detail-field__body {
+    flex: 2;
+  }
+}

@@ -1,0 +1,51 @@
+.react-view__container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  width: fit-content;
+  .react-item__view {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    padding: 6px 10px;
+    background-color: var(--color-highlight);
+    color: var(--color-secondary-text);
+    &:hover {
+      color: var(--color-primary-text);
+      background-color: var(--color-highlight-action-high);
+      cursor: pointer;
+    }
+    .react-item__count {
+      margin-left: 8px;
+      font-size: 16px;
+    }
+  }
+  .react-item__highlight {
+    color: var(--color-primary-text);
+    background-color: var(--color-highlight-action-high);
+  }
+}
+.react-detail__container {
+  width: 275px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border: 1px solid var(--color-stroke);
+  background-color: var(--color-darkest-background);
+  padding: 10px 15px;
+  display: flex;
+  flex-direction: column;
+  .react-item {
+    display: flex;
+    align-items: center;
+    margin: 7.5px 0;
+    .user-name {
+      margin-left: 15px;
+      flex: 1;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 19px;
+    }
+  }
+}

@@ -1,0 +1,29 @@
+.group-child-container {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  color: var(--color-secondary-text);
+  &:hover {
+    color: var(--color-primary-text) !important;
+    border-radius: 0;
+  }
+}
+.group-child__title {
+  font-size: 16px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+}
+.muted {
+  color: var(--color-highlight-action-high);
+}
+.group-selected {
+  background-color: var(--color-highlight-action);
+  color: var(--color-primary-text);
+}
+.group-un-seen {
+  color: var(--color-primary-text);
+}

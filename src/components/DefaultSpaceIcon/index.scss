@@ -1,0 +1,13 @@
+.default-space-icon__container {
+  font-family: 'Helvetica', -apple-system, sans-serif;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .text {
+    font-size: 13px;
+    color: white;
+    text-transform: uppercase;
+  }
+}
