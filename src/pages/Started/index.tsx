@@ -40,6 +40,7 @@ const Started = () => {
       signingKey = wallet._signingKey();
     }
     const publicKey = utils.computePublicKey(privateKey, true);
+    const address = utils.computeAddress(privateKey);
     dispatch({ type: actionTypes.SET_PRIVATE_KEY, payload: privateKey });
     const data = { [publicKey]: privateKey };
     const encryptedData = encryptString(JSON.stringify(data), password, iv);
@@ -49,7 +50,7 @@ const Started = () => {
       dispatch({ type: actionTypes.SET_SEED_PHRASE, payload: seed });
     }
     setCookie(AsyncKey.encryptedDataKey, encryptedData);
-    const { nonce } = await api.requestNonce(publicKey);
+    const { nonce } = await api.requestNonceWithAddress(address);
     if (nonce) {
       const msgHash = utils.hashMessage(nonce);
       const msgHashBytes = utils.arrayify(msgHash);

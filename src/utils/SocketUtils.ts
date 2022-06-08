@@ -352,7 +352,9 @@ class SocketUtil {
       if (typeof current === "string") {
         dataLocal = JSON.parse(current);
       }
-      Object.keys(data).forEach((k) => {
+      const dataKeys = Object.keys(data);
+      if (dataKeys.length === 0) return;
+      dataKeys.forEach((k) => {
         const arr = data[k];
         dataLocal[k] = uniqBy([...(dataLocal?.[k] || []), ...arr], "key");
         arr.forEach((el: any) => {
