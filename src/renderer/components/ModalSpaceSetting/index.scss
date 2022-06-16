@@ -1,0 +1,17 @@
+.delete-space__wrapper {
+  display: flex;
+  align-items: center;
+  padding: 8px 20px;
+  color: var(--color-secondary-text);
+  &:hover {
+    cursor: pointer;
+    background-color: var(--color-highlight);
+    color: var(--color-primary-text);
+  }
+  .delete-space-text {
+    font-size: 16px;
+    line-height: 19px;
+    margin-left: 15px;
+    font-weight: 600;
+  }
+}

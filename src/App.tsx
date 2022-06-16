@@ -1,34 +1,41 @@
 import React, { useCallback, useEffect } from "react";
-import "./App.css";
 import "./index.scss";
 import "./App.scss";
-import "./styles/spacing.scss";
+import "../src/renderer/styles/spacing.scss";
 import "./emoji.scss";
-import { useNavigate } from "react-router-dom";
-import { ThemeProvider, createTheme } from "@material-ui/core";
-import Main from "./pages/Main";
-import AppToastNotification from "./components/AppToastNotification";
-import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
-import GlobalVariable from "./services/GlobalVariable";
-import SocketUtils from "./utils/SocketUtils";
+import { ThemeProvider } from "@material-ui/styles";
+import { createTheme } from "@material-ui/core";
+import GlobalVariable from "renderer/services/GlobalVariable";
+import { clearData, getCookie, getDeviceCode } from "renderer/common/Cookie";
+import { AsyncKey, LoginType } from "renderer/common/AppConfig";
+import actionTypes from "renderer/actions/ActionTypes";
+import api from "renderer/api";
+import { findUser, getInitial, logout } from "renderer/actions/UserActions";
+import AppToastNotification from "renderer/components/AppToastNotification";
+import Main from "renderer/pages/Main";
+import SocketUtils from "renderer/utils/SocketUtils";
+import WalletConnectUtils from "renderer/services/connectors/WalletConnectUtils";
+import useAppSelector from "renderer/hooks/useAppSelector";
+import useAppDispatch from "renderer/hooks/useAppDispatch";
+import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 
-type AppProps = {
-  findUser?: () => any;
-  getInitial?: () => () => void;
-};
-
-const App = ({ findUser, getInitial }: AppProps) => {
-  const navigate = useNavigate();
-  const user = useSelector((state: any) => state.user.userData);
-  const imgDomain = useSelector((state: any) => state.user.imgDomain);
+function App() {
+  const history = useHistory();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user.userData);
+  const imgDomain = useAppSelector((state: any) => state.user.imgDomain);
   const initApp = useCallback(async () => {
-    await findUser?.();
-    if (!imgDomain) {
-      await getInitial?.();
+    const accessToken = await getCookie(AsyncKey.accessTokenKey);
+    if (accessToken && typeof accessToken === "string") {
+      await dispatch(findUser?.());
+      history.replace("/");
     }
-    navigate("/home");
-  }, [findUser, getInitial, imgDomain, navigate]);
+    if (!imgDomain) {
+      await dispatch(getInitial?.());
+    }
+  }, [imgDomain, dispatch, history]);
   useEffect(() => {
     TextareaAutosize.defaultProps = {
       ...TextareaAutosize.defaultProps,
@@ -65,6 +72,48 @@ const App = ({ findUser, getInitial }: AppProps) => {
       window.removeEventListener("paste", eventPaste);
     };
   }, [user, initApp]);
+  const initGeneratedPrivateKey = useCallback(async () => {
+    const generatedPrivateKey = await getCookie(AsyncKey.generatedPrivateKey);
+    if (typeof generatedPrivateKey === "string") {
+      dispatch({
+        type: actionTypes.SET_PRIVATE_KEY,
+        payload: generatedPrivateKey,
+      });
+    }
+  }, [dispatch]);
+  useEffect(() => {
+    initGeneratedPrivateKey();
+  }, [initGeneratedPrivateKey]);
+  const metamaskUpdate = useCallback((data) => {
+    console.log(data);
+  }, []);
+  const connectLogout = useCallback(async () => {
+    const deviceCode = await getDeviceCode();
+    await api.removeDevice({
+      device_code: deviceCode,
+    });
+    clearData(() => {
+      window.location.reload();
+      dispatch(logout?.());
+    });
+  }, [dispatch]);
+  useEffect(() => {
+    getCookie(AsyncKey.loginType)
+      .then((res) => {
+        if (res === LoginType.WalletConnect) {
+          WalletConnectUtils.init(connectLogout);
+          if (!WalletConnectUtils.connector?.connected) {
+            connectLogout();
+          }
+        } else if (res === LoginType.Metamask) {
+          MetamaskUtils.connected = true;
+          MetamaskUtils.init(connectLogout, metamaskUpdate);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [connectLogout, metamaskUpdate]);
   const overrides: any = {
     MuiPickersDay: {
       day: {
@@ -83,7 +132,13 @@ const App = ({ findUser, getInitial }: AppProps) => {
   };
   const materialTheme = createTheme({
     overrides,
+    typography: {
+      fontFamily: `-apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif`,
+      fontWeightMedium: 600,
+      fontWeightBold: "bold",
+    },
   });
+
   return (
     <ThemeProvider theme={materialTheme}>
       <div>
@@ -92,17 +147,6 @@ const App = ({ findUser, getInitial }: AppProps) => {
       </div>
     </ThemeProvider>
   );
-};
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <Routes>
-//         <Route path="/" element={<Home />} />
-//         <Route path="about" element={<About />} />
-//       </Routes>
-//     </div>
-//   );
-// }
+}
 
 export default App;
