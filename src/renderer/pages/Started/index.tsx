@@ -161,7 +161,7 @@ const Started = () => {
         <div className="wallet-button normal-button" onClick={handleMetamask}>
           <span>Metamask</span>
           <div className="wallet-icon">
-            <img src={images.icWalletConnect} alt="" />
+            <img src={images.icMetamask} alt="" />
           </div>
         </div>
       </div>
