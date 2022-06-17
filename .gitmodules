@@ -1,0 +1,3 @@
+[submodule "src/renderer/shared"]
+	path = src/renderer/shared
+	url = https://github.com/buidlerfoundation/buidler-component.git
