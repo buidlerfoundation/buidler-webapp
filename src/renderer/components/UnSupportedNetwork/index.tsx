@@ -9,9 +9,7 @@ const UnSupportedNetwork = () => {
     window.ethereum
       ?.request({
         method: "wallet_switchEthereumChain",
-        params: [
-          { chainId: '0x1' },
-        ],
+        params: [{ chainId: "0x1" }],
       })
       .catch((err) => {
         toast.error(err.message);
@@ -19,15 +17,21 @@ const UnSupportedNetwork = () => {
   }, []);
   return (
     <div className="un-supported__container">
-      <span className="un-supported-text">Unsupported Network</span>
-      <span className="un-supported-des-text">
-        Please change your network to Ethereum Mainnet
-      </span>
-      <NormalButton
-        title="Change network"
-        onPress={handleChangeNetwork}
-        type="main"
-      />
+      <div className="top-view" />
+      <div className="page-body">
+        <div className="side-bar-view" />
+        <div className="un-support-view">
+          <span className="un-supported-text">
+            Unsupported Network <br />
+            Please change your network to Ethereum Mainnet
+          </span>
+          <NormalButton
+            title="Change network"
+            onPress={handleChangeNetwork}
+            type="main"
+          />
+        </div>
+      </div>
     </div>
   );
 };
