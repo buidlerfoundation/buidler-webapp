@@ -84,9 +84,6 @@ function App() {
   useEffect(() => {
     initGeneratedPrivateKey();
   }, [initGeneratedPrivateKey]);
-  const metamaskUpdate = useCallback((data) => {
-    console.log(data);
-  }, []);
   const connectLogout = useCallback(async () => {
     const deviceCode = await getDeviceCode();
     await api.removeDevice({
@@ -96,6 +93,28 @@ function App() {
       window.location.reload();
       dispatch(logout?.());
     });
+  }, [dispatch]);
+  const metamaskUpdate = useCallback(
+    (data) => {
+      if (typeof data === "string") {
+        dispatch({
+          type: actionTypes.SWITCH_NETWORK,
+          payload: parseInt(data),
+        });
+      } else if (data.length === 0) {
+        connectLogout();
+      }
+    },
+    [connectLogout, dispatch]
+  );
+  const metamaskConnected = useCallback(() => {
+    setTimeout(() => {
+      const chainId = window.ethereum?.chainId || "";
+      dispatch({
+        type: actionTypes.SWITCH_NETWORK,
+        payload: parseInt(chainId),
+      });
+    }, 300);
   }, [dispatch]);
   useEffect(() => {
     getCookie(AsyncKey.loginType)
@@ -107,13 +126,13 @@ function App() {
           }
         } else if (res === LoginType.Metamask) {
           MetamaskUtils.connected = true;
-          MetamaskUtils.init(connectLogout, metamaskUpdate);
+          MetamaskUtils.init(connectLogout, metamaskUpdate, metamaskConnected);
         }
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [connectLogout, metamaskUpdate]);
+  }, [connectLogout, dispatch, metamaskConnected, metamaskUpdate]);
   const overrides: any = {
     MuiPickersDay: {
       day: {

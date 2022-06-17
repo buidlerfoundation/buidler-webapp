@@ -1,10 +1,16 @@
 class MetamaskUtils {
   connected = false;
-  init(onDisconnect: () => void, onUpdate: (data: any) => void) {
+  init(
+    onDisconnect: () => void,
+    onUpdate: (data: any) => void,
+    onConnected: () => void
+  ) {
     if (window.ethereum?.isConnected()) {
+      onConnected();
       this.metamaskListener(onDisconnect, onUpdate);
     } else {
       window.ethereum?.on("connect", () => {
+        onConnected();
         this.metamaskListener(onDisconnect, onUpdate);
       });
     }

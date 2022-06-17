@@ -12,6 +12,8 @@ import Started from "../Started";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import { useState } from "react";
 import { useCallback } from "react";
+import UnSupportedNetwork from "renderer/components/UnSupportedNetwork";
+import ChainId from "renderer/services/connectors/ChainId";
 
 interface PrivateRouteProps {
   component: any;
@@ -49,12 +51,16 @@ const PrivateRoute = ({ component: Component, ...rest }: PrivateRouteProps) => {
 
 const Main = () => {
   const imgDomain = useAppSelector((state) => state.user.imgDomain);
+  const chainId = useAppSelector((state) => state.network.chainId);
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(getInitial?.());
   }, [dispatch]);
   if (!imgDomain) {
     return <div className="main-load-page" />;
+  }
+  if (chainId !== ChainId.EthereumMainnet) {
+    return <UnSupportedNetwork />;
   }
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>

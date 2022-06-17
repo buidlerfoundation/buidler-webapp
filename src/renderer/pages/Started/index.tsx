@@ -108,12 +108,24 @@ const Started = () => {
   }, [dispatch]);
   const onMetamaskUpdate = useCallback(
     (data) => {
-      if (data.length === 0) {
+      if (typeof data === "string") {
+        dispatch({
+          type: actionTypes.SWITCH_NETWORK,
+          payload: parseInt(data),
+        });
+      } else if (data.length === 0) {
         onDisconnected();
       }
     },
-    [onDisconnected]
+    [dispatch, onDisconnected]
   );
+  const metamaskConnected = useCallback(() => {
+    const chainId = window.ethereum?.chainId || "";
+    dispatch({
+      type: actionTypes.SWITCH_NETWORK,
+      payload: parseInt(chainId),
+    });
+  }, [dispatch]);
   const handleMetamask = useCallback(() => {
     if (!window.ethereum) {
       toast.error("install metamask extension!");
@@ -122,13 +134,17 @@ const Started = () => {
         .request({ method: "eth_requestAccounts" })
         .then((res) => {
           doingMetamaskLogin(res?.[0]);
-          MetamaskUtils.init(onDisconnected, onMetamaskUpdate);
+          MetamaskUtils.init(
+            onDisconnected,
+            onMetamaskUpdate,
+            metamaskConnected
+          );
         })
         .catch((err) => {
           toast.error(err.message);
         });
     }
-  }, [doingMetamaskLogin, onDisconnected, onMetamaskUpdate]);
+  }, [doingMetamaskLogin, metamaskConnected, onDisconnected, onMetamaskUpdate]);
   const handleWalletConnect = useCallback(() => {
     WalletConnectUtils.connect(onWCConnected, onDisconnected);
   }, [onWCConnected, onDisconnected]);

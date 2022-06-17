@@ -1,0 +1,21 @@
+.un-supported__container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--color-darkest-background);
+  .un-supported-text {
+    color: var(--color-primary-text);
+    font-size: 26px;
+    font-weight: 500;
+  }
+  .un-supported-des-text {
+    color: var(--color-secondary-text);
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+}
