@@ -3,9 +3,37 @@
   src: url("./renderer/assets/fonts/Helvetica.otf");
 }
 
+@font-face {
+  font-family: 'SF-UI-Text';
+  src: url('./renderer/assets/fonts/SFUIText-Regular.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SF-UI-Text';
+  src: url('./renderer/assets/fonts/SFUIText-Medium.ttf');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SF-UI-Text';
+  src: url('./renderer/assets/fonts/SFUIText-Semibold.ttf');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SF-UI-Text';
+  src: url('./renderer/assets/fonts/SFUIText-Bold.ttf');
+  font-weight: 700;
+  font-style: normal;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  font-family: SF-UI-Text, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
