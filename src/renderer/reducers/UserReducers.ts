@@ -6,7 +6,7 @@ import { setCookie } from "../common/Cookie";
 
 interface UserReducerState {
   userData: UserData;
-  team: Array<Community>;
+  team?: Array<Community>;
   channel: Array<Channel>;
   spaceChannel: Array<Space>;
   currentTeam: Community;
@@ -24,7 +24,7 @@ const initialState: UserReducerState = {
     user_id: "",
     user_name: "",
   },
-  team: [],
+  team: undefined,
   channel: [],
   spaceChannel: [],
   currentTeam: {
@@ -524,7 +524,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     case actionTypes.LEAVE_TEAM_SUCCESS: {
       return {
         ...state,
-        team: state.team.filter((el) => el.team_id !== payload.teamId),
+        team: state?.team?.filter((el) => el.team_id !== payload.teamId),
       };
     }
     case actionTypes.USER_CHANNEL_SUCCESS: {
@@ -544,7 +544,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
           state.currentTeam.team_id === teamId
             ? { ...state.currentTeam, ...body }
             : state.currentTeam,
-        team: state.team.map((el) => {
+        team: state?.team?.map((el) => {
           if (el.team_id === teamId) {
             return {
               ...el,
@@ -557,7 +557,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     }
     case actionTypes.DELETE_TEAM_SUCCESS: {
       const { teamId } = payload;
-      const newTeam = state.team.filter((el) => el.team_id !== teamId);
+      const newTeam = state?.team?.filter((el) => el.team_id !== teamId);
       return {
         ...state,
         currentTeam:

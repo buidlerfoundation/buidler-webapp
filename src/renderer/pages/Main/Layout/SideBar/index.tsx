@@ -13,7 +13,7 @@ import "./index.scss";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import ModalConfirmDelete from "renderer/components/ModalConfirmDelete";
 import { Space, UserData } from "renderer/models";
-import { findTeamAndChannel, findUser } from "renderer/actions/UserActions";
+import { findTeamAndChannel } from "renderer/actions/UserActions";
 import { createErrorMessageSelector } from "../../../../reducers/selectors";
 import actionTypes from "../../../../actions/ActionTypes";
 import PopoverButton from "../../../../components/PopoverButton";
@@ -84,15 +84,10 @@ const SideBar = forwardRef(
       return role === "Owner";
     }, [teamUserData, userData?.user_id]);
     useEffect(() => {
-      if (team.length === 0 && errorTeam === "") {
+      if (!team && errorTeam === "" && !!userData?.user_id) {
         dispatch(findTeamAndChannel());
       }
-    }, [team, errorTeam, dispatch]);
-    useEffect(() => {
-      if (!userData) {
-        dispatch(findUser());
-      }
-    }, [userData, dispatch]);
+    }, [team, errorTeam, dispatch, userData?.user_id]);
     useImperativeHandle(ref, () => {
       return {
         scrollToBottom: () => {
@@ -233,7 +228,7 @@ const SideBar = forwardRef(
     );
     return (
       <div id="sidebar">
-        {team?.length > 0 ? (
+        {team && team?.length > 0 ? (
           <div className="sidebar-body">
             <Droppable droppableId="group-channel-container" isDropDisabled>
               {(provided) => {

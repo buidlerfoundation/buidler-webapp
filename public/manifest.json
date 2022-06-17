@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Buidler",
+  "name": "Buidler - Make web3 happen",
   "icons": [
     {
       "src": "favicon.ico",

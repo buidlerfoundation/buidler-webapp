@@ -57,7 +57,7 @@ const AppTitleBar = () => {
     null
   );
   const setTeam = useCallback(
-    (t: Community) => {
+    (t?: Community) => {
       dispatch(setCurrentTeam?.(t));
     },
     [dispatch]

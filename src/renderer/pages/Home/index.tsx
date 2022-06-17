@@ -624,7 +624,7 @@ const Home = () => {
           />
 
           <div className="home-body">
-            {team?.length > 0 ? (
+            {team && team?.length > 0 ? (
               <>
                 <ChannelView
                   ref={channelViewRef}
