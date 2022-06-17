@@ -34,7 +34,6 @@ const AppTitleBar = () => {
   );
   const { privateKey } = useAppSelector((state) => state.configs);
   const history = useHistory();
-  const location = useLocation();
   const [openTeamSetting, setOpenTeamSetting] = useState(false);
   const teamMenu = [
     {
