@@ -1,7 +1,6 @@
-import { utils } from "ethers";
 import React, { useCallback } from "react";
 import toast from "react-hot-toast";
-import NormalButton from "../NormalButton";
+import NormalButton from "renderer/shared/NormalButton";
 import "./index.scss";
 
 const UnSupportedNetwork = () => {

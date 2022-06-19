@@ -1,8 +1,8 @@
-import React from 'react';
-import images from '../../../../common/images';
-import TaskDetailField from './components/TaskDetailField';
-import './index.scss';
-import { TaskDetailUIConfigures } from './UIConfigures';
+import React from "react";
+import images from "renderer/common/images";
+import TaskDetailField from "renderer/shared/TaskDetailField";
+import "./index.scss";
+import { TaskDetailUIConfigures } from "./UIConfigures";
 
 const TaskDetailView = () => {
   return (

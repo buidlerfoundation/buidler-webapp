@@ -11,20 +11,20 @@ import React, {
 import useAppSelector from "renderer/hooks/useAppSelector";
 import "./index.scss";
 import { Droppable, Draggable } from "react-beautiful-dnd";
-import ModalConfirmDelete from "renderer/components/ModalConfirmDelete";
+import ModalConfirmDelete from "renderer/shared/ModalConfirmDelete";
 import { Space, UserData } from "renderer/models";
 import { findTeamAndChannel } from "renderer/actions/UserActions";
-import { createErrorMessageSelector } from "../../../../reducers/selectors";
-import actionTypes from "../../../../actions/ActionTypes";
-import PopoverButton from "../../../../components/PopoverButton";
+import { createErrorMessageSelector } from "renderer/reducers/selectors";
+import actionTypes from "renderer/actions/ActionTypes";
+import PopoverButton from "renderer/shared/PopoverButton";
 import {
   channelMenu,
   memberMenu,
   privateChannelMenu,
   spaceChannelMenu,
-} from "../../../../utils/Menu";
-import SpaceItem from "./components/SpaceItem";
-import MemberSpace from "./components/MemberSpace";
+} from "renderer/utils/Menu";
+import SpaceItem from "renderer/shared/SpaceItem";
+import MemberSpace from "renderer/shared/MemberSpace";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 
 const errorSelector = createErrorMessageSelector([actionTypes.TEAM_PREFIX]);

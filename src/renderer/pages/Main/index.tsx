@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import { Switch, Route, useHistory } from "react-router-dom";
-import AppListener from "renderer/components/AppListener";
 import { findUser, getInitial } from "renderer/actions/UserActions";
 import MainWrapper from "./Layout";
 import Home from "../Home";
 import { AsyncKey } from "../../common/AppConfig";
 import { getCookie } from "../../common/Cookie";
-import AppTitleBar from "../../components/AppTitleBar";
+import AppTitleBar from "../../shared/AppTitleBar";
 import Started from "../Started";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import { useState } from "react";
@@ -65,7 +64,6 @@ const Main = () => {
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <AppTitleBar />
-      <AppListener />
       <MainWrapper>
         <Switch>
           <PrivateRoute exact path="/" component={Home} />

@@ -1,9 +1,9 @@
 import React, { useCallback } from "react";
-import TaskHeader from "renderer/components/TaskHeader";
+import TaskHeader from "renderer/shared/TaskHeader";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import { TaskData } from "renderer/models";
-import TaskItem from "renderer/components/TaskItem";
-import { PopoverItem } from "renderer/components/PopoverButton";
+import TaskItem from "renderer/shared/TaskItem";
+import { PopoverItem } from "renderer/shared/PopoverButton";
 import useAppSelector from "renderer/hooks/useAppSelector";
 
 type TaskGroupItemProps = {

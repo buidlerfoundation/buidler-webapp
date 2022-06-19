@@ -17,7 +17,7 @@ import {
   MessageData,
   MessageGroup,
 } from "renderer/models";
-import { PopoverItem } from "renderer/components/PopoverButton";
+import { PopoverItem } from "renderer/shared/PopoverButton";
 import { debounce } from "lodash";
 import { CircularProgress } from "@material-ui/core";
 import { useLocation } from "react-router-dom";
@@ -36,7 +36,7 @@ import toast from "react-hot-toast";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import { titleMessageFromNow } from "../../../../utils/DateUtils";
 import images from "../../../../common/images";
-import MessageItem from "../../../../components/MessageItem";
+import MessageItem from "../../../../shared/MessageItem";
 import {
   extractContent,
   getMentionData,
@@ -48,8 +48,8 @@ import SocketUtils from "../../../../utils/SocketUtils";
 import "./index.scss";
 import { getUniqueId } from "../../../../helpers/GenerateUUID";
 import api from "../../../../api";
-import MessageInput from "../../../../components/MessageInput";
-import MessageReplyItem from "../../../../components/MessageReplyItem";
+import MessageInput from "../../../../shared/MessageInput";
+import MessageReplyItem from "../../../../shared/MessageReplyItem";
 import ChannelHeader from "./ChannelHeader";
 import DirectDescription from "./DirectDescription";
 import useAppDispatch from "renderer/hooks/useAppDispatch";

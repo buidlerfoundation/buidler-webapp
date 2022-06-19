@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import api from 'renderer/api';
-import NormalButton from 'renderer/components/NormalButton';
+import NormalButton from 'renderer/shared/NormalButton';
 import { createMemberChannelData } from 'renderer/helpers/ChannelHelper';
 import './index.scss';
 

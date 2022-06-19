@@ -13,13 +13,13 @@ import {
   uploadChannelAvatar,
 } from 'renderer/actions/UserActions';
 import ImageHelper from 'renderer/common/ImageHelper';
-import EmojiAndAvatarPicker from 'renderer/components/EmojiAndAvatarPicker';
+import EmojiAndAvatarPicker from 'renderer/shared/EmojiAndAvatarPicker';
 import { normalizeUserName } from 'renderer/helpers/MessageHelper';
 import useAppDispatch from 'renderer/hooks/useAppDispatch';
 import useAppSelector from 'renderer/hooks/useAppSelector';
 import images from '../../../../common/images';
-import AvatarView from '../../../../components/AvatarView';
-import PopoverButton from '../../../../components/PopoverButton';
+import AvatarView from '../../../../shared/AvatarView';
+import PopoverButton from '../../../../shared/PopoverButton';
 import ChannelSettings from './ChannelSettings';
 import './index.scss';
 

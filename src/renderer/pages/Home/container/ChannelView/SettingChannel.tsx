@@ -8,12 +8,12 @@ import useAppDispatch from "renderer/hooks/useAppDispatch";
 import { Channel } from "renderer/models";
 import api from "../../../../api";
 import images from "../../../../common/images";
-import AppInput from "../../../../components/AppInput";
-import ModalConfirmDeleteChannel from "../../../../components/ModalConfirmDeleteChannel";
-import NormalButton from "../../../../components/NormalButton";
+import AppInput from "../../../../shared/AppInput";
+import ModalConfirmDeleteChannel from "../../../../shared/ModalConfirmDeleteChannel";
+import NormalButton from "../../../../shared/NormalButton";
 import PopoverButton, {
   PopoverItem,
-} from "../../../../components/PopoverButton";
+} from "../../../../shared/PopoverButton";
 
 type SettingChannelProps = {
   currentChannel?: Channel;

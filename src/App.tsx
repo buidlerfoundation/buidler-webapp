@@ -13,7 +13,7 @@ import { AsyncKey, LoginType } from "renderer/common/AppConfig";
 import actionTypes from "renderer/actions/ActionTypes";
 import api from "renderer/api";
 import { findUser, getInitial, logout } from "renderer/actions/UserActions";
-import AppToastNotification from "renderer/components/AppToastNotification";
+import AppToastNotification from "renderer/shared/AppToastNotification";
 import Main from "renderer/pages/Main";
 import SocketUtils from "renderer/utils/SocketUtils";
 import WalletConnectUtils from "renderer/services/connectors/WalletConnectUtils";

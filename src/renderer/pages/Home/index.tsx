@@ -8,19 +8,19 @@ import React, {
 } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
 import moment from "moment";
-import PageWrapper from "renderer/components/PageWrapper";
+import PageWrapper from "renderer/shared/PageWrapper";
 import { useHistory } from "react-router-dom";
 import { createMemberChannelData } from "renderer/helpers/ChannelHelper";
 import { setCookie } from "renderer/common/Cookie";
 import { AsyncKey, SpaceBadge } from "renderer/common/AppConfig";
-import ModalOTP from "renderer/components/ModalOTP";
+import ModalOTP from "renderer/shared/ModalOTP";
 import WalletConnectUtils from "renderer/services/connectors/WalletConnectUtils";
-import ModalCreateSpace from "renderer/components/ModalCreateSpace";
+import ModalCreateSpace from "renderer/shared/ModalCreateSpace";
 import toast from "react-hot-toast";
 import { uniqBy } from "lodash";
 import { CreateSpaceData, MessageData, Space, TaskData } from "renderer/models";
-import ModalSpaceSetting from "renderer/components/ModalSpaceSetting";
-import ModalSpaceDetail from "renderer/components/ModalSpaceDetail";
+import ModalSpaceSetting from "renderer/shared/ModalSpaceSetting";
+import ModalSpaceDetail from "renderer/shared/ModalSpaceDetail";
 import { getSpaceBackgroundColor } from "renderer/helpers/SpaceHelper";
 import ImageHelper from "renderer/common/ImageHelper";
 import useAppSelector from "renderer/hooks/useAppSelector";
@@ -44,26 +44,26 @@ import {
   updateTask,
 } from "renderer/actions/TaskActions";
 import { getMessages } from "renderer/actions/MessageActions";
-import ModalCreateTask from "../../components/ModalCreateTask";
+import ModalCreateTask from "../../shared/ModalCreateTask";
 import SideBar from "../Main/Layout/SideBar";
 import ChannelView from "./container/ChannelView";
 import TaskListView from "./container/TaskListView";
 import "./index.scss";
-import ModalCreateChannel from "../../components/ModalCreateChannel";
+import ModalCreateChannel from "../../shared/ModalCreateChannel";
 import {
   createLoadingSelector,
   createLoadMoreSelector,
 } from "../../reducers/selectors";
 import actionTypes from "../../actions/ActionTypes";
-import HomeLoading from "../../components/HomeLoading";
-import { PopoverItem } from "../../components/PopoverButton";
-import ModalTaskView from "../../components/ModalTaskView";
+import HomeLoading from "../../shared/HomeLoading";
+import { PopoverItem } from "../../shared/PopoverButton";
+import ModalTaskView from "../../shared/ModalTaskView";
 import { groupTaskByFiltered } from "../../helpers/TaskHelper";
-import ModalConversation from "../../components/ModalConversation";
+import ModalConversation from "../../shared/ModalConversation";
 import GlobalVariable from "../../services/GlobalVariable";
-import ModalConfirmDeleteGroupChannel from "../../components/ModalConfirmDeleteGroupChannel";
-import ModalConfirmDeleteChannel from "../../components/ModalConfirmDeleteChannel";
-import ModalInviteMember from "../../components/ModalInviteMember";
+import ModalConfirmDeleteGroupChannel from "../../shared/ModalConfirmDeleteGroupChannel";
+import ModalConfirmDeleteChannel from "../../shared/ModalConfirmDeleteChannel";
+import ModalInviteMember from "../../shared/ModalInviteMember";
 import api from "../../api";
 import EmptyView from "./container/EmptyView";
 import useAppDispatch from "renderer/hooks/useAppDispatch";

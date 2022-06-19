@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import NormalButton from "renderer/components/NormalButton";
-import TeamUserItem from "renderer/components/TeamUserItem";
+import NormalButton from "renderer/shared/NormalButton";
+import TeamUserItem from "renderer/shared/TeamUserItem";
 import { createMemberChannelData } from "renderer/helpers/ChannelHelper";
 import api from "../../../../api";
 import images from "../../../../common/images";
-import AvatarView from "../../../../components/AvatarView";
+import AvatarView from "../../../../shared/AvatarView";
 
 type SettingMemberProps = {
   currentChannel?: any;

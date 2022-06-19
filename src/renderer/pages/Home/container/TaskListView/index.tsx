@@ -5,7 +5,7 @@ import { TaskData } from "renderer/models";
 import images from "../../../../common/images";
 import PopoverButton, {
   PopoverItem,
-} from "../../../../components/PopoverButton";
+} from "../../../../shared/PopoverButton";
 import {
   getGroupTask,
   getToggleState,
