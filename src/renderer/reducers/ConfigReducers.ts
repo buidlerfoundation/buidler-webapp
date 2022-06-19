@@ -18,7 +18,7 @@ const initialState: ConfigReducerState = {
   openOTP: false,
   requestOtpCode: "",
   dataFromUrl: "",
-  isFullScreen: false,
+  isFullScreen: true,
 };
 
 const configReducers: Reducer<ConfigReducerState, AnyAction> = (

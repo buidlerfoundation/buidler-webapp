@@ -67,6 +67,7 @@ import ModalInviteMember from "../../shared/ModalInviteMember";
 import api from "../../api";
 import EmptyView from "./container/EmptyView";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
+import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 
 const loadingSelector = createLoadingSelector([
   actionTypes.TEAM_PREFIX,
@@ -750,7 +751,7 @@ const Home = () => {
           />
         </div>
       </DragDropContext>
-      <ModalOTP />
+      <ModalOTP metamaskConnected={MetamaskUtils.connected} />
     </PageWrapper>
   );
 };
