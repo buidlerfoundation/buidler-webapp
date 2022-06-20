@@ -23,9 +23,11 @@
       position: relative;
       width: 25px;
       height: 25px;
+      border-radius: 12.5px;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
     .channel-icon {
       width: 25px;

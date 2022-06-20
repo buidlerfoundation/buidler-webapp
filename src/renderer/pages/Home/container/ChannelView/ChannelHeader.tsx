@@ -81,7 +81,7 @@ const ChannelHeader = forwardRef(
           />
         );
       }
-      if (currentChannel.attachment) {
+      if (currentChannel?.attachment) {
         return (
           <>
             <img
