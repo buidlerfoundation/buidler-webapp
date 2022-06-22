@@ -165,6 +165,12 @@ const Started = () => {
             & airdrop tokens, join exclusive clubs, and more.
           </span>
         </div>
+        <div className="wallet-button normal-button" onClick={handleMetamask}>
+          <span>Metamask</span>
+          <div className="wallet-icon">
+            <img src={images.icMetamask} alt="" />
+          </div>
+        </div>
         <div
           className="wallet-button normal-button"
           onClick={handleWalletConnect}
@@ -172,12 +178,6 @@ const Started = () => {
           <span>WalletConnect</span>
           <div className="wallet-icon">
             <img src={images.icWalletConnect} alt="" />
-          </div>
-        </div>
-        <div className="wallet-button normal-button" onClick={handleMetamask}>
-          <span>Metamask</span>
-          <div className="wallet-icon">
-            <img src={images.icMetamask} alt="" />
           </div>
         </div>
       </div>

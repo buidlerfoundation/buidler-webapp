@@ -75,6 +75,7 @@ const Main = () => {
       <MainWrapper>
         <Switch>
           <PrivateRoute exact path="/" component={RedirectToHome} />
+          <PrivateRoute exact path="/channels" component={Home} />
           <PrivateRoute exact path="/channels/:match_id" component={Home} />
           <Route exact path="/started" component={Started} />
         </Switch>
