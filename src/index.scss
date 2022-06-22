@@ -4,42 +4,43 @@
 }
 
 @font-face {
-  font-family: 'SF-UI-Text';
-  src: url('./renderer/assets/fonts/SFUIText-Regular.ttf');
+  font-family: "SF-UI-Text";
+  src: url("./renderer/assets/fonts/SFUIText-Regular.ttf");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'SF-UI-Text';
-  src: url('./renderer/assets/fonts/SFUIText-Medium.ttf');
+  font-family: "SF-UI-Text";
+  src: url("./renderer/assets/fonts/SFUIText-Medium.ttf");
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'SF-UI-Text';
-  src: url('./renderer/assets/fonts/SFUIText-Semibold.ttf');
+  font-family: "SF-UI-Text";
+  src: url("./renderer/assets/fonts/SFUIText-Semibold.ttf");
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'SF-UI-Text';
-  src: url('./renderer/assets/fonts/SFUIText-Bold.ttf');
+  font-family: "SF-UI-Text";
+  src: url("./renderer/assets/fonts/SFUIText-Bold.ttf");
   font-weight: 700;
   font-style: normal;
 }
 
 body {
   margin: 0;
-  font-family: SF-UI-Text, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: SF-UI-Text, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--color-primary-text);
   font-weight: 500;
+  background-color: var(--color-lighter-background);
 }
 
 div {

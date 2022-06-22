@@ -8,6 +8,7 @@ import { getCookie, setCookie } from "../common/Cookie";
 import ImageHelper from "../common/ImageHelper";
 import SocketUtils from "../utils/SocketUtils";
 import { Channel, Community, UserData } from "renderer/models";
+import store from "renderer/store";
 
 export const testActions = () => async (dispatch: Dispatch) => {
   dispatch({ type: "TEST_ACTION" });
@@ -32,7 +33,7 @@ export const findUser = () => async (dispatch: Dispatch) => {
   dispatch({ type: ActionTypes.USER_REQUEST });
   const res = await api.findUser();
   if (res.statusCode === 200) {
-    dispatch({ type: ActionTypes.USER_SUCCESS, payload: { user: res } });
+    dispatch({ type: ActionTypes.USER_SUCCESS, payload: { user: res.data } });
   } else {
     dispatch({ type: ActionTypes.USER_FAIL });
   }
@@ -187,22 +188,16 @@ const actionSetCurrentTeam = async (
   });
   const teamUsersRes = await api.getTeamUsers(team.team_id);
   let lastChannelId: any = null;
+  const resChannel = await api.findChannel(team.team_id);
+  const lastChannel = store.getState().user?.lastChannel?.[team.team_id];
   if (channelId) {
     lastChannelId = channelId;
+  } else if (lastChannel) {
+    lastChannelId = lastChannel.channel_id;
   } else {
-    lastChannelId = await getCookie(AsyncKey.lastChannelId);
+    lastChannelId = resChannel.data?.[0]?.channel_id;
   }
-  const resChannel = await api.findChannel(team.team_id);
-  // const teamActivityRes = await api.getTeamActivity(team.team_id);
-  // if (teamActivityRes.statusCode === 200) {
-  //   dispatch({
-  //     type: ActionTypes.GET_TEAM_ACTIVITY,
-  //     payload: {
-  //       teamId: team.team_id,
-  //       activity: teamActivityRes.data,
-  //     },
-  //   });
-  // }
+  await setCookie(AsyncKey.lastChannelId, lastChannelId);
   if (teamUsersRes.statusCode === 200) {
     dispatch({
       type: ActionTypes.GET_TEAM_USER,
@@ -245,9 +240,8 @@ const actionSetCurrentTeam = async (
 };
 
 export const setCurrentTeam =
-  (team: any, channelId?: string) => async (dispatch: Dispatch) => {
+  (team: any, channelId?: string) => async (dispatch: Dispatch) =>
     actionSetCurrentTeam(team, dispatch, channelId);
-  };
 
 export const deleteSpaceChannel =
   (spaceId: string) => async (dispatch: Dispatch) => {

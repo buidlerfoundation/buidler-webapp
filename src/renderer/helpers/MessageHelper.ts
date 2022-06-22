@@ -59,7 +59,7 @@ export const normalizeMessageText = (text: string, isShowNote = false) => {
   });
   res = res?.replace?.(
     /\$mention_location/g,
-    `${window.location.origin}${window.location.pathname}/`
+    `${window.location.origin}${window.location.pathname}/channels`
   );
   if (isShowNote) {
     return `<div style='display: flex; align-items: flex-start'><span class='enable-user-select'>${res}</span><img src='${images.icNote}' style='margin-left: 15px; margin-top: 7px' /></div>`;

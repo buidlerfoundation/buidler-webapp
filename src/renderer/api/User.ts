@@ -4,6 +4,7 @@ import {
   InitialApiData,
   Space,
   SpaceCollectionData,
+  UserData,
   UserNFTCollection,
 } from "renderer/models";
 import ApiCaller from "./ApiCaller";
@@ -13,7 +14,7 @@ export const loginWithGoogle = (code: string) =>
   ApiCaller.post("user", { code });
 
 export const findUser = async () => {
-  return ApiCaller.get("user");
+  return Caller.get<UserData>("user");
 };
 
 export const findTeam = () => Caller.get<Array<Community>>("user/team");

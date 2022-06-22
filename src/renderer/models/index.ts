@@ -50,6 +50,7 @@ export interface UserData {
   status?: string;
   direct_channel?: string;
   user_channels?: Array<string>;
+  user_bio?: string;
 }
 
 export interface Channel {

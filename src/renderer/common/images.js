@@ -89,6 +89,7 @@ import icStar from "../assets/images/ic_star.svg";
 import icSettingSpaceDisplay from "../assets/images/ic_setting_space_display.svg";
 import icSettingSpaceAccess from "../assets/images/ic_setting_space_access.svg";
 import icMetamask from "../assets/images/ic_metamask.svg";
+import icBadgeVerified from "../assets/images/ic_badge_verified.svg";
 
 const images = {
   icTeamDefault,
@@ -182,6 +183,7 @@ const images = {
   icSettingSpaceDisplay,
   icSettingSpaceAccess,
   icMetamask,
+  icBadgeVerified,
 };
 
 export default images;

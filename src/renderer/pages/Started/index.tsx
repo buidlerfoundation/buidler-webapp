@@ -30,7 +30,7 @@ const Started = () => {
         }
       }
       MetamaskUtils.connected = true;
-      history.replace("/");
+      history.replace("/channels");
     },
     [dataFromUrl, dispatch, history]
   );

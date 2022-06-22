@@ -9,12 +9,11 @@ import React, {
 import { DragDropContext } from "react-beautiful-dnd";
 import moment from "moment";
 import PageWrapper from "renderer/shared/PageWrapper";
-import { useHistory } from "react-router-dom";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { createMemberChannelData } from "renderer/helpers/ChannelHelper";
-import { setCookie } from "renderer/common/Cookie";
+import { getCookie, setCookie } from "renderer/common/Cookie";
 import { AsyncKey, SpaceBadge } from "renderer/common/AppConfig";
 import ModalOTP from "renderer/shared/ModalOTP";
-import WalletConnectUtils from "renderer/services/connectors/WalletConnectUtils";
 import ModalCreateSpace from "renderer/shared/ModalCreateSpace";
 import toast from "react-hot-toast";
 import { uniqBy } from "lodash";
@@ -68,6 +67,7 @@ import api from "../../api";
 import EmptyView from "./container/EmptyView";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
+import ModalUserProfile from "renderer/shared/ModalUserProfile";
 
 const loadingSelector = createLoadingSelector([
   actionTypes.TEAM_PREFIX,
@@ -89,10 +89,13 @@ const filterTask: Array<PopoverItem> = [
 ];
 
 const Home = () => {
+  const match = useRouteMatch<{ match_id?: string }>();
+  const matchId = match.params?.match_id;
   const dispatch = useAppDispatch();
   const loadMoreMessage = useAppSelector((state) =>
     loadMoreMessageSelector(state)
   );
+  const [currentUserId, setCurrentUserId] = useState("");
   const loading = useAppSelector((state) => loadingSelector(state));
   const channels = useAppSelector((state) => state.user.channel);
   const { team, teamUserData, currentChannel, currentTeam, spaceChannel } =
@@ -489,6 +492,10 @@ const Home = () => {
   const handleCloseModalConfirmDeleteSpace = useCallback(() => {
     setOpenConfirmDeleteSpace(false);
   }, []);
+  const handleCloseModalUserProfile = useCallback(async () => {
+    const lastChannelId = await getCookie(AsyncKey.lastChannelId);
+    history.replace(`/channels/${lastChannelId}`);
+  }, [history]);
   const handleDeleteSpace = useCallback(async () => {
     if (!selectedSpace?.space_id) return;
     await dispatch(deleteSpaceChannel(selectedSpace?.space_id));
@@ -508,6 +515,18 @@ const Home = () => {
       }
     }
   }, [dataFromUrl, dispatch]);
+  useEffect(() => {
+    if (matchId) {
+      const matchChannel = channels.find((c) => c.channel_id === matchId);
+      channelViewRef.current?.hideReply?.();
+      if (matchChannel) {
+        setCurrentUserId("");
+        dispatch(setCurrentChannel?.(matchChannel));
+      } else {
+        setCurrentUserId(matchId);
+      }
+    }
+  }, [channels, dispatch, matchId]);
   useEffect(() => {
     if (dataFromUrl) handleDataFromUrl();
   }, [dataFromUrl, handleDataFromUrl]);
@@ -646,7 +665,6 @@ const Home = () => {
                   openTaskView={openTaskView}
                   onSelectTask={openTaskDetail}
                   isOpenConversation={openConversation}
-                  channel={channels}
                   teamUserData={teamUserData}
                 />
                 {currentChannel.channel_type !== "Direct" && (
@@ -748,6 +766,11 @@ const Home = () => {
             spaceName={selectedSpace?.space_name || ""}
             handleClose={handleCloseModalConfirmDeleteSpace}
             onDelete={handleDeleteSpace}
+          />
+          <ModalUserProfile
+            open={!!currentUserId}
+            handleClose={handleCloseModalUserProfile}
+            userId={currentUserId}
           />
         </div>
       </DragDropContext>

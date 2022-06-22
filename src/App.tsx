@@ -30,7 +30,7 @@ function App() {
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     if (accessToken && typeof accessToken === "string") {
       await dispatch(findUser?.());
-      history.replace("/");
+      history.replace("/channels");
     }
     if (!imgDomain) {
       await dispatch(getInitial?.());
