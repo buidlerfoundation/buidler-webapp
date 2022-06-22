@@ -189,6 +189,7 @@ class SocketUtil {
   socket: any = null;
   firstLoad = false;
   async init(teamId?: string) {
+    this.firstLoad = false;
     if (this.socket?.connected) return;
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     this.socket = io(

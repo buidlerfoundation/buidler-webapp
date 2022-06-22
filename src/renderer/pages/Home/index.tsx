@@ -64,7 +64,6 @@ import ModalConfirmDeleteGroupChannel from "../../shared/ModalConfirmDeleteGroup
 import ModalConfirmDeleteChannel from "../../shared/ModalConfirmDeleteChannel";
 import ModalInviteMember from "../../shared/ModalInviteMember";
 import api from "../../api";
-import EmptyView from "./container/EmptyView";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 import ModalUserProfile from "renderer/shared/ModalUserProfile";
@@ -89,8 +88,11 @@ const filterTask: Array<PopoverItem> = [
 ];
 
 const Home = () => {
-  const match = useRouteMatch<{ match_id?: string }>();
-  const matchId = match.params?.match_id;
+  const match = useRouteMatch<{
+    match_channel_id?: string;
+    match_community_id?: string;
+  }>();
+  const { match_channel_id, match_community_id } = match.params;
   const dispatch = useAppDispatch();
   const loadMoreMessage = useAppSelector((state) =>
     loadMoreMessageSelector(state)
@@ -98,7 +100,7 @@ const Home = () => {
   const [currentUserId, setCurrentUserId] = useState("");
   const loading = useAppSelector((state) => loadingSelector(state));
   const channels = useAppSelector((state) => state.user.channel);
-  const { team, teamUserData, currentChannel, currentTeam, spaceChannel } =
+  const { teamUserData, currentChannel, currentTeam, spaceChannel } =
     useAppSelector((state) => state.user);
   const currentChannelId = useMemo(
     () => currentChannel?.channel_id || currentChannel?.user?.user_id || "",
@@ -494,8 +496,8 @@ const Home = () => {
   }, []);
   const handleCloseModalUserProfile = useCallback(async () => {
     const lastChannelId = await getCookie(AsyncKey.lastChannelId);
-    history.replace(`/channels/${lastChannelId}`);
-  }, [history]);
+    history.replace(`/channels/${currentTeam.team_id}/${lastChannelId}`);
+  }, [currentTeam?.team_id, history]);
   const handleDeleteSpace = useCallback(async () => {
     if (!selectedSpace?.space_id) return;
     await dispatch(deleteSpaceChannel(selectedSpace?.space_id));
@@ -516,25 +518,34 @@ const Home = () => {
     }
   }, [dataFromUrl, dispatch]);
   useEffect(() => {
-    if (matchId) {
-      const matchChannel = channels.find((c) => c.channel_id === matchId);
-      channelViewRef.current?.hideReply?.();
-      if (matchChannel) {
-        setCurrentUserId("");
-        dispatch(setCurrentChannel?.(matchChannel));
+    if (match_channel_id) {
+      if (match_community_id === "user") {
+        setCurrentUserId(match_channel_id);
       } else {
-        setCurrentUserId(matchId);
+        const matchChannel = channels.find(
+          (c) => c.channel_id === match_channel_id
+        );
+        channelViewRef.current?.hideReply?.();
+        if (matchChannel) {
+          setCurrentUserId("");
+          if (matchChannel.channel_id !== currentChannel.channel_id) {
+            dispatch(setCurrentChannel?.(matchChannel));
+          }
+        }
       }
     }
-  }, [channels, dispatch, matchId]);
+  }, [
+    channels,
+    currentChannel.channel_id,
+    dispatch,
+    match_channel_id,
+    match_community_id,
+  ]);
   useEffect(() => {
     if (dataFromUrl) handleDataFromUrl();
   }, [dataFromUrl, handleDataFromUrl]);
   useEffect(() => {
-    setOpenConversation(false);
-    inputRef.current?.focus();
     if (currentChannel?.channel_id || currentChannel?.user) {
-      setOpenTask(false);
       if (currentChannel?.user) {
         dispatch(
           getTaskFromUser(
@@ -546,6 +557,18 @@ const Home = () => {
       } else {
         dispatch(getTasks(currentChannel.channel_id));
       }
+    }
+  }, [
+    currentChannel?.channel_id,
+    currentChannel?.user,
+    currentTeam?.team_id,
+    dispatch,
+  ]);
+  useEffect(() => {
+    setOpenConversation(false);
+    inputRef.current?.focus();
+    if (currentChannel?.channel_id || currentChannel?.user) {
+      setOpenTask(false);
       if (currentChannel.channel_id && privateKey) {
         dispatch(
           getMessages(
@@ -644,52 +667,46 @@ const Home = () => {
           />
 
           <div className="home-body">
-            {team && team?.length > 0 ? (
-              <>
-                <ChannelView
-                  ref={channelViewRef}
-                  inputRef={inputRef}
-                  currentChannel={currentChannel}
-                  messages={uniqBy(
-                    messageData?.[currentChannelId]?.data || [],
-                    "message_id"
-                  )}
-                  currentTeam={currentTeam}
-                  openConversation={handleOpenConversation}
-                  onMoreMessage={onMoreMessage}
-                  loadMoreMessage={loadMoreMessage}
-                  messageCanMore={messageData?.[currentChannelId]?.canMore}
-                  scrollData={messageData?.[currentChannelId]?.scrollData}
-                  replyTask={replyTask}
-                  setReplyTask={setReplyTask}
-                  openTaskView={openTaskView}
-                  onSelectTask={openTaskDetail}
-                  isOpenConversation={openConversation}
-                  teamUserData={teamUserData}
-                />
-                {currentChannel.channel_type !== "Direct" && (
-                  <TaskListView
-                    channelId={currentChannel?.channel_id}
-                    archivedCount={taskData?.[currentChannelId]?.archivedCount}
-                    teamId={currentTeam?.team_id}
-                    tasks={taskData?.[currentChannelId]?.tasks || []}
-                    archivedTasks={
-                      taskData?.[currentChannelId]?.archivedTasks || []
-                    }
-                    onAddTask={handleAddTask}
-                    onUpdateStatus={onUpdateStatus}
-                    filter={filter}
-                    filterData={filterTask}
-                    onUpdateFilter={handleTaskUpdateFilter}
-                    onDeleteTask={onDeleteTask}
-                    onSelectTask={openTaskDetail}
-                    onReplyTask={onReplyTask}
-                    directUserId={currentChannel?.user?.user_id}
-                  />
-                )}
-              </>
-            ) : (
-              <EmptyView />
+            <ChannelView
+              ref={channelViewRef}
+              inputRef={inputRef}
+              currentChannel={currentChannel}
+              messages={uniqBy(
+                messageData?.[currentChannelId]?.data || [],
+                "message_id"
+              )}
+              currentTeam={currentTeam}
+              openConversation={handleOpenConversation}
+              onMoreMessage={onMoreMessage}
+              loadMoreMessage={loadMoreMessage}
+              messageCanMore={messageData?.[currentChannelId]?.canMore}
+              scrollData={messageData?.[currentChannelId]?.scrollData}
+              replyTask={replyTask}
+              setReplyTask={setReplyTask}
+              openTaskView={openTaskView}
+              onSelectTask={openTaskDetail}
+              isOpenConversation={openConversation}
+              teamUserData={teamUserData}
+            />
+            {currentChannel.channel_type !== "Direct" && (
+              <TaskListView
+                channelId={currentChannel?.channel_id}
+                archivedCount={taskData?.[currentChannelId]?.archivedCount}
+                teamId={currentTeam?.team_id}
+                tasks={taskData?.[currentChannelId]?.tasks || []}
+                archivedTasks={
+                  taskData?.[currentChannelId]?.archivedTasks || []
+                }
+                onAddTask={handleAddTask}
+                onUpdateStatus={onUpdateStatus}
+                filter={filter}
+                filterData={filterTask}
+                onUpdateFilter={handleTaskUpdateFilter}
+                onDeleteTask={onDeleteTask}
+                onSelectTask={openTaskDetail}
+                onReplyTask={onReplyTask}
+                directUserId={currentChannel?.user?.user_id}
+              />
             )}
           </div>
           <ModalSpaceDetail

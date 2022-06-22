@@ -1,5 +1,4 @@
 import React, {
-  useEffect,
   useRef,
   useState,
   forwardRef,
@@ -13,9 +12,6 @@ import "./index.scss";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import ModalConfirmDelete from "renderer/shared/ModalConfirmDelete";
 import { Space, UserData } from "renderer/models";
-import { findTeamAndChannel } from "renderer/actions/UserActions";
-import { createErrorMessageSelector } from "renderer/reducers/selectors";
-import actionTypes from "renderer/actions/ActionTypes";
 import PopoverButton from "renderer/shared/PopoverButton";
 import {
   channelMenu,
@@ -25,9 +21,6 @@ import {
 } from "renderer/utils/Menu";
 import SpaceItem from "renderer/shared/SpaceItem";
 import MemberSpace from "renderer/shared/MemberSpace";
-import useAppDispatch from "renderer/hooks/useAppDispatch";
-
-const errorSelector = createErrorMessageSelector([actionTypes.TEAM_PREFIX]);
 
 type SideBarProps = {
   onEditGroupChannel: (group: any) => void;
@@ -56,7 +49,6 @@ const SideBar = forwardRef(
     }: SideBarProps,
     ref
   ) => {
-    const dispatch = useAppDispatch();
     const {
       userData,
       spaceChannel,
@@ -65,7 +57,6 @@ const SideBar = forwardRef(
       team,
       teamUserData,
     } = useAppSelector((state) => state.user);
-    const errorTeam = useAppSelector((state) => errorSelector(state));
     const [isOpenConfirmRemoveMember, setOpenConfirmRemoveMember] =
       useState(false);
     const [selectedMenuChannel, setSelectedMenuChannel] = useState<any>(null);
@@ -83,11 +74,6 @@ const SideBar = forwardRef(
       )?.role;
       return role === "Owner";
     }, [teamUserData, userData?.user_id]);
-    useEffect(() => {
-      if (!team && errorTeam === "" && !!userData?.user_id) {
-        dispatch(findTeamAndChannel());
-      }
-    }, [team, errorTeam, dispatch, userData?.user_id]);
     useImperativeHandle(ref, () => {
       return {
         scrollToBottom: () => {

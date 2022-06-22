@@ -219,10 +219,16 @@ a {
   background-color: var(--color-backdrop);
 }
 
-.setting-modal {
+.normal-modal {
   display: flex;
   justify-content: center;
   padding-top: 200px;
+}
+
+.setting-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .setting-modal__container {
   user-select: none; /* standard syntax */
@@ -313,4 +319,15 @@ a {
   --color-dark-text: #222222;
   --color-highlight-action: #1e1e1e;
   --color-highlight-action-high: #363636;
+}
+
+@media only screen and (max-height: 900px) {
+  .normal-modal {
+    padding-top: 0;
+    align-items: center;
+  }
+  .setting-modal {
+    padding-top: 0;
+    align-items: center;
+  }
 }

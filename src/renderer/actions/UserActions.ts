@@ -54,13 +54,11 @@ export const dragChannel =
   };
 
 export const findTeamAndChannel =
-  (showLoading = true) =>
-  async (dispatch: Dispatch) => {
-    if (showLoading) {
-      dispatch({ type: ActionTypes.TEAM_REQUEST });
-    }
+  (initCommunityId?: string) => async (dispatch: Dispatch) => {
+    dispatch({ type: ActionTypes.TEAM_REQUEST });
     const res = await api.findTeam();
-    const lastTeamId = await getCookie(AsyncKey.lastTeamId);
+    const lastTeamId =
+      initCommunityId || (await getCookie(AsyncKey.lastTeamId));
     if (res.statusCode === 200) {
       const communities = res.data || [];
       if (communities.length > 0) {
@@ -237,6 +235,7 @@ const actionSetCurrentTeam = async (
       });
     }
   }
+  return { lastChannelId };
 };
 
 export const setCurrentTeam =

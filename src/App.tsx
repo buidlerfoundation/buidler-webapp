@@ -12,7 +12,7 @@ import { clearData, getCookie, getDeviceCode } from "renderer/common/Cookie";
 import { AsyncKey, LoginType } from "renderer/common/AppConfig";
 import actionTypes from "renderer/actions/ActionTypes";
 import api from "renderer/api";
-import { findUser, getInitial, logout } from "renderer/actions/UserActions";
+import { getInitial, logout } from "renderer/actions/UserActions";
 import AppToastNotification from "renderer/shared/AppToastNotification";
 import Main from "renderer/pages/Main";
 import SocketUtils from "renderer/utils/SocketUtils";
@@ -29,7 +29,6 @@ function App() {
   const initApp = useCallback(async () => {
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     if (accessToken && typeof accessToken === "string") {
-      await dispatch(findUser?.());
       history.replace("/channels");
     }
     if (!imgDomain) {

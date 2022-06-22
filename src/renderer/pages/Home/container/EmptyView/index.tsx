@@ -25,8 +25,8 @@ const EmptyView = () => {
     },
     [dispatch]
   );
-  const handleAcceptTeam = useCallback(() => {
-    dispatch(findTeamAndChannel());
+  const handleAcceptTeam = useCallback(async () => {
+    await dispatch(findTeamAndChannel());
     setOpenModalTeam(false);
   }, [dispatch]);
   return (
