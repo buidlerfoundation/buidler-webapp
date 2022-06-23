@@ -8,6 +8,8 @@ const METHOD_PUT = "put";
 const METHOD_DELETE = "delete";
 const METHOD_PATCH = "patch";
 
+const unauthorizedUri = ["initial", "user/address", "user"];
+
 async function requestAPI<T = any>(
   method: string,
   uri: string,
@@ -45,7 +47,8 @@ async function requestAPI<T = any>(
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     if (accessToken != null) {
       headers.Authorization = `Bearer ${accessToken}`;
-    } else {
+    } else if (!unauthorizedUri.includes(uri)) {
+      window.location.reload();
       console.log("No token is stored");
     }
   } catch (e: any) {

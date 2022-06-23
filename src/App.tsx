@@ -62,13 +62,18 @@ function App() {
         document.execCommand("insertText", false, text);
       }
     };
+    const eventContextMenu = (e: any) => {
+      if (process.env.NODE_ENV === "production") e.preventDefault();
+    };
     window.addEventListener("offline", eventOffline);
     window.addEventListener("online", eventOnline);
     window.addEventListener("paste", eventPaste);
+    window.addEventListener("contextmenu", eventContextMenu);
     return () => {
       window.removeEventListener("offline", eventOffline);
       window.removeEventListener("online", eventOnline);
       window.removeEventListener("paste", eventPaste);
+      window.removeEventListener("contextmenu", eventContextMenu);
     };
   }, [user, initApp]);
   const initGeneratedPrivateKey = useCallback(async () => {

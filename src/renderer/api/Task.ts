@@ -24,7 +24,7 @@ export const getArchivedTasks = (channelId: string) =>
   ApiCaller.get(`tasks/${channelId}?archived=true`);
 
 export const getArchivedTaskCount = (channelId: string) =>
-  Caller.get(`task/${channelId}/count?archived=true`);
+  Caller.get<{ total: number }>(`task/${channelId}/count?archived=true`);
 
 export const getTaskActivity = (taskId: string) =>
   ApiCaller.get(`task/${taskId}/task_activity`);
@@ -39,4 +39,6 @@ export const getArchivedTaskFromUser = (userId: string, teamId?: string) =>
   ApiCaller.get(`tasks/${userId}/user/${teamId}?archived=true`);
 
 export const getArchivedTaskCountFromUser = (userId: string, teamId: string) =>
-  Caller.get(`task/${userId}/user/${teamId}/count?archived=true`);
+  Caller.get<{ total: number }>(
+    `task/${userId}/user/${teamId}/count?archived=true`
+  );

@@ -21,7 +21,7 @@ export const getTaskFromUser =
           payload: {
             channelId,
             tasks: taskRes.data,
-            archivedCount: archivedCountRes.total,
+            archivedCount: archivedCountRes.data?.total,
           },
         });
       } else {
@@ -48,7 +48,7 @@ export const getTasks = (channelId: string) => async (dispatch: Dispatch) => {
         payload: {
           channelId,
           tasks: taskRes.data,
-          archivedCount: archivedCountRes.total,
+          archivedCount: archivedCountRes.data?.total,
         },
       });
     } else {
