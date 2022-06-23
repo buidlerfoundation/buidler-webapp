@@ -19,13 +19,13 @@ class WalletConnectUtils {
       bridge: "https://bridge.walletconnect.org", // Required
       qrcodeModal: QRCodeModal,
     });
-    this.connector.killSession();
+    if (this.connector.connected) {
+      this.connector.killSession();
+    }
     this.connector.on("disconnect", onDisconnect);
     this.connector.on("connect", onConnect);
-    if (!this.connector.connected) {
-      // create new session
-      this.connector.createSession();
-    }
+    // create new session
+    this.connector.createSession();
   }
 
   disconnect() {
