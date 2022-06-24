@@ -31,9 +31,9 @@ export const formatUSD = (
   return `$${round(valueUSD, afterDot)}`;
 };
 
-export const tokenSymbol = (params: { name?: string; symbol?: string }) => {
-  const { name, symbol } = params;
-  if (!name || !symbol) return "";
-  const imagePath = `${symbol}-${name}`.replace(/ /g, "-").toLowerCase();
-  return `https://cryptocurrencyliveprices.com/img/${imagePath}.png`;
+export const tokenSymbol = (params: { symbol?: string }) => {
+  const { symbol } = params;
+  if (!symbol) return "";
+  const imagePath = symbol.toLowerCase();
+  return `https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@bea1a9722a8c63169dcc06e86182bf2c55a76bbc/svg/color/${imagePath}.svg`;
 };
