@@ -75,7 +75,7 @@ const Started = () => {
         WalletConnectUtils.connector.killSession();
         return;
       }
-      const params = ["0xd6302729c18fE9be641B00eC70A6c01654C8b507", nonce];
+      const params = [address, nonce];
       const signature = await WalletConnectUtils.connector.signMessage(params);
       const res = await api.verifyNonce(nonce, signature);
       if (res.statusCode === 200) {

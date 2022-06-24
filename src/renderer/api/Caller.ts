@@ -20,6 +20,7 @@ async function requestAPI<T = any>(
   message?: string;
   total?: number;
   token?: string;
+  metadata?: { total?: number };
 }> {
   // Build API header
   const headers: any = {

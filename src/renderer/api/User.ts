@@ -1,9 +1,12 @@
 import {
+  BalanceApiData,
   Channel,
   Community,
   InitialApiData,
+  NFTCollectionDataApi,
   Space,
   SpaceCollectionData,
+  TransactionApiData,
   UserData,
   UserNFTCollection,
 } from "renderer/models";
@@ -78,3 +81,16 @@ export const getNFTCollection = () =>
 
 export const getSpaceCondition = (spaceId: string) =>
   Caller.get<Array<SpaceCollectionData>>(`space/${spaceId}/condition`);
+
+export const fetchWalletBalance = () =>
+  Caller.get<BalanceApiData>("user/balance");
+
+export const fetchTransaction = (params: { page?: number; limit?: number }) => {
+  const { page = 1, limit = 10 } = params;
+  return Caller.get<Array<TransactionApiData>>(
+    `user/transaction?page=${page}&limit=${limit}`
+  );
+};
+
+export const fetchNFTCollection = () =>
+  Caller.get<Array<NFTCollectionDataApi>>("user/nft-collection/group");

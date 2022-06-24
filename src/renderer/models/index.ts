@@ -24,6 +24,7 @@ export type CreateSpaceData = {
     image_url?: string;
     token_type?: string;
   } | null;
+  isUpdateCondition?: boolean;
 };
 
 export interface UserNFTCollection {
@@ -252,4 +253,76 @@ export interface InitialApiData {
   img_domain: string;
   version: string;
   img_config: ImageConfig;
+}
+
+export interface Contract {
+  contract_address: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+  totalSupply: string;
+  owner: string;
+  is_potential: boolean;
+}
+
+export interface TokenPrice {
+  rate: number;
+  diff: number;
+  diff1h: number;
+  diff7d: number;
+  diff30d: number;
+  diff60d: number;
+  diff90d: number;
+  marketCapUsd: number;
+  volume24h: number;
+  availableSupply: number;
+  ts: string;
+  currency: string;
+}
+
+export interface Token {
+  contract: Contract;
+  balance: number;
+  price: TokenPrice;
+}
+
+export interface BalanceApiData {
+  address: string;
+  ETH: Token;
+  tokens: Array<Token>;
+}
+
+export interface TransactionApiData {
+  block_number: string;
+  time_stamp: string;
+  hash: string;
+  nonce: string;
+  block_hash: string;
+  from: string;
+  contract_address: string;
+  to: string;
+  value: string;
+  token_name: string;
+  token_symbol: string;
+  token_decimal: string;
+  transaction_index: string;
+  gas: string;
+  gas_price: string;
+  gas_used: string;
+  cumulative_gas_used: string;
+  input: string;
+  confirmations: string;
+}
+
+export interface NFTCollectionDataApi {
+  name: string;
+  description: string;
+  contract_address: string;
+  token_type: string;
+  image_url: string;
+  background_image_url: string;
+  external_url: string;
+  symbol: string;
+  network: string;
+  nft: Array<UserNFTCollection>;
 }
