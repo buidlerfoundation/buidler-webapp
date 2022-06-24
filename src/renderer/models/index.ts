@@ -37,6 +37,7 @@ export interface UserNFTCollection {
   external_url: string;
   symbol: string;
   network: string;
+  token_id: string;
 }
 
 export interface UserData {
