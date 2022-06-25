@@ -301,6 +301,10 @@ a {
   }
 }
 
+.MuiPopover-paper {
+  transition: all 200ms !important;
+}
+
 :root {
   --color-accent: #092555;
   --color-darkest-background: #121212;
