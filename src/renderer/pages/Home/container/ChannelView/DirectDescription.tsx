@@ -1,8 +1,8 @@
-import { useSelector } from 'react-redux';
-import api from 'renderer/api';
-import NormalButton from 'renderer/shared/NormalButton';
-import { createMemberChannelData } from 'renderer/helpers/ChannelHelper';
-import './index.scss';
+import { useSelector } from "react-redux";
+import api from "renderer/api";
+import NormalButton from "renderer/shared/NormalButton";
+import { createMemberChannelData } from "renderer/helpers/ChannelHelper";
+import "./index.scss";
 
 type DirectDescriptionProps = {
   currentChannel: any;
@@ -21,11 +21,10 @@ const DirectDescription = ({
     }
     const { res } = await createMemberChannelData(members);
     const body: any = {
-      channel_type: 'Direct',
+      channel_type: "Direct",
       channel_member_data: res,
     };
-    const result = await api.createChannel(teamId, body);
-    console.log(result);
+    await api.createChannel(teamId, body);
   };
   return (
     <div className="direct-description__container">

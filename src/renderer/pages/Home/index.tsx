@@ -17,7 +17,12 @@ import ModalOTP from "renderer/shared/ModalOTP";
 import ModalCreateSpace from "renderer/shared/ModalCreateSpace";
 import toast from "react-hot-toast";
 import { uniqBy } from "lodash";
-import { CreateSpaceData, MessageData, Space, TaskData } from "renderer/models";
+import {
+  CreateSpaceData,
+  MessageData,
+  Space,
+  TaskData,
+} from "renderer/models";
 import ModalSpaceSetting from "renderer/shared/ModalSpaceSetting";
 import ModalSpaceDetail from "renderer/shared/ModalSpaceDetail";
 import { getSpaceBackgroundColor } from "renderer/helpers/SpaceHelper";
@@ -462,16 +467,19 @@ const Home = () => {
         const { res } = await createMemberChannelData(channelData.members);
         body.channel_member_data = res;
       }
-      const success = await dispatch(
+      const res: any = await dispatch(
         createNewChannel(
           currentTeam.team_id,
           body,
           channelData.space?.space_name
         )
       );
-      if (!!success) setOpenCreateChannel(false);
+      if (res?.channel_id) {
+        history.replace(`/channels/${currentTeam.team_id}/${res.channel_id}`);
+        setOpenCreateChannel(false);
+      }
     },
-    [currentTeam?.team_id, dispatch]
+    [currentTeam?.team_id, dispatch, history]
   );
   const handleCloseModalCreateChannel = useCallback(
     () => setOpenCreateChannel(false),

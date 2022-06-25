@@ -162,7 +162,7 @@ export const createNewChannel =
       dispatch({
         type: ActionTypes.CREATE_CHANNEL_SUCCESS,
         payload: {
-          ...res,
+          ...res.data,
           group_channel: {
             group_channel_name: groupName,
           },
@@ -174,7 +174,7 @@ export const createNewChannel =
         payload: res,
       });
     }
-    return res.statusCode === 200;
+    return res.data;
   };
 
 const actionSetCurrentTeam = async (

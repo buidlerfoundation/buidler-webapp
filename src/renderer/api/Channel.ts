@@ -1,9 +1,9 @@
-import { SpaceMember } from 'renderer/models';
-import ApiCaller from './ApiCaller';
-import Caller from './Caller';
+import { Channel, SpaceMember } from "renderer/models";
+import ApiCaller from "./ApiCaller";
+import Caller from "./Caller";
 
 export const createChannel = (teamId: string, body: any) =>
-  ApiCaller.post(`channel/${teamId}`, body);
+  Caller.post<Channel>(`channel/${teamId}`, body);
 
 export const getChannels = (teamId: string) =>
   ApiCaller.get(`channel/${teamId}`);
