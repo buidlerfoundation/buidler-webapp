@@ -19,8 +19,11 @@ import { useCallback } from "react";
 import UnSupportedNetwork from "renderer/components/UnSupportedNetwork";
 import ChainId from "renderer/services/connectors/ChainId";
 import EmptyTeamView from "renderer/components/EmptyTeamView";
+import useQuery from "renderer/hooks/useQuery";
+import actionTypes from "renderer/actions/ActionTypes";
 
 const PrivateRoute = ({ component: Component, ...rest }: any) => {
+  const query = useQuery();
   const match_community_id = rest?.computedMatch?.params?.match_community_id;
   const userData = useAppSelector((state) => state.user.userData);
   const team = useAppSelector((state) => state.user.team);
@@ -53,6 +56,16 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
     userData.user_id,
   ]);
   useEffect(() => {
+    if (query.has("invitation")) {
+      dispatch({
+        type: actionTypes.SET_DATA_FROM_URL,
+        payload: `invitation=${query.get("invitation")}`,
+      });
+      query.delete("invitation");
+      history.replace({
+        search: query.toString(),
+      });
+    }
     getCookie(AsyncKey.accessTokenKey)
       .then((res: any) => {
         if (!res) {
@@ -64,7 +77,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
       .catch(() => {
         history.replace("/started");
       });
-  }, [history, initApp]);
+  }, [history, query, initApp, dispatch]);
   if (loading) return <div className="main-load-page" />;
   return <Route {...rest} render={(props) => <Component {...props} />} />;
 };
