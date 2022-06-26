@@ -22,7 +22,7 @@ interface UserReducerState {
   teamUserData: Array<UserData>;
   lastChannel: { [key: string]: Channel };
   spaceMembers: Array<UserData>;
-  walletBalance?: BalanceApiData;
+  walletBalance?: BalanceApiData | null;
 }
 
 const initialState: UserReducerState = {
@@ -53,65 +53,7 @@ const initialState: UserReducerState = {
   teamUserData: [],
   lastChannel: {},
   spaceMembers: [],
-  walletBalance: {
-    address: "0x929a19641205817ecf9d7c17194fcb7ab656276f",
-    ETH: {
-      contract: {
-        contract_address: "",
-        name: "Ethereum",
-        symbol: "ETH",
-        decimals: 18,
-        totalSupply: "",
-        owner: "",
-        is_potential: false,
-        logo_url: "",
-      },
-      balance: 0.037897777517949094,
-      price: {
-        rate: 1084.5973122767018,
-        diff: -1.0669525,
-        diff1h: 0.65415847,
-        diff7d: -9.76744989,
-        diff30d: -45.52154032,
-        diff60d: -63.26314726,
-        diff90d: -65.41720015,
-        marketCapUsd: 131531342059.11981,
-        volume24h: 15202511864.074205,
-        availableSupply: 121272052.374,
-        ts: "2022-06-23 04:47:00 +0000 UTC",
-        currency: "USD",
-      },
-    },
-    tokens: [
-      {
-        contract: {
-          contract_address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          name: "USD Coin",
-          symbol: "USDC",
-          decimals: 6,
-          totalSupply: "",
-          owner: "",
-          is_potential: true,
-          logo_url: "",
-        },
-        balance: 121748589,
-        price: {
-          rate: 1.0003458440836606,
-          diff: 0.02863412,
-          diff1h: 0.02444251,
-          diff7d: 0.03645991,
-          diff30d: 0.00447482,
-          diff60d: -0.14939286,
-          diff90d: 0.04263957,
-          marketCapUsd: 55882740050.821465,
-          volume24h: 4716695078.001875,
-          availableSupply: 55863420017.515366,
-          ts: "2022-06-23 04:47:00 +0000 UTC",
-          currency: "USD",
-        },
-      },
-    ],
-  },
+  walletBalance: null,
 };
 
 const userReducers: Reducer<UserReducerState, AnyAction> = (
@@ -120,6 +62,26 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.ADD_USER_TOKEN: {
+      const newWalletBalance = state.walletBalance
+        ? {
+            ...state.walletBalance,
+            tokens: [
+              ...(state.walletBalance.tokens || []).filter(
+                (el) =>
+                  el.contract.contract_address !==
+                  payload.contract.contract_address
+              ),
+              payload,
+            ],
+          }
+        : null;
+
+      return {
+        ...state,
+        walletBalance: newWalletBalance,
+      };
+    }
     case actionTypes.WALLET_BALANCE_SUCCESS: {
       return {
         ...state,

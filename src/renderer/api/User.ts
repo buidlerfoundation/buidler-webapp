@@ -6,6 +6,7 @@ import {
   NFTCollectionDataApi,
   Space,
   SpaceCollectionData,
+  Token,
   TransactionApiData,
   UserData,
   UserNFTCollection,
@@ -97,3 +98,6 @@ export const fetchNFTCollection = () =>
 
 export const getUserDetail = (userId: string, teamId: string) =>
   Caller.get<UserData>(`user/${userId}/team/${teamId}`);
+
+export const searchToken = (address: string) =>
+  Caller.get<Token>(`user/balance/${address}`);
