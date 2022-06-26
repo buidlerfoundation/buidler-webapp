@@ -53,6 +53,7 @@ export interface UserData {
   direct_channel?: string;
   user_channels?: Array<string>;
   user_bio?: string;
+  spaces?: Array<Space>;
 }
 
 export interface Channel {
@@ -86,6 +87,7 @@ export interface Space {
   attachment?: LocalAttachment;
   space_background_color?: string;
   channels: Array<Channel>;
+  is_space_member: boolean;
 }
 
 export interface Community {
@@ -105,6 +107,7 @@ export interface NFTCollection {
   external_url: string;
   symbol: string;
   network: string;
+  slug: string;
 }
 
 export interface SpaceCollectionData {
@@ -115,7 +118,7 @@ export interface SpaceCollectionData {
   network: string;
   amount: number;
   nft_collection?: NFTCollection;
-  contract?: Contract;
+  token_contract?: Contract;
 }
 
 export interface SettingItem {
@@ -265,6 +268,7 @@ export interface Contract {
   totalSupply: string;
   owner: string;
   is_potential: boolean;
+  logo_url: string;
 }
 
 export interface TokenPrice {

@@ -58,8 +58,12 @@ export const findTeamAndChannel =
   (initCommunityId?: string) => async (dispatch: Dispatch) => {
     dispatch({ type: ActionTypes.TEAM_REQUEST });
     const res = await api.findTeam();
-    const lastTeamId =
-      initCommunityId || (await getCookie(AsyncKey.lastTeamId));
+    let lastTeamId = "";
+    if (initCommunityId && initCommunityId !== "user") {
+      lastTeamId = initCommunityId;
+    } else {
+      lastTeamId = await getCookie(AsyncKey.lastTeamId);
+    }
     if (res.statusCode === 200) {
       const communities = res.data || [];
       if (communities.length > 0) {

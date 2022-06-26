@@ -94,3 +94,6 @@ export const fetchTransaction = (params: { page?: number; limit?: number }) => {
 
 export const fetchNFTCollection = () =>
   Caller.get<Array<NFTCollectionDataApi>>("user/nft-collection/group");
+
+export const getUserDetail = (userId: string, teamId: string) =>
+  Caller.get<UserData>(`user/${userId}/team/${teamId}`);

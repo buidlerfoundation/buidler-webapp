@@ -49,14 +49,13 @@ const SideBar = forwardRef(
     }: SideBarProps,
     ref
   ) => {
-    const {
-      userData,
-      spaceChannel,
-      channel,
-      currentChannel,
-      team,
-      teamUserData,
-    } = useAppSelector((state) => state.user);
+    const { userData, channel, currentChannel, team, teamUserData } =
+      useAppSelector((state) => state.user);
+    const spaceChannel = useAppSelector((state) =>
+      state.user.spaceChannel.sort((v1, v2) =>
+        v1.is_space_member > v2.is_space_member ? -1 : 1
+      )
+    );
     const [isOpenConfirmRemoveMember, setOpenConfirmRemoveMember] =
       useState(false);
     const [selectedMenuChannel, setSelectedMenuChannel] = useState<any>(null);
@@ -92,7 +91,7 @@ const SideBar = forwardRef(
     }, [onRemoveTeamMember, selectedMenuMember]);
     const handleContextMenuSpace = useCallback(
       (e, space) => {
-        if (!isOwner) return;
+        if (!isOwner || !space.is_space_member) return;
         setSelectedMenuSpaceChannel(space);
         menuSpaceChannelRef.current?.show(e.currentTarget, {
           x: e.pageX,

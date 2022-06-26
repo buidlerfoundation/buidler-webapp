@@ -64,6 +64,7 @@ const initialState: UserReducerState = {
         totalSupply: "",
         owner: "",
         is_potential: false,
+        logo_url: "",
       },
       balance: 0.037897777517949094,
       price: {
@@ -91,6 +92,7 @@ const initialState: UserReducerState = {
           totalSupply: "",
           owner: "",
           is_potential: true,
+          logo_url: "",
         },
         balance: 121748589,
         price: {
