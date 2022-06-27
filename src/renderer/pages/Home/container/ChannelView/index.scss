@@ -12,6 +12,11 @@
     align-items: center;
     background-color: var(--color-lighter-background);
     justify-content: space-between;
+    .normal-button {
+      &:hover {
+        background-color: transparent;
+      }
+    }
     .channel-view__avatar {
       width: 35px;
       height: 35px;
