@@ -300,9 +300,8 @@ a {
     justify-content: flex-end;
   }
 }
-
 .MuiPopover-paper {
-  transition: all 200ms !important;
+  -webkit-transition: all 200ms !important;
 }
 
 :root {
