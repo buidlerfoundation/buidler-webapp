@@ -15,7 +15,12 @@ import { UserData } from "renderer/models";
 import { ethers, utils } from "ethers";
 import actionTypes from "renderer/actions/ActionTypes";
 import AppConfig, { AsyncKey, LoginType } from "../common/AppConfig";
-import { getCookie, getDeviceCode, setCookie } from "../common/Cookie";
+import {
+  GeneratedPrivateKey,
+  getCookie,
+  getDeviceCode,
+  setCookie,
+} from "../common/Cookie";
 import store from "../store";
 import api from "../api";
 import { createRefreshSelector } from "../reducers/selectors";
@@ -722,19 +727,16 @@ class SocketUtil {
   }
   async emitOnline(teamId: string) {
     const deviceCode = await getDeviceCode();
-    const generatedPrivateKey = await getCookie(AsyncKey.generatedPrivateKey);
+    const generatedPrivateKey = await GeneratedPrivateKey();
     const loginType = await getCookie(AsyncKey.loginType);
     if (
-      Object.keys(generatedPrivateKey || {}).length === 0 &&
-      (loginType === LoginType.WalletConnect ||
-        loginType === LoginType.Metamask)
+      loginType === LoginType.WalletConnect ||
+      loginType === LoginType.Metamask
     ) {
-      const { privateKey } = ethers.Wallet.createRandom();
-      const publicKey = utils.computePublicKey(privateKey, true);
-      await setCookie(AsyncKey.generatedPrivateKey, privateKey);
+      const publicKey = utils.computePublicKey(generatedPrivateKey, true);
       store.dispatch({
         type: actionTypes.SET_PRIVATE_KEY,
-        payload: privateKey,
+        payload: generatedPrivateKey,
       });
       this.socket.emit("ONLINE", {
         team_id: teamId,

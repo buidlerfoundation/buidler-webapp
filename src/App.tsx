@@ -8,7 +8,12 @@ import TextareaAutosize from "react-textarea-autosize";
 import { ThemeProvider } from "@material-ui/styles";
 import { createTheme } from "@material-ui/core";
 import GlobalVariable from "renderer/services/GlobalVariable";
-import { clearData, getCookie, getDeviceCode } from "renderer/common/Cookie";
+import {
+  clearData,
+  GeneratedPrivateKey,
+  getCookie,
+  getDeviceCode,
+} from "renderer/common/Cookie";
 import { AsyncKey, LoginType } from "renderer/common/AppConfig";
 import actionTypes from "renderer/actions/ActionTypes";
 import api from "renderer/api";
@@ -77,13 +82,11 @@ function App() {
     };
   }, [user, initApp]);
   const initGeneratedPrivateKey = useCallback(async () => {
-    const generatedPrivateKey = await getCookie(AsyncKey.generatedPrivateKey);
-    if (typeof generatedPrivateKey === "string") {
-      dispatch({
-        type: actionTypes.SET_PRIVATE_KEY,
-        payload: generatedPrivateKey,
-      });
-    }
+    const generatedPrivateKey = await GeneratedPrivateKey();
+    dispatch({
+      type: actionTypes.SET_PRIVATE_KEY,
+      payload: generatedPrivateKey,
+    });
   }, [dispatch]);
   useEffect(() => {
     initGeneratedPrivateKey();
