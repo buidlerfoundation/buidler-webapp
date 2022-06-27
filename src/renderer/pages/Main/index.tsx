@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 import useAppSelector from "renderer/hooks/useAppSelector";
-import { Switch, Route, useHistory, useRouteMatch } from "react-router-dom";
+import {
+  Switch,
+  Route,
+  useHistory,
+  useRouteMatch,
+  useLocation,
+} from "react-router-dom";
 import {
   findTeamAndChannel,
   findUser,
@@ -123,6 +129,7 @@ const RedirectToHome = () => {
 };
 
 const Main = () => {
+  const location = useLocation();
   const imgDomain = useAppSelector((state) => state.user.imgDomain);
   const chainId = useAppSelector((state) => state.network.chainId);
   const dispatch = useAppDispatch();
@@ -137,7 +144,7 @@ const Main = () => {
   }
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      <AppTitleBar />
+      {location.pathname !== "/started" && <AppTitleBar />}
       <MainWrapper>
         <Switch>
           <PrivateRoute exact path="/" component={RedirectToHome} />

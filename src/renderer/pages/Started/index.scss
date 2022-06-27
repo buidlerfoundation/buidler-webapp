@@ -2,13 +2,13 @@
   display: flex;
   width: 100%;
   background-color: var(--color-darkest-background);
-  height: calc(100vh - 50px);
+  height: 100vh;
   justify-content: center;
   .started-body {
     display: flex;
     width: 580px;
     background-color: var(--color-lighter-background);
-    height: calc(100vh - 50px);
+    height: 100vh;
     align-items: center;
     justify-content: center;
     flex-direction: column;
