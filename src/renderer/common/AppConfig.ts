@@ -7,6 +7,7 @@ const AppConfig = {
   stagingBaseUrl: "https://testnet.buidler.app/",
   // baseUrl: 'http://127.0.0.1:8888/',
   maxLengthSpaceDescription: 450,
+  maxLengthCommunityDescription: 1000,
 };
 
 export default AppConfig;

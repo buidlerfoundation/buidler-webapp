@@ -41,6 +41,9 @@ body {
   color: var(--color-primary-text);
   font-weight: 500;
   background-color: var(--color-lighter-background);
+  transform: rotate(0deg);
+  height: 100vh;
+  width: 100vw;
 }
 
 div {
