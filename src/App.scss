@@ -260,11 +260,13 @@ a {
     flex-direction: column;
     border-radius: 5px 0 0 5px;
     .group-setting-title {
-      padding: 10px 20px;
+      padding: 8px 20px;
       font-size: 14px;
       line-height: 16px;
       color: var(--color-secondary-text);
       font-weight: 600;
+      text-transform: uppercase;
+      margin-top: 12px;
     }
     .setting-item {
       padding: 10px 20px;
