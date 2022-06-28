@@ -70,17 +70,26 @@ function App() {
     const eventContextMenu = (e: any) => {
       if (process.env.NODE_ENV === "production") e.preventDefault();
     };
+    const eventClick = (e: any) => {
+      const href = e?.target?.href;
+      if (href?.includes("channels/user")) {
+        history.replace(`/channels/user/${href.split("/channels/user/")[1]}`);
+        e.preventDefault();
+      }
+    };
     window.addEventListener("offline", eventOffline);
     window.addEventListener("online", eventOnline);
     window.addEventListener("paste", eventPaste);
     window.addEventListener("contextmenu", eventContextMenu);
+    window.addEventListener("click", eventClick);
     return () => {
       window.removeEventListener("offline", eventOffline);
       window.removeEventListener("online", eventOnline);
       window.removeEventListener("paste", eventPaste);
       window.removeEventListener("contextmenu", eventContextMenu);
+      window.removeEventListener("click", eventClick);
     };
-  }, [user, initApp]);
+  }, [user, initApp, history]);
   const initGeneratedPrivateKey = useCallback(async () => {
     const generatedPrivateKey = await GeneratedPrivateKey();
     dispatch({
