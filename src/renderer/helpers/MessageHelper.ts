@@ -1,5 +1,5 @@
-import moment from 'moment';
-import images from '../common/images';
+import moment from "moment";
+import images from "../common/images";
 
 export const normalizeMessage = (messages: Array<any>) => {
   return messages.map((msg, index) => {
@@ -15,7 +15,7 @@ export const normalizeMessage = (messages: Array<any>) => {
 
 export const normalizeMessages = (messages: Array<any>) => {
   return messages.reduce((result: Array<any>, val) => {
-    const date = moment(new Date(val.createdAt)).format('YYYY-MM-DD');
+    const date = moment(new Date(val.createdAt)).format("YYYY-MM-DD");
     const index = result.findIndex((el) => el.date === date);
     if (index >= 0) {
       result[index].messages =
@@ -30,18 +30,18 @@ export const normalizeMessages = (messages: Array<any>) => {
 };
 
 export const removeTagHTML = (s: string) => {
-  return s.replace(/<div>/g, '<br>').replace(/<\/div>/g, '');
+  return s.replace(/<div>/g, "<br>").replace(/<\/div>/g, "");
 };
 
 export const extractContent = (s: string) => {
-  const span = document.createElement('span');
-  span.innerHTML = s.replaceAll('<br>', '\n');
+  const span = document.createElement("span");
+  span.innerHTML = s.replaceAll("<br>", "\n");
   return span.textContent || span.innerText;
 };
 
 export const normalizeMessageText = (text: string, isShowNote = false) => {
-  if (!text) return '';
-  let res = text?.replaceAll?.('<br>', '\n');
+  if (!text) return "";
+  let res = text?.replaceAll?.("<br>", "\n");
   const regexLink = /(http|https):\/\/(\S+)\.([a-z]{2,}?)(.*?)( |$)/gim;
   const linkMatches = res.match(regexLink);
   linkMatches?.forEach((el) => {
@@ -69,17 +69,16 @@ export const normalizeMessageText = (text: string, isShowNote = false) => {
 
 export const getMentionData = (s: string) => {
   const mentionRegex =
-    /(<a href="\$mention_location\?)(.*?)(" class="mention-string">)/g;
+    /(<a href="\$mention_location\/\?*)(.*?)(" class="mention-string">)/g;
   const mentionMatches = s.match(mentionRegex);
   return mentionMatches?.map((el) => {
     const match =
-      /(<a href="\$mention_location\?)(.*?)(" class="mention-string">)/.exec(
+      /(<a href="\$mention_location\/\?*)(.*?)(" class="mention-string">)/.exec(
         el
       );
-    const split = match?.[2]?.split('=');
     return {
-      mention_id: split?.[1],
-      tag_type: split?.[0]?.includes('user') ? 'User' : 'Channel',
+      mention_id: match?.[2],
+      tag_type: "User",
     };
   });
 };

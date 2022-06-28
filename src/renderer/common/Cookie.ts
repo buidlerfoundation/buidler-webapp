@@ -32,6 +32,10 @@ export const getCookie = async (key: string) => {
   });
 };
 
+export const removeCookie = (key: string) => {
+  Cookies.remove(key);
+};
+
 export const getDeviceCode = async () => {
   const current = await getCookie(AsyncKey.deviceCode);
   if (typeof current === "string") {

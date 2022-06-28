@@ -242,6 +242,14 @@ a {
   width: 855px;
   border-radius: 5px !important;
   border: 1px solid var(--color-stroke);
+  .setting-icon {
+    width: 25px;
+    height: 25px;
+  }
+  .setting-action-icon {
+    width: 20px;
+    height: 20px;
+  }
   .left-side {
     position: relative;
     width: 275px;
