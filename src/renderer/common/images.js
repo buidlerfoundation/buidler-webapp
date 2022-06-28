@@ -2,7 +2,7 @@ import notableLogo from "../assets/images/notable_logo.svg";
 import icSound from "../assets/images/ic_sound.png";
 import icGoogle from "../assets/images/logo_google.png";
 import icCollapse from "../assets/images/ic_collapse.svg";
-import icReact from "../assets/images/ic_react.svg";
+import icReact from "../assets/images/ic_react.png";
 import icPhone from "../assets/images/ic_phone.svg";
 import icMore from "../assets/images/ic_more.svg";
 import icReply from "../assets/images/ic_reply.svg";
