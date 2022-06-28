@@ -51,6 +51,7 @@ import MessageReplyItem from "../../../../shared/MessageReplyItem";
 import ChannelHeader from "./ChannelHeader";
 import DirectDescription from "./DirectDescription";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
+import { useLocation } from "react-router-dom";
 
 type ChannelViewProps = {
   currentChannel: Channel;
@@ -91,6 +92,7 @@ const ChannelView = forwardRef(
     }: ChannelViewProps,
     ref
   ) => {
+    const location = useLocation();
     const dispatch = useAppDispatch();
     const reactData = useAppSelector((state) => state.reactReducer.reactData);
     const messagesGroup = useMemo<Array<MessageGroup>>(() => {
@@ -597,7 +599,8 @@ const ChannelView = forwardRef(
                 <div style={{ position: "relative" }}>
                   {scrollData?.showScrollDown &&
                     !openTaskView &&
-                    !isOpenConversation && (
+                    !isOpenConversation &&
+                    !location.pathname.includes("user") && (
                       <div className="message-scroll-down__wrapper">
                         {scrollData?.unreadCount > 0 && (
                           <div className="unread-count">
