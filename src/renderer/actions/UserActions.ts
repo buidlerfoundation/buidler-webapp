@@ -332,10 +332,11 @@ export const createSpaceChannel =
     const res = await api.createSpaceChannel(teamId, body);
     if (res.statusCode !== 200) {
       dispatch({
-        type: ActionTypes.CREATE_CHANNEL_FAIL,
+        type: ActionTypes.CREATE_GROUP_CHANNEL_FAIL,
         payload: res,
       });
     }
+    return res.statusCode === 200;
   };
 
 export const createTeam = (body: any) => async (dispatch: Dispatch) => {
@@ -344,7 +345,6 @@ export const createTeam = (body: any) => async (dispatch: Dispatch) => {
     payload: { body },
   });
   const res = await api.createTeam(body);
-  await actionSetCurrentTeam(res, dispatch);
   if (res.statusCode === 200) {
     dispatch({
       type: ActionTypes.CREATE_TEAM_SUCCESS,
@@ -356,6 +356,7 @@ export const createTeam = (body: any) => async (dispatch: Dispatch) => {
       payload: res,
     });
   }
+  return res;
 };
 
 export const removeTeamMember =

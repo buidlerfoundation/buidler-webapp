@@ -17,12 +17,7 @@ import ModalOTP from "renderer/shared/ModalOTP";
 import ModalCreateSpace from "renderer/shared/ModalCreateSpace";
 import toast from "react-hot-toast";
 import { uniqBy } from "lodash";
-import {
-  CreateSpaceData,
-  MessageData,
-  Space,
-  TaskData,
-} from "renderer/models";
+import { CreateSpaceData, MessageData, Space, TaskData } from "renderer/models";
 import ModalSpaceSetting from "renderer/shared/ModalSpaceSetting";
 import ModalSpaceDetail from "renderer/shared/ModalSpaceDetail";
 import { getSpaceBackgroundColor } from "renderer/helpers/SpaceHelper";
@@ -417,12 +412,12 @@ const Home = () => {
         if (!spaceData.spaceBadgeId) {
           error = "Badge can not be empty";
         } else if (!spaceData.condition) {
-          error = "NFT can not be empty";
+          error = "Condition can not be empty";
         } else if (
           !spaceData.condition.amount &&
           !spaceData.condition.amountInput
         ) {
-          error = "NFT amount can not be empty";
+          error = "Amount can not be empty";
         }
         if (error) {
           toast.error(error);
@@ -445,9 +440,13 @@ const Home = () => {
           icon_sub_color: badge?.backgroundColor,
         };
       }
-      await dispatch(createSpaceChannel(currentTeam.team_id, body));
-      setOpenCreateSpace(false);
-      sideBarRef.current?.scrollToBottom?.();
+      const success = await dispatch(
+        createSpaceChannel(currentTeam.team_id, body)
+      );
+      if (!!success) {
+        setOpenCreateSpace(false);
+        sideBarRef.current?.scrollToBottom?.();
+      }
       return null;
     },
     [dispatch, currentTeam?.team_id]
