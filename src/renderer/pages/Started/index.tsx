@@ -39,16 +39,16 @@ const Started = () => {
   const doingMetamaskLogin = useCallback(
     async (address: string) => {
       const nonceRes = await api.requestNonceWithAddress(address);
-      const nonce = nonceRes.data?.nonce;
-      if (nonceRes.statusCode !== 200 || !nonce) {
+      const message = nonceRes.data?.message;
+      if (nonceRes.statusCode !== 200 || !message) {
         toast.error(nonceRes?.message || "");
         return;
       }
       const metamaskProvider: any = window.ethereum;
       const provider = new ethers.providers.Web3Provider(metamaskProvider);
       const signer = provider.getSigner();
-      const signature = await signer.signMessage(nonce);
-      const res = await api.verifyNonce(nonce, signature);
+      const signature = await signer.signMessage(message);
+      const res = await api.verifyNonce(message, signature);
       if (res.statusCode === 200) {
         await handleResponseVerify(res, LoginType.Metamask);
       } else {
@@ -67,8 +67,8 @@ const Started = () => {
       const { accounts, peerMeta } = WalletConnectUtils.connector;
       const address = accounts?.[0];
       const nonceRes = await api.requestNonceWithAddress(address);
-      const nonce = nonceRes.data?.nonce;
-      if (nonceRes.statusCode !== 200 || !nonce) {
+      const message = nonceRes.data?.message;
+      if (nonceRes.statusCode !== 200 || !message) {
         toast.error(nonceRes?.message || "");
         return;
       }
@@ -77,9 +77,9 @@ const Started = () => {
         WalletConnectUtils.connector.killSession();
         return;
       }
-      const params = [address, nonce];
+      const params = [address, message];
       const signature = await WalletConnectUtils.connector.signMessage(params);
-      const res = await api.verifyNonce(nonce, signature);
+      const res = await api.verifyNonce(message, signature);
       if (res.statusCode === 200) {
         await handleResponseVerify(res, LoginType.WalletConnect);
       } else {

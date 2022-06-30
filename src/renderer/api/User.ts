@@ -50,14 +50,14 @@ export const requestNonce = (pubKey: string) =>
   ApiCaller.post("user/nonce", { public_key: pubKey });
 
 export const requestNonceWithAddress = (address: string) =>
-  Caller.post<{ nonce: string }>("user/address", { address });
+  Caller.post<{ message: string }>("user/address", { address });
 
-export const verifyNonce = (nonce: string, signature: string) =>
+export const verifyNonce = (message: string, signature: string) =>
   Caller.post<{
     avatar_url: string;
     user_id: string;
     user_name: string;
-  }>("user", { nonce, signature });
+  }>("user", { message, signature });
 
 export const getCollectibles = (page = 1, limit = 10) => {
   return Caller.get<any>(`user/nft?page=${page}&limit=${limit}`);
