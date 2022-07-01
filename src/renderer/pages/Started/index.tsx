@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import "./index.scss";
 import { useHistory } from "react-router-dom";
 import { clearData, getDeviceCode, setCookie } from "renderer/common/Cookie";
@@ -17,6 +17,10 @@ import { ethers } from "ethers";
 const Started = () => {
   const dispatch = useAppDispatch();
   const history = useHistory();
+  const hideMetaMask = useMemo(() => {
+    const userAgent = window.navigator.userAgent;
+    return /Safari/.test(userAgent);
+  }, []);
   const dataFromUrl = useAppSelector((state) => state.configs.dataFromUrl);
   const handleResponseVerify = useCallback(
     async (res: any, loginType: string) => {
@@ -167,12 +171,14 @@ const Started = () => {
             & airdrop tokens, join exclusive clubs, and more.
           </span>
         </div>
-        <div className="wallet-button normal-button" onClick={handleMetamask}>
-          <span>MetaMask</span>
-          <div className="wallet-icon">
-            <img src={images.icMetamask} alt="" />
+        {!hideMetaMask && (
+          <div className="wallet-button normal-button" onClick={handleMetamask}>
+            <span>MetaMask</span>
+            <div className="wallet-icon">
+              <img src={images.icMetamask} alt="" />
+            </div>
           </div>
-        </div>
+        )}
         <div
           className="wallet-button normal-button"
           onClick={handleWalletConnect}
