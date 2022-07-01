@@ -18,7 +18,7 @@ const Started = () => {
   const dispatch = useAppDispatch();
   const hideMetaMask = useMemo(() => {
     const userAgent = window.navigator.userAgent;
-    return /Safari/.test(userAgent);
+    return !/Chrome/.test(userAgent);
   }, []);
   const history = useHistory();
   const dataFromUrl = useAppSelector((state) => state.configs.dataFromUrl);
