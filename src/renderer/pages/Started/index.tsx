@@ -16,11 +16,11 @@ import { ethers } from "ethers";
 
 const Started = () => {
   const dispatch = useAppDispatch();
-  const history = useHistory();
   const hideMetaMask = useMemo(() => {
     const userAgent = window.navigator.userAgent;
     return /Safari/.test(userAgent);
   }, []);
+  const history = useHistory();
   const dataFromUrl = useAppSelector((state) => state.configs.dataFromUrl);
   const handleResponseVerify = useCallback(
     async (res: any, loginType: string) => {
@@ -167,8 +167,8 @@ const Started = () => {
             to buidl together
           </span>
           <span className="started-description">
-            Buidler helps your community quickly discuss, make transfers, create
-            & airdrop tokens, join exclusive clubs, and more.
+            Web3 application for your community, teams, and supporters to
+            connect, communicate and collaborate.
           </span>
         </div>
         {!hideMetaMask && (
