@@ -12,7 +12,7 @@ import images from "../../common/images";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
-import { ethers } from "ethers";
+import { ethers, utils } from "ethers";
 
 const Started = () => {
   const dispatch = useAppDispatch();
@@ -76,13 +76,18 @@ const Started = () => {
         toast.error(nonceRes?.message || "");
         return;
       }
-      if (peerMeta.name === "MetaMask") {
-        toast.error("Something wrongs, you can try another wallet");
-        WalletConnectUtils.connector.killSession();
-        return;
-      }
-      const params = [address, message];
-      const signature = await WalletConnectUtils.connector.signMessage(params);
+      // if (peerMeta.name === "MetaMask") {
+      //   toast.error("Something wrongs, you can try another wallet");
+      //   WalletConnectUtils.connector.killSession();
+      //   return;
+      // }
+      const params = [
+        utils.hexlify(ethers.utils.toUtf8Bytes(message)),
+        address,
+      ];
+      const signature = await WalletConnectUtils.connector.signPersonalMessage(
+        params
+      );
       const res = await api.verifyNonce(message, signature);
       if (res.statusCode === 200) {
         await handleResponseVerify(res, LoginType.WalletConnect);
