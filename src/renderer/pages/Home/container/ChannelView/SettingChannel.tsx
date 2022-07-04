@@ -11,9 +11,7 @@ import images from "../../../../common/images";
 import AppInput from "../../../../shared/AppInput";
 import ModalConfirmDeleteChannel from "../../../../shared/ModalConfirmDeleteChannel";
 import NormalButton from "../../../../shared/NormalButton";
-import PopoverButton, {
-  PopoverItem,
-} from "../../../../shared/PopoverButton";
+import PopoverButton, { PopoverItem } from "../../../../shared/PopoverButton";
 
 type SettingChannelProps = {
   currentChannel?: Channel;
@@ -122,7 +120,11 @@ const SettingChannel = ({
           />
         </div>
       )}
-      <div className="setting-item normal-button" onClick={toggleEditName}>
+      <div
+        className="setting-item normal-button"
+        style={{ marginTop: 12 }}
+        onClick={toggleEditName}
+      >
         <img src={images.icSettingChannelEdit} alt="" />
         <span className="setting-label">Edit channel name</span>
       </div>

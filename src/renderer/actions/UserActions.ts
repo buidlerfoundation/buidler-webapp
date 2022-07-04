@@ -321,6 +321,7 @@ export const updateSpaceChannel =
       payload: { spaceId, body },
     });
     const res = await api.updateSpaceChannel(spaceId, body);
+    return res.statusCode === 200;
   };
 
 export const createSpaceChannel =

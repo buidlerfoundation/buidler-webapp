@@ -134,7 +134,7 @@ const Started = () => {
   }, [dispatch]);
   const handleMetamask = useCallback(() => {
     if (!window.ethereum) {
-      toast.error("install metamask extension!");
+      toast.error("Please install MetaMask extension!");
     } else {
       window.ethereum
         .request({ method: "eth_requestAccounts" })

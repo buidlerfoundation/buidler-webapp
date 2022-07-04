@@ -18,6 +18,7 @@ import {
   memberMenu,
   privateChannelMenu,
   spaceChannelMenu,
+  spaceExclusiveChannelMenu,
 } from "renderer/utils/Menu";
 import SpaceItem from "renderer/shared/SpaceItem";
 import MemberSpace from "renderer/shared/MemberSpace";
@@ -61,7 +62,7 @@ const SideBar = forwardRef(
     const [selectedMenuChannel, setSelectedMenuChannel] = useState<any>(null);
     const [selectedMenuMember, setSelectedMenuMember] = useState<any>(null);
     const [selectedMenuSpaceChannel, setSelectedMenuSpaceChannel] =
-      useState<any>(null);
+      useState<Space | null>(null);
     const bottomBodyRef = useRef<any>();
     const menuPrivateChannelRef = useRef<any>();
     const menuChannelRef = useRef<any>();
@@ -89,6 +90,11 @@ const SideBar = forwardRef(
       setSelectedMenuMember(null);
       setOpenConfirmRemoveMember(false);
     }, [onRemoveTeamMember, selectedMenuMember]);
+    const spaceChannelMenuData = useMemo(() => {
+      if (selectedMenuSpaceChannel?.space_type === "Private")
+        return spaceExclusiveChannelMenu;
+      return spaceChannelMenu;
+    }, [selectedMenuSpaceChannel?.space_type]);
     const handleContextMenuSpace = useCallback(
       (e, space) => {
         if (!isOwner || !space.is_space_member) return;
@@ -159,6 +165,11 @@ const SideBar = forwardRef(
             setOpenConfirmRemoveMember(true);
             break;
           }
+          case "View entry requirement": {
+            if (!!selectedMenuSpaceChannel)
+              onSpaceBadgeClick(selectedMenuSpaceChannel);
+            break;
+          }
           default:
             break;
         }
@@ -172,6 +183,7 @@ const SideBar = forwardRef(
         onEditChannelMember,
         onEditChannelName,
         onEditGroupChannel,
+        onSpaceBadgeClick,
         selectedMenuChannel,
         selectedMenuSpaceChannel,
       ]
@@ -239,7 +251,7 @@ const SideBar = forwardRef(
         <PopoverButton
           popupOnly
           ref={menuSpaceChannelRef}
-          data={spaceChannelMenu}
+          data={spaceChannelMenuData}
           onSelected={onSelectedMenu}
         />
         <PopoverButton
