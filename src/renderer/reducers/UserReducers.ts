@@ -97,10 +97,13 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     case actionTypes.UPDATE_USER_SUCCESS: {
       return {
         ...state,
-        userData: {
-          ...state.userData,
-          ...payload,
-        },
+        userData:
+          payload.user_id === state.userData.user_id
+            ? {
+                ...state.userData,
+                ...payload,
+              }
+            : state.userData,
         teamUserData: state.teamUserData.map((el) => {
           if (el.user_id === payload.user_id) {
             return {
