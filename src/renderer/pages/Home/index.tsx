@@ -259,10 +259,10 @@ const Home = () => {
   );
   const handleOpenEditChannelName = useCallback(
     (channel) => {
-      dispatch(setCurrentChannel(channel));
+      history.replace(`/channels/${currentTeam.team_id}/${channel.channel_id}`);
       channelViewRef.current.showSetting("edit-name");
     },
-    [dispatch]
+    [currentTeam?.team_id, history]
   );
   const handleOpenInviteMember = useCallback(() => setOpenInvite(true), []);
   const handleSpaceBadgeClick = useCallback((s: Space) => {

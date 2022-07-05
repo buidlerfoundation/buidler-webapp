@@ -289,7 +289,7 @@ export interface TokenPrice {
 export interface Token {
   contract: Contract;
   balance: number;
-  price: TokenPrice;
+  price?: TokenPrice;
 }
 
 export interface BalanceApiData {
