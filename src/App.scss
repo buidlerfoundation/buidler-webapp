@@ -188,12 +188,12 @@ a {
   padding: 16px 20px;
   background-color: var(--color-highlight);
   border-radius: 5px;
-  outline: 1px solid var(--color-stroke);
+  box-shadow: 0 0 0 1px var(--color-stroke);
   &::placeholder {
     color: var(--color-secondary-text);
   }
   &:focus {
-    outline: 1px solid var(--color-highlight-action-high);
+    box-shadow: 0 0 0 1px var(--color-highlight-action-high);
   }
 }
 
