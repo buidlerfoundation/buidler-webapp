@@ -513,6 +513,7 @@ const ChannelView = forwardRef(
               content={msg.content}
               reacts={reactData?.[msg.message_id]}
               replyCount={msg.conversation_data?.length - 1}
+              task={msg.task}
             />
           );
         }
