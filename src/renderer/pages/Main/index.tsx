@@ -28,6 +28,22 @@ import EmptyTeamView from "renderer/components/EmptyTeamView";
 import useQuery from "renderer/hooks/useQuery";
 import actionTypes from "renderer/actions/ActionTypes";
 
+const PublicRoute = ({ component: Component, ...rest }: any) => {
+  const history = useHistory();
+  useEffect(() => {
+    getCookie(AsyncKey.accessTokenKey)
+      .then((res: any) => {
+        if (res) {
+          history.replace("/");
+        }
+      })
+      .catch(() => {
+        history.replace("/started");
+      });
+  }, [history]);
+  return <Route {...rest} render={(props) => <Component {...props} />} />;
+};
+
 const PrivateRoute = ({ component: Component, ...rest }: any) => {
   const query = useQuery();
   const match_community_id = rest?.computedMatch?.params?.match_community_id;
@@ -159,7 +175,7 @@ const Main = () => {
             path="/channels/:match_community_id/:match_channel_id"
             component={Home}
           />
-          <Route exact path="/started" component={Started} />
+          <PublicRoute exact path="/started" component={Started} />
         </Switch>
       </MainWrapper>
     </div>

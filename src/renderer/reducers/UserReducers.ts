@@ -561,6 +561,16 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     case actionTypes.LEAVE_TEAM_SUCCESS: {
       return {
         ...state,
+        channel: [],
+        currentChannel: {
+          channel_id: "",
+          channel_member: [],
+          channel_name: "",
+          channel_type: "Public",
+          notification_type: "",
+          seen: true,
+        },
+        spaceChannel: [],
         team: state?.team?.filter((el) => el.team_id !== payload.teamId),
       };
     }
