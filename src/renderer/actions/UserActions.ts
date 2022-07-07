@@ -56,7 +56,7 @@ export const dragChannel =
 
 export const findTeamAndChannel =
   (initCommunityId?: string) => async (dispatch: Dispatch) => {
-    dispatch({ type: ActionTypes.TEAM_REQUEST });
+    dispatch({ type: ActionTypes.TEAM_REQUEST, payload: { initCommunityId } });
     const res = await api.findTeam();
     let lastTeamId = "";
     if (initCommunityId && initCommunityId !== "user") {
