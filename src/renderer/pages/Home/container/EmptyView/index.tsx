@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { createTeam, findTeamAndChannel } from "renderer/actions/UserActions";
+import { createTeam } from "renderer/actions/UserActions";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import ModalTeam from "../../../../shared/ModalTeam";
 import NormalButton from "../../../../shared/NormalButton";
@@ -30,10 +30,13 @@ const EmptyView = () => {
     },
     [dispatch, history]
   );
-  const handleAcceptTeam = useCallback(async () => {
-    await dispatch(findTeamAndChannel());
-    setOpenModalTeam(false);
-  }, [dispatch]);
+  const handleAcceptTeam = useCallback(
+    async (teamId: string) => {
+      history.replace(`/channels/${teamId}`);
+      setOpenModalTeam(false);
+    },
+    [history]
+  );
   return (
     <div className="empty-view__container">
       <span className="empty-text">
