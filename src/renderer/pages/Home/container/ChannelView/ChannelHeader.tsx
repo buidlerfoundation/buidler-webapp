@@ -164,7 +164,7 @@ const ChannelHeader = forwardRef(
       (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         if (!currentChannel?.user) {
           settingRef.current?.show(e.currentTarget, {
-            x: 385,
+            x: 570,
             y: 110,
           });
         }

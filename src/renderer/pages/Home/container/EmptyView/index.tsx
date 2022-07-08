@@ -30,10 +30,14 @@ const EmptyView = () => {
     },
     [dispatch, history]
   );
-  const handleAcceptTeam = useCallback(async () => {
-    await dispatch(findTeamAndChannel());
-    setOpenModalTeam(false);
-  }, [dispatch]);
+  const handleAcceptTeam = useCallback(
+    async (teamId: string) => {
+      await dispatch(findTeamAndChannel());
+      history.replace(`/channels/${teamId}`);
+      setOpenModalTeam(false);
+    },
+    [dispatch, history]
+  );
   return (
     <div className="empty-view__container">
       <span className="empty-text">

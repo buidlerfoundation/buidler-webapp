@@ -16,7 +16,7 @@ import {
 import MainWrapper from "./Layout";
 import Home from "../Home";
 import { AsyncKey } from "../../common/AppConfig";
-import { getCookie } from "../../common/Cookie";
+import { getCookie, removeCookie, setCookie } from "../../common/Cookie";
 import AppTitleBar from "../../shared/AppTitleBar";
 import Started from "../Started";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
@@ -27,6 +27,8 @@ import ChainId from "renderer/services/connectors/ChainId";
 import EmptyTeamView from "renderer/components/EmptyTeamView";
 import useQuery from "renderer/hooks/useQuery";
 import actionTypes from "renderer/actions/ActionTypes";
+import api from "renderer/api";
+import toast from "react-hot-toast";
 
 const PublicRoute = ({ component: Component, ...rest }: any) => {
   const history = useHistory();
@@ -53,32 +55,43 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
   const history = useHistory();
-  const initApp = useCallback(async () => {
-    setLoading(true);
-    if (!userData.user_id) {
-      await dispatch(findUser());
-      await dispatch(findTeamAndChannel(match_community_id));
-    } else if (
-      match_community_id &&
-      currentTeam.team_id !== match_community_id
-    ) {
-      const matchCommunity = team?.find(
-        (t) => t.team_id === match_community_id
-      );
-      if (matchCommunity) {
-        await dispatch(setCurrentTeam(matchCommunity));
+
+  const initApp = useCallback(
+    async (invitationId) => {
+      setLoading(true);
+      if (invitationId) {
+        await dispatch(findUser());
+        const res = await api.acceptInvitation(invitationId);
+        if (res.statusCode === 200) {
+          toast.success("You have successfully joined new team.");
+          dispatch({ type: actionTypes.REMOVE_DATA_FROM_URL });
+          removeCookie(AsyncKey.lastChannelId);
+          removeCookie(AsyncKey.lastTeamId);
+          setCookie(AsyncKey.lastTeamId, res.data?.team_id);
+          history.replace(`/channels/${res.data?.team_id}`);
+        }
+      } else if (!userData.user_id) {
+        await dispatch(findUser());
+        await dispatch(findTeamAndChannel(match_community_id));
+      } else if (
+        match_community_id &&
+        currentTeam.team_id !== match_community_id
+      ) {
+        const matchCommunity = team?.find(
+          (t) => t.team_id === match_community_id
+        );
+        if (matchCommunity) {
+          await dispatch(setCurrentTeam(matchCommunity));
+        }
       }
-    }
-    setLoading(false);
-  }, [
-    currentTeam.team_id,
-    dispatch,
-    match_community_id,
-    team,
-    userData.user_id,
-  ]);
+      setLoading(false);
+    },
+    [currentTeam.team_id, dispatch, match_community_id, team, userData.user_id]
+  );
   useEffect(() => {
+    let invitationId: string | null = null;
     if (query.has("invitation")) {
+      invitationId = query.get("invitation");
       dispatch({
         type: actionTypes.SET_DATA_FROM_URL,
         payload: `invitation=${query.get("invitation")}`,
@@ -93,7 +106,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
         if (!res) {
           history.replace("/started");
         } else {
-          initApp();
+          initApp(invitationId);
         }
       })
       .catch(() => {

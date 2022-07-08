@@ -36,7 +36,7 @@ class ImageHelper {
     }
     let params = '?auto=format&fit=crop';
     if (options.w || options.h) {
-      params += `&dpr=1.0&fm=jpg&q=50`;
+      params += `&dpr=1.0&fm=jpg&q=90`;
     }
     if (options.w) {
       params += `&w=${options.w}`;

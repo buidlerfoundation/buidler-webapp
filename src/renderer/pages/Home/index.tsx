@@ -111,7 +111,7 @@ const Home = () => {
   );
   const { taskData } = useAppSelector((state) => state.task);
   const { activityData } = useAppSelector((state) => state.activity);
-  const { dataFromUrl, privateKey } = useAppSelector((state) => state.configs);
+  const { privateKey } = useAppSelector((state) => state.configs);
   const history = useHistory();
   const inputRef = useRef<any>();
   const channelViewRef = useRef<any>();
@@ -512,18 +512,6 @@ const Home = () => {
     setOpenConfirmDeleteSpace(false);
     setOpenEditSpaceChannel(false);
   }, [dispatch, selectedSpace?.space_id]);
-  const handleDataFromUrl = useCallback(async () => {
-    if (dataFromUrl?.includes("invitation=")) {
-      const invitationId = dataFromUrl.split("=")[1];
-      const res = await api.acceptInvitation(invitationId);
-      if (res.statusCode === 200) {
-        toast.success("You have successfully joined new team.");
-        dispatch({ type: actionTypes.REMOVE_DATA_FROM_URL });
-        setCookie(AsyncKey.lastTeamId, res.data?.team_id);
-        dispatch(findTeamAndChannel());
-      }
-    }
-  }, [dataFromUrl, dispatch]);
   useEffect(() => {
     if (match_channel_id) {
       if (match_community_id === "user") {
@@ -548,9 +536,6 @@ const Home = () => {
     match_channel_id,
     match_community_id,
   ]);
-  useEffect(() => {
-    if (dataFromUrl) handleDataFromUrl();
-  }, [dataFromUrl, handleDataFromUrl]);
   useEffect(() => {
     if (currentChannel?.channel_id || currentChannel?.user) {
       if (currentChannel?.user) {
