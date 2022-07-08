@@ -13,6 +13,6 @@ services:
       - VIRTUAL_HOST=community.buidler.app
       - LETSENCRYPT_HOST=community.buidler.app
 networks: 
-  default: 
-    external: 
-      name: nginx-proxy
+  default:  
+    name: nginx-proxy
+    external: true
