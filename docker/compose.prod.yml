@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  app:
+    image: buidler/buidler-webapp:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "3001:80"
+    restart: unless-stopped
+    environment:
+      - VIRTUAL_HOST=community.buidler.app
+      - LETSENCRYPT_HOST=community.buidler.app
+networks: 
+  default: 
+    external: 
+      name: nginx-proxy
