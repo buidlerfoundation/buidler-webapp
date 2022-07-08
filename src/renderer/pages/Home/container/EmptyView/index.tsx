@@ -32,8 +32,8 @@ const EmptyView = () => {
   );
   const handleAcceptTeam = useCallback(
     async (teamId: string) => {
-      await dispatch(findTeamAndChannel());
       history.replace(`/channels/${teamId}`);
+      dispatch(findTeamAndChannel());
       setOpenModalTeam(false);
     },
     [dispatch, history]
