@@ -7,11 +7,11 @@ services:
       context: ..
       dockerfile: Dockerfile
     expose:
-      - "3001"
+      - "80"
     restart: unless-stopped
     environment:
       - VIRTUAL_HOST=community.buidler.app
-      - VIRTUAL_PORT=3001
+      - VIRTUAL_PORT=80
       # - LETSENCRYPT_HOST=community.buidler.app
       # - LETSENCRYPT_EMAIL="test.tai.htm@gmail.com"
 networks: 
