@@ -524,7 +524,7 @@ const Home = () => {
         if (matchChannel) {
           setCurrentUserId("");
           if (matchChannel.channel_id !== currentChannel.channel_id) {
-            dispatch(setCurrentChannel?.(matchChannel));
+            dispatch(setCurrentChannel?.(matchChannel, match_community_id));
           }
         }
       }

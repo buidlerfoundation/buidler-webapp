@@ -378,13 +378,16 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
     }
     case actionTypes.SET_CURRENT_CHANNEL: {
+      const lastChannel = state.lastChannel;
+      if (payload.communityId) {
+        lastChannel[payload.communityId] = payload.channel;
+      } else {
+        lastChannel[state?.currentTeam?.team_id] = payload.channel;
+      }
       return {
         ...state,
         currentChannel: payload.channel,
-        lastChannel: {
-          ...state.lastChannel,
-          [state?.currentTeam?.team_id]: payload.channel,
-        },
+        lastChannel,
         channel:
           payload.channel.channel_type === "Direct"
             ? state.channel.map((c) => {
@@ -559,18 +562,24 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
     }
     case actionTypes.LEAVE_TEAM_SUCCESS: {
+      if (payload.teamId === state.currentTeam.team_id) {
+        return {
+          ...state,
+          channel: [],
+          currentChannel: {
+            channel_id: "",
+            channel_member: [],
+            channel_name: "",
+            channel_type: "Public",
+            notification_type: "",
+            seen: true,
+          },
+          spaceChannel: [],
+          team: state?.team?.filter((el) => el.team_id !== payload.teamId),
+        };
+      }
       return {
         ...state,
-        channel: [],
-        currentChannel: {
-          channel_id: "",
-          channel_member: [],
-          channel_name: "",
-          channel_type: "Public",
-          notification_type: "",
-          seen: true,
-        },
-        spaceChannel: [],
         team: state?.team?.filter((el) => el.team_id !== payload.teamId),
       };
     }

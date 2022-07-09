@@ -127,14 +127,15 @@ export const findTeamAndChannel =
     }
   };
 
-export const setCurrentChannel = (channel: any) => (dispatch: Dispatch) => {
-  if (channel?.channel_id)
-    setCookie(AsyncKey.lastChannelId, channel?.channel_id);
-  dispatch({
-    type: ActionTypes.SET_CURRENT_CHANNEL,
-    payload: { channel },
-  });
-};
+export const setCurrentChannel =
+  (channel: any, communityId?: string) => (dispatch: Dispatch) => {
+    if (channel?.channel_id)
+      setCookie(AsyncKey.lastChannelId, channel?.channel_id);
+    dispatch({
+      type: ActionTypes.SET_CURRENT_CHANNEL,
+      payload: { channel, communityId },
+    });
+  };
 
 export const updateChannel =
   (channelId: string, body: any) => async (dispatch: Dispatch) => {

@@ -86,7 +86,14 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
       }
       setLoading(false);
     },
-    [currentTeam.team_id, dispatch, match_community_id, team, userData.user_id]
+    [
+      currentTeam?.team_id,
+      dispatch,
+      history,
+      match_community_id,
+      team,
+      userData.user_id,
+    ]
   );
   useEffect(() => {
     let invitationId: string | null = null;
