@@ -22,6 +22,7 @@ import {
 } from "renderer/utils/Menu";
 import SpaceItem from "renderer/shared/SpaceItem";
 import MemberSpace from "renderer/shared/MemberSpace";
+import images from "renderer/common/images";
 
 type SideBarProps = {
   onEditGroupChannel: (group: any) => void;
@@ -209,6 +210,7 @@ const SideBar = forwardRef(
                   onContextSpaceChannel={handleContextMenuSpace}
                   onContextChannel={handleContextMenuChannel}
                   onSpaceBadgeClick={onSpaceBadgeClick}
+                  onCreateChannelClick={onCreateChannel}
                   channels={space.channels}
                 />
               </div>
@@ -220,6 +222,7 @@ const SideBar = forwardRef(
         handleContextMenuChannel,
         handleContextMenuSpace,
         isOwner,
+        onCreateChannel,
         onSpaceBadgeClick,
       ]
     );
@@ -244,6 +247,10 @@ const SideBar = forwardRef(
               onContextMenu={handleContextMenuMemberSpace}
               onInviteMember={onInviteMember}
             />
+            <div className="btn-create-space" onClick={onCreateGroupChannel}>
+              <img src={images.icPlus} alt="" />
+              <span className="create-space-text">New space</span>
+            </div>
           </div>
         ) : (
           <div className="sidebar-body" />

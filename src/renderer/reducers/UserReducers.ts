@@ -23,6 +23,7 @@ interface UserReducerState {
   lastChannel: { [key: string]: Channel };
   spaceMembers: Array<UserData>;
   walletBalance?: BalanceApiData | null;
+  createdChannelSpaceId?: string | null;
 }
 
 const initialState: UserReducerState = {
@@ -54,6 +55,7 @@ const initialState: UserReducerState = {
   lastChannel: {},
   spaceMembers: [],
   walletBalance: null,
+  createdChannelSpaceId: null,
 };
 
 const userReducers: Reducer<UserReducerState, AnyAction> = (
@@ -157,11 +159,24 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
     }
     case actionTypes.DELETE_GROUP_CHANNEL_SUCCESS: {
+      const { currentChannel, channel } = state;
+      const currentIdx = channel.findIndex(
+        (el) => el.channel_id === currentChannel.channel_id
+      );
+      const nextChannels = channel.filter(
+        (el) => el.space_id !== payload.spaceId
+      );
+      const newCurrentChannel =
+        nextChannels?.[currentIdx] ||
+        nextChannels?.[0] ||
+        initialState.currentChannel;
       return {
         ...state,
         spaceChannel: state.spaceChannel.filter(
           (el) => el.space_id !== payload.spaceId
         ),
+        channel: nextChannels,
+        currentChannel: newCurrentChannel,
       };
     }
     case actionTypes.CREATE_GROUP_CHANNEL_SUCCESS: {
@@ -330,7 +345,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         team,
         teamUsersRes,
       } = payload;
-      let channel = state.currentChannel;
+      let channel: Channel = initialState.currentChannel;
       if (directChannelUser && lastChannelId) {
         const directChannel = resChannel.data.find(
           (c) => c?.channel_id === directChannelUser.direct_channel
@@ -363,6 +378,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       setCookie(AsyncKey.lastChannelId, channel?.channel_id);
       return {
         ...state,
+        channel: resChannel.data,
         currentTeam: team,
         currentChannel: channel,
         lastChannel: {
@@ -482,6 +498,34 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         }),
       };
     }
+    case actionTypes.DELETE_CHANNEL_REQUEST: {
+      const { currentChannel, channel, teamUserData } = state;
+      const currentIdx = channel.findIndex(
+        (el) => el.channel_id === currentChannel.channel_id
+      );
+      const newChannel = channel.filter(
+        (el) => el.channel_id !== payload.channelId
+      );
+      let newCurrentChannel = initialState.currentChannel;
+      if (currentChannel.channel_id === payload.channelId) {
+        newCurrentChannel =
+          newChannel?.[currentIdx] ||
+          newChannel?.[0] ||
+          initialState.currentChannel;
+        if (newCurrentChannel.channel_type === "Direct") {
+          newCurrentChannel.user = teamUserData?.find(
+            (u) => u.direct_channel === newCurrentChannel.channel_id
+          );
+        }
+      }
+      return {
+        ...state,
+        lastChannel: {
+          ...state.lastChannel,
+          [payload.communityId]: newCurrentChannel,
+        },
+      };
+    }
     case actionTypes.DELETE_CHANNEL_SUCCESS: {
       const { currentChannel, channel, teamUserData } = state;
       const currentIdx = channel.findIndex(
@@ -493,9 +537,12 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       const newChannel = channel.filter(
         (el) => el.channel_id !== payload.channelId
       );
-      let newCurrentChannel = currentChannel;
+      let newCurrentChannel = initialState.currentChannel;
       if (currentChannel.channel_id === payload.channelId) {
-        newCurrentChannel = newChannel?.[currentIdx] || newChannel?.[0];
+        newCurrentChannel =
+          newChannel?.[currentIdx] ||
+          newChannel?.[0] ||
+          initialState.currentChannel;
         if (newCurrentChannel.channel_type === "Direct") {
           newCurrentChannel.user = teamUserData?.find(
             (u) => u.direct_channel === newCurrentChannel.channel_id
@@ -543,14 +590,20 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             : state.currentChannel,
       };
     }
+    case actionTypes.CREATE_CHANNEL_REQUEST: {
+      return {
+        ...state,
+        createdChannelSpaceId: null,
+      };
+    }
     case actionTypes.CREATE_CHANNEL_SUCCESS: {
       return {
         ...state,
-        currentChannel: payload,
         lastChannel: {
           ...state.lastChannel,
           [state.currentTeam.team_id]: payload,
         },
+        createdChannelSpaceId: payload.space_id,
       };
     }
     case actionTypes.REMOVE_MEMBER_SUCCESS: {

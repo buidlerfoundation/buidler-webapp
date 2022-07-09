@@ -161,6 +161,9 @@ const RedirectToHome = () => {
   if (isEmpty && team?.length === 0) {
     return <EmptyTeamView />;
   }
+  if (isEmpty && channel?.length === 0) {
+    return <Home />;
+  }
   return null;
 };
 

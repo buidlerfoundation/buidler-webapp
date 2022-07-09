@@ -4,7 +4,7 @@ import { getSpaceBackgroundColor } from "renderer/helpers/SpaceHelper";
 import api from "../api";
 import ActionTypes from "./ActionTypes";
 import { AsyncKey } from "../common/AppConfig";
-import { getCookie, setCookie } from "../common/Cookie";
+import { getCookie, removeCookie, setCookie } from "../common/Cookie";
 import ImageHelper from "../common/ImageHelper";
 import SocketUtils from "../utils/SocketUtils";
 import { Channel, Community, UserData } from "renderer/models";
@@ -147,12 +147,13 @@ export const updateChannel =
   };
 
 export const deleteChannel =
-  (channelId: string) => async (dispatch: Dispatch) => {
+  (channelId: string, communityId: string) => async (dispatch: Dispatch) => {
     dispatch({
-      type: ActionTypes.DELETE_CHANNEL_PREFIX,
-      payload: { channelId },
+      type: ActionTypes.DELETE_CHANNEL_REQUEST,
+      payload: { channelId, communityId },
     });
-    const res = await api.deleteChannel(channelId);
+    removeCookie(AsyncKey.lastChannelId);
+    await api.deleteChannel(channelId);
   };
 
 export const createNewChannel =

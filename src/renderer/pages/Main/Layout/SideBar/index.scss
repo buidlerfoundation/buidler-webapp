@@ -10,7 +10,7 @@
     margin-left: 15px;
   }
   .team-logo::before {
-    content: ' ';
+    content: " ";
     display: block;
     position: absolute;
     height: 50px;
@@ -22,7 +22,7 @@
     border-radius: 10px;
     background-color: var(--color-darkest-background);
     background-repeat: no-repeat;
-    background-image: url('../../../../assets/images/ic_team_default.svg');
+    background-image: url("../../../../assets/images/ic_team_default.svg");
   }
 }
 .sidebar-body {
@@ -90,6 +90,24 @@
     width: 4px;
     border-radius: 5px;
     background-color: var(--color-lighter-background);
+  }
+  .btn-create-space {
+    display: flex;
+    align-items: center;
+    margin: 0 10px 10px 10px;
+    padding: 12px 23px;
+    border-radius: 5px;
+    .create-space-text {
+      margin-left: 13px;
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 26px;
+      color: var(--color-secondary-text);
+    }
+    &:hover {
+      cursor: pointer;
+      background-color: var(--color-stroke);
+    }
   }
 }
 
