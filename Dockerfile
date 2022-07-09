@@ -8,6 +8,7 @@ RUN yarn build
 
 # Stage 2 - production stage
 FROM nginx:1.17-alpine as production-stage
+COPY ./docker/nginx-config/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build-stage /usr/src/app/build /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
