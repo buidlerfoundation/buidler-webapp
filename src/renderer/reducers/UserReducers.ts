@@ -40,6 +40,7 @@ const initialState: UserReducerState = {
     team_icon: "",
     team_id: "",
     team_url: "",
+    role: "",
   },
   currentChannel: {
     channel_id: "",

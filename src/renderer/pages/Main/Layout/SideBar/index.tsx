@@ -51,8 +51,9 @@ const SideBar = forwardRef(
     }: SideBarProps,
     ref
   ) => {
-    const { userData, channel, currentChannel, team, teamUserData } =
-      useAppSelector((state) => state.user);
+    const { channel, currentChannel, team, currentTeam } = useAppSelector(
+      (state) => state.user
+    );
     const spaceChannel = useAppSelector((state) =>
       state.user.spaceChannel.sort((v1, v2) =>
         v1.is_space_member > v2.is_space_member ? -1 : 1
@@ -70,11 +71,8 @@ const SideBar = forwardRef(
     const menuSpaceChannelRef = useRef<any>();
     const menuMemberRef = useRef<any>();
     const isOwner = useMemo(() => {
-      const role = teamUserData?.find?.(
-        (el) => el.user_id === userData?.user_id
-      )?.role;
-      return role === "Owner";
-    }, [teamUserData, userData?.user_id]);
+      return currentTeam.role === "Owner";
+    }, [currentTeam.role]);
     useImperativeHandle(ref, () => {
       return {
         scrollToBottom: () => {
@@ -247,10 +245,12 @@ const SideBar = forwardRef(
               onContextMenu={handleContextMenuMemberSpace}
               onInviteMember={onInviteMember}
             />
-            <div className="btn-create-space" onClick={onCreateGroupChannel}>
-              <img src={images.icPlus} alt="" />
-              <span className="create-space-text">New space</span>
-            </div>
+            {isOwner && (
+              <div className="btn-create-space" onClick={onCreateGroupChannel}>
+                <img src={images.icPlus} alt="" />
+                <span className="create-space-text">New space</span>
+              </div>
+            )}
           </div>
         ) : (
           <div className="sidebar-body" />
