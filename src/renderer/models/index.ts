@@ -332,3 +332,25 @@ export interface NFTCollectionDataApi {
   network: string;
   nft: Array<UserNFTCollection>;
 }
+
+export interface NFTAsset {
+  name: string;
+  description: string;
+  contract_address: string;
+  token_id: string;
+  token_type: string;
+  user_id: string;
+  image_url: string;
+  background_image_url: string;
+  network: string;
+  nft_collection: NFTCollection;
+}
+
+export interface ENSAsset {
+  name: string;
+}
+
+export interface CollectibleDataApi {
+  ens_assets: Array<ENSAsset>;
+  nft_assets: Array<NFTAsset>;
+}

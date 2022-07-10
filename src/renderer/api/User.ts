@@ -1,6 +1,7 @@
 import {
   BalanceApiData,
   Channel,
+  CollectibleDataApi,
   Community,
   InitialApiData,
   NFTCollectionDataApi,
@@ -60,7 +61,7 @@ export const verifyNonce = (message: string, signature: string) =>
   }>("user", { message, signature });
 
 export const getCollectibles = (page = 1, limit = 10) => {
-  return Caller.get<any>(`user/nft?page=${page}&limit=${limit}`);
+  return Caller.get<CollectibleDataApi>(`user/nft?page=${page}&limit=${limit}`);
 };
 
 export const updateUser = (data: any) => ApiCaller.put("user", data);
