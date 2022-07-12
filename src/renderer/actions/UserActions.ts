@@ -469,17 +469,17 @@ export const deleteTeam = (teamId: string) => async (dispatch: Dispatch) => {
 export const updateUser = (userData: any) => async (dispatch: Dispatch) => {
   dispatch({ type: ActionTypes.UPDATE_USER_REQUEST, payload: userData });
   const dataUpdate: any = {
-    ens_asset: userData?.ensAsset,
     username: userData?.userName,
   };
+  if (userData.isUpdateENS && userData?.ensAsset) {
+    dataUpdate.ens_asset = userData?.ensAsset;
+  }
   if (userData?.nftAsset) {
     dataUpdate.nft_asset = {
       contract_address: userData?.nftAsset?.contract_address,
       token_id: userData?.nftAsset?.token_id,
       network: userData?.nftAsset?.network,
     };
-  } else if (userData?.avatarUrl) {
-    dataUpdate.avatar_url = userData?.avatarUrl;
   }
   try {
     const res = await api.updateUser(dataUpdate);
