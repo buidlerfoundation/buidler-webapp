@@ -91,6 +91,7 @@ import icSettingSpaceAccess from "../assets/images/ic_setting_space_access.svg";
 import icMetamask from "../assets/images/ic_metamask.svg";
 import icBadgeVerified from "../assets/images/ic_badge_verified.svg";
 import icPlusCircleLight from "../assets/images/ic_plus_circle_light.svg";
+import icConvert from "../assets/images/ic_convert.svg";
 
 const images = {
   icTeamDefault,
@@ -186,6 +187,7 @@ const images = {
   icMetamask,
   icBadgeVerified,
   icPlusCircleLight,
+  icConvert,
 };
 
 export default images;

@@ -96,6 +96,7 @@ export interface Community {
   team_id: string;
   team_url: string;
   role: string;
+  team_description?: string;
 }
 
 export interface NFTCollection {

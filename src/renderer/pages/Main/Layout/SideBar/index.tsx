@@ -247,7 +247,7 @@ const SideBar = forwardRef(
             />
             {isOwner && (
               <div className="btn-create-space" onClick={onCreateGroupChannel}>
-                <img src={images.icPlus} alt="" />
+                <img src={images.icPlus} alt="" className="ic-plus" />
                 <span className="create-space-text">New space</span>
               </div>
             )}

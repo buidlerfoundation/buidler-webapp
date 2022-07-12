@@ -21,6 +21,7 @@ const EmptyView = () => {
           team_id: body.teamId,
           team_display_name: body.name,
           team_icon: body.teamIcon?.url,
+          team_description: body.description,
         })
       );
       if (res.statusCode === 200) {
