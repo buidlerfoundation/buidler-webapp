@@ -84,7 +84,7 @@ export const getMentionData = (s: string) => {
 };
 
 export const getLastIndexOfMention = (s: string) => {
-  const mentionRegex = /(<a href="\$mention_location\?)(.*?)(<\/a>)/g;
+  const mentionRegex = /(<a href="\$mention_location.*?">)(.*?)(<\/a>)/g;
   const mentionMatches = s.match(mentionRegex) || [];
   if (mentionMatches?.length > 0) {
     return s.lastIndexOf(mentionMatches[mentionMatches.length - 1]);

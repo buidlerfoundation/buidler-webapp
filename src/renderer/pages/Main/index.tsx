@@ -29,6 +29,7 @@ import useQuery from "renderer/hooks/useQuery";
 import actionTypes from "renderer/actions/ActionTypes";
 import api from "renderer/api";
 import toast from "react-hot-toast";
+import { createErrorMessageSelector } from "renderer/reducers/selectors";
 
 const PublicRoute = ({ component: Component, ...rest }: any) => {
   const history = useHistory();
@@ -46,10 +47,13 @@ const PublicRoute = ({ component: Component, ...rest }: any) => {
   return <Route {...rest} render={(props) => <Component {...props} />} />;
 };
 
+const errorUserSelector = createErrorMessageSelector([actionTypes.USER_PREFIX]);
+
 const PrivateRoute = ({ component: Component, ...rest }: any) => {
   const query = useQuery();
   const match_community_id = rest?.computedMatch?.params?.match_community_id;
   const userData = useAppSelector((state) => state.user.userData);
+  const userError = useAppSelector((state) => errorUserSelector(state));
   const team = useAppSelector((state) => state.user.team);
   const currentTeam = useAppSelector((state) => state.user.currentTeam);
   const dispatch = useAppDispatch();
@@ -70,7 +74,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
           setCookie(AsyncKey.lastTeamId, res.data?.team_id);
           history.replace(`/channels/${res.data?.team_id}`);
         }
-      } else if (!userData.user_id) {
+      } else if (!userData.user_id && !userError) {
         await dispatch(findUser());
         await dispatch(findTeamAndChannel(match_community_id));
       } else if (
@@ -93,6 +97,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
       match_community_id,
       team,
       userData.user_id,
+      userError,
     ]
   );
   useEffect(() => {
