@@ -195,7 +195,10 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
               ) {
                 msg.conversation_data = payload.conversation_data;
               }
-              if (msg.message_id === payload.parent_id) {
+              if (
+                msg.message_id === payload.parent_id ||
+                msg.parent_id === payload.parent_id
+              ) {
                 msg.parent_id = payload.parent_id;
                 if (msg.task) {
                   msg.task.comment_count = msg.task.comment_count
@@ -254,7 +257,10 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
                 ) {
                   msg.conversation_data = data.conversation_data;
                 }
-                if (msg.message_id === data.parent_id) {
+                if (
+                  msg.message_id === data.parent_id ||
+                  msg.parent_id === data.parent_id
+                ) {
                   msg.parent_id = data.parent_id;
                   if (msg.task) {
                     msg.task.comment_count = msg.task.comment_count
