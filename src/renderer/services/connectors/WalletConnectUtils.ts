@@ -21,11 +21,16 @@ class WalletConnectUtils {
     });
     if (this.connector.connected) {
       this.connector.killSession();
+      this.connector.on("disconnect", onDisconnect);
+      this.connector.on("connect", onConnect);
+      // create new session
+      this.connector.createSession();
+    } else {
+      this.connector.on("disconnect", onDisconnect);
+      this.connector.on("connect", onConnect);
+      // create new session
+      this.connector.createSession();
     }
-    this.connector.on("disconnect", onDisconnect);
-    this.connector.on("connect", onConnect);
-    // create new session
-    this.connector.createSession();
   }
 
   disconnect() {
