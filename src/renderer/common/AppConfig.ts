@@ -3,9 +3,7 @@ import images from "./images";
 const Prefix = "Buidler";
 
 const AppConfig = {
-  baseUrl: "https://api.remotetoday.app/",
-  stagingBaseUrl: "https://testnet.buidler.app/",
-  // baseUrl: 'http://127.0.0.1:8888/',
+  apiBaseUrl: process.env.REACT_APP_API_BASE_URL,
   maxLengthSpaceDescription: 450,
   maxLengthCommunityDescription: 1000,
   maximumFileSize: 100000000,

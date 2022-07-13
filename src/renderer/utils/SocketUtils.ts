@@ -197,17 +197,13 @@ class SocketUtil {
     this.firstLoad = false;
     if (this.socket?.connected) return;
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
-    this.socket = io(
-      // `${AppConfig.baseUrl}`,
-      `${AppConfig.stagingBaseUrl}`,
-      {
-        query: { token: accessToken },
-        transports: ["websocket"],
-        upgrade: false,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
-      }
-    );
+    this.socket = io(`${AppConfig.apiBaseUrl}`, {
+      query: { token: accessToken },
+      transports: ["websocket"],
+      upgrade: false,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
     this.socket.on("connect", () => {
       console.log("socket connected");
       if (this.firstLoad) {
