@@ -348,11 +348,11 @@ const Home = () => {
         channel_ids.unshift(currentChannel?.channel_id);
       }
       if (channel_ids.length === 0) {
-        toast.error("Channels can not be empty");
+        toast.error("Channels cannot be empty");
         return;
       }
       if (!taskCreateData?.title) {
-        toast.error("Title can not be empty");
+        toast.error("Title cannot be empty");
         return;
       }
       const body: any = {
@@ -410,14 +410,14 @@ const Home = () => {
       }
       if (spaceData.spaceType === "Exclusive") {
         if (!spaceData.spaceBadgeId) {
-          error = "Badge can not be empty";
+          error = "Badge cannot be empty";
         } else if (!spaceData.condition) {
-          error = "Condition can not be empty";
+          error = "Condition cannot be empty";
         } else if (
           !spaceData.condition.amount &&
           !spaceData.condition.amountInput
         ) {
-          error = "Amount can not be empty";
+          error = "Amount cannot be empty";
         }
         if (error) {
           toast.error(error);

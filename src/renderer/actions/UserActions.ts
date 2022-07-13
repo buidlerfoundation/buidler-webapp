@@ -487,8 +487,10 @@ export const updateUser = (userData: any) => async (dispatch: Dispatch) => {
     if (res.statusCode !== 200) {
       dispatch({ type: ActionTypes.UPDATE_USER_FAIL, message: res.message });
     }
+    return res.statusCode === 200;
   } catch (error) {
     dispatch({ type: ActionTypes.UPDATE_USER_FAIL, message: error });
+    return false;
   }
 };
 

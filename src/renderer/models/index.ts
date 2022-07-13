@@ -356,3 +356,19 @@ export interface CollectibleDataApi {
   ens_assets: Array<ENSAsset>;
   nft_assets: Array<NFTAsset>;
 }
+
+export type SendData = {
+  recipientAddress?: string;
+  asset?: Token | null;
+  amount?: number;
+};
+
+export interface BaseDataApi<T> {
+  success: boolean;
+  data?: T;
+  statusCode: number;
+  message?: string;
+  total?: number;
+  token?: string;
+  metadata?: { total?: number };
+}
