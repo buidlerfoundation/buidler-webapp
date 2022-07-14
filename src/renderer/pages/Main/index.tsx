@@ -183,7 +183,10 @@ const Main = () => {
   if (!imgDomain) {
     return <div className="main-load-page" />;
   }
-  if (chainId !== ChainId.EthereumMainnet) {
+  if (
+    chainId !== ChainId.EthereumMainnet &&
+    chainId !== ChainId.EthereumRinkeby
+  ) {
     return <UnSupportedNetwork />;
   }
   return (

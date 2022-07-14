@@ -1,5 +1,7 @@
+import { utils } from "ethers";
+
 export const createConfirmSeedState = () => {
-  return new Array(12).fill({}).map((_, index) => ({ index, title: '' }));
+  return new Array(12).fill({}).map((_, index) => ({ index, title: "" }));
 };
 
 export const isValidPrivateKey = (key: string) => {
@@ -8,4 +10,9 @@ export const isValidPrivateKey = (key: string) => {
   }
   const regex = /^[0-9A-Fa-f]{64}$/;
   return key.match(regex);
+};
+
+export const isValidAddress = (address?: string) => {
+  if (!address) return false;
+  return utils.isAddress(address);
 };
