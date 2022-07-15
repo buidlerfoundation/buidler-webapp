@@ -239,6 +239,8 @@ class SocketUtil {
         this.socket.off("ON_UPDATE_SPACE");
         this.socket.off("ON_DELETE_SPACE");
         this.socket.off("ON_USER_UPDATE_PROFILE");
+        this.socket.off("ON_ADD_USER_TO_SPACE");
+        this.socket.off("ON_REMOVE_USER_FROM_SPACE");
         this.socket.off("disconnect");
       });
       const user: any = store.getState()?.user;
@@ -296,6 +298,32 @@ class SocketUtil {
     });
   };
   listenSocket() {
+    this.socket.on(
+      "ON_ADD_USER_TO_SPACE",
+      async (data: { space_id: string }) => {
+        const channelFromSpaceRes = await api.getChannelFromSpace(
+          data.space_id
+        );
+        store.dispatch({
+          type: actionTypes.ADD_USER_TO_SPACE,
+          payload: {
+            channelFromSpace: channelFromSpaceRes.data || [],
+            space_id: data.space_id,
+          },
+        });
+      }
+    );
+    this.socket.on(
+      "ON_REMOVE_USER_FROM_SPACE",
+      (data: { space_id: string }) => {
+        store.dispatch({
+          type: actionTypes.REMOVE_USER_FROM_SPACE,
+          payload: {
+            space_id: data.space_id,
+          },
+        });
+      }
+    );
     this.socket.on("ON_USER_UPDATE_PROFILE", (data: UserData) => {
       store.dispatch({
         type: actionTypes.UPDATE_USER_SUCCESS,

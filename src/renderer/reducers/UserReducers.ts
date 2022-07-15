@@ -65,6 +65,32 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.ADD_USER_TO_SPACE: {
+      return {
+        ...state,
+        channel: [...state.channel, ...payload.channelFromSpace],
+        spaceChannel: state.spaceChannel.map((el) => {
+          if (el.space_id === payload.space_id) {
+            el.channels = [...(el.channels || []), ...payload.channelFromSpace];
+            el.is_space_member = true;
+          }
+          return el;
+        }),
+      };
+    }
+    case actionTypes.REMOVE_USER_FROM_SPACE: {
+      return {
+        ...state,
+        channel: state.channel.filter((el) => el.space_id !== payload.space_id),
+        spaceChannel: state.spaceChannel.map((el) => {
+          if (el.space_id === payload.space_id) {
+            el.channels = [];
+            el.is_space_member = false;
+          }
+          return el;
+        }),
+      };
+    }
     case actionTypes.ADD_USER_TOKEN: {
       const newWalletBalance = state.walletBalance
         ? {

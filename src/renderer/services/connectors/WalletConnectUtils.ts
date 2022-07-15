@@ -4,7 +4,7 @@ import { ethers, utils } from "ethers";
 import MinABI from "./MinABI";
 
 class WalletConnectUtils {
-  connector: any = null;
+  connector: WalletConnect | null = null;
 
   init(onDisconnect: () => void) {
     this.connector = new WalletConnect({
@@ -16,13 +16,13 @@ class WalletConnectUtils {
     }
   }
 
-  connect(onConnect: () => void, onDisconnect: () => void) {
+  async connect(onConnect: () => void, onDisconnect: () => void) {
     this.connector = new WalletConnect({
       bridge: "https://bridge.walletconnect.org", // Required
       qrcodeModal: QRCodeModal,
     });
     if (this.connector.connected) {
-      this.connector.killSession();
+      await this.connector.killSession();
       this.connector.on("disconnect", onDisconnect);
       this.connector.on("connect", onConnect);
       // create new session
@@ -36,7 +36,7 @@ class WalletConnectUtils {
   }
 
   disconnect() {
-    if (this.connector.connected) {
+    if (this.connector?.connected) {
       this.connector.killSession();
     }
   }
@@ -52,7 +52,7 @@ class WalletConnectUtils {
       from: "0x27fA68A776AF552d73C77631Bcfcb8F47b1b62e9",
       value: amountHex,
     };
-    return this.connector.sendTransaction(transactionParameters);
+    return this.connector?.sendTransaction(transactionParameters);
   };
 
   sendERC20Transaction = async () => {
@@ -81,7 +81,7 @@ class WalletConnectUtils {
       ],
     };
 
-    return this.connector.sendCustomRequest(customRequest);
+    return this.connector?.sendCustomRequest(customRequest);
   };
 }
 

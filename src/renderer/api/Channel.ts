@@ -42,3 +42,6 @@ export const deleteSpaceChannel = (spaceId: string) =>
 
 export const getSpaceMembers = (id: string) =>
   Caller.get<Array<SpaceMember>>(`space/${id}/member`);
+
+export const getChannelFromSpace = (id: string) =>
+  Caller.get<Array<Channel>>(`space/${id}/channel`);
