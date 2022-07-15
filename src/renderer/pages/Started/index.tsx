@@ -13,6 +13,7 @@ import useAppDispatch from "renderer/hooks/useAppDispatch";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 import { ethers, utils } from "ethers";
+import GlobalVariable from "renderer/services/GlobalVariable";
 
 const Started = () => {
   const dispatch = useAppDispatch();
@@ -24,6 +25,7 @@ const Started = () => {
   const dataFromUrl = useAppSelector((state) => state.configs.dataFromUrl);
   const handleResponseVerify = useCallback(
     async (res: any, loginType: string) => {
+      GlobalVariable.loginType = loginType;
       await setCookie(AsyncKey.accessTokenKey, res?.token);
       await setCookie(AsyncKey.loginType, loginType);
       if (dataFromUrl?.includes?.("invitation")) {

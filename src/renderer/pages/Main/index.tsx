@@ -11,6 +11,7 @@ import {
   findTeamAndChannel,
   findUser,
   getInitial,
+  logout,
   setCurrentTeam,
 } from "renderer/actions/UserActions";
 import MainWrapper from "./Layout";
@@ -30,6 +31,7 @@ import actionTypes from "renderer/actions/ActionTypes";
 import api from "renderer/api";
 import toast from "react-hot-toast";
 import { createErrorMessageSelector } from "renderer/reducers/selectors";
+import SocketUtils from "renderer/utils/SocketUtils";
 
 const PublicRoute = ({ component: Component, ...rest }: any) => {
   const history = useHistory();
@@ -117,12 +119,14 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
       .then((res: any) => {
         if (!res) {
           history.replace("/started");
+          dispatch(logout?.());
         } else {
           initApp(invitationId);
         }
       })
       .catch(() => {
         history.replace("/started");
+        dispatch(logout?.());
       });
   }, [history, query, initApp, dispatch]);
   if (loading) return <div className="main-load-page" />;

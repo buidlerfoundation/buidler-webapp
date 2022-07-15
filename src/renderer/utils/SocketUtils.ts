@@ -12,7 +12,7 @@ import {
 import { io } from "socket.io-client";
 import { uniqBy } from "lodash";
 import { UserData } from "renderer/models";
-import { ethers, utils } from "ethers";
+import { utils } from "ethers";
 import actionTypes from "renderer/actions/ActionTypes";
 import AppConfig, { AsyncKey, LoginType } from "../common/AppConfig";
 import {
@@ -24,6 +24,7 @@ import {
 import store from "../store";
 import api from "../api";
 import { createRefreshSelector } from "../reducers/selectors";
+import GlobalVariable from "renderer/services/GlobalVariable";
 
 const getTasks = async (channelId: string, dispatch: Dispatch) => {
   dispatch({ type: actionTypes.TASK_REQUEST, payload: { channelId } });
@@ -557,14 +558,7 @@ class SocketUtil {
       const configs: any = store.getState()?.configs;
       const { channelPrivateKey } = configs;
       const user: any = store.getState()?.user;
-      const {
-        userData,
-        team,
-        currentTeam,
-        teamUserData,
-        channel,
-        currentChannel,
-      } = user;
+      const { userData, teamUserData, channel, currentChannel } = user;
       const messageData: any = store.getState()?.message.messageData;
       const channelNotification = channel.find(
         (c: any) => c.channel_id === message_data.channel_id
@@ -724,7 +718,8 @@ class SocketUtil {
   async emitOnline(teamId: string) {
     const deviceCode = await getDeviceCode();
     const generatedPrivateKey = await GeneratedPrivateKey();
-    const loginType = await getCookie(AsyncKey.loginType);
+    const loginType =
+      (await getCookie(AsyncKey.loginType)) || GlobalVariable.loginType;
     if (
       loginType === LoginType.WalletConnect ||
       loginType === LoginType.Metamask

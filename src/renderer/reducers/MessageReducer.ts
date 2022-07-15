@@ -1,4 +1,5 @@
 import { AnyAction, Reducer } from "redux";
+import { normalizeMessage } from "renderer/helpers/MessageHelper";
 import { MessageData } from "renderer/models";
 import actionTypes from "../actions/ActionTypes";
 
@@ -25,7 +26,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
   const { type, payload } = action;
   switch (type) {
     case actionTypes.CONVERSATION_SUCCESS: {
-      const { parentId, data, before, isFresh } = payload;
+      const { parentId, data, before } = payload;
       let cvs = data;
       if (before && state.conversationData?.[parentId]) {
         cvs = [...state.conversationData[parentId], ...data];
@@ -39,7 +40,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
       };
     }
     case actionTypes.MESSAGE_SUCCESS: {
-      const { channelId, data, before, isFresh } = payload;
+      const { channelId, data, before } = payload;
       let msg = data;
       let scrollData = state.messageData?.[channelId]?.scrollData;
       if (
@@ -57,7 +58,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
         messageData: {
           ...state.messageData,
           [channelId]: {
-            data: msg,
+            data: normalizeMessage(msg),
             canMore: data.length !== 0,
             scrollData,
           },
@@ -106,15 +107,26 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
       const { messageId, channelId, parentId } = payload;
       const newMessageData = state.messageData;
       if (newMessageData[channelId]) {
+        const currentIdx = newMessageData[channelId].data.findIndex(
+          (el) => el.message_id === messageId
+        );
+        const currentMsg = newMessageData[channelId].data?.[currentIdx];
         newMessageData[channelId] = {
           ...newMessageData[channelId],
           data: newMessageData[channelId].data
             .filter((el) => el.message_id !== messageId)
-            .map((el) => {
+            .map((el, index) => {
               if (el.parent_id === parentId) {
                 el.conversation_data = el.conversation_data.filter(
                   (c) => c.message_id !== messageId
                 );
+              }
+              if (currentIdx === index + 1) {
+                return {
+                  ...el,
+                  isHead: currentMsg?.isHead,
+                  isConversationHead: currentMsg?.isConversationHead,
+                };
               }
               return el;
             }),
@@ -186,7 +198,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
       if (newMessageData[payload.channel_id]?.data) {
         newMessageData[payload.channel_id] = {
           ...newMessageData[payload.channel_id],
-          data: [
+          data: normalizeMessage([
             payload,
             ...newMessageData[payload.channel_id].data.map((msg) => {
               if (
@@ -208,17 +220,18 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
               }
               return msg;
             }),
-          ],
+          ]),
         };
       } else {
         newMessageData[payload.channel_id] = {
-          data: [payload],
+          data: normalizeMessage([payload]),
           canMore: true,
           scrollData: { showScrollDown: false, unreadCount: 0 },
         };
       }
       return {
         ...state,
+        newMessageData,
       };
     }
     case actionTypes.RECEIVE_MESSAGE: {
@@ -238,17 +251,19 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
         if (isExited) {
           newMessageData[data.channel_id] = {
             ...newMessageData[data.channel_id],
-            data: newMessageData[data.channel_id].data.map((msg) => {
-              if (msg.message_id === data.message_id) {
-                return data;
-              }
-              return msg;
-            }),
+            data: normalizeMessage(
+              newMessageData[data.channel_id].data.map((msg) => {
+                if (msg.message_id === data.message_id) {
+                  return data;
+                }
+                return msg;
+              })
+            ),
           };
         } else {
           newMessageData[data.channel_id] = {
             ...newMessageData[data.channel_id],
-            data: [
+            data: normalizeMessage([
               data,
               ...newMessageData[data.channel_id].data.map((msg) => {
                 if (
@@ -270,12 +285,12 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
                 }
                 return msg;
               }),
-            ],
+            ]),
           };
         }
       } else {
         newMessageData[data.channel_id] = {
-          data: [data],
+          data: normalizeMessage([data]),
           canMore: true,
           scrollData: { showScrollDown: false, unreadCount: 0 },
         };
