@@ -1,4 +1,5 @@
 import { ethers, utils } from "ethers";
+import { SendData } from "renderer/models";
 import MinABI from "./MinABI";
 
 class MetamaskUtils {
@@ -25,16 +26,19 @@ class MetamaskUtils {
     window.ethereum?.on("chainChanged", onUpdate);
   }
 
-  sendETHTransaction = () => {
-    const amount = 1000000000000000;
-    const amountHex = ethers.BigNumber.from(amount.toString()).toHexString();
-    const gasHex = ethers.BigNumber.from("21000").toHexString();
+  sendETHTransaction = (sendData: SendData, from: string) => {
+    const amount = ethers.BigNumber.from(
+      `${
+        parseFloat(`${sendData.amount || 0}`) *
+        Math.pow(10, sendData.asset?.contract.decimals || 0)
+      }`
+    );
     const transactionParameters = {
-      gasPrice: "0x061ce9a604",
-      gas: gasHex,
-      to: "0x639Ea2A5c71aB079564aa4291a47494ad5650E4F",
-      from: "0x27fA68A776AF552d73C77631Bcfcb8F47b1b62e9",
-      value: amountHex,
+      gasPrice: sendData.gasPrice?.toHexString(),
+      gas: sendData.gasLimit.toHexString(),
+      to: sendData.recipientAddress,
+      from,
+      value: amount.toHexString(),
     };
     return window.ethereum?.request({
       method: "eth_sendTransaction",
@@ -42,21 +46,24 @@ class MetamaskUtils {
     });
   };
 
-  sendERC20Transaction = async () => {
-    const amount = 1000000000000000000;
-    const amountHex = ethers.BigNumber.from(amount.toString()).toHexString();
-    const gasHex = ethers.BigNumber.from("35000").toHexString();
+  sendERC20Transaction = async (sendData: SendData, from: string) => {
+    const amount = ethers.BigNumber.from(
+      `${
+        parseFloat(`${sendData.amount || 0}`) *
+        Math.pow(10, sendData.asset?.contract.decimals || 0)
+      }`
+    );
     const inf = new utils.Interface(MinABI);
     const transferData = inf.encodeFunctionData("transfer", [
-      "0x639Ea2A5c71aB079564aa4291a47494ad5650E4F",
-      amountHex,
+      sendData.recipientAddress,
+      amount.toHexString(),
     ]);
 
     const transactionParameters = {
-      gasPrice: "0x061ce9a604",
-      gas: gasHex,
-      to: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-      from: "0x27fA68A776AF552d73C77631Bcfcb8F47b1b62e9",
+      gasPrice: sendData.gasPrice?.toHexString(),
+      gas: sendData.gasLimit.toHexString(),
+      to: sendData.asset?.contract.contract_address,
+      from,
       value: "0x00",
       data: transferData,
     };

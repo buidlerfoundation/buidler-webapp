@@ -1,4 +1,4 @@
-import { utils } from "ethers";
+import { ethers, utils } from "ethers";
 
 export const createConfirmSeedState = () => {
   return new Array(12).fill({}).map((_, index) => ({ index, title: "" }));
@@ -15,4 +15,9 @@ export const isValidPrivateKey = (key: string) => {
 export const isValidAddress = (address?: string) => {
   if (!address) return false;
   return utils.isAddress(address);
+};
+
+export const findENSName = async (address: string) => {
+  const provider = ethers.getDefaultProvider();
+  return provider.lookupAddress(address);
 };

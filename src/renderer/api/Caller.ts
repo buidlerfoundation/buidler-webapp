@@ -1,5 +1,6 @@
 import toast from "react-hot-toast";
 import { BaseDataApi } from "renderer/models";
+import store from "renderer/store";
 import AppConfig, { AsyncKey } from "../common/AppConfig";
 import { getCookie } from "../common/Cookie";
 
@@ -45,6 +46,12 @@ async function requestAPI<T = any>(
     }
   } catch (e: any) {
     console.log(e);
+  }
+
+  const chainId = store.getState().network.chainId;
+
+  if (chainId) {
+    headers["Chain-Id"] = chainId;
   }
 
   // Build API body

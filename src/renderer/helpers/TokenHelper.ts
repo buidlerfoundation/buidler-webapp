@@ -1,6 +1,6 @@
 export const round = (value: number, afterDot: number) => {
   const p = Math.pow(10, afterDot);
-  return Math.round(value * p) / p;
+  return Math.floor(value * p) / p;
 };
 
 export const formatToken = (

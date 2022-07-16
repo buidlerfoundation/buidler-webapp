@@ -366,6 +366,7 @@ export type SendData = {
   amountUSD?: number | string;
   gasPrice?: ethers.BigNumber;
   gasLimit: ethers.BigNumber;
+  recipientENS?: string | null;
 };
 
 export interface BaseDataApi<T> {
