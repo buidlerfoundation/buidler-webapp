@@ -96,7 +96,7 @@ const SideBar = forwardRef(
     }, [selectedMenuSpaceChannel?.space_type]);
     const handleContextMenuSpace = useCallback(
       (e, space) => {
-        if (!isOwner || !space.is_space_member) return;
+        if (!isOwner) return;
         setSelectedMenuSpaceChannel(space);
         menuSpaceChannelRef.current?.show(e.currentTarget, {
           x: e.pageX,
