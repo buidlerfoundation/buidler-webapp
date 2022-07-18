@@ -176,7 +176,7 @@ const ChannelView = forwardRef(
           return current;
         });
         const { scrollTop, scrollHeight, clientHeight } = e.target;
-        const showScrollDown = scrollTop < -80;
+        const showScrollDown = scrollTop < 0;
         if (showScrollDown !== scrollData?.showScrollDown) {
           dispatch(
             setScrollData(currentChannel?.channel_id, {
