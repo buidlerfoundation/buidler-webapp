@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import "./index.scss";
 import { useHistory } from "react-router-dom";
 import { clearData, getDeviceCode, setCookie } from "renderer/common/Cookie";
@@ -14,8 +14,22 @@ import useAppSelector from "renderer/hooks/useAppSelector";
 import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 import { ethers, utils } from "ethers";
 import GlobalVariable from "renderer/services/GlobalVariable";
+import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
+import {
+  GAAction,
+  GACategory,
+  GALabel,
+  GAPageView,
+} from "renderer/services/analytics/GAEventName";
 
 const Started = () => {
+  useEffect(() => {
+    GoogleAnalytics.pageView(GAPageView.STARTED);
+    GoogleAnalytics.event({
+      category: GACategory.LOGIN,
+      action: GAAction.VIEW,
+    });
+  }, []);
   const dispatch = useAppDispatch();
   const hideMetaMask = useMemo(() => {
     const userAgent = window.navigator.userAgent;
@@ -23,9 +37,47 @@ const Started = () => {
   }, []);
   const history = useHistory();
   const dataFromUrl = useAppSelector((state) => state.configs.dataFromUrl);
+  const gaLoginFailed = useCallback((label: string) => {
+    GoogleAnalytics.event({
+      category: GACategory.LOGIN,
+      action: GAAction.FAILED,
+      label,
+    });
+  }, []);
+  const gaLoginSuccess = useCallback((label: string) => {
+    GoogleAnalytics.event({
+      category: GACategory.LOGIN,
+      action: GAAction.SUCCESS,
+      label,
+    });
+  }, []);
+  const gaLoginSubmit = useCallback((label: string) => {
+    GoogleAnalytics.event({
+      category: GACategory.LOGIN,
+      action: GAAction.SUBMIT,
+      label,
+    });
+  }, []);
+  const gaLoginClick = useCallback((label: string) => {
+    GoogleAnalytics.event({
+      category: GACategory.LOGIN,
+      action: GAAction.CLICK,
+      label,
+    });
+  }, []);
   const handleResponseVerify = useCallback(
     async (res: any, loginType: string) => {
       GlobalVariable.loginType = loginType;
+      if (
+        loginType === LoginType.Metamask ||
+        loginType === LoginType.WalletConnect
+      ) {
+        gaLoginSuccess(
+          loginType === LoginType.Metamask
+            ? GALabel.METAMASK
+            : GALabel.WALLET_CONNECT
+        );
+      }
       await setCookie(AsyncKey.accessTokenKey, res?.token);
       await setCookie(AsyncKey.loginType, loginType);
       if (dataFromUrl?.includes?.("invitation")) {
@@ -40,28 +92,34 @@ const Started = () => {
       MetamaskUtils.connected = true;
       history.replace("/channels");
     },
-    [dataFromUrl, dispatch, history]
+    [dataFromUrl, dispatch, gaLoginSuccess, history]
   );
   const doingMetamaskLogin = useCallback(
     async (address: string) => {
-      const nonceRes = await api.requestNonceWithAddress(address);
-      const message = nonceRes.data?.message;
-      if (nonceRes.statusCode !== 200 || !message) {
-        toast.error(nonceRes?.message || "");
-        return;
-      }
-      const metamaskProvider: any = window.ethereum;
-      const provider = new ethers.providers.Web3Provider(metamaskProvider);
-      const signer = provider.getSigner();
-      const signature = await signer.signMessage(message);
-      const res = await api.verifyNonce(message, signature);
-      if (res.statusCode === 200) {
-        await handleResponseVerify(res, LoginType.Metamask);
-      } else {
-        toast.error(res.message || "");
+      try {
+        const nonceRes = await api.requestNonceWithAddress(address);
+        const message = nonceRes.data?.message;
+        if (nonceRes.statusCode !== 200 || !message) {
+          toast.error(nonceRes?.message || "");
+          gaLoginFailed(GALabel.METAMASK);
+          return;
+        }
+        const metamaskProvider: any = window.ethereum;
+        const provider = new ethers.providers.Web3Provider(metamaskProvider);
+        const signer = provider.getSigner();
+        const signature = await signer.signMessage(message);
+        gaLoginSubmit(GALabel.METAMASK);
+        const res = await api.verifyNonce(message, signature);
+        if (res.statusCode === 200) {
+          await handleResponseVerify(res, LoginType.Metamask);
+        } else {
+          toast.error(res.message || "");
+        }
+      } catch (error) {
+        gaLoginFailed(GALabel.METAMASK);
       }
     },
-    [handleResponseVerify]
+    [gaLoginFailed, gaLoginSubmit, handleResponseVerify]
   );
   const doingLogin = useCallback(async () => {
     if (
@@ -75,6 +133,7 @@ const Started = () => {
       const nonceRes = await api.requestNonceWithAddress(address);
       const message = nonceRes.data?.message;
       if (nonceRes.statusCode !== 200 || !message) {
+        gaLoginFailed(GALabel.WALLET_CONNECT);
         toast.error(nonceRes?.message || "");
         return;
       }
@@ -85,18 +144,21 @@ const Started = () => {
       const signature = await WalletConnectUtils.connector.signPersonalMessage(
         params
       );
+      gaLoginSubmit(GALabel.WALLET_CONNECT);
       const res = await api.verifyNonce(message, signature);
       if (res.statusCode === 200) {
         await handleResponseVerify(res, LoginType.WalletConnect);
       } else {
         toast.error(res.message || "");
+        gaLoginFailed(GALabel.WALLET_CONNECT);
         WalletConnectUtils.connector.killSession();
       }
     } catch (err) {
       console.log(err);
+      gaLoginFailed(GALabel.WALLET_CONNECT);
       WalletConnectUtils.connector.killSession();
     }
-  }, [handleResponseVerify]);
+  }, [gaLoginFailed, gaLoginSubmit, handleResponseVerify]);
   const onWCConnected = useCallback(() => {
     setTimeout(doingLogin, 300);
   }, [doingLogin]);
@@ -135,6 +197,7 @@ const Started = () => {
     });
   }, [dispatch]);
   const handleMetamask = useCallback(() => {
+    gaLoginClick(GALabel.METAMASK);
     if (!window.ethereum) {
       toast.error("Please install MetaMask extension!");
     } else {
@@ -152,10 +215,17 @@ const Started = () => {
           toast.error(err.message);
         });
     }
-  }, [doingMetamaskLogin, metamaskConnected, onDisconnected, onMetamaskUpdate]);
+  }, [
+    doingMetamaskLogin,
+    gaLoginClick,
+    metamaskConnected,
+    onDisconnected,
+    onMetamaskUpdate,
+  ]);
   const handleWalletConnect = useCallback(() => {
+    gaLoginClick(GALabel.WALLET_CONNECT);
     WalletConnectUtils.connect(onWCConnected, onDisconnected);
-  }, [onWCConnected, onDisconnected]);
+  }, [gaLoginClick, onWCConnected, onDisconnected]);
   return (
     <div className="started-container">
       <div className="started-body">

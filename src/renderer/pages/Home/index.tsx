@@ -29,7 +29,6 @@ import {
   deleteChannel,
   deleteSpaceChannel,
   dragChannel,
-  findTeamAndChannel,
   getSpaceMembers,
   removeTeamMember,
   setCurrentChannel,
@@ -63,10 +62,15 @@ import GlobalVariable from "../../services/GlobalVariable";
 import ModalConfirmDeleteGroupChannel from "../../shared/ModalConfirmDeleteGroupChannel";
 import ModalConfirmDeleteChannel from "../../shared/ModalConfirmDeleteChannel";
 import ModalInviteMember from "../../shared/ModalInviteMember";
-import api from "../../api";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 import ModalUserProfile from "renderer/shared/ModalUserProfile";
+import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
+import {
+  GAAction,
+  GACategory,
+  GAPageView,
+} from "renderer/services/analytics/GAEventName";
 
 const loadingSelector = createLoadingSelector([
   actionTypes.TEAM_PREFIX,
@@ -440,12 +444,26 @@ const Home = () => {
           icon_sub_color: badge?.backgroundColor,
         };
       }
+      GoogleAnalytics.event({
+        category: GACategory.ADD_NEW_SPACE,
+        action: GAAction.SUBMIT,
+        label: spaceData.spaceType,
+      });
       const success = await dispatch(
         createSpaceChannel(currentTeam.team_id, body)
       );
       if (!!success) {
+        GoogleAnalytics.event({
+          category: GACategory.ADD_NEW_SPACE,
+          action: GAAction.SUCCESS,
+        });
         setOpenCreateSpace(false);
         sideBarRef.current?.scrollToBottom?.();
+      } else {
+        GoogleAnalytics.event({
+          category: GACategory.ADD_NEW_SPACE,
+          action: GAAction.FAILED,
+        });
       }
       return null;
     },
@@ -457,6 +475,10 @@ const Home = () => {
   );
   const onCreateChannel = useCallback(
     async (channelData: any) => {
+      GoogleAnalytics.event({
+        category: GACategory.ADD_NEW_CHANNEL,
+        action: GAAction.SUBMIT,
+      });
       const body: any = {
         channel_name: channelData.name,
         space_id: channelData.space?.space_id,
@@ -474,8 +496,17 @@ const Home = () => {
         )
       );
       if (res?.channel_id) {
+        GoogleAnalytics.event({
+          category: GACategory.ADD_NEW_CHANNEL,
+          action: GAAction.SUCCESS,
+        });
         history.replace(`/channels/${currentTeam.team_id}/${res.channel_id}`);
         setOpenCreateChannel(false);
+      } else {
+        GoogleAnalytics.event({
+          category: GACategory.ADD_NEW_CHANNEL,
+          action: GAAction.FAILED,
+        });
       }
     },
     [currentTeam?.team_id, dispatch, history]
@@ -520,12 +551,18 @@ const Home = () => {
   }, [channels, currentChannel?.channel_id]);
   const handleDeleteChannel = useCallback(async () => {
     if (!channelDelete?.channel_id) return;
-    await dispatch(
+    const success = await dispatch(
       deleteChannel(channelDelete?.channel_id, currentTeam.team_id)
     );
-    history.replace(`/channels/${currentTeam.team_id}/${nextChannelId}`);
-    setChannelDelete(null);
-    setOpenConfirmDeleteChannel(false);
+    if (!!success) {
+      GoogleAnalytics.event({
+        category: GACategory.CHANNEL,
+        action: GAAction.DELETE,
+      });
+      history.replace(`/channels/${currentTeam.team_id}/${nextChannelId}`);
+      setChannelDelete(null);
+      setOpenConfirmDeleteChannel(false);
+    }
   }, [
     channelDelete?.channel_id,
     currentTeam?.team_id,
@@ -543,6 +580,10 @@ const Home = () => {
   const handleDeleteSpace = useCallback(async () => {
     if (!selectedSpace?.space_id) return;
     await dispatch(deleteSpaceChannel(selectedSpace?.space_id));
+    GoogleAnalytics.event({
+      category: GACategory.SPACE,
+      action: GAAction.DELETE,
+    });
     history.replace(
       `/channels/${currentTeam.team_id}/${nextChannelIdWhenDeleteSpace}`
     );
@@ -556,6 +597,9 @@ const Home = () => {
     nextChannelIdWhenDeleteSpace,
     selectedSpace?.space_id,
   ]);
+  useEffect(() => {
+    GoogleAnalytics.pageView(GAPageView.CHANNELS);
+  }, []);
   useEffect(() => {
     if (match_channel_id) {
       if (match_community_id === "user") {

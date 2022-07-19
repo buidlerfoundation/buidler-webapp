@@ -144,6 +144,7 @@ export const updateChannel =
       payload: { channelId, body },
     });
     const res = await api.updateChannel(channelId, body);
+    return res.statusCode === 200;
   };
 
 export const deleteChannel =
@@ -153,7 +154,8 @@ export const deleteChannel =
       payload: { channelId, communityId },
     });
     removeCookie(AsyncKey.lastChannelId);
-    await api.deleteChannel(channelId);
+    const res = await api.deleteChannel(channelId);
+    return res.statusCode === 200;
   };
 
 export const createNewChannel =

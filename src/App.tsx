@@ -26,6 +26,7 @@ import useAppSelector from "renderer/hooks/useAppSelector";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 import ErrorBoundary from "renderer/shared/ErrorBoundary";
+import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 
 function App() {
   const history = useHistory();
@@ -41,6 +42,9 @@ function App() {
       history.replace("/channels");
     }
   }, [imgDomain, dispatch, history]);
+  useEffect(() => {
+    GoogleAnalytics.init();
+  }, []);
   useEffect(() => {
     TextareaAutosize.defaultProps = {
       ...TextareaAutosize.defaultProps,
