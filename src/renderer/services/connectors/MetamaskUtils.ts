@@ -26,7 +26,12 @@ class MetamaskUtils {
     window.ethereum?.on("chainChanged", onUpdate);
   }
 
-  sendETHTransaction = (sendData: SendData, from: string) => {
+  sendETHTransaction = async (sendData: SendData, from: string) => {
+    if (!window.ethereum?.selectedAddress) {
+      await window.ethereum?.request({
+        method: "eth_requestAccounts",
+      });
+    }
     const amount = ethers.BigNumber.from(
       `${
         parseFloat(`${sendData.amount || 0}`) *
@@ -47,6 +52,11 @@ class MetamaskUtils {
   };
 
   sendERC20Transaction = async (sendData: SendData, from: string) => {
+    if (!window.ethereum?.selectedAddress) {
+      await window.ethereum?.request({
+        method: "eth_requestAccounts",
+      });
+    }
     const amount = ethers.BigNumber.from(
       `${
         parseFloat(`${sendData.amount || 0}`) *

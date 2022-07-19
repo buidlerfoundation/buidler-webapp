@@ -25,6 +25,7 @@ import WalletConnectUtils from "renderer/services/connectors/WalletConnectUtils"
 import useAppSelector from "renderer/hooks/useAppSelector";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
+import ErrorBoundary from "renderer/shared/ErrorBoundary";
 
 function App() {
   const history = useHistory();
@@ -32,12 +33,12 @@ function App() {
   const user = useAppSelector((state) => state.user.userData);
   const imgDomain = useAppSelector((state: any) => state.user.imgDomain);
   const initApp = useCallback(async () => {
+    if (!imgDomain) {
+      await dispatch(getInitial?.());
+    }
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     if (accessToken && typeof accessToken === "string") {
       history.replace("/channels");
-    }
-    if (!imgDomain) {
-      await dispatch(getInitial?.());
     }
   }, [imgDomain, dispatch, history]);
   useEffect(() => {
@@ -54,7 +55,7 @@ function App() {
       SocketUtils.socket?.disconnect?.();
     };
     const eventOnline = () => {
-      if (!user) {
+      if (!user.user_id) {
         initApp();
       } else {
         SocketUtils.reconnectIfNeeded();
@@ -176,10 +177,10 @@ function App() {
 
   return (
     <ThemeProvider theme={materialTheme}>
-      <div>
+      <ErrorBoundary>
         <Main />
         <AppToastNotification />
-      </div>
+      </ErrorBoundary>
     </ThemeProvider>
   );
 }
