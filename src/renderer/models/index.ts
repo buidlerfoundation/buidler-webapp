@@ -277,17 +277,17 @@ export interface Contract {
 
 export interface TokenPrice {
   rate: number;
-  diff: number;
-  diff1h: number;
-  diff7d: number;
-  diff30d: number;
-  diff60d: number;
-  diff90d: number;
-  marketCapUsd: number;
-  volume24h: number;
-  availableSupply: number;
-  ts: string;
-  currency: string;
+  diff?: number;
+  diff1h?: number;
+  diff7d?: number;
+  diff30d?: number;
+  diff60d?: number;
+  diff90d?: number;
+  marketCapUsd?: number;
+  volume24h?: number;
+  availableSupply?: number;
+  ts?: string;
+  currency?: string;
 }
 
 export interface Token {
@@ -367,6 +367,7 @@ export type SendData = {
   gasPrice?: ethers.BigNumber;
   gasLimit: ethers.BigNumber;
   recipientENS?: string | null;
+  recipientUser?: UserData | null;
 };
 
 export interface BaseDataApi<T> {

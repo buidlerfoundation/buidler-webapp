@@ -82,6 +82,14 @@ async function requestAPI<T = any>(
         if (data.data) {
           return { ...data, statusCode: res.status };
         }
+        if (data.success || data.message) {
+          return {
+            data: data.data,
+            success: data.success,
+            message: data.message,
+            statusCode: res.status,
+          };
+        }
         return { data, statusCode: res.status };
       });
     })

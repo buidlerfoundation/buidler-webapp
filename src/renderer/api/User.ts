@@ -109,3 +109,5 @@ export const findUserByAddress = (address: string) =>
 
 export const getTokenPrice = (contractAddress: string) =>
   Caller.get<TokenPrice>(`price/${contractAddress}`);
+
+export const getGasPrice = () => Caller.get<number>("price/gas");
