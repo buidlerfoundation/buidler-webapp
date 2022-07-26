@@ -3,11 +3,11 @@ import ChainId from "renderer/services/connectors/ChainId";
 import actionTypes from "../actions/ActionTypes";
 
 type NetworkReducerState = {
-  chainId: number;
+  chainId: number | string;
 };
 
 const initialState: NetworkReducerState = {
-  chainId: ChainId.EthereumMainnet,
+  chainId: process.env.REACT_APP_DEFAULT_CHAIN_ID || ChainId.EthereumMainnet,
 };
 
 const messageReducers: Reducer<NetworkReducerState, AnyAction> = (
