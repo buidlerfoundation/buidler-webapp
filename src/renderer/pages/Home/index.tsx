@@ -584,9 +584,11 @@ const Home = () => {
       category: GACategory.SPACE,
       action: GAAction.DELETE,
     });
-    history.replace(
-      `/channels/${currentTeam.team_id}/${nextChannelIdWhenDeleteSpace}`
-    );
+    if (currentChannel?.space_id === selectedSpace?.space_id) {
+      history.replace(
+        `/channels/${currentTeam.team_id}/${nextChannelIdWhenDeleteSpace}`
+      );
+    }
     setSelectedSpace(null);
     setOpenConfirmDeleteSpace(false);
     setOpenEditSpaceChannel(false);
@@ -596,6 +598,7 @@ const Home = () => {
     history,
     nextChannelIdWhenDeleteSpace,
     selectedSpace?.space_id,
+    currentChannel?.space_id,
   ]);
   useEffect(() => {
     GoogleAnalytics.pageView(GAPageView.CHANNELS);
