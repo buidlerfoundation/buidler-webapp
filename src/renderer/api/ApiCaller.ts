@@ -86,6 +86,7 @@ async function requestAPI<T = any>(
       });
     })
     .catch((err) => {
+      toast.error(err.message || err);
       return {
         message: err,
       };
