@@ -51,14 +51,8 @@ const SideBar = forwardRef(
     }: SideBarProps,
     ref
   ) => {
-    const { channel, currentChannel, team, currentTeam } = useAppSelector(
-      (state) => state.user
-    );
-    const spaceChannel = useAppSelector((state) =>
-      state.user.spaceChannel.sort((v1, v2) =>
-        v1.is_space_member > v2.is_space_member ? -1 : 1
-      )
-    );
+    const { channel, currentChannel, spaceChannel, team, currentTeam } =
+      useAppSelector((state) => state.user);
     const [isOpenConfirmRemoveMember, setOpenConfirmRemoveMember] =
       useState(false);
     const [selectedMenuChannel, setSelectedMenuChannel] = useState<any>(null);
