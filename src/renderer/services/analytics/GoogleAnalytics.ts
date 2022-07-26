@@ -1,24 +1,33 @@
-import ReactGA from "react-ga";
+import { gtag, install } from "ga-gtag";
 
 class GoogleAnalytics {
   init() {
-    ReactGA.initialize(process.env.REACT_APP_GA_ID || "", {
-      debug: process.env.NODE_ENV === "development",
-      testMode: process.env.NODE_ENV === "development",
-      alwaysSendToDefaultTracker: true,
-    });
+    install(process.env.REACT_APP_GA_ID);
   }
 
   pageView(path: string) {
-    ReactGA.pageview(path);
+    gtag("event", "page_view", {
+      page_path: path,
+    });
   }
 
   modalView(name: string) {
-    ReactGA.modalview(name);
+    gtag("event", "modal_view", {
+      name,
+    });
   }
 
-  event(args: ReactGA.EventArgs) {
-    ReactGA.event(args);
+  event(args: {
+    category: string;
+    action: string;
+    label?: string;
+    value?: number;
+  }) {
+    gtag("event", args.action, {
+      event_category: args.category,
+      event_label: args.label,
+      value: args.value,
+    });
   }
 }
 
