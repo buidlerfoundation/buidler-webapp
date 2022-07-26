@@ -27,6 +27,7 @@ import useAppDispatch from "renderer/hooks/useAppDispatch";
 import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 import ErrorBoundary from "renderer/shared/ErrorBoundary";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
+import { CustomEventName } from "renderer/services/events/WindowEvent";
 
 function App() {
   const history = useHistory();
@@ -82,17 +83,26 @@ function App() {
         e.preventDefault();
       }
     };
+    const changeRouteListener = (e) => {
+      const { detail: path } = e;
+      history.replace(path);
+    };
     window.addEventListener("offline", eventOffline);
     window.addEventListener("online", eventOnline);
     window.addEventListener("paste", eventPaste);
     window.addEventListener("contextmenu", eventContextMenu);
     window.addEventListener("click", eventClick);
+    window.addEventListener(CustomEventName.CHANGE_ROUTE, changeRouteListener);
     return () => {
       window.removeEventListener("offline", eventOffline);
       window.removeEventListener("online", eventOnline);
       window.removeEventListener("paste", eventPaste);
       window.removeEventListener("contextmenu", eventContextMenu);
       window.removeEventListener("click", eventClick);
+      window.removeEventListener(
+        CustomEventName.CHANGE_ROUTE,
+        changeRouteListener
+      );
     };
   }, [user, initApp, history]);
   const initGeneratedPrivateKey = useCallback(async () => {
