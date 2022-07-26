@@ -7,7 +7,9 @@ type NetworkReducerState = {
 };
 
 const initialState: NetworkReducerState = {
-  chainId: process.env.REACT_APP_DEFAULT_CHAIN_ID || ChainId.EthereumMainnet,
+  chainId: process.env.REACT_APP_DEFAULT_CHAIN_ID
+    ? parseInt(process.env.REACT_APP_DEFAULT_CHAIN_ID)
+    : ChainId.EthereumMainnet,
 };
 
 const messageReducers: Reducer<NetworkReducerState, AnyAction> = (
