@@ -8,7 +8,7 @@ const UnSupportedNetwork = () => {
     window.ethereum
       ?.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x4" }],
+        params: [{ chainId: `0x${process.env.REACT_APP_DEFAULT_CHAIN_ID}` }],
       })
       .catch((err) => {
         toast.error(err.message);
