@@ -87,7 +87,7 @@ export const findTeamAndChannel =
           dispatch({
             type: ActionTypes.GET_TEAM_USER,
             payload: {
-              teamUsers: teamUsersRes.data,
+              teamUsers: teamUsersRes,
               teamId: currentTeam.team_id,
             },
           });
@@ -210,7 +210,7 @@ const actionSetCurrentTeam = async (
   if (teamUsersRes.statusCode === 200) {
     dispatch({
       type: ActionTypes.GET_TEAM_USER,
-      payload: { teamUsers: teamUsersRes.data, teamId: team.team_id },
+      payload: { teamUsers: teamUsersRes, teamId: team.team_id },
     });
   }
   SocketUtils.changeTeam(team.team_id);

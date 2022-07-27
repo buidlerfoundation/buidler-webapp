@@ -120,7 +120,7 @@ const actionSetCurrentTeam = async (
   if (teamUsersRes.statusCode === 200) {
     dispatch({
       type: actionTypes.GET_TEAM_USER,
-      payload: { teamUsers: teamUsersRes.data, teamId: team.team_id },
+      payload: { teamUsers: teamUsersRes, teamId: team.team_id },
     });
   }
   const directChannelUser = teamUsersRes?.data?.find(
@@ -844,7 +844,7 @@ class SocketUtil {
     if (teamUsersRes.statusCode === 200) {
       dispatch({
         type: actionTypes.GET_TEAM_USER,
-        payload: { teamUsers: teamUsersRes.data, teamId: team.team_id },
+        payload: { teamUsers: teamUsersRes, teamId: team.team_id },
       });
     }
     this.changeTeam(team.team_id);
