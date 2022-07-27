@@ -25,7 +25,7 @@ class GoogleAnalytics {
     label?: string;
     value?: number;
   }) {
-    mixpanel.track(action, {
+    mixpanel.track(args.action, {
       category: args.category,
       label: args.label,
       value: args.value,
