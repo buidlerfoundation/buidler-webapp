@@ -115,3 +115,6 @@ export const getTokenPrice = (contractAddress: string) =>
   Caller.get<TokenPrice>(`price/${contractAddress}`);
 
 export const getGasPrice = () => Caller.get<number>("price/gas");
+
+export const getMembersByRole = (teamId: string, role: string) =>
+  Caller.get<Array<UserData>>(`team/${teamId}/role/${role}`);
