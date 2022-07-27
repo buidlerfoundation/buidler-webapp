@@ -33,10 +33,10 @@ class MetamaskUtils {
       });
     }
     const amount = ethers.BigNumber.from(
-      `${
+      `${Math.floor(
         parseFloat(`${sendData.amount || 0}`) *
-        Math.pow(10, sendData.asset?.contract.decimals || 0)
-      }`
+          Math.pow(10, sendData.asset?.contract.decimals || 0)
+      ).toLocaleString("fullwide", { useGrouping: false })}`
     );
     const transactionParameters = {
       gasPrice: sendData.gasPrice?.toHexString(),
@@ -58,10 +58,10 @@ class MetamaskUtils {
       });
     }
     const amount = ethers.BigNumber.from(
-      `${
+      `${Math.floor(
         parseFloat(`${sendData.amount || 0}`) *
-        Math.pow(10, sendData.asset?.contract.decimals || 0)
-      }`
+          Math.pow(10, sendData.asset?.contract.decimals || 0)
+      ).toLocaleString("fullwide", { useGrouping: false })}`
     );
     const inf = new utils.Interface(MinABI);
     const transferData = inf.encodeFunctionData("transfer", [
