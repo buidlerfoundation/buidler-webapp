@@ -102,7 +102,7 @@ const Started = () => {
         if (nonceRes.statusCode !== 200 || !message) {
           toast.error(nonceRes?.message || "");
           gaLoginFailed(GALabel.METAMASK);
-          return;
+          return false;
         }
         const metamaskProvider: any = window.ethereum;
         const provider = new ethers.providers.Web3Provider(metamaskProvider);
@@ -112,11 +112,14 @@ const Started = () => {
         const res = await api.verifyNonce(message, signature);
         if (res.statusCode === 200) {
           await handleResponseVerify(res, LoginType.Metamask);
+          return true;
         } else {
           toast.error(res.message || "");
         }
+        return false;
       } catch (error) {
         gaLoginFailed(GALabel.METAMASK);
+        return false;
       }
     },
     [gaLoginFailed, gaLoginSubmit, handleResponseVerify]
@@ -203,13 +206,15 @@ const Started = () => {
     } else {
       window.ethereum
         .request({ method: "eth_requestAccounts" })
-        .then((res) => {
-          doingMetamaskLogin(res?.[0]);
-          MetamaskUtils.init(
-            onDisconnected,
-            onMetamaskUpdate,
-            metamaskConnected
-          );
+        .then(async (res) => {
+          const success = await doingMetamaskLogin(res?.[0]);
+          if (success) {
+            MetamaskUtils.init(
+              onDisconnected,
+              onMetamaskUpdate,
+              metamaskConnected
+            );
+          }
         })
         .catch((err) => {
           toast.error(err.message);
