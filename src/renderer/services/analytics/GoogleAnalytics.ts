@@ -1,18 +1,20 @@
-import { gtag, install } from "ga-gtag";
+import mixpanel from "mixpanel-browser";
 
 class GoogleAnalytics {
   init() {
-    install(process.env.REACT_APP_GA_ID);
+    mixpanel.init(process.env.REACT_APP_MIXPANEL_TOKEN, {
+      debug: process.env.NODE_ENV === "development",
+    });
   }
 
   pageView(path: string) {
-    gtag("event", "page_view", {
-      page_path: path,
+    mixpanel.track("page_view", {
+      path,
     });
   }
 
   modalView(name: string) {
-    gtag("event", "modal_view", {
+    mixpanel.track("modal_view", {
       name,
     });
   }
@@ -23,9 +25,9 @@ class GoogleAnalytics {
     label?: string;
     value?: number;
   }) {
-    gtag("event", args.action, {
-      event_category: args.category,
-      event_label: args.label,
+    mixpanel.track(action, {
+      category: args.category,
+      label: args.label,
       value: args.value,
     });
   }
