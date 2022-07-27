@@ -188,9 +188,10 @@ const Main = () => {
     return <div className="main-load-page" />;
   }
   if (
-    chainId !== process.env.REACT_APP_DEFAULT_CHAIN_ID
+    chainId !==
+    (process.env.REACT_APP_DEFAULT_CHAIN_ID
       ? parseInt(process.env.REACT_APP_DEFAULT_CHAIN_ID)
-      : ChainId.EthereumMainnet
+      : ChainId.EthereumMainnet)
   ) {
     return <UnSupportedNetwork />;
   }
