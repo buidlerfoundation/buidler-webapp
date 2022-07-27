@@ -21,7 +21,9 @@ export const getInitial: ActionCreator<any> =
     if (data?.force_update && data?.version > GlobalVariable.version) {
       // Update Desktop App
     }
-    dispatch({ type: ActionTypes.GET_INITIAL, payload: { data } });
+    if (data) {
+      dispatch({ type: ActionTypes.GET_INITIAL, payload: { data } });
+    }
   };
 
 export const logout: ActionCreator<any> = () => (dispatch: Dispatch) => {
