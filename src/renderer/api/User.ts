@@ -116,5 +116,28 @@ export const getTokenPrice = (contractAddress: string) =>
 
 export const getGasPrice = () => Caller.get<number>("price/gas");
 
-export const getMembersByRole = (teamId: string, role: string) =>
-  Caller.get<Array<UserData>>(`team/${teamId}/role/${role}`);
+export const getMembersByRole = (
+  teamId: string,
+  roles: Array<string> = [],
+  userName?: string
+) => {
+  let url = `team/${teamId}/role`;
+  let idx = 0;
+  roles.forEach((el) => {
+    const postFix = idx === 0 ? "?" : "&";
+    url += `${postFix}roles[]=${el}`;
+    idx++;
+  });
+  if (userName) {
+    url += `&username=${userName}`;
+  }
+  return Caller.get<Array<UserData>>(url);
+};
+
+export const modifyRole = (
+  teamId: string,
+  role: string,
+  body: { user_ids_to_add?: Array<string>; user_ids_to_remove?: Array<string> }
+) => {
+  return Caller.put(`team/${teamId}/${role}`, body);
+};

@@ -26,6 +26,7 @@ import api from "../api";
 import { createRefreshSelector } from "../reducers/selectors";
 import GlobalVariable from "renderer/services/GlobalVariable";
 import { dispatchChangeRoute } from "renderer/services/events/WindowEvent";
+import { actionFetchWalletBalance } from "renderer/actions/UserActions";
 
 const getTasks = async (channelId: string, dispatch: Dispatch) => {
   dispatch({ type: actionTypes.TASK_REQUEST, payload: { channelId } });
@@ -242,6 +243,7 @@ class SocketUtil {
         this.socket.off("ON_USER_UPDATE_PROFILE");
         this.socket.off("ON_ADD_USER_TO_SPACE");
         this.socket.off("ON_REMOVE_USER_FROM_SPACE");
+        this.socket.off("ON_UPDATE_BALANCE_OF_USER");
         this.socket.off("disconnect");
       });
       const user: any = store.getState()?.user;
@@ -299,6 +301,9 @@ class SocketUtil {
     });
   };
   listenSocket() {
+    this.socket.on("ON_UPDATE_BALANCE_OF_USER", async () => {
+      actionFetchWalletBalance(store.dispatch);
+    });
     this.socket.on(
       "ON_ADD_USER_TO_SPACE",
       async (data: { space_id: string }) => {

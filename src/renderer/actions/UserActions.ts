@@ -509,7 +509,7 @@ export const getSpaceMembers =
     }
   };
 
-const actionFetchWalletBalance = async (dispatch: Dispatch) => {
+export const actionFetchWalletBalance = async (dispatch: Dispatch) => {
   dispatch({ type: ActionTypes.WALLET_BALANCE_REQUEST });
   try {
     const res = await api.fetchWalletBalance();
