@@ -9,7 +9,7 @@ export const formatToken = (
     symbol?: string;
     decimal?: number;
   },
-  afterDot = 4
+  afterDot = 5
 ) => {
   const { value, symbol, decimal } = params;
   const p = decimal ? Math.pow(10, decimal) : 1;
@@ -26,7 +26,7 @@ export const formatTokenValue = (
     decimal?: number;
     gap?: number;
   },
-  afterDot = 4
+  afterDot = 5
 ) => {
   const { value, decimal, gap = 0 } = params;
   const p = decimal ? Math.pow(10, decimal) : 1;
