@@ -1,3 +1,4 @@
+import { UserRoleType } from "renderer/models";
 import images from "./images";
 
 const Prefix = "Buidler";
@@ -62,3 +63,13 @@ export const SpaceBadge = [
   { id: 7, color: "#F19B91", backgroundColor: "#F19B911A" },
   { id: 8, color: "#FCB828", backgroundColor: "#FCB8281A" },
 ];
+
+export const UserRole: {
+  Owner: UserRoleType;
+  Admin: UserRoleType;
+  Member: UserRoleType;
+} = {
+  Owner: "owner",
+  Admin: "admin",
+  Member: "member",
+};

@@ -379,3 +379,5 @@ export interface BaseDataApi<T> {
   token?: string;
   metadata?: { total?: number };
 }
+
+export type UserRoleType = "owner" | "admin" | "member";

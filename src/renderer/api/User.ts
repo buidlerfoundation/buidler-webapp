@@ -13,6 +13,7 @@ import {
   TransactionApiData,
   UserData,
   UserNFTCollection,
+  UserRoleType,
 } from "renderer/models";
 import ApiCaller from "./ApiCaller";
 import Caller from "./Caller";
@@ -118,7 +119,7 @@ export const getGasPrice = () => Caller.get<number>("price/gas");
 
 export const getMembersByRole = (
   teamId: string,
-  roles: Array<string> = [],
+  roles: Array<UserRoleType> = [],
   userName?: string
 ) => {
   let url = `team/${teamId}/role`;
