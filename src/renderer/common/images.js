@@ -97,6 +97,7 @@ import icPlusCircleDark from "../assets/images/ic_plus_circle_dark.svg";
 import icConvertVertical from "../assets/images/ic_convert_vertical.svg";
 import icMembers from "../assets/images/ic_members.svg";
 import icCrown from "../assets/images/ic_crown.svg";
+import WalletConnectLogo2 from "../assets/images/wallet_connect_logo_2.svg";
 
 const images = {
   icTeamDefault,
@@ -198,6 +199,7 @@ const images = {
   icConvertVertical,
   icMembers,
   icCrown,
+  WalletConnectLogo2,
 };
 
 export default images;
