@@ -318,16 +318,25 @@ class SocketUtil {
         action: "View transaction detail",
         link: `${AppConfig.etherscanUrl}/tx/${hash}`,
       };
+      const duration = 4000;
       if (receipt_status === "1") {
         if (input !== "0x") {
           toast.success("Transaction complete.", {
             className: "Success !",
             ariaProps: toastProps,
+            duration,
+          });
+        } else if (from === to) {
+          toast.success(`You sent yourself ${amount} ETH`, {
+            className: `Transaction self !`,
+            ariaProps: toastProps,
+            duration,
           });
         } else {
-          toast.success(`You ${txType} ${amount} ${txPrefix}`, {
+          toast.success(`You ${txType} ${amount} ETH ${txPrefix}`, {
             className: `Transaction ${txType} !`,
             ariaProps: toastProps,
+            duration,
           });
         }
       }
@@ -335,6 +344,7 @@ class SocketUtil {
         toast.error("Transaction failed to complete. Please try again.", {
           className: "Failed !",
           ariaProps: toastProps,
+          duration,
         });
       }
       store.dispatch(getTransactions(1));
