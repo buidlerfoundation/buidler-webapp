@@ -322,6 +322,7 @@ export interface TransactionApiData {
   cumulative_gas_used: string;
   input: string;
   confirmations: string;
+  receipt_status: string;
 }
 
 export interface NFTCollectionDataApi {

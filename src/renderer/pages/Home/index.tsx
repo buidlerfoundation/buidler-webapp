@@ -72,6 +72,7 @@ import {
   GAPageView,
 } from "renderer/services/analytics/GAEventName";
 import ModalAllMembers from "renderer/shared/ModalAllMembers";
+import { getTransactions } from "renderer/actions/TransactionActions";
 
 const loadingSelector = createLoadingSelector([
   actionTypes.TEAM_PREFIX,
@@ -105,7 +106,7 @@ const Home = () => {
   const [currentUserId, setCurrentUserId] = useState("");
   const loading = useAppSelector((state) => loadingSelector(state));
   const channels = useAppSelector((state) => state.user.channel);
-  const { teamUserData, currentChannel, currentTeam, spaceChannel } =
+  const { teamUserData, currentChannel, currentTeam, spaceChannel, userData } =
     useAppSelector((state) => state.user);
   const currentChannelId = useMemo(
     () => currentChannel?.channel_id || currentChannel?.user?.user_id || "",
@@ -677,6 +678,12 @@ const Home = () => {
     currentTeam?.team_id,
     privateKey,
   ]);
+
+  useEffect(() => {
+    if (!!userData.user_id) {
+      dispatch(getTransactions(1));
+    }
+  }, [dispatch, userData.user_id]);
 
   useEffect(() => {
     if (currentChannel?.space_id) {

@@ -14,6 +14,7 @@ interface UserReducerState {
   userData: UserData;
   team?: Array<Community>;
   channel: Array<Channel>;
+  directChannel: Array<Channel>;
   spaceChannel: Array<Space>;
   currentTeam: Community;
   currentChannel: Channel;
@@ -35,6 +36,7 @@ const initialState: UserReducerState = {
   },
   team: undefined,
   channel: [],
+  directChannel: [],
   spaceChannel: [],
   currentTeam: {
     team_display_name: "",
@@ -176,7 +178,14 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       }
       return {
         ...state,
-        channel: [...state.channel, payload],
+        channel:
+          payload.channel_type === "Direct"
+            ? state.channel
+            : [...state.channel, payload],
+        directChannel:
+          payload.channel_type === "Direct"
+            ? [...state.directChannel, payload]
+            : state.directChannel,
         teamUserData: newTeamUserData,
         currentChannel,
         spaceChannel: state.spaceChannel.map((el) => {
@@ -408,7 +417,10 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       setCookie(AsyncKey.lastChannelId, channel?.channel_id);
       return {
         ...state,
-        channel: resChannel.data,
+        channel: resChannel.data.filter((el) => el.channel_type !== "Direct"),
+        directChannel: resChannel.data.filter(
+          (el) => el.channel_type === "Direct"
+        ),
         currentTeam: team,
         currentChannel: channel,
         lastChannel: {
@@ -519,7 +531,10 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     case actionTypes.CHANNEL_SUCCESS: {
       return {
         ...state,
-        channel: payload.channel,
+        channel: payload.channel.filter((el) => el.channel_type !== "Direct"),
+        directChannel: payload.channel.filter(
+          (el) => el.channel_type === "Direct"
+        ),
         spaceChannel: state.spaceChannel.map((el) => {
           el.channels = payload.channel.filter(
             (c) => c.space_id === el.space_id
@@ -557,7 +572,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
     }
     case actionTypes.DELETE_CHANNEL_SUCCESS: {
-      const { currentChannel, channel, teamUserData } = state;
+      const { currentChannel, channel, teamUserData, directChannel } = state;
       const currentIdx = channel.findIndex(
         (el) => el.channel_id === currentChannel.channel_id
       );
@@ -565,6 +580,9 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         (el) => el.channel_id === payload.channelId
       )?.space_id;
       const newChannel = channel.filter(
+        (el) => el.channel_id !== payload.channelId
+      );
+      const newDirectChannel = directChannel.filter(
         (el) => el.channel_id !== payload.channelId
       );
       let newCurrentChannel = initialState.currentChannel;
@@ -583,6 +601,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       return {
         ...state,
         channel: newChannel,
+        directChannel: newDirectChannel,
         currentChannel: newCurrentChannel,
         spaceChannel: state.spaceChannel.map((el) => {
           if (el.space_id === spaceId) {
@@ -649,6 +668,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         return {
           ...state,
           channel: [],
+          directChannel: [],
           currentChannel: {
             channel_id: "",
             channel_member: [],

@@ -8,6 +8,10 @@ const AppConfig = {
   maxLengthSpaceDescription: 450,
   maxLengthCommunityDescription: 1000,
   maximumFileSize: 100000000,
+  etherscanUrl:
+    process.env.REACT_APP_DEFAULT_CHAIN_ID === "4"
+      ? "https://rinkeby.etherscan.io"
+      : "https://etherscan.io",
 };
 
 export default AppConfig;

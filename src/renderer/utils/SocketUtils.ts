@@ -11,7 +11,7 @@ import {
 } from "renderer/helpers/ChannelHelper";
 import { io } from "socket.io-client";
 import { uniqBy } from "lodash";
-import { UserData } from "renderer/models";
+import { TransactionApiData, UserData } from "renderer/models";
 import { utils } from "ethers";
 import actionTypes from "renderer/actions/ActionTypes";
 import AppConfig, { AsyncKey, LoginType } from "../common/AppConfig";
@@ -27,6 +27,9 @@ import { createRefreshSelector } from "../reducers/selectors";
 import GlobalVariable from "renderer/services/GlobalVariable";
 import { dispatchChangeRoute } from "renderer/services/events/WindowEvent";
 import { actionFetchWalletBalance } from "renderer/actions/UserActions";
+import { getTransactions } from "renderer/actions/TransactionActions";
+import { formatTokenValue } from "renderer/helpers/TokenHelper";
+import { normalizeUserName } from "renderer/helpers/MessageHelper";
 
 const getTasks = async (channelId: string, dispatch: Dispatch) => {
   dispatch({ type: actionTypes.TASK_REQUEST, payload: { channelId } });
@@ -243,7 +246,7 @@ class SocketUtil {
         this.socket.off("ON_USER_UPDATE_PROFILE");
         this.socket.off("ON_ADD_USER_TO_SPACE");
         this.socket.off("ON_REMOVE_USER_FROM_SPACE");
-        this.socket.off("ON_UPDATE_BALANCE_OF_USER");
+        this.socket.off("ON_NEW_TRANSACTION");
         this.socket.off("disconnect");
       });
       const user: any = store.getState()?.user;
@@ -301,7 +304,40 @@ class SocketUtil {
     });
   };
   listenSocket() {
-    this.socket.on("ON_UPDATE_BALANCE_OF_USER", async () => {
+    this.socket.on("ON_NEW_TRANSACTION", async (data: TransactionApiData) => {
+      const userData = store.getState().user.userData;
+      const address = utils.computeAddress(userData.user_id);
+      const { hash, receipt_status, from, input, value, to } = data;
+      const amount = formatTokenValue({ value: parseInt(value), decimal: 18 });
+      const txType = address === from ? "sent" : "received";
+      const txPrefix =
+        address === from
+          ? `to ${normalizeUserName(to, 7)}`
+          : `from ${normalizeUserName(from, 7)}`;
+      const toastProps: any = {
+        action: "View transaction detail",
+        link: `${AppConfig.etherscanUrl}/tx/${hash}`,
+      };
+      if (receipt_status === "1") {
+        if (input !== "0x") {
+          toast.success("Transaction complete.", {
+            className: "Success !",
+            ariaProps: toastProps,
+          });
+        } else {
+          toast.success(`You ${txType} ${amount} ${txPrefix}`, {
+            className: `Transaction ${txType} !`,
+            ariaProps: toastProps,
+          });
+        }
+      }
+      if (receipt_status === "0") {
+        toast.error("Transaction failed to complete. Please try again.", {
+          className: "Failed !",
+          ariaProps: toastProps,
+        });
+      }
+      store.dispatch(getTransactions(1));
       actionFetchWalletBalance(store.dispatch);
     });
     this.socket.on(

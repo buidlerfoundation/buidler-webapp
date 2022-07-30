@@ -10,10 +10,6 @@ import SocketUtils from "../utils/SocketUtils";
 import { Channel, Community, UserData } from "renderer/models";
 import store from "renderer/store";
 
-export const testActions = () => async (dispatch: Dispatch) => {
-  dispatch({ type: "TEST_ACTION" });
-};
-
 export const getInitial: ActionCreator<any> =
   () => async (dispatch: Dispatch) => {
     const { data } = await api.getInitial();

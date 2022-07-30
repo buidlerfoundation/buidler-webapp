@@ -42,7 +42,7 @@ export const updateChannel = (id: string, data: any) =>
   ApiCaller.put(`channel/${id}`, data);
 
 export const removeTeamMember = (teamId: string, userId: string) =>
-  ApiCaller.delete(`team/${teamId}/member/${userId}`);
+  ApiCaller.delete(`team/${teamId}/member`, { user_ids: [userId] });
 
 export const leaveTeam = (teamId: string) =>
   ApiCaller.delete(`team/${teamId}/leave`);
@@ -91,7 +91,7 @@ export const fetchWalletBalance = () =>
   Caller.get<BalanceApiData>("user/balance");
 
 export const fetchTransaction = (params: { page?: number; limit?: number }) => {
-  const { page = 1, limit = 10 } = params;
+  const { page = 1, limit = 20 } = params;
   return Caller.get<Array<TransactionApiData>>(
     `user/transaction?page=${page}&limit=${limit}`
   );
@@ -142,3 +142,6 @@ export const modifyRole = (
 ) => {
   return Caller.put(`team/${teamId}/${role}`, body);
 };
+
+export const addPendingTx = (tx: TransactionApiData) =>
+  Caller.post<TransactionApiData>("user/transaction", tx);
