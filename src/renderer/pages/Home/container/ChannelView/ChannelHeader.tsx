@@ -1,5 +1,5 @@
-import { CircularProgress } from '@material-ui/core';
-import { Emoji } from 'emoji-mart';
+import { CircularProgress } from "@material-ui/core";
+import { Emoji } from "emoji-mart";
 import React, {
   useRef,
   useMemo,
@@ -7,21 +7,20 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useCallback,
-} from 'react';
+} from "react";
 import {
   updateChannel,
   uploadChannelAvatar,
-} from 'renderer/actions/UserActions';
-import ImageHelper from 'renderer/common/ImageHelper';
-import EmojiAndAvatarPicker from 'renderer/shared/EmojiAndAvatarPicker';
-import { normalizeUserName } from 'renderer/helpers/MessageHelper';
-import useAppDispatch from 'renderer/hooks/useAppDispatch';
-import useAppSelector from 'renderer/hooks/useAppSelector';
-import images from '../../../../common/images';
-import AvatarView from '../../../../shared/AvatarView';
-import PopoverButton from '../../../../shared/PopoverButton';
-import ChannelSettings from './ChannelSettings';
-import './index.scss';
+} from "renderer/actions/UserActions";
+import ImageHelper from "renderer/common/ImageHelper";
+import EmojiAndAvatarPicker from "renderer/shared/EmojiAndAvatarPicker";
+import useAppDispatch from "renderer/hooks/useAppDispatch";
+import useAppSelector from "renderer/hooks/useAppSelector";
+import images from "../../../../common/images";
+import AvatarView from "../../../../shared/AvatarView";
+import PopoverButton from "../../../../shared/PopoverButton";
+import ChannelSettings from "./ChannelSettings";
+import "./index.scss";
 
 type ChannelHeaderProps = {
   currentChannel?: any;
@@ -41,7 +40,7 @@ const ChannelHeader = forwardRef(
     const users = useMemo(() => {
       if (!currentChannel) return [];
       const { channel_type, channel_member } = currentChannel;
-      if (channel_type === 'Public') {
+      if (channel_type === "Public") {
         return teamUserData;
       }
       if (!channel_member) return [];
@@ -49,18 +48,18 @@ const ChannelHeader = forwardRef(
         .filter((id: string) => !!teamUserData.find((el) => el.user_id === id))
         .map((id: any) => teamUserData.find((el) => el.user_id === id));
     }, [currentChannel, teamUserData]);
-    const isChannelPrivate = currentChannel?.channel_type === 'Private';
+    const isChannelPrivate = currentChannel?.channel_type === "Private";
     const role = teamUserData?.find?.(
       (el) => el.user_id === userData?.user_id
     )?.role;
-    const isOwner = role === 'Owner';
+    const isOwner = role === "Owner";
     useImperativeHandle(ref, () => {
       return {
-        showSetting(action: 'edit-member' | 'edit-name') {
-          if (action === 'edit-member') {
+        showSetting(action: "edit-member" | "edit-name") {
+          if (action === "edit-member") {
             setActiveMember(true);
           }
-          if (action === 'edit-name') {
+          if (action === "edit-name") {
             setActiveName(true);
           }
           settingButtonRef.current.click();
@@ -140,7 +139,7 @@ const ChannelHeader = forwardRef(
       async (file) => {
         await dispatch(
           updateChannel(currentChannel.channel_id, {
-            channel_emoji: '',
+            channel_emoji: "",
             channel_image_url: file.file_url,
           })
         );
@@ -153,7 +152,7 @@ const ChannelHeader = forwardRef(
         await dispatch(
           updateChannel(currentChannel.channel_id, {
             channel_emoji: emoji.id,
-            channel_image_url: '',
+            channel_image_url: "",
           })
         );
         popupChannelIconRef.current?.hide();
@@ -210,8 +209,8 @@ const ChannelHeader = forwardRef(
         <div className="channel-view__header">
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
+              display: "flex",
+              alignItems: "center",
               flex: 1,
             }}
           >
@@ -243,11 +242,11 @@ const ChannelHeader = forwardRef(
             <div
               ref={settingButtonRef}
               onClick={handleChannelClick}
-              style={{ display: 'flex', width: 0, flex: 1 }}
+              style={{ display: "flex", width: 0, flex: 1 }}
             >
               <span className="channel-view__title text-ellipsis">
                 {currentChannel?.user?.user_name
-                  ? normalizeUserName(currentChannel?.user?.user_name)
+                  ? currentChannel?.user?.user_name
                   : currentChannel?.channel_name}
               </span>
             </div>
