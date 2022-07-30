@@ -309,9 +309,10 @@ class SocketUtil {
       const address = utils.computeAddress(userData.user_id);
       const { hash, receipt_status, from, input, value, to } = data;
       const amount = formatTokenValue({ value: parseInt(value), decimal: 18 });
-      const txType = address === from ? "sent" : "received";
+      const txType =
+        address.toLowerCase() === from.toLowerCase() ? "sent" : "received";
       const txPrefix =
-        address === from
+        address.toLowerCase() === from.toLowerCase()
           ? `to ${normalizeUserName(to, 7)}`
           : `from ${normalizeUserName(from, 7)}`;
       const toastProps: any = {
