@@ -83,7 +83,10 @@ const configReducers: Reducer<ConfigReducerState, AnyAction> = (
       };
     }
     case actionTypes.LOGOUT: {
-      return initialState;
+      return {
+        ...initialState,
+        dataFromUrl: state.dataFromUrl,
+      };
     }
     default:
       return state;
