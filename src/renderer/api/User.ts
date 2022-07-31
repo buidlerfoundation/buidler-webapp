@@ -109,8 +109,18 @@ export const importToken = (address: string) =>
 export const searchToken = (address: string) =>
   Caller.get<Contract>(`contract/${address}`);
 
-export const findUserByAddress = (address: string) =>
-  Caller.get<UserData>(`user/search?address=${address}`);
+export const findUserByAddress = (params: {
+  address?: string;
+  username?: string;
+}) => {
+  let url = "user/search";
+  if (params.address) {
+    url += `?address=${params.address}`;
+  } else if (params.username) {
+    url += `?username=${params.username}`;
+  }
+  return Caller.get<Array<UserData>>(url);
+};
 
 export const getTokenPrice = (contractAddress: string) =>
   Caller.get<TokenPrice>(`price/${contractAddress}`);
@@ -122,12 +132,9 @@ export const getMembersByRole = (
   roles: Array<UserRoleType> = [],
   userName?: string
 ) => {
-  let url = `team/${teamId}/role`;
-  let idx = 0;
+  let url = `team/${teamId}/role?page=1&limit=50`;
   roles.forEach((el) => {
-    const postFix = idx === 0 ? "?" : "&";
-    url += `${postFix}roles[]=${el}`;
-    idx++;
+    url += `&roles[]=${el}`;
   });
   if (userName) {
     url += `&username=${userName}`;

@@ -611,6 +611,9 @@ const Home = () => {
     GoogleAnalytics.pageView(GAPageView.CHANNELS);
   }, []);
   useEffect(() => {
+    if (currentChannel.channel_id) channelViewRef.current?.hideReply?.();
+  }, [currentChannel.channel_id]);
+  useEffect(() => {
     if (match_channel_id) {
       if (match_community_id === "user") {
         setCurrentUserId(match_channel_id);
@@ -618,7 +621,6 @@ const Home = () => {
         const matchChannel = channels.find(
           (c) => c.channel_id === match_channel_id
         );
-        channelViewRef.current?.hideReply?.();
         if (matchChannel) {
           setCurrentUserId("");
           if (matchChannel.channel_id !== currentChannel.channel_id) {
@@ -881,14 +883,14 @@ const Home = () => {
             handleClose={handleCloseModalConfirmDeleteSpace}
             onDelete={handleDeleteSpace}
           />
+          <ModalAllMembers
+            open={isOpenMembers}
+            handleClose={toggleOpenMembers}
+          />
           <ModalUserProfile
             open={!!currentUserId}
             handleClose={handleCloseModalUserProfile}
             userId={currentUserId}
-          />
-          <ModalAllMembers
-            open={isOpenMembers}
-            handleClose={toggleOpenMembers}
           />
         </div>
       </DragDropContext>

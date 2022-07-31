@@ -230,7 +230,7 @@ class SocketUtil {
         this.socket.off("ON_DELETE_MESSAGE");
         this.socket.off("ON_REACTION_ADDED");
         this.socket.off("ON_REACTION_REMOVED");
-        this.socket.off("ON_USER_JOIN_TEAM");
+        this.socket.off("ON_NEW_USER_JOIN_TEAM");
         this.socket.off("ON_CREATE_NEW_CHANNEL");
         this.socket.off("ON_CREATE_NEW_SPACE");
         this.socket.off("ON_ADD_NEW_MEMBER_TO_PRIVATE_CHANNEL");
@@ -315,39 +315,34 @@ class SocketUtil {
         address.toLowerCase() === from.toLowerCase()
           ? `to ${normalizeUserName(to, 7)}`
           : `from ${normalizeUserName(from, 7)}`;
-      const toastProps: any = {
-        action: "View transaction detail",
-        link: `${AppConfig.etherscanUrl}/tx/${hash}`,
+      const toastData = {
+        title: "",
+        message: "",
+        hash,
+        type: "success",
       };
-      const duration = 4000;
+
       if (receipt_status === "1") {
         if (input !== "0x") {
-          toast.success("Transaction complete.", {
-            className: "Success !",
-            ariaProps: toastProps,
-            duration,
-          });
+          toastData.title = "Success !";
+          toastData.message = "Transaction complete.";
         } else if (from === to) {
-          toast.success(`You sent yourself ${amount} ETH`, {
-            className: `Transaction self !`,
-            ariaProps: toastProps,
-            duration,
-          });
+          toastData.title = "Transaction self !";
+          toastData.message = `You sent yourself ${amount} ETH`;
         } else {
-          toast.success(`You ${txType} ${amount} ETH ${txPrefix}`, {
-            className: `Transaction ${txType} !`,
-            ariaProps: toastProps,
-            duration,
-          });
+          toastData.title = `Transaction ${txType} !`;
+          toastData.message = `You ${txType} ${amount} ETH ${txPrefix}`;
         }
       }
       if (receipt_status === "0") {
-        toast.error("Transaction failed to complete. Please try again.", {
-          className: "Failed !",
-          ariaProps: toastProps,
-          duration,
-        });
+        toastData.title = `Failed !`;
+        toastData.message = `Transaction failed to complete. Please try again.`;
+        toastData.type = "error";
       }
+      store.dispatch({
+        type: actionTypes.UPDATE_TRANSACTION_TOAST,
+        payload: toastData,
+      });
       store.dispatch(getTransactions(1));
       actionFetchWalletBalance(store.dispatch);
     });
@@ -574,7 +569,7 @@ class SocketUtil {
         }
       }
     });
-    this.socket.on("ON_USER_JOIN_TEAM", (data: any) => {
+    this.socket.on("ON_NEW_USER_JOIN_TEAM", (data: any) => {
       const user: any = store.getState()?.user;
       const { currentTeam } = user;
       if (currentTeam.team_id === data.team_id) {
