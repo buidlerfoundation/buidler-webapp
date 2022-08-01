@@ -115,6 +115,8 @@ export const findTeamAndChannel =
             type: ActionTypes.CHANNEL_FAIL,
           });
         }
+      } else {
+        SocketUtils.init();
       }
       dispatch({ type: ActionTypes.TEAM_SUCCESS, payload: { team: res.data } });
     } else {
