@@ -10,6 +10,9 @@ const UnSupportedNetwork = () => {
         method: "wallet_switchEthereumChain",
         params: [{ chainId: `0x${process.env.REACT_APP_DEFAULT_CHAIN_ID}` }],
       })
+      .then(() => {
+        window.location.reload();
+      })
       .catch((err) => {
         toast.error(err.message);
       });
