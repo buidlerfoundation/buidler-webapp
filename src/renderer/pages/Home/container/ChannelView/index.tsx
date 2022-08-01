@@ -301,15 +301,10 @@ const ChannelView = forwardRef(
       msgListRef.current?.scrollTo?.(0, 0);
     }, []);
     const onRemoveReply = useCallback(() => {
-      if (
-        messageReply ||
-        replyTask ||
-        messageEdit ||
-        currentChannel.channel_id
-      ) {
+      if (messageReply || replyTask || messageEdit) {
         setText("");
-        inputRef.current?.blur();
       }
+      inputRef.current?.blur();
       setMessageReply(null);
       setReplyTask(null);
       setMessageEdit(null);
@@ -323,7 +318,6 @@ const ChannelView = forwardRef(
       setMessageReply,
       setReplyTask,
       setMessageEdit,
-      currentChannel.channel_id,
     ]);
     const openFile = useCallback(() => {
       inputFileRef.current?.click();

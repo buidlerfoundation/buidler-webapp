@@ -3,7 +3,17 @@ import images from "../common/images";
 
 export const normalizeMessage = (messages: Array<any>) => {
   return messages.map((msg, index) => {
+    const date = moment(new Date(msg.createdAt)).format("YYYY-MM-DD");
+    const dateCompare = messages?.[index + 1]
+      ? moment(new Date(messages?.[index + 1].createdAt)).format("YYYY-MM-DD")
+      : null;
     if (msg.sender_id !== messages?.[index + 1]?.sender_id) {
+      msg.isHead = true;
+    }
+    if (
+      msg.sender_id === messages?.[index + 1]?.sender_id &&
+      date !== dateCompare
+    ) {
       msg.isHead = true;
     }
     if (msg.parent_id !== messages?.[index + 1]?.parent_id) {

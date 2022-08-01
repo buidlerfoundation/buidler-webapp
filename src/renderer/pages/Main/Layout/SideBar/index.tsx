@@ -53,7 +53,7 @@ const SideBar = forwardRef(
     }: SideBarProps,
     ref
   ) => {
-    const { channel, currentChannel, spaceChannel, team, currentTeam } =
+    const { directChannel, currentChannel, spaceChannel, team, currentTeam } =
       useAppSelector((state) => state.user);
     const [isOpenConfirmRemoveMember, setOpenConfirmRemoveMember] =
       useState(false);
@@ -236,7 +236,7 @@ const SideBar = forwardRef(
             </Droppable>
             <div ref={bottomBodyRef} />
             <MemberSpace
-              channel={channel}
+              directChannel={directChannel}
               currentChannel={currentChannel}
               onContextMenu={handleContextMenuMemberSpace}
               onInviteMember={onInviteMember}

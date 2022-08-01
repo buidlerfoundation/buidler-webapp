@@ -491,35 +491,42 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     }
     case actionTypes.MARK_UN_SEEN_CHANNEL: {
       const { channelId } = payload;
+      const unSeenChannel =
+        state.channel.find((el) => el.channel_id === channelId) ||
+        state.directChannel.find((el) => el.channel_id === channelId);
+      if (!unSeenChannel?.seen) {
+        return state;
+      }
       const spaceId = state.channel.find(
         (el) => el.channel_id === channelId
       )?.space_id;
+      if (!spaceId) {
+        return {
+          ...state,
+          directChannel: state.directChannel.map((el) => {
+            if (el.channel_id === channelId) {
+              el.seen = false;
+              return { ...el };
+            }
+            return el;
+          }),
+        };
+      }
       return {
         ...state,
-        channel: !spaceId
-          ? state.channel.map((el) => {
-              if (el.channel_id === channelId) {
-                el.seen = false;
-                return { ...el };
+        spaceChannel: state.spaceChannel.map((el) => {
+          if (el.space_id === spaceId) {
+            el.channels = el.channels?.map((c) => {
+              if (c.channel_id === channelId) {
+                c.seen = false;
+                return { ...c };
               }
-              return el;
-            })
-          : state.channel,
-        spaceChannel: spaceId
-          ? state.spaceChannel.map((el) => {
-              if (el.space_id === spaceId) {
-                el.channels = el.channels?.map((c) => {
-                  if (c.channel_id === channelId) {
-                    c.seen = false;
-                    return { ...c };
-                  }
-                  return c;
-                });
-                return { ...el };
-              }
-              return el;
-            })
-          : state.spaceChannel,
+              return c;
+            });
+            return { ...el };
+          }
+          return el;
+        }),
       };
     }
     case actionTypes.TEAM_SUCCESS: {
