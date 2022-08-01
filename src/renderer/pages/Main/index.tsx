@@ -144,11 +144,19 @@ const RedirectToHome = () => {
   const lastChannel = useAppSelector((state) => state.user.lastChannel);
   const history = useHistory();
   const gotoChannel = useCallback(async () => {
+    if (!team) return;
     setEmpty(false);
     const cookieChannelId = await getCookie(AsyncKey.lastChannelId);
     let channelId = cookieChannelId;
     let teamId = match_community_id || (await getCookie(AsyncKey.lastTeamId));
     if (match_community_id) {
+      const matchCommunity = team.find(
+        (el) => el.team_id === match_community_id
+      );
+      if (!matchCommunity) {
+        history.replace("/channels");
+        return;
+      }
       const channelByTeam = lastChannel?.[match_community_id];
       channelId = channelByTeam?.channel_id;
     }
