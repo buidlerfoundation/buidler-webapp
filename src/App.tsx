@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./index.scss";
 import "./App.scss";
 import "../src/renderer/styles/spacing.scss";
@@ -32,6 +32,7 @@ import { CustomEventName } from "renderer/services/events/WindowEvent";
 function App() {
   const history = useHistory();
   const dispatch = useAppDispatch();
+  const currentToken = useAppSelector((state) => state.configs.currentToken);
   const user = useAppSelector((state) => state.user.userData);
   const imgDomain = useAppSelector((state: any) => state.user.imgDomain);
   const initApp = useCallback(async () => {
@@ -45,7 +46,23 @@ function App() {
   }, [imgDomain, dispatch, history]);
   useEffect(() => {
     GoogleAnalytics.init();
-  }, []);
+    getCookie(AsyncKey.accessTokenKey).then((res) => {
+      dispatch({ type: actionTypes.UPDATE_CURRENT_TOKEN, payload: res });
+    });
+  }, [dispatch]);
+  useEffect(() => {
+    const eventFocus = async (e) => {
+      const token = await getCookie(AsyncKey.accessTokenKey);
+      if (token !== currentToken) {
+        window.location.reload();
+      }
+      dispatch({ type: actionTypes.UPDATE_CURRENT_TOKEN, payload: token });
+    };
+    window.addEventListener("focus", eventFocus);
+    return () => {
+      window.removeEventListener("focus", eventFocus);
+    };
+  }, [currentToken, dispatch]);
   useEffect(() => {
     TextareaAutosize.defaultProps = {
       ...TextareaAutosize.defaultProps,

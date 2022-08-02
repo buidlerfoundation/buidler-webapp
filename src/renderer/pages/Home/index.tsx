@@ -11,7 +11,7 @@ import moment from "moment";
 import PageWrapper from "renderer/shared/PageWrapper";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { createMemberChannelData } from "renderer/helpers/ChannelHelper";
-import { getCookie } from "renderer/common/Cookie";
+import { getCookie, removeCookie } from "renderer/common/Cookie";
 import { AsyncKey, SpaceBadge } from "renderer/common/AppConfig";
 import ModalOTP from "renderer/shared/ModalOTP";
 import ModalCreateSpace from "renderer/shared/ModalCreateSpace";
@@ -624,6 +624,7 @@ const Home = () => {
           (c) => c.team_id === match_community_id
         );
         if (!matchCommunity) {
+          removeCookie(AsyncKey.lastTeamId);
           history.replace("/channels");
         } else {
           const matchChannel = channels.find(
