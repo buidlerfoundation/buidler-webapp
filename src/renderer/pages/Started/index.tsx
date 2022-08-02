@@ -78,6 +78,7 @@ const Started = () => {
             : GALabel.WALLET_CONNECT
         );
       }
+      dispatch({ type: actionTypes.UPDATE_CURRENT_TOKEN, payload: res?.token });
       await setCookie(AsyncKey.accessTokenKey, res?.token);
       await setCookie(AsyncKey.loginType, loginType);
       if (dataFromUrl?.includes?.("invitation")) {
