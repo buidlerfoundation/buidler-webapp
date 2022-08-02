@@ -154,6 +154,7 @@ const RedirectToHome = () => {
         (el) => el.team_id === match_community_id
       );
       if (!matchCommunity) {
+        removeCookie(AsyncKey.lastTeamId);
         history.replace("/channels");
         return;
       }

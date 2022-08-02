@@ -24,6 +24,7 @@ import { getSpaceBackgroundColor } from "renderer/helpers/SpaceHelper";
 import ImageHelper from "renderer/common/ImageHelper";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import {
+  clearLastChannel,
   createNewChannel,
   createSpaceChannel,
   deleteChannel,
@@ -634,6 +635,7 @@ const Home = () => {
               dispatch(setCurrentChannel?.(matchChannel, match_community_id));
             }
           } else {
+            dispatch(clearLastChannel(match_community_id));
             history.replace(`/channels/${match_community_id}`);
           }
         }

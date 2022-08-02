@@ -69,6 +69,15 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.CLEAR_LAST_CHANNEL: {
+      return {
+        ...state,
+        lastChannel: {
+          ...state.lastChannel,
+          [payload.communityId]: null,
+        },
+      };
+    }
     case actionTypes.ADD_USER_TO_SPACE: {
       return {
         ...state,
