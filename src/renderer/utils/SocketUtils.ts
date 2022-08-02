@@ -103,7 +103,7 @@ const getMessages = async (
   if (messageRes.statusCode === 200) {
     dispatch({
       type: actionTypes.MESSAGE_SUCCESS,
-      payload: { data: messageData, channelId },
+      payload: { data: messageData, channelId, reloadSocket: true },
     });
   }
 };

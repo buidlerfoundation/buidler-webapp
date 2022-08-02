@@ -2,6 +2,7 @@ import { AnyAction, Reducer } from "redux";
 import { normalizeMessage } from "renderer/helpers/MessageHelper";
 import { MessageData } from "renderer/models";
 import actionTypes from "../actions/ActionTypes";
+import { differenceBy } from "lodash";
 
 type MessageReducerState = {
   conversationData: { [key: string]: Array<MessageData> };
@@ -40,14 +41,27 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
       };
     }
     case actionTypes.MESSAGE_SUCCESS: {
-      const { channelId, data, before } = payload;
-      let msg = data;
+      const { channelId, data, before, reloadSocket } = payload;
+      let msg = data || [];
       let scrollData = state.messageData?.[channelId]?.scrollData;
-      if (
+      const currentData = state.messageData[channelId]?.data || [];
+      if (reloadSocket) {
+        const diff = differenceBy(
+          currentData.filter(
+            (el) => el.createdAt >= data[data.length - 1].createdAt
+          ),
+          data,
+          "message_id"
+        );
+        scrollData = {
+          showScrollDown: false,
+        };
+        msg = [...diff, ...msg];
+      } else if (
         (before || data.length === 0) &&
         state.messageData?.[channelId]?.data
       ) {
-        msg = [...state.messageData[channelId].data, ...data];
+        msg = [...currentData, ...data];
       } else {
         scrollData = {
           showScrollDown: false,
