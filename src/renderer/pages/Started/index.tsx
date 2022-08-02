@@ -84,7 +84,7 @@ const Started = () => {
         const invitationId = dataFromUrl.split("=")[1];
         const acceptRes = await api.acceptInvitation(invitationId);
         if (acceptRes.statusCode === 200) {
-          toast.success("You have successfully joined new team.");
+          toast.success("You have successfully joined new community.");
           dispatch({ type: actionTypes.REMOVE_DATA_FROM_URL });
           await setCookie(AsyncKey.lastTeamId, acceptRes.data?.team_id);
         }

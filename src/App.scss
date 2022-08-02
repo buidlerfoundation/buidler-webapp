@@ -310,6 +310,15 @@ a {
 }
 .MuiPopover-paper {
   -webkit-transition: all 200ms !important;
+  &::-webkit-scrollbar-track {
+    display: none;
+  }
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  &::-webkit-scrollbar-thumb {
+    display: none;
+  }
 }
 
 :root {
