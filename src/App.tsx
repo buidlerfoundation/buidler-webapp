@@ -91,7 +91,7 @@ function App() {
       }
     };
     const eventContextMenu = (e: any) => {
-      if (process.env.NODE_ENV === "production") e.preventDefault();
+      if (!process.env.REACT_APP_ENABLE_INSPECT) e.preventDefault();
     };
     const eventClick = (e: any) => {
       const href = e?.target?.href;
