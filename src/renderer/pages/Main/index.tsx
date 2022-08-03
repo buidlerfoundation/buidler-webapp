@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import {
   Switch,
@@ -53,7 +53,11 @@ const errorUserSelector = createErrorMessageSelector([actionTypes.USER_PREFIX]);
 
 const PrivateRoute = ({ component: Component, ...rest }: any) => {
   const query = useQuery();
-  const match_community_id = rest?.computedMatch?.params?.match_community_id;
+  const match_community_id = useMemo(
+    () => rest?.computedMatch?.params?.match_community_id,
+    [rest?.computedMatch?.params?.match_community_id]
+  );
+  const invitationId = useMemo(() => query.get("invitation"), [query]);
   const userData = useAppSelector((state) => state.user.userData);
   const userError = useAppSelector((state) => errorUserSelector(state));
   const team = useAppSelector((state) => state.user.team);
@@ -62,57 +66,53 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
   const [loading, setLoading] = useState(true);
   const history = useHistory();
 
-  const initApp = useCallback(
-    async (invitationId) => {
-      setLoading(true);
-      if (invitationId) {
-        await dispatch(findUser());
+  const initApp = useCallback(async () => {
+    setLoading(true);
+    if (!userData.user_id && !userError) {
+      await dispatch(findUser());
+      if (invitationId && !team) {
         const res = await api.acceptInvitation(invitationId);
         if (res.statusCode === 200) {
-          toast.success("You have successfully joined new team.");
+          await dispatch(findTeamAndChannel(res.data?.team_id));
+          toast.success("You have successfully joined new community.");
           dispatch({ type: actionTypes.REMOVE_DATA_FROM_URL });
-          removeCookie(AsyncKey.lastChannelId);
-          removeCookie(AsyncKey.lastTeamId);
           setCookie(AsyncKey.lastTeamId, res.data?.team_id);
-          history.replace(`/channels/${res.data?.team_id}`);
+          history.replace({
+            search: "",
+            pathname: `/channels/${res.data?.team_id}`,
+          });
+          return;
         }
-      } else if (!userData.user_id && !userError) {
-        await dispatch(findUser());
+      } else {
         await dispatch(findTeamAndChannel(match_community_id));
-      } else if (
-        match_community_id &&
-        currentTeam.team_id !== match_community_id
-      ) {
-        const matchCommunity = team?.find(
-          (t) => t.team_id === match_community_id
-        );
-        if (matchCommunity) {
-          await dispatch(setCurrentTeam(matchCommunity));
-        }
       }
-      setLoading(false);
-    },
-    [
-      currentTeam?.team_id,
-      dispatch,
-      history,
-      match_community_id,
-      team,
-      userData.user_id,
-      userError,
-    ]
-  );
+    } else if (
+      match_community_id &&
+      currentTeam.team_id !== match_community_id
+    ) {
+      const matchCommunity = team?.find(
+        (t) => t.team_id === match_community_id
+      );
+      if (matchCommunity) {
+        await dispatch(setCurrentTeam(matchCommunity));
+      }
+    }
+    setLoading(false);
+  }, [
+    currentTeam?.team_id,
+    dispatch,
+    history,
+    match_community_id,
+    team,
+    userData.user_id,
+    userError,
+    invitationId,
+  ]);
   useEffect(() => {
-    let invitationId: string | null = null;
-    if (query.has("invitation")) {
-      invitationId = query.get("invitation");
+    if (invitationId) {
       dispatch({
         type: actionTypes.SET_DATA_FROM_URL,
-        payload: `invitation=${query.get("invitation")}`,
-      });
-      query.delete("invitation");
-      history.replace({
-        search: query.toString(),
+        payload: `invitation=${invitationId}`,
       });
     }
     getCookie(AsyncKey.accessTokenKey)
@@ -121,14 +121,14 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
           history.replace("/started");
           dispatch(logout?.());
         } else {
-          initApp(invitationId);
+          initApp();
         }
       })
       .catch(() => {
         history.replace("/started");
         dispatch(logout?.());
       });
-  }, [history, query, initApp, dispatch]);
+  }, [history, initApp, dispatch, invitationId]);
   if (loading) return <div className="main-load-page" />;
   return <Route {...rest} render={(props) => <Component {...props} />} />;
 };

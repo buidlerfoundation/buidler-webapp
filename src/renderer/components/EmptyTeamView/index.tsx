@@ -18,7 +18,7 @@ const EmptyTeamView = () => {
       const invitationId = dataFromUrl.split("=")[1];
       const res = await api.acceptInvitation(invitationId);
       if (res.statusCode === 200) {
-        toast.success("You have successfully joined new team.");
+        toast.success("You have successfully joined new community.");
         dispatch({ type: actionTypes.REMOVE_DATA_FROM_URL });
         setCookie(AsyncKey.lastTeamId, res.data?.team_id);
         dispatch(findTeamAndChannel());
