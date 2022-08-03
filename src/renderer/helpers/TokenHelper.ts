@@ -1,3 +1,6 @@
+import { BalanceApiData } from "renderer/models";
+import numeral from "numeral";
+
 export const round = (value: number, afterDot: number) => {
   const p = Math.pow(10, afterDot);
   return Math.floor(value * p) / p;
@@ -53,7 +56,7 @@ export const formatUSD = (
   if (!value || !price) return "$0";
   const p = decimal ? Math.pow(10, decimal) : 1;
   const valueUSD = (value / p) * price;
-  return `$${round(valueUSD, afterDot)}`;
+  return `$${numeral(round(valueUSD, afterDot)).format("0,0[.][00]")}`;
 };
 
 export const tokenSymbol = (params: { symbol?: string }) => {
@@ -61,4 +64,22 @@ export const tokenSymbol = (params: { symbol?: string }) => {
   if (!symbol) return "";
   const imagePath = symbol.toLowerCase();
   return `https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@bea1a9722a8c63169dcc06e86182bf2c55a76bbc/svg/color/${imagePath}.svg`;
+};
+
+export const totalBalanceUSD = (userBalance?: BalanceApiData | null) => {
+  if (!userBalance) return 0;
+  const { ETH, tokens } = userBalance;
+  let res = formatUSDValue({
+    value: ETH.balance,
+    decimal: ETH.contract.decimals,
+    price: ETH.price?.rate,
+  });
+  tokens.forEach((el) => {
+    res += formatUSDValue({
+      value: el.balance,
+      decimal: el.contract.decimals,
+      price: el.price?.rate,
+    });
+  });
+  return res;
 };

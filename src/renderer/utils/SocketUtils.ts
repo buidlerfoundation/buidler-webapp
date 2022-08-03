@@ -247,6 +247,7 @@ class SocketUtil {
         this.socket.off("ON_ADD_USER_TO_SPACE");
         this.socket.off("ON_REMOVE_USER_FROM_SPACE");
         this.socket.off("ON_NEW_TRANSACTION");
+        this.socket.off("ON_REMOVE_USER_FROM_TEAM");
         this.socket.off("disconnect");
       });
       const user: any = store.getState()?.user;
@@ -304,6 +305,21 @@ class SocketUtil {
     });
   };
   listenSocket() {
+    this.socket.on("ON_REMOVE_USER_FROM_TEAM", (data) => {
+      const { user_id, team_id } = data;
+      const { currentTeam, userData } = store.getState().user;
+      if (team_id === currentTeam.team_id && user_id === userData.user_id) {
+        window.location.reload();
+      } else {
+        store.dispatch({
+          type: actionTypes.REMOVE_MEMBER_SUCCESS,
+          payload: {
+            teamId: team_id,
+            userId: user_id,
+          },
+        });
+      }
+    });
     this.socket.on("ON_NEW_TRANSACTION", async (data: TransactionApiData) => {
       const userData = store.getState().user.userData;
       const address = utils.computeAddress(userData.user_id);
@@ -572,7 +588,7 @@ class SocketUtil {
     this.socket.on("ON_NEW_USER_JOIN_TEAM", (data: any) => {
       const user: any = store.getState()?.user;
       const { currentTeam } = user;
-      if (currentTeam.team_id === data.team_id) {
+      if (currentTeam.team_id === data.team.team_id) {
         store.dispatch({
           type: actionTypes.NEW_USER,
           payload: data.user,

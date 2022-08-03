@@ -69,6 +69,12 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.ACCEPT_TEAM_SUCCESS: {
+      return {
+        ...state,
+        team: [...(state.team || []), payload],
+      };
+    }
     case actionTypes.CLEAR_LAST_CHANNEL: {
       return {
         ...state,
@@ -161,6 +167,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       return {
         ...state,
         teamUserData: [...state.teamUserData, payload],
+        totalTeamUser: state.totalTeamUser + 1,
       };
     }
     case actionTypes.NEW_CHANNEL: {
@@ -677,6 +684,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         teamUserData: state.teamUserData.filter(
           (el) => el.user_id !== payload.userId
         ),
+        totalTeamUser: state.totalTeamUser - 1,
       };
     }
     case actionTypes.LEAVE_TEAM_SUCCESS: {

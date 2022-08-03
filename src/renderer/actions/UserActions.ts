@@ -27,6 +27,18 @@ export const logout: ActionCreator<any> = () => (dispatch: Dispatch) => {
   dispatch({ type: ActionTypes.LOGOUT });
 };
 
+export const acceptTeam =
+  (invitationId: string) => async (dispatch: Dispatch) => {
+    const res = await api.acceptInvitation(invitationId);
+    if (res.statusCode === 200) {
+      dispatch({
+        type: ActionTypes.ACCEPT_TEAM_SUCCESS,
+        payload: res.data,
+      });
+    }
+    return res;
+  };
+
 export const clearLastChannel: ActionCreator<any> =
   (communityId: string) => (dispatch: Dispatch) => {
     removeCookie(AsyncKey.lastChannelId);
@@ -380,17 +392,13 @@ export const removeTeamMember =
       payload: { teamId, userId },
     });
     const res = await api.removeTeamMember(teamId, userId);
-    if (res.statusCode === 200) {
-      dispatch({
-        type: ActionTypes.REMOVE_MEMBER_SUCCESS,
-        payload: { teamId, userId },
-      });
-    } else {
+    if (res.statusCode !== 200) {
       dispatch({
         type: ActionTypes.REMOVE_MEMBER_FAIL,
         payload: res,
       });
     }
+    return res.statusCode === 200;
   };
 
 export const leaveTeam = (teamId: string) => async (dispatch: Dispatch) => {

@@ -258,8 +258,13 @@ const Home = () => {
     setOpenConfirmDeleteChannel(true);
   }, []);
   const handleRemoveTeamMember = useCallback(
-    (u) => {
-      dispatch(removeTeamMember(currentTeam.team_id, u.user_id));
+    async (u) => {
+      const success = await dispatch(
+        removeTeamMember(currentTeam.team_id, u.user_id)
+      );
+      if (!!success) {
+        toast.success("User has been removed!");
+      }
     },
     [dispatch, currentTeam?.team_id]
   );
