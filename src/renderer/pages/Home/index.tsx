@@ -573,13 +573,16 @@ const Home = () => {
         category: GACategory.CHANNEL,
         action: GAAction.DELETE,
       });
-      history.replace(`/channels/${currentTeam.team_id}/${nextChannelId}`);
+      if (currentChannel?.channel_id === channelDelete?.channel_id) {
+        history.replace(`/channels/${currentTeam.team_id}/${nextChannelId}`);
+      }
       setChannelDelete(null);
       setOpenConfirmDeleteChannel(false);
     }
   }, [
     channelDelete?.channel_id,
-    currentTeam?.team_id,
+    currentChannel?.channel_id,
+    currentTeam.team_id,
     dispatch,
     history,
     nextChannelId,

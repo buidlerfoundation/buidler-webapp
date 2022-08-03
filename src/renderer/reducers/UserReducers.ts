@@ -25,7 +25,6 @@ interface UserReducerState {
   lastChannel: { [key: string]: Channel };
   spaceMembers: Array<UserData>;
   walletBalance?: BalanceApiData | null;
-  createdChannelSpaceId?: string | null;
 }
 
 const initialState: UserReducerState = {
@@ -60,7 +59,6 @@ const initialState: UserReducerState = {
   lastChannel: {},
   spaceMembers: [],
   walletBalance: null,
-  createdChannelSpaceId: null,
 };
 
 const userReducers: Reducer<UserReducerState, AnyAction> = (
@@ -69,6 +67,18 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.UPDATE_EXPAND_SPACE_ITEM: {
+      const { spaceId, isExpand } = payload;
+      return {
+        ...state,
+        spaceChannel: state.spaceChannel.map((el) => {
+          if (el.space_id === spaceId) {
+            el.is_expand = isExpand;
+          }
+          return el;
+        }),
+      };
+    }
     case actionTypes.ACCEPT_TEAM_SUCCESS: {
       return {
         ...state,
@@ -620,6 +630,8 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
           );
         }
         setCookie(AsyncKey.lastChannelId, newCurrentChannel?.channel_id);
+      } else {
+        newCurrentChannel = currentChannel;
       }
       return {
         ...state,
@@ -662,12 +674,6 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             : state.currentChannel,
       };
     }
-    case actionTypes.CREATE_CHANNEL_REQUEST: {
-      return {
-        ...state,
-        createdChannelSpaceId: null,
-      };
-    }
     case actionTypes.CREATE_CHANNEL_SUCCESS: {
       return {
         ...state,
@@ -675,7 +681,12 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
           ...state.lastChannel,
           [state.currentTeam.team_id]: payload,
         },
-        createdChannelSpaceId: payload.space_id,
+        spaceChannel: state.spaceChannel.map((el) => {
+          if (el.space_id === payload.space_id) {
+            el.is_expand = true;
+          }
+          return el;
+        }),
       };
     }
     case actionTypes.REMOVE_MEMBER_SUCCESS: {

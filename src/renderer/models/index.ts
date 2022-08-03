@@ -90,6 +90,7 @@ export interface Space {
   space_background_color?: string;
   channels: Array<Channel>;
   is_space_member: boolean;
+  is_expand?: boolean;
 }
 
 export interface Community {

@@ -206,6 +206,7 @@ const SideBar = forwardRef(
                   onSpaceBadgeClick={onSpaceBadgeClick}
                   onCreateChannelClick={onCreateChannel}
                   channels={space.channels}
+                  isCollapsed={!space.is_expand}
                 />
               </div>
             )}
