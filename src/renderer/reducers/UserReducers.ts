@@ -10,6 +10,13 @@ import actionTypes from "../actions/ActionTypes";
 import { AsyncKey } from "../common/AppConfig";
 import { setCookie } from "../common/Cookie";
 
+interface MemberRoleData {
+  data: Array<UserData>;
+  total: number;
+  canMore: boolean;
+  currentPage: number;
+}
+
 interface UserReducerState {
   userData: UserData;
   team?: Array<Community>;
@@ -25,6 +32,11 @@ interface UserReducerState {
   lastChannel: { [key: string]: Channel };
   spaceMembers: Array<UserData>;
   walletBalance?: BalanceApiData | null;
+  memberData: {
+    admin: MemberRoleData;
+    owner: MemberRoleData;
+    member: MemberRoleData;
+  };
 }
 
 const initialState: UserReducerState = {
@@ -59,6 +71,26 @@ const initialState: UserReducerState = {
   lastChannel: {},
   spaceMembers: [],
   walletBalance: null,
+  memberData: {
+    admin: {
+      data: [],
+      total: 0,
+      canMore: false,
+      currentPage: 1,
+    },
+    owner: {
+      data: [],
+      total: 0,
+      canMore: false,
+      currentPage: 1,
+    },
+    member: {
+      data: [],
+      total: 0,
+      canMore: false,
+      currentPage: 1,
+    },
+  },
 };
 
 const userReducers: Reducer<UserReducerState, AnyAction> = (
@@ -67,6 +99,20 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.MEMBER_DATA_SUCCESS: {
+      const { role, page, data, total } = payload;
+      const { memberData } = state;
+      memberData[role] = {
+        data: page === 1 ? data : [...(memberData[role]?.data || []), ...data],
+        total,
+        canMore: data.length === 50,
+        currentPage: page,
+      };
+      return {
+        ...state,
+        memberData,
+      };
+    }
     case actionTypes.UPDATE_EXPAND_SPACE_ITEM: {
       const { spaceId, isExpand } = payload;
       return {
@@ -452,6 +498,26 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         lastChannel: {
           ...state.lastChannel,
           [team.team_id]: channel,
+        },
+        memberData: {
+          admin: {
+            data: [],
+            total: 0,
+            canMore: false,
+            currentPage: 1,
+          },
+          owner: {
+            data: [],
+            total: 0,
+            canMore: false,
+            currentPage: 1,
+          },
+          member: {
+            data: [],
+            total: 0,
+            canMore: false,
+            currentPage: 1,
+          },
         },
       };
     }

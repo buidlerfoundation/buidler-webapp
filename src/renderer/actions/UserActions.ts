@@ -3,11 +3,11 @@ import GlobalVariable from "renderer/services/GlobalVariable";
 import { getSpaceBackgroundColor } from "renderer/helpers/SpaceHelper";
 import api from "../api";
 import ActionTypes from "./ActionTypes";
-import { AsyncKey } from "../common/AppConfig";
+import { AsyncKey, UserRole } from "../common/AppConfig";
 import { getCookie, removeCookie, setCookie } from "../common/Cookie";
 import ImageHelper from "../common/ImageHelper";
 import SocketUtils from "../utils/SocketUtils";
-import { Channel, Community, UserData } from "renderer/models";
+import { Channel, Community, UserData, UserRoleType } from "renderer/models";
 import store from "renderer/store";
 
 export const getInitial: ActionCreator<any> =
@@ -26,6 +26,35 @@ export const logout: ActionCreator<any> = () => (dispatch: Dispatch) => {
   SocketUtils.disconnect();
   dispatch({ type: ActionTypes.LOGOUT });
 };
+
+export const getMemberData =
+  (teamId: string, role: UserRoleType, page: number) =>
+  async (dispatch: Dispatch) => {
+    if (page > 1) {
+      dispatch({
+        type: ActionTypes.MEMBER_DATA_MORE,
+        payload: { teamId, role, page },
+      });
+    } else {
+      dispatch({
+        type: ActionTypes.MEMBER_DATA_REQUEST,
+        payload: { teamId, role, page },
+      });
+    }
+    const roles = role === UserRole.Member ? Object.values(UserRole) : [role];
+    const res = await api.getMembersByRole(teamId, roles);
+    if (res.success) {
+      dispatch({
+        type: ActionTypes.MEMBER_DATA_SUCCESS,
+        payload: { role, page, data: res.data, total: res.metadata?.total },
+      });
+    } else {
+      dispatch({
+        type: ActionTypes.MEMBER_DATA_FAIL,
+        payload: res,
+      });
+    }
+  };
 
 export const acceptTeam =
   (invitationId: string) => async (dispatch: Dispatch) => {

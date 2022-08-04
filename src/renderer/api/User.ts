@@ -130,9 +130,13 @@ export const getGasPrice = () => Caller.get<number>("price/gas");
 export const getMembersByRole = (
   teamId: string,
   roles: Array<UserRoleType> = [],
-  userName?: string
+  params: {
+    userName?: string;
+    page?: number;
+  } = {}
 ) => {
-  let url = `team/${teamId}/role?page=1&limit=50`;
+  const { userName, page } = params;
+  let url = `team/${teamId}/role?page=${page || 1}&limit=50`;
   roles.forEach((el) => {
     url += `&roles[]=${el}`;
   });
