@@ -75,23 +75,28 @@ async function requestAPI<T = any>(
   // Run the fetching
   return fetch(apiUrl, fetchOptions)
     .then((res) => {
-      return res.json().then((data) => {
-        if (res.status !== 200) {
-          toast.error(data.message || data);
-        }
-        if (data.data) {
-          return { ...data, statusCode: res.status };
-        }
-        if (data.success || data.message) {
-          return {
-            data: data.data,
-            success: data.success,
-            message: data.message,
-            statusCode: res.status,
-          };
-        }
-        return { data, statusCode: res.status };
-      });
+      return res
+        .json()
+        .then((data) => {
+          if (res.status !== 200) {
+            toast.error(data.message || data);
+          }
+          if (data.data) {
+            return { ...data, statusCode: res.status };
+          }
+          if (data.success || data.message) {
+            return {
+              data: data.data,
+              success: data.success,
+              message: data.message,
+              statusCode: res.status,
+            };
+          }
+          return { data, statusCode: res.status };
+        })
+        .catch((err) => {
+          return { message: err, statusCode: res.status };
+        });
     })
     .catch((err) => {
       toast.error(err.message || err);

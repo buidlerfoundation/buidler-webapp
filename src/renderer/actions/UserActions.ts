@@ -84,7 +84,7 @@ export const findUser = () => async (dispatch: Dispatch) => {
     actionFetchWalletBalance(dispatch);
     dispatch({ type: ActionTypes.USER_SUCCESS, payload: { user: res.data } });
   } else {
-    dispatch({ type: ActionTypes.USER_FAIL, payload: res.data });
+    dispatch({ type: ActionTypes.USER_FAIL, payload: res });
   }
   return res.statusCode === 200;
 };
