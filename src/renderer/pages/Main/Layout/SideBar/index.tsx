@@ -23,6 +23,8 @@ import {
 import SpaceItem from "renderer/shared/SpaceItem";
 import MemberSpace from "renderer/shared/MemberSpace";
 import images from "renderer/common/images";
+import useMatchCommunityId from "renderer/hooks/useMatchCommunityId";
+import useSpaceChannel from "renderer/hooks/useSpaceChannel";
 
 type SideBarProps = {
   onEditGroupChannel: (group: any) => void;
@@ -53,8 +55,11 @@ const SideBar = forwardRef(
     }: SideBarProps,
     ref
   ) => {
-    const { directChannel, currentChannel, spaceChannel, team, currentTeam } =
-      useAppSelector((state) => state.user);
+    const { directChannel, currentChannel, team, currentTeam } = useAppSelector(
+      (state) => state.user
+    );
+    const communityId = useMatchCommunityId();
+    const spaceChannel = useSpaceChannel();
     const [isOpenConfirmRemoveMember, setOpenConfirmRemoveMember] =
       useState(false);
     const [selectedMenuChannel, setSelectedMenuChannel] = useState<any>(null);
@@ -67,8 +72,11 @@ const SideBar = forwardRef(
     const menuSpaceChannelRef = useRef<any>();
     const menuMemberRef = useRef<any>();
     const isOwner = useMemo(() => {
-      return currentTeam.role === "Owner";
-    }, [currentTeam.role]);
+      return (
+        (team?.find((el) => el.team_id === communityId)?.role ||
+          currentTeam.role) === "Owner"
+      );
+    }, [communityId, currentTeam.role, team]);
     useImperativeHandle(ref, () => {
       return {
         scrollToBottom: () => {
@@ -205,7 +213,7 @@ const SideBar = forwardRef(
                   onContextChannel={handleContextMenuChannel}
                   onSpaceBadgeClick={onSpaceBadgeClick}
                   onCreateChannelClick={onCreateChannel}
-                  channels={space.channels}
+                  channel_ids={space.channel_ids}
                   isCollapsed={!space.is_expand}
                 />
               </div>

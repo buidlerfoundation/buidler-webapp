@@ -7,6 +7,7 @@ import {
 } from "renderer/actions/UserActions";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import useAppSelector from "renderer/hooks/useAppSelector";
+import useChannel from "renderer/hooks/useChannel";
 import { Channel } from "renderer/models";
 import { GAAction, GACategory } from "renderer/services/analytics/GAEventName";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
@@ -31,7 +32,7 @@ const SettingChannel = ({
   const history = useHistory();
   const dispatch = useAppDispatch();
   const currentTeam = useAppSelector((state) => state.user.currentTeam);
-  const channels = useAppSelector((state) => state.user.channel);
+  const channels = useChannel();
   const [isOpenConfirm, setOpenConfirm] = useState(false);
   const [currentName, setCurrentName] = useState("");
   const [isOpenEditName, setOpenEditName] = useState(false);

@@ -120,12 +120,6 @@ export const findTeamAndChannel =
           communities[0];
         const teamId = currentTeam.team_id;
         const resSpace = await api.getSpaceChannel(teamId);
-        if (resSpace.statusCode === 200) {
-          dispatch({
-            type: ActionTypes.GROUP_CHANNEL,
-            payload: resSpace.data,
-          });
-        }
         const resChannel = await api.findChannel(teamId);
         const lastChannelId = await getCookie(AsyncKey.lastChannelId);
         const teamUsersRes = await api.getTeamUsers(currentTeam.team_id);
@@ -150,21 +144,9 @@ export const findTeamAndChannel =
             directChannelUser,
             resChannel,
             teamUsersRes,
+            resSpace,
           },
         });
-        if (resChannel.statusCode === 200) {
-          const channels = resChannel.data || [];
-          if (channels.length > 0) {
-            dispatch({
-              type: ActionTypes.CHANNEL_SUCCESS,
-              payload: { channel: channels },
-            });
-          }
-        } else {
-          dispatch({
-            type: ActionTypes.CHANNEL_FAIL,
-          });
-        }
       } else {
         SocketUtils.init();
       }
@@ -245,6 +227,7 @@ const actionSetCurrentTeam = async (
   });
   const teamUsersRes = await api.getTeamUsers(team.team_id);
   let lastChannelId: any = null;
+  const resSpace = await api.getSpaceChannel(team.team_id);
   const resChannel = await api.findChannel(team.team_id);
   const lastChannel = store.getState().user?.lastChannel?.[team.team_id];
   if (channelId) {
@@ -264,36 +247,9 @@ const actionSetCurrentTeam = async (
   SocketUtils.changeTeam(team.team_id);
   dispatch({
     type: ActionTypes.SET_CURRENT_TEAM,
-    payload: { team, resChannel, lastChannelId, teamUsersRes },
+    payload: { team, resChannel, lastChannelId, teamUsersRes, resSpace },
   });
   setCookie(AsyncKey.lastTeamId, team.team_id);
-  const resSpace = await api.getSpaceChannel(team.team_id);
-  if (resSpace.statusCode === 200) {
-    dispatch({
-      type: ActionTypes.GROUP_CHANNEL,
-      payload: resSpace.data,
-    });
-  }
-  if (resChannel.statusCode === 200) {
-    const channels = resChannel.data || [];
-    if (channels.length > 0) {
-      dispatch({
-        type: ActionTypes.CHANNEL_SUCCESS,
-        payload: {
-          channel: channels.map((c: Channel) => {
-            if (c.channel_id === lastChannelId) {
-              c.seen = true;
-            }
-            return c;
-          }),
-        },
-      });
-    } else {
-      dispatch({
-        type: ActionTypes.CHANNEL_FAIL,
-      });
-    }
-  }
   return { lastChannelId };
 };
 
