@@ -75,6 +75,7 @@ import useSpaceChannel from "renderer/hooks/useSpaceChannel";
 import useTeamUserData from "renderer/hooks/useTeamUserData";
 import useMatchChannelId from "renderer/hooks/useMatchChannelId";
 import AppTitleBar from "renderer/shared/AppTitleBar";
+import useMatchCommunityId from "renderer/hooks/useMatchCommunityId";
 
 const loadMoreMessageSelector = createLoadMoreSelector([
   actionTypes.MESSAGE_PREFIX,
@@ -118,6 +119,7 @@ const Home = () => {
     (state) => state.message
   );
   const teamUserData = useTeamUserData();
+  const communityId = useMatchCommunityId();
   const channelId = useMatchChannelId();
   const { taskData } = useAppSelector((state) => state.task);
   const { activityData } = useAppSelector((state) => state.activity);
@@ -623,7 +625,7 @@ const Home = () => {
     GoogleAnalytics.pageView(GAPageView.CHANNELS);
   }, []);
   useEffect(() => {
-    if (currentChannel.channel_id) channelViewRef.current?.hideReply?.();
+    if (currentChannel.channel_id) channelViewRef.current?.clearText?.();
   }, [currentChannel.channel_id]);
   useEffect(() => {
     if (match_channel_id && !!community) {
@@ -635,6 +637,7 @@ const Home = () => {
         );
         if (!matchCommunity) {
           removeCookie(AsyncKey.lastTeamId);
+          removeCookie(AsyncKey.lastChannelId);
           history.replace("/channels");
         } else {
           const matchChannel = channels.find(
@@ -813,7 +816,7 @@ const Home = () => {
               <TaskListView
                 channelId={channelId}
                 archivedCount={taskData?.[channelId]?.archivedCount}
-                teamId={currentTeam?.team_id}
+                teamId={communityId}
                 tasks={taskData?.[channelId]?.tasks || []}
                 archivedTasks={taskData?.[channelId]?.archivedTasks || []}
                 onAddTask={handleAddTask}
