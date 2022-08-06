@@ -6,6 +6,15 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
-    ports:
-      - "3001:80"
+    expose:
+      - "80"
     restart: unless-stopped
+    environment:
+      - VIRTUAL_HOST=staging.community.buidler.app
+      - VIRTUAL_PORT=80
+      - LETSENCRYPT_HOST=staging.community.buidler.app
+      - LETSENCRYPT_EMAIL="test.tai.htm@gmail.com"
+networks: 
+  default:  
+    name: nginx-proxy
+    external: true
