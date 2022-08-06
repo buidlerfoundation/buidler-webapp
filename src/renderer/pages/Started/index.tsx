@@ -15,20 +15,10 @@ import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 import { ethers, utils } from "ethers";
 import GlobalVariable from "renderer/services/GlobalVariable";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
-import {
-  GAAction,
-  GACategory,
-  GALabel,
-  GAPageView,
-} from "renderer/services/analytics/GAEventName";
 
 const Started = () => {
   useEffect(() => {
-    GoogleAnalytics.pageView(GAPageView.STARTED);
-    GoogleAnalytics.event({
-      category: GACategory.LOGIN,
-      action: GAAction.VIEW,
-    });
+    GoogleAnalytics.tracking("Login Started", { category: "Login" });
   }, []);
   const dispatch = useAppDispatch();
   const hideMetaMask = useMemo(() => {
@@ -37,32 +27,22 @@ const Started = () => {
   }, []);
   const history = useHistory();
   const dataFromUrl = useAppSelector((state) => state.configs.dataFromUrl);
-  const gaLoginFailed = useCallback((label: string) => {
-    GoogleAnalytics.event({
-      category: GACategory.LOGIN,
-      action: GAAction.FAILED,
-      label,
-    });
-  }, []);
   const gaLoginSuccess = useCallback((label: string) => {
-    GoogleAnalytics.event({
-      category: GACategory.LOGIN,
-      action: GAAction.SUCCESS,
-      label,
+    GoogleAnalytics.tracking("Login Successful", {
+      category: "Login",
+      method: label,
     });
   }, []);
   const gaLoginSubmit = useCallback((label: string) => {
-    GoogleAnalytics.event({
-      category: GACategory.LOGIN,
-      action: GAAction.SUBMIT,
-      label,
+    GoogleAnalytics.tracking("Login Submitted", {
+      category: "Login",
+      method: label,
     });
   }, []);
   const gaLoginClick = useCallback((label: string) => {
-    GoogleAnalytics.event({
-      category: GACategory.LOGIN,
-      action: GAAction.CLICK,
-      label,
+    GoogleAnalytics.tracking("Login Method Selected", {
+      category: "Login",
+      method: label,
     });
   }, []);
   const handleResponseVerify = useCallback(
@@ -73,9 +53,7 @@ const Started = () => {
         loginType === LoginType.WalletConnect
       ) {
         gaLoginSuccess(
-          loginType === LoginType.Metamask
-            ? GALabel.METAMASK
-            : GALabel.WALLET_CONNECT
+          loginType === LoginType.Metamask ? "MetaMask" : "WalletConnect"
         );
       }
       dispatch({ type: actionTypes.UPDATE_CURRENT_TOKEN, payload: res?.token });
@@ -101,29 +79,24 @@ const Started = () => {
         const nonceRes = await api.requestNonceWithAddress(address);
         const message = nonceRes.data?.message;
         if (nonceRes.statusCode !== 200 || !message) {
-          toast.error(nonceRes?.message || "");
-          gaLoginFailed(GALabel.METAMASK);
           return false;
         }
         const metamaskProvider: any = window.ethereum;
         const provider = new ethers.providers.Web3Provider(metamaskProvider);
         const signer = provider.getSigner();
         const signature = await signer.signMessage(message);
-        gaLoginSubmit(GALabel.METAMASK);
+        gaLoginSubmit("MetaMask");
         const res = await api.verifyNonce(message, signature);
         if (res.statusCode === 200) {
           await handleResponseVerify(res, LoginType.Metamask);
           return true;
-        } else {
-          toast.error(res.message || "");
         }
         return false;
-      } catch (error) {
-        gaLoginFailed(GALabel.METAMASK);
+      } catch (error: any) {
         return false;
       }
     },
-    [gaLoginFailed, gaLoginSubmit, handleResponseVerify]
+    [gaLoginSubmit, handleResponseVerify]
   );
   const doingLogin = useCallback(async () => {
     if (
@@ -137,8 +110,6 @@ const Started = () => {
       const nonceRes = await api.requestNonceWithAddress(address);
       const message = nonceRes.data?.message;
       if (nonceRes.statusCode !== 200 || !message) {
-        gaLoginFailed(GALabel.WALLET_CONNECT);
-        toast.error(nonceRes?.message || "");
         return;
       }
       const params = [
@@ -148,21 +119,18 @@ const Started = () => {
       const signature = await WalletConnectUtils.connector.signPersonalMessage(
         params
       );
-      gaLoginSubmit(GALabel.WALLET_CONNECT);
+      gaLoginSubmit("WalletConnect");
       const res = await api.verifyNonce(message, signature);
       if (res.statusCode === 200) {
         await handleResponseVerify(res, LoginType.WalletConnect);
       } else {
-        toast.error(res.message || "");
-        gaLoginFailed(GALabel.WALLET_CONNECT);
         WalletConnectUtils.connector.killSession();
       }
-    } catch (err) {
+    } catch (err: any) {
       console.log(err);
-      gaLoginFailed(GALabel.WALLET_CONNECT);
       WalletConnectUtils.connector.killSession();
     }
-  }, [gaLoginFailed, gaLoginSubmit, handleResponseVerify]);
+  }, [gaLoginSubmit, handleResponseVerify]);
   const onWCConnected = useCallback(() => {
     setTimeout(doingLogin, 300);
   }, [doingLogin]);
@@ -201,7 +169,7 @@ const Started = () => {
     });
   }, [dispatch]);
   const handleMetamask = useCallback(() => {
-    gaLoginClick(GALabel.METAMASK);
+    gaLoginClick("MetaMask");
     if (!window.ethereum) {
       toast.error("Please install MetaMask extension!");
     } else {
@@ -229,7 +197,7 @@ const Started = () => {
     onMetamaskUpdate,
   ]);
   const handleWalletConnect = useCallback(() => {
-    gaLoginClick(GALabel.WALLET_CONNECT);
+    gaLoginClick("WalletConnect");
     WalletConnectUtils.connect(onWCConnected, onDisconnected);
   }, [gaLoginClick, onWCConnected, onDisconnected]);
   return (

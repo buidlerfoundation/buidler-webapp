@@ -264,6 +264,7 @@ export const deleteSpaceChannel =
       payload: { spaceId },
     });
     const res = await api.deleteSpaceChannel(spaceId);
+    return res.statusCode === 200;
   };
 
 export const uploadChannelAvatar =

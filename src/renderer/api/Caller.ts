@@ -1,5 +1,6 @@
 import toast from "react-hot-toast";
 import { BaseDataApi } from "renderer/models";
+import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import store from "renderer/store";
 import AppConfig, { AsyncKey } from "../common/AppConfig";
 import { getCookie } from "../common/Cookie";
@@ -99,6 +100,13 @@ async function requestAPI<T = any>(
         });
     })
     .catch((err) => {
+      GoogleAnalytics.trackingError(
+        uri,
+        method.toLowerCase(),
+        err.message || "",
+        err.statusCode,
+        body
+      );
       toast.error(err.message || err);
       return {
         message: err,

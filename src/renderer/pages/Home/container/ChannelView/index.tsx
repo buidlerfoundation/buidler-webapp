@@ -51,8 +51,8 @@ import DirectDescription from "./DirectDescription";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import { useLocation } from "react-router-dom";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
-import { GAAction, GACategory } from "renderer/services/analytics/GAEventName";
 import useMatchCommunityId from "renderer/hooks/useMatchCommunityId";
+import useTotalTeamUserData from "renderer/hooks/useTotalMemberUser";
 
 type ChannelViewProps = {
   currentChannel: Channel;
@@ -95,6 +95,7 @@ const ChannelView = forwardRef(
   ) => {
     const location = useLocation();
     const dispatch = useAppDispatch();
+    const totalTeamUser = useTotalTeamUserData();
     const communityId = useMatchCommunityId();
     const reactData = useAppSelector((state) => state.reactReducer.reactData);
     const messagesGroup = useMemo<Array<MessageGroup>>(() => {
@@ -230,9 +231,8 @@ const ChannelView = forwardRef(
             msg.message_tag?.[0]?.mention_id || currentChannel?.user?.user_id,
         };
         dispatch(createTask(currentChannel?.channel_id, body));
-        GoogleAnalytics.event({
-          category: GACategory.MESSAGE,
-          action: GAAction.PIN,
+        GoogleAnalytics.tracking("Message Pinned", {
+          category: "Message",
         });
       },
       [
@@ -250,10 +250,6 @@ const ChannelView = forwardRef(
         setReplyTask(null);
         setMessageEdit(null);
         inputRef.current?.focus?.();
-        GoogleAnalytics.event({
-          category: GACategory.MESSAGE,
-          action: GAAction.REPLY,
-        });
       },
       [inputRef, setReplyTask]
     );
@@ -267,9 +263,8 @@ const ChannelView = forwardRef(
               currentChannel.channel_id
             )
           );
-          GoogleAnalytics.event({
-            category: GACategory.MESSAGE,
-            action: GAAction.DELETE,
+          GoogleAnalytics.tracking("Message Deleted", {
+            category: "Message",
           });
         }
         if (menu.value === "Edit") {
@@ -393,9 +388,8 @@ const ChannelView = forwardRef(
           plain_text,
           files.map((el) => el.id)
         );
-        GoogleAnalytics.event({
-          category: GACategory.MESSAGE,
-          action: GAAction.EDIT,
+        GoogleAnalytics.tracking("Message Edited", {
+          category: "Message",
         });
         setText("");
         setFiles([]);
@@ -485,10 +479,14 @@ const ChannelView = forwardRef(
         if (files?.find((el) => el.type.includes("application"))) {
           gaLabel += ", file";
         }
-        GoogleAnalytics.event({
-          category: GACategory.MESSAGE,
-          action: GAAction.SENT,
-          label: gaLabel,
+        GoogleAnalytics.tracking("Message Sent", {
+          category: "Message",
+          type: gaLabel,
+          is_reply: `${!!messageReply}`,
+          is_exclusive_space: `${
+            currentChannel?.space?.space_type === "Private"
+          }`,
+          total_member: `${totalTeamUser}`,
         });
         SocketUtils.sendMessage(message);
         setText("");
@@ -507,6 +505,8 @@ const ChannelView = forwardRef(
       replyTask,
       text,
       userData?.user_id,
+      currentChannel?.space?.space_type,
+      totalTeamUser,
       scrollDown,
     ]);
     const handleRemoveFile = useCallback(

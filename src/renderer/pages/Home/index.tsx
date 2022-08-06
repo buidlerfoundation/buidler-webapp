@@ -63,11 +63,6 @@ import useAppDispatch from "renderer/hooks/useAppDispatch";
 import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 import ModalUserProfile from "renderer/shared/ModalUserProfile";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
-import {
-  GAAction,
-  GACategory,
-  GAPageView,
-} from "renderer/services/analytics/GAEventName";
 import ModalAllMembers from "renderer/shared/ModalAllMembers";
 import { getTransactions } from "renderer/actions/TransactionActions";
 import useChannel from "renderer/hooks/useChannel";
@@ -462,26 +457,23 @@ const Home = () => {
           icon_sub_color: badge?.backgroundColor,
         };
       }
-      GoogleAnalytics.event({
-        category: GACategory.ADD_NEW_SPACE,
-        action: GAAction.SUBMIT,
-        label: spaceData.spaceType,
+      GoogleAnalytics.tracking("Create Space Submitted", {
+        category: "Add Space",
+        space_type: spaceData.spaceType === "Exclusive" ? "Private" : "Public",
+        contract_address: spaceData.condition?.address || "",
       });
       const success = await dispatch(
         createSpaceChannel(currentTeam.team_id, body)
       );
       if (!!success) {
-        GoogleAnalytics.event({
-          category: GACategory.ADD_NEW_SPACE,
-          action: GAAction.SUCCESS,
+        GoogleAnalytics.tracking("Create Space Successful", {
+          category: "Add Space",
+          space_type:
+            spaceData.spaceType === "Exclusive" ? "Private" : "Public",
+          contract_address: spaceData.condition?.address || "",
         });
         setOpenCreateSpace(false);
         sideBarRef.current?.scrollToBottom?.();
-      } else {
-        GoogleAnalytics.event({
-          category: GACategory.ADD_NEW_SPACE,
-          action: GAAction.FAILED,
-        });
       }
       return null;
     },
@@ -492,10 +484,10 @@ const Home = () => {
     []
   );
   const onCreateChannel = useCallback(
-    async (channelData: any) => {
-      GoogleAnalytics.event({
-        category: GACategory.ADD_NEW_CHANNEL,
-        action: GAAction.SUBMIT,
+    async (channelData: any, spaceType: string) => {
+      GoogleAnalytics.tracking("Create Channel Submitted", {
+        category: "Add Channel",
+        space_type: spaceType,
       });
       const body: any = {
         channel_name: channelData.name,
@@ -514,17 +506,12 @@ const Home = () => {
         )
       );
       if (res?.channel_id) {
-        GoogleAnalytics.event({
-          category: GACategory.ADD_NEW_CHANNEL,
-          action: GAAction.SUCCESS,
+        GoogleAnalytics.tracking("Create Channel Successful", {
+          category: "Add Channel",
+          space_type: spaceType,
         });
         history.replace(`/channels/${currentTeam.team_id}/${res.channel_id}`);
         setOpenCreateChannel(false);
-      } else {
-        GoogleAnalytics.event({
-          category: GACategory.ADD_NEW_CHANNEL,
-          action: GAAction.FAILED,
-        });
       }
     },
     [currentTeam?.team_id, dispatch, history]
@@ -573,10 +560,6 @@ const Home = () => {
       deleteChannel(channelDelete?.channel_id, currentTeam.team_id)
     );
     if (!!success) {
-      GoogleAnalytics.event({
-        category: GACategory.CHANNEL,
-        action: GAAction.DELETE,
-      });
       if (currentChannel?.channel_id === channelDelete?.channel_id) {
         history.replace(`/channels/${currentTeam.team_id}/${nextChannelId}`);
       }
@@ -600,19 +583,20 @@ const Home = () => {
   }, [currentTeam?.team_id, history]);
   const handleDeleteSpace = useCallback(async () => {
     if (!selectedSpace?.space_id) return;
-    await dispatch(deleteSpaceChannel(selectedSpace?.space_id));
-    GoogleAnalytics.event({
-      category: GACategory.SPACE,
-      action: GAAction.DELETE,
-    });
-    if (currentChannel?.space_id === selectedSpace?.space_id) {
-      history.replace(
-        `/channels/${currentTeam.team_id}/${nextChannelIdWhenDeleteSpace}`
-      );
+    const success = await dispatch(deleteSpaceChannel(selectedSpace?.space_id));
+    if (!!success) {
+      GoogleAnalytics.tracking("Delete Space Successful", {
+        category: "Space",
+      });
+      if (currentChannel?.space_id === selectedSpace?.space_id) {
+        history.replace(
+          `/channels/${currentTeam.team_id}/${nextChannelIdWhenDeleteSpace}`
+        );
+      }
+      setSelectedSpace(null);
+      setOpenConfirmDeleteSpace(false);
+      setOpenEditSpaceChannel(false);
     }
-    setSelectedSpace(null);
-    setOpenConfirmDeleteSpace(false);
-    setOpenEditSpaceChannel(false);
   }, [
     currentTeam?.team_id,
     dispatch,
@@ -621,9 +605,6 @@ const Home = () => {
     selectedSpace?.space_id,
     currentChannel?.space_id,
   ]);
-  useEffect(() => {
-    GoogleAnalytics.pageView(GAPageView.CHANNELS);
-  }, []);
   useEffect(() => {
     if (currentChannel.channel_id) channelViewRef.current?.clearText?.();
   }, [currentChannel.channel_id]);

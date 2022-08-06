@@ -25,9 +25,19 @@ import api from "renderer/api";
 import toast from "react-hot-toast";
 import { createErrorMessageSelector } from "renderer/reducers/selectors";
 import AppTitleBar from "renderer/shared/AppTitleBar";
+import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 
 const PublicRoute = ({ component: Component, ...rest }: any) => {
   const history = useHistory();
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    GoogleAnalytics.tracking("Page Viewed", {
+      category: "Traffic",
+      page_name: "Login",
+      source: query.get("ref") || "",
+      path: window.location.pathname,
+    });
+  }, []);
   useEffect(() => {
     getCookie(AsyncKey.accessTokenKey)
       .then((res: any) => {
@@ -111,6 +121,17 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
     history,
   ]);
   useEffect(() => {
+    if (window.location.pathname !== "/") {
+      const query = new URLSearchParams(window.location.search);
+      GoogleAnalytics.tracking("Page Viewed", {
+        category: "Traffic",
+        page_name: "Home",
+        source: query.get("ref") || "",
+        path: window.location.pathname,
+      });
+    }
+  }, []);
+  useEffect(() => {
     if (invitationId) {
       dispatch({
         type: actionTypes.SET_DATA_FROM_URL,
@@ -120,14 +141,20 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
     getCookie(AsyncKey.accessTokenKey)
       .then((res: any) => {
         if (!res) {
-          history.replace("/started");
+          history.replace({
+            pathname: "/started",
+            search: window.location.search,
+          });
           dispatch(logout?.());
         } else {
           initApp();
         }
       })
       .catch(() => {
-        history.replace("/started");
+        history.replace({
+          pathname: "/started",
+          search: window.location.search,
+        });
         dispatch(logout?.());
       });
   }, [history, initApp, dispatch, invitationId]);

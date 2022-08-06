@@ -1,4 +1,5 @@
 import toast from "react-hot-toast";
+import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import AppConfig, { AsyncKey } from "../common/AppConfig";
 import { getCookie } from "../common/Cookie";
 
@@ -75,17 +76,29 @@ async function requestAPI<T = any>(
   // Run the fetching
   return fetch(apiUrl, fetchOptions)
     .then((res) => {
-      return res.json().then((data) => {
-        if (res.status !== 200) {
-          toast.error(data.message || data);
-        }
-        if (data.length >= 0) {
-          return { data, statusCode: res.status };
-        }
-        return { ...data, statusCode: res.status };
-      });
+      return res
+        .json()
+        .then((data) => {
+          if (res.status !== 200) {
+            toast.error(data.message || data);
+          }
+          if (data.length >= 0) {
+            return { data, statusCode: res.status };
+          }
+          return { ...data, statusCode: res.status };
+        })
+        .catch((err) => {
+          return { message: err, statusCode: res.status };
+        });
     })
     .catch((err) => {
+      GoogleAnalytics.trackingError(
+        uri,
+        method.toLowerCase(),
+        err.message || "",
+        err.statusCode,
+        body
+      );
       toast.error(err.message || err);
       return {
         message: err,
