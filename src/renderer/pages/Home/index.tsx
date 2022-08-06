@@ -49,12 +49,8 @@ import ChannelView from "./container/ChannelView";
 import TaskListView from "./container/TaskListView";
 import "./index.scss";
 import ModalCreateChannel from "../../shared/ModalCreateChannel";
-import {
-  createLoadingSelector,
-  createLoadMoreSelector,
-} from "../../reducers/selectors";
+import { createLoadMoreSelector } from "../../reducers/selectors";
 import actionTypes from "../../actions/ActionTypes";
-import HomeLoading from "../../shared/HomeLoading";
 import { PopoverItem } from "../../shared/PopoverButton";
 import ModalTaskView from "../../shared/ModalTaskView";
 import { groupTaskByFiltered } from "../../helpers/TaskHelper";
@@ -74,11 +70,12 @@ import {
 } from "renderer/services/analytics/GAEventName";
 import ModalAllMembers from "renderer/shared/ModalAllMembers";
 import { getTransactions } from "renderer/actions/TransactionActions";
-
-const loadingSelector = createLoadingSelector([
-  actionTypes.TEAM_PREFIX,
-  actionTypes.CHANNEL_PREFIX,
-]);
+import useChannel from "renderer/hooks/useChannel";
+import useSpaceChannel from "renderer/hooks/useSpaceChannel";
+import useTeamUserData from "renderer/hooks/useTeamUserData";
+import useMatchChannelId from "renderer/hooks/useMatchChannelId";
+import AppTitleBar from "renderer/shared/AppTitleBar";
+import useMatchCommunityId from "renderer/hooks/useMatchCommunityId";
 
 const loadMoreMessageSelector = createLoadMoreSelector([
   actionTypes.MESSAGE_PREFIX,
@@ -99,17 +96,21 @@ const Home = () => {
     match_channel_id?: string;
     match_community_id?: string;
   }>();
-  const { match_channel_id, match_community_id } = match.params;
+  const { match_channel_id, match_community_id } = useMemo(
+    () => match.params,
+    [match.params]
+  );
   const dispatch = useAppDispatch();
   const loadMoreMessage = useAppSelector((state) =>
     loadMoreMessageSelector(state)
   );
   const [currentUserId, setCurrentUserId] = useState("");
-  const loading = useAppSelector((state) => loadingSelector(state));
-  const channels = useAppSelector((state) => state.user.channel);
   const community = useAppSelector((state) => state.user.team);
-  const { teamUserData, currentChannel, currentTeam, spaceChannel, userData } =
-    useAppSelector((state) => state.user);
+  const { currentChannel, currentTeam, userData } = useAppSelector(
+    (state) => state.user
+  );
+  const channels = useChannel();
+  const spaceChannel = useSpaceChannel();
   const currentChannelId = useMemo(
     () => currentChannel?.channel_id || currentChannel?.user?.user_id || "",
     [currentChannel?.channel_id, currentChannel?.user?.user_id]
@@ -117,6 +118,9 @@ const Home = () => {
   const { messageData, conversationData } = useAppSelector(
     (state) => state.message
   );
+  const teamUserData = useTeamUserData();
+  const communityId = useMatchCommunityId();
+  const channelId = useMatchChannelId();
   const { taskData } = useAppSelector((state) => state.task);
   const { activityData } = useAppSelector((state) => state.activity);
   const { privateKey } = useAppSelector((state) => state.configs);
@@ -621,7 +625,7 @@ const Home = () => {
     GoogleAnalytics.pageView(GAPageView.CHANNELS);
   }, []);
   useEffect(() => {
-    if (currentChannel.channel_id) channelViewRef.current?.hideReply?.();
+    if (currentChannel.channel_id) channelViewRef.current?.clearText?.();
   }, [currentChannel.channel_id]);
   useEffect(() => {
     if (match_channel_id && !!community) {
@@ -633,6 +637,7 @@ const Home = () => {
         );
         if (!matchCommunity) {
           removeCookie(AsyncKey.lastTeamId);
+          removeCookie(AsyncKey.lastChannelId);
           history.replace("/channels");
         } else {
           const matchChannel = channels.find(
@@ -696,11 +701,10 @@ const Home = () => {
       }
     }
   }, [
-    currentChannel?.user,
     currentChannel?.channel_id,
     currentChannel?.channel_type,
+    currentChannel?.user,
     dispatch,
-    currentTeam?.team_id,
     privateKey,
   ]);
 
@@ -766,12 +770,10 @@ const Home = () => {
     taskData,
     currentChannelId,
   ]);
-  if (loading) {
-    return <HomeLoading />;
-  }
 
   return (
     <PageWrapper>
+      <AppTitleBar />
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="home-container">
           <SideBar
@@ -794,15 +796,15 @@ const Home = () => {
               inputRef={inputRef}
               currentChannel={currentChannel}
               messages={uniqBy(
-                messageData?.[currentChannelId]?.data || [],
+                messageData[channelId]?.data || [],
                 "message_id"
               )}
               currentTeam={currentTeam}
               openConversation={handleOpenConversation}
               onMoreMessage={onMoreMessage}
               loadMoreMessage={loadMoreMessage}
-              messageCanMore={messageData?.[currentChannelId]?.canMore}
-              scrollData={messageData?.[currentChannelId]?.scrollData}
+              messageCanMore={messageData?.[channelId]?.canMore}
+              scrollData={messageData?.[channelId]?.scrollData}
               replyTask={replyTask}
               setReplyTask={setReplyTask}
               openTaskView={openTaskView}
@@ -812,13 +814,11 @@ const Home = () => {
             />
             {currentChannel.channel_type !== "Direct" && (
               <TaskListView
-                channelId={currentChannel?.channel_id}
-                archivedCount={taskData?.[currentChannelId]?.archivedCount}
-                teamId={currentTeam?.team_id}
-                tasks={taskData?.[currentChannelId]?.tasks || []}
-                archivedTasks={
-                  taskData?.[currentChannelId]?.archivedTasks || []
-                }
+                channelId={channelId}
+                archivedCount={taskData?.[channelId]?.archivedCount}
+                teamId={communityId}
+                tasks={taskData?.[channelId]?.tasks || []}
+                archivedTasks={taskData?.[channelId]?.archivedTasks || []}
                 onAddTask={handleAddTask}
                 onUpdateStatus={onUpdateStatus}
                 filter={filter}

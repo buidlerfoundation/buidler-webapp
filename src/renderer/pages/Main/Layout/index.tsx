@@ -1,7 +1,6 @@
 import React from "react";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import { useLocation } from "react-router-dom";
 
 const styles: { [name: string]: React.CSSProperties } = {
   row: {
@@ -18,15 +17,13 @@ const styles: { [name: string]: React.CSSProperties } = {
 };
 
 const MainWrapper = (props: any) => {
-  const location = useLocation();
   const { children } = props;
   return (
     <div
       style={{
         ...styles.col,
         overflow: "hidden",
-        height:
-          location.pathname === "/started" ? "100vh" : "calc(100vh - 50px)",
+        height: "100vh",
       }}
     >
       <div style={{ ...styles.row, overflow: "hidden" }}>

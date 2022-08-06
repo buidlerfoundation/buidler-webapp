@@ -1,12 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import useAppSelector from "renderer/hooks/useAppSelector";
-import {
-  Switch,
-  Route,
-  useHistory,
-  useRouteMatch,
-  useLocation,
-} from "react-router-dom";
+import { Switch, Route, useHistory, useRouteMatch } from "react-router-dom";
 import {
   findTeamAndChannel,
   findUser,
@@ -18,7 +12,6 @@ import MainWrapper from "./Layout";
 import Home from "../Home";
 import { AsyncKey } from "../../common/AppConfig";
 import { getCookie, removeCookie, setCookie } from "../../common/Cookie";
-import AppTitleBar from "../../shared/AppTitleBar";
 import Started from "../Started";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import { useState } from "react";
@@ -31,7 +24,7 @@ import actionTypes from "renderer/actions/ActionTypes";
 import api from "renderer/api";
 import toast from "react-hot-toast";
 import { createErrorMessageSelector } from "renderer/reducers/selectors";
-import SocketUtils from "renderer/utils/SocketUtils";
+import AppTitleBar from "renderer/shared/AppTitleBar";
 
 const PublicRoute = ({ component: Component, ...rest }: any) => {
   const history = useHistory();
@@ -63,11 +56,13 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
   const team = useAppSelector((state) => state.user.team);
   const currentTeam = useAppSelector((state) => state.user.currentTeam);
   const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const history = useHistory();
 
   const initApp = useCallback(async () => {
-    setLoading(true);
+    if (rest.redirect) {
+      setLoading(true);
+    }
     if (!userData.user_id && !userError) {
       await dispatch(findUser());
       if (invitationId && !team) {
@@ -105,14 +100,15 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
     }
     setLoading(false);
   }, [
-    currentTeam?.team_id,
-    dispatch,
-    history,
-    match_community_id,
-    team,
+    rest.redirect,
     userData.user_id,
     userError,
+    match_community_id,
+    currentTeam.team_id,
+    dispatch,
     invitationId,
+    team,
+    history,
   ]);
   useEffect(() => {
     if (invitationId) {
@@ -135,7 +131,12 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
         dispatch(logout?.());
       });
   }, [history, initApp, dispatch, invitationId]);
-  if (loading) return <div className="main-load-page" />;
+  if (loading)
+    return (
+      <div className="main-load-page">
+        <AppTitleBar />
+      </div>
+    );
   return <Route {...rest} render={(props) => <Component {...props} />} />;
 };
 
@@ -145,9 +146,13 @@ const RedirectToHome = () => {
     match_community_id?: string;
   }>();
   const { match_community_id } = match.params;
-  const channel = useAppSelector((state) => state.user.channel);
+  const channelMap = useAppSelector((state) => state.user.channelMap);
   const team = useAppSelector((state) => state.user.team);
   const lastChannel = useAppSelector((state) => state.user.lastChannel);
+  const channel = useMemo(
+    () => channelMap[match_community_id || ""] || [],
+    [channelMap, match_community_id]
+  );
   const history = useHistory();
   const gotoChannel = useCallback(async () => {
     if (!team) return;
@@ -167,7 +172,8 @@ const RedirectToHome = () => {
       const channelByTeam = lastChannel?.[match_community_id];
       channelId = channelByTeam?.channel_id;
     }
-    if (!channelId && !cookieChannelId) {
+    const matchChannel = channel.find((el) => el.channel_id === channelId);
+    if ((!channelId && !cookieChannelId) || !matchChannel) {
       channelId = channel?.[0]?.channel_id;
     }
     if (!teamId) {
@@ -175,6 +181,8 @@ const RedirectToHome = () => {
     }
     if (channelId && teamId) {
       history.replace(`/channels/${teamId}/${channelId}`);
+    } else if (teamId) {
+      history.replace(`/channels/${teamId}`);
     } else {
       setEmpty(true);
     }
@@ -188,11 +196,10 @@ const RedirectToHome = () => {
   if (isEmpty && channel?.length === 0) {
     return <Home />;
   }
-  return null;
+  return <AppTitleBar />;
 };
 
 const Main = () => {
-  const location = useLocation();
   const imgDomain = useAppSelector((state) => state.user.imgDomain);
   const chainId = useAppSelector((state) => state.network.chainId);
   const dispatch = useAppDispatch();
@@ -212,15 +219,20 @@ const Main = () => {
   }
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      {location.pathname !== "/started" && <AppTitleBar />}
       <MainWrapper>
         <Switch>
-          <PrivateRoute exact path="/" component={RedirectToHome} />
-          <PrivateRoute exact path="/channels" component={RedirectToHome} />
+          <PrivateRoute exact path="/" component={RedirectToHome} redirect />
+          <PrivateRoute
+            exact
+            path="/channels"
+            component={RedirectToHome}
+            redirect
+          />
           <PrivateRoute
             exact
             path="/channels/:match_community_id"
             component={RedirectToHome}
+            redirect
           />
           <PrivateRoute
             exact

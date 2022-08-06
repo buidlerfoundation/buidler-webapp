@@ -120,6 +120,7 @@ const actionSetCurrentTeam = async (
   } else {
     lastChannelId = await getCookie(AsyncKey.lastChannelId);
   }
+  const resSpace = await api.getSpaceChannel(team.team_id);
   const resChannel = await api.findChannel(team.team_id);
   if (teamUsersRes.statusCode === 200) {
     dispatch({
@@ -132,36 +133,9 @@ const actionSetCurrentTeam = async (
   );
   dispatch({
     type: actionTypes.SET_CURRENT_TEAM,
-    payload: { team, resChannel, directChannelUser, lastChannelId },
+    payload: { team, resChannel, directChannelUser, lastChannelId, resSpace },
   });
   setCookie(AsyncKey.lastTeamId, team.team_id);
-  const resSpace = await api.getSpaceChannel(team.team_id);
-  if (resSpace.statusCode === 200) {
-    dispatch({
-      type: actionTypes.GROUP_CHANNEL,
-      payload: resSpace.data,
-    });
-  }
-  if (resChannel.statusCode === 200) {
-    const channels = resChannel.data || [];
-    if (channels.length > 0) {
-      dispatch({
-        type: actionTypes.CHANNEL_SUCCESS,
-        payload: {
-          channel: channels.map((c: any) => {
-            if (c.channel_id === lastChannelId) {
-              c.seen = true;
-            }
-            return c;
-          }),
-        },
-      });
-    } else {
-      dispatch({
-        type: actionTypes.CHANNEL_FAIL,
-      });
-    }
-  }
 };
 
 const loadMessageIfNeeded = async () => {
@@ -380,7 +354,9 @@ class SocketUtil {
     this.socket.on(
       "ON_REMOVE_USER_FROM_SPACE",
       (data: { space_id: string }) => {
-        const { currentChannel, currentTeam, channel } = store.getState().user;
+        const { currentChannel, currentTeam, channelMap } =
+          store.getState().user;
+        const channel = channelMap[currentTeam.team_id] || [];
         if (data.space_id === currentChannel.space_id) {
           const nextChannelId =
             channel?.filter((el) => el.channel_type !== "Direct")?.[0]
@@ -903,6 +879,7 @@ class SocketUtil {
     } else {
       lastChannelId = await getCookie(AsyncKey.lastChannelId);
     }
+    const resSpace = await api.getSpaceChannel(team.team_id);
     const resChannel = await api.findChannel(team.team_id);
     if (teamUsersRes.statusCode === 200) {
       dispatch({
@@ -913,29 +890,9 @@ class SocketUtil {
     this.changeTeam(team.team_id);
     dispatch({
       type: actionTypes.SET_CURRENT_TEAM,
-      payload: { team, resChannel, lastChannelId },
+      payload: { team, resChannel, lastChannelId, resSpace },
     });
     setCookie(AsyncKey.lastTeamId, team.team_id);
-    const resGroupChannel = await api.getSpaceChannel(team.team_id);
-    if (resGroupChannel.statusCode === 200) {
-      dispatch({
-        type: actionTypes.GROUP_CHANNEL,
-        payload: resGroupChannel.data,
-      });
-    }
-    if (resChannel.statusCode === 200) {
-      const channels = resChannel.data || [];
-      if (channels.length > 0) {
-        dispatch({
-          type: actionTypes.CHANNEL_SUCCESS,
-          payload: { channel: channels },
-        });
-      } else {
-        dispatch({
-          type: actionTypes.CHANNEL_FAIL,
-        });
-      }
-    }
   };
 
   disconnect = () => {

@@ -88,7 +88,7 @@ export interface Space {
   icon_sub_color?: string;
   attachment?: LocalAttachment;
   space_background_color?: string;
-  channels: Array<Channel>;
+  channel_ids: Array<string>;
   is_space_member: boolean;
   is_expand?: boolean;
 }
