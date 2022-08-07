@@ -601,7 +601,6 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       setCookie(AsyncKey.lastChannelId, channel?.channel_id);
       return {
         ...state,
-        channel: resChannel.data.filter((el) => el.channel_type !== "Direct"),
         channelMap: {
           ...channelMap,
           [payload.team.team_id]: resChannel.data.filter(
@@ -712,13 +711,13 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
     }
     case actionTypes.MARK_SEEN_CHANNEL: {
-      const { channelId } = payload;
+      const { channel_id } = payload;
       return {
         ...state,
         channelMap: {
           ...channelMap,
           [currentTeam.team_id]: channelMap[currentTeam.team_id]?.map((el) => {
-            if (el.channel_id === channelId) {
+            if (el.channel_id === channel_id) {
               return {
                 ...el,
                 seen: true,
@@ -915,7 +914,6 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       if (payload.teamId === currentTeam.team_id) {
         return {
           ...state,
-          channel: [],
           directChannel: [],
           currentChannel: {
             channel_id: "",
