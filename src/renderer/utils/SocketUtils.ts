@@ -222,6 +222,7 @@ class SocketUtil {
         this.socket.off("ON_REMOVE_USER_FROM_SPACE");
         this.socket.off("ON_NEW_TRANSACTION");
         this.socket.off("ON_REMOVE_USER_FROM_TEAM");
+        this.socket.off("ON_VIEW_MESSAGE_IN_CHANNEL");
         this.socket.off("disconnect");
       });
       const user: any = store.getState()?.user;
@@ -279,6 +280,12 @@ class SocketUtil {
     });
   };
   listenSocket() {
+    this.socket.on("ON_VIEW_MESSAGE_IN_CHANNEL", (data) => {
+      store.dispatch({
+        type: actionTypes.MARK_SEEN_CHANNEL,
+        payload: data,
+      });
+    });
     this.socket.on("ON_REMOVE_USER_FROM_TEAM", (data) => {
       const { user_id, team_id } = data;
       const { currentTeam, userData } = store.getState().user;
@@ -793,6 +800,13 @@ class SocketUtil {
       return;
     }
     this.emitOnline(teamId);
+  }
+  emitSeenChannel(messageId: string | undefined, channelId: string) {
+    if (!messageId) return;
+    this.socket.emit("ON_VIEW_MESSAGE_IN_CHANNEL", {
+      message_id: messageId,
+      channel_id: channelId,
+    });
   }
   async emitOnline(teamId?: string) {
     const deviceCode = await getDeviceCode();

@@ -3,6 +3,7 @@ import {
   normalizeMessageData,
   normalizePublicMessageData,
 } from "renderer/helpers/ChannelHelper";
+import SocketUtils from "renderer/utils/SocketUtils";
 import api from "../api";
 import actionTypes from "./ActionTypes";
 
@@ -58,6 +59,9 @@ export const getMessages: ActionCreator<any> =
       dispatch({ type: actionTypes.MESSAGE_REQUEST, payload: { channelId } });
     }
     const messageRes = await api.getMessages(channelId, 50, before);
+    if (!before) {
+      SocketUtils.emitSeenChannel(messageRes.data?.[0]?.message_id, channelId);
+    }
     const isPrivate = channelType === "Private" || channelType === "Direct";
     const messageData = isPrivate
       ? await normalizeMessageData(messageRes.data || [], channelId)
