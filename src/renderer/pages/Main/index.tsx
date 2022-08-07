@@ -23,7 +23,10 @@ import useQuery from "renderer/hooks/useQuery";
 import actionTypes from "renderer/actions/ActionTypes";
 import api from "renderer/api";
 import toast from "react-hot-toast";
-import { createErrorMessageSelector } from "renderer/reducers/selectors";
+import {
+  createErrorMessageSelector,
+  createLoadingSelector,
+} from "renderer/reducers/selectors";
 import AppTitleBar from "renderer/shared/AppTitleBar";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 
@@ -53,6 +56,9 @@ const PublicRoute = ({ component: Component, ...rest }: any) => {
 };
 
 const errorUserSelector = createErrorMessageSelector([actionTypes.USER_PREFIX]);
+const currentTeamLoadingSelector = createLoadingSelector([
+  actionTypes.CURRENT_TEAM_PREFIX,
+]);
 
 const PrivateRoute = ({ component: Component, ...rest }: any) => {
   const query = useQuery();
@@ -63,6 +69,9 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
   const invitationId = useMemo(() => query.get("invitation"), [query]);
   const userData = useAppSelector((state) => state.user.userData);
   const userError = useAppSelector((state) => errorUserSelector(state));
+  const currentTeamLoading = useAppSelector((state) =>
+    currentTeamLoadingSelector(state)
+  );
   const team = useAppSelector((state) => state.user.team);
   const currentTeam = useAppSelector((state) => state.user.currentTeam);
   const dispatch = useAppDispatch();
@@ -104,12 +113,13 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
       const matchCommunity = team?.find(
         (t) => t.team_id === match_community_id
       );
-      if (matchCommunity) {
+      if (matchCommunity && !currentTeamLoading) {
         await dispatch(setCurrentTeam(matchCommunity));
       }
     }
     setLoading(false);
   }, [
+    currentTeamLoading,
     rest.redirect,
     userData.user_id,
     userError,

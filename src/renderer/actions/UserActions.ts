@@ -137,7 +137,7 @@ export const findTeamAndChannel =
           (u: UserData) => u.direct_channel === lastChannelId
         );
         dispatch({
-          type: ActionTypes.SET_CURRENT_TEAM,
+          type: ActionTypes.CURRENT_TEAM_SUCCESS,
           payload: {
             team: currentTeam,
             lastChannelId,
@@ -223,7 +223,7 @@ const actionSetCurrentTeam = async (
   channelId?: string
 ) => {
   dispatch({
-    type: ActionTypes.CHANNEL_REQUEST,
+    type: ActionTypes.CURRENT_TEAM_REQUEST,
   });
   const teamUsersRes = await api.getTeamUsers(team.team_id);
   let lastChannelId: any = null;
@@ -246,7 +246,7 @@ const actionSetCurrentTeam = async (
   }
   SocketUtils.changeTeam(team.team_id);
   dispatch({
-    type: ActionTypes.SET_CURRENT_TEAM,
+    type: ActionTypes.CURRENT_TEAM_SUCCESS,
     payload: { team, resChannel, lastChannelId, teamUsersRes, resSpace },
   });
   setCookie(AsyncKey.lastTeamId, team.team_id);
@@ -393,12 +393,7 @@ export const leaveTeam = (teamId: string) => async (dispatch: Dispatch) => {
     payload: { teamId },
   });
   const res = await api.leaveTeam(teamId);
-  if (res.statusCode === 200) {
-    dispatch({
-      type: ActionTypes.LEAVE_TEAM_SUCCESS,
-      payload: { teamId },
-    });
-  } else {
+  if (res.statusCode !== 200) {
     dispatch({
       type: ActionTypes.LEAVE_TEAM_FAIL,
       payload: res,

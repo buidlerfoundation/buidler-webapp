@@ -554,13 +554,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         userData: payload.user,
       };
     }
-    case actionTypes.GROUP_CHANNEL: {
-      return {
-        ...state,
-        spaceChannel: payload,
-      };
-    }
-    case actionTypes.SET_CURRENT_TEAM: {
+    case actionTypes.CURRENT_TEAM_SUCCESS: {
       const {
         lastChannelId,
         resChannel,
@@ -620,12 +614,6 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             return el;
           }),
         },
-        spaceChannel: resSpace?.data?.map((el) => {
-          el.channel_ids = resChannel.data
-            ?.filter((c) => c.space_id === el.space_id)
-            .map((c) => c.channel_id);
-          return el;
-        }),
         directChannel: resChannel.data.filter(
           (el) => el.channel_type === "Direct"
         ),
@@ -905,7 +893,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             data: teamUserMap[payload.teamId]?.data?.filter(
               (el) => el.user_id !== payload.userId
             ),
-            total: teamUserMap[payload.teamId].total - 1,
+            total: teamUserMap[payload.teamId]?.total - 1,
           },
         },
       };
