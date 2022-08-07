@@ -896,13 +896,17 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     case actionTypes.REMOVE_MEMBER_SUCCESS: {
       return {
         ...state,
+        team:
+          userData.user_id === payload.userId
+            ? state.team?.filter((el) => el.team_id !== payload.teamId)
+            : state.team,
         teamUserMap: {
           ...teamUserMap,
-          [currentTeam.team_id]: {
-            data: teamUserMap[currentTeam.team_id]?.data?.filter(
+          [payload.teamId]: {
+            data: teamUserMap[payload.teamId]?.data?.filter(
               (el) => el.user_id !== payload.userId
             ),
-            total: teamUserMap[currentTeam.team_id].total - 1,
+            total: teamUserMap[payload.teamId].total - 1,
           },
         },
       };
