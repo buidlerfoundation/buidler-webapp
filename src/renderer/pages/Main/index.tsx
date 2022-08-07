@@ -86,10 +86,10 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
       await dispatch(findUser());
       if (invitationId && !team) {
         const res = await api.acceptInvitation(invitationId);
-        dispatch({ type: actionTypes.REMOVE_DATA_FROM_URL });
         if (res.statusCode === 200) {
           await dispatch(findTeamAndChannel(res.data?.team_id));
           toast.success("You have successfully joined new community.");
+          dispatch({ type: actionTypes.REMOVE_DATA_FROM_URL });
           setCookie(AsyncKey.lastTeamId, res.data?.team_id);
           history.replace({
             search: "",
