@@ -305,6 +305,10 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
           currentChannel.channel_id = payload.channel_id;
         }
       }
+      const newChannels = channelMap[currentTeam.team_id] || [];
+      if (payload.channel_type !== "Direct") {
+        newChannels.push(payload);
+      }
       return {
         ...state,
         channelMap:
@@ -312,10 +316,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             ? channelMap
             : {
                 ...channelMap,
-                [currentTeam.team_id]: [
-                  ...(channelMap[currentTeam.team_id] || []),
-                  payload,
-                ],
+                [currentTeam.team_id]: newChannels,
               },
         directChannel:
           payload.channel_type === "Direct"
@@ -334,10 +335,27 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
           [currentTeam.team_id]: spaceChannelMap[currentTeam.team_id].map(
             (el) => {
               if (el.space_id === payload.space_id) {
-                el.channel_ids = [
-                  ...(el.channel_ids || []),
-                  payload.channel_id,
-                ];
+                el.channel_ids = [...(el.channel_ids || []), payload.channel_id]
+                  .sort((a1, a2) => {
+                    const name1 =
+                      newChannels.find((el) => el.channel_id === a1)
+                        ?.channel_name || "";
+                    const name2 =
+                      newChannels.find((el) => el.channel_id === a2)
+                        ?.channel_name || "";
+                    if (name1 > name2) return 1;
+                    return -1;
+                  })
+                  .sort((a1, a2) => {
+                    const type1 =
+                      newChannels.find((el) => el.channel_id === a1)
+                        ?.channel_type || "";
+                    const type2 =
+                      newChannels.find((el) => el.channel_id === a2)
+                        ?.channel_type || "";
+                    if (type1 > type2) return -1;
+                    return 1;
+                  });
               }
               return el;
             }
