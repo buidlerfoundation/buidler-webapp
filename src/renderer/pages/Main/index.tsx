@@ -29,6 +29,8 @@ import {
 } from "renderer/reducers/selectors";
 import AppTitleBar from "renderer/shared/AppTitleBar";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
+import { utils } from "ethers";
+import SwitchAccountMetaMask from "renderer/components/SwitchAccountMetaMask";
 
 const PublicRoute = ({ component: Component, ...rest }: any) => {
   const history = useHistory();
@@ -238,7 +240,12 @@ const RedirectToHome = () => {
 
 const Main = () => {
   const imgDomain = useAppSelector((state) => state.user.imgDomain);
-  const chainId = useAppSelector((state) => state.network.chainId);
+  const { chainId, metaMaskAccount } = useAppSelector((state) => state.network);
+  const userData = useAppSelector((state) => state.user.userData);
+  const address = useMemo(() => {
+    if (!userData.user_id) return null;
+    return utils.computeAddress(userData?.user_id);
+  }, [userData.user_id]);
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(getInitial?.());
@@ -253,6 +260,13 @@ const Main = () => {
       : ChainId.EthereumMainnet)
   ) {
     return <UnSupportedNetwork />;
+  }
+  if (
+    !!address &&
+    !!metaMaskAccount &&
+    address.toLowerCase() !== metaMaskAccount?.toLowerCase()
+  ) {
+    return <SwitchAccountMetaMask />;
   }
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>

@@ -151,6 +151,11 @@ function App() {
         });
       } else if (data.length === 0) {
         connectLogout();
+      } else if (data.length > 0) {
+        dispatch({
+          type: actionTypes.SET_METAMASK_ACCOUNT,
+          payload: data[0],
+        });
       }
     },
     [connectLogout, dispatch]
@@ -158,6 +163,11 @@ function App() {
   const metamaskConnected = useCallback(() => {
     setTimeout(() => {
       const chainId = window.ethereum?.chainId || "";
+      const account = window.ethereum?.selectedAddress;
+      dispatch({
+        type: actionTypes.SET_METAMASK_ACCOUNT,
+        payload: account,
+      });
       dispatch({
         type: actionTypes.SWITCH_NETWORK,
         payload: parseInt(chainId),

@@ -157,12 +157,22 @@ const Started = () => {
         });
       } else if (data.length === 0) {
         onDisconnected();
+      } else if (data.length > 0) {
+        dispatch({
+          type: actionTypes.SET_METAMASK_ACCOUNT,
+          payload: data[0],
+        });
       }
     },
     [dispatch, onDisconnected]
   );
   const metamaskConnected = useCallback(() => {
     const chainId = window.ethereum?.chainId || "";
+    const account = window.ethereum?.selectedAddress;
+    dispatch({
+      type: actionTypes.SET_METAMASK_ACCOUNT,
+      payload: account,
+    });
     dispatch({
       type: actionTypes.SWITCH_NETWORK,
       payload: parseInt(chainId),
