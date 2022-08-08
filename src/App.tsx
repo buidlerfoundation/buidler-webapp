@@ -51,6 +51,11 @@ function App() {
     });
   }, [dispatch]);
   useEffect(() => {
+    if (user.user_id) {
+      GoogleAnalytics.identify(user);
+    }
+  }, [user]);
+  useEffect(() => {
     const eventFocus = async (e) => {
       const token = await getCookie(AsyncKey.accessTokenKey);
       if (token !== currentToken) {

@@ -3,12 +3,18 @@ import {
   getCategoryByApi,
   getEventNameByApi,
 } from "renderer/helpers/AnalyticHelper";
+import { UserData } from "renderer/models";
 
 class GoogleAnalytics {
   init() {
     mixpanel.init(process.env.REACT_APP_MIXPANEL_TOKEN, {
       debug: process.env.NODE_ENV === "development",
     });
+  }
+
+  identify(user: UserData) {
+    mixpanel.identify(user.user_id);
+    mixpanel.people.set({ name: user.user_name });
   }
 
   tracking(eventName: string, props: { [key: string]: string }) {
