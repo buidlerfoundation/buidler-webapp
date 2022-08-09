@@ -30,11 +30,11 @@ export const findTeam = () => Caller.get<Array<Community>>("user/team");
 export const getGroupChannel = (teamId: string) =>
   ApiCaller.get(`group/${teamId}`);
 
-export const getSpaceChannel = (teamId: string) =>
-  Caller.get<Array<Space>>(`space/${teamId}`);
+export const getSpaceChannel = (teamId: string, controller?: AbortController) =>
+  Caller.get<Array<Space>>(`space/${teamId}`, undefined, controller);
 
-export const findChannel = (teamId: string) =>
-  Caller.get<Array<Channel>>(`channel/${teamId}`);
+export const findChannel = (teamId: string, controller?: AbortController) =>
+  Caller.get<Array<Channel>>(`channel/${teamId}`, undefined, controller);
 
 export const getInitial = () => Caller.get<InitialApiData>(`initial`);
 

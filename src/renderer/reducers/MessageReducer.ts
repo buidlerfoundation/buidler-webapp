@@ -13,11 +13,13 @@ type MessageReducerState = {
       scrollData: { showScrollDown: boolean; unreadCount?: number };
     };
   };
+  apiController?: AbortController | null;
 };
 
 const initialState: MessageReducerState = {
   messageData: {},
   conversationData: {},
+  apiController: null,
 };
 
 const messageReducers: Reducer<MessageReducerState, AnyAction> = (
@@ -38,6 +40,12 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           ...state.conversationData,
           [parentId]: cvs,
         },
+      };
+    }
+    case actionTypes.MESSAGE_REQUEST: {
+      return {
+        ...state,
+        apiController: payload.controller,
       };
     }
     case actionTypes.MESSAGE_SUCCESS: {
@@ -77,6 +85,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
             scrollData,
           },
         },
+        apiController: null,
       };
     }
     case actionTypes.REMOVE_MESSAGE_ATTACHMENT: {

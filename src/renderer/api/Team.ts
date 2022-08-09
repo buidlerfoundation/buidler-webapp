@@ -10,8 +10,8 @@ import Caller from "./Caller";
 
 export const createTeam = (body: any) => ApiCaller.post("team", body);
 
-export const getTeamUsers = (teamId: string) =>
-  Caller.get<Array<UserData>>(`team/${teamId}/members`);
+export const getTeamUsers = (teamId: string, controller?: AbortController) =>
+  Caller.get<Array<UserData>>(`team/${teamId}/members`, undefined, controller);
 
 export const invitation = (teamId: string) =>
   Caller.post<{ invitation_url: string }>(`team/invitation/${teamId}/members`);

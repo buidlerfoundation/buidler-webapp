@@ -1,8 +1,8 @@
-import moment from 'moment';
-import { AnyAction, Reducer } from 'redux';
-import { TaskData } from 'renderer/models';
-import actionTypes from '../actions/ActionTypes';
-import { isFilterStatus } from '../helpers/TaskHelper';
+import moment from "moment";
+import { AnyAction, Reducer } from "redux";
+import { TaskData } from "renderer/models";
+import actionTypes from "../actions/ActionTypes";
+import { isFilterStatus } from "../helpers/TaskHelper";
 
 type TaskReducerState = {
   taskData: {
@@ -12,10 +12,12 @@ type TaskReducerState = {
       archivedTasks: Array<TaskData>;
     };
   };
+  apiController?: AbortController | null;
 };
 
 const initialState: TaskReducerState = {
   taskData: {},
+  apiController: null,
 };
 
 const taskReducers: Reducer<TaskReducerState, AnyAction> = (
@@ -25,9 +27,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
   const { type, payload } = action;
   switch (type) {
     case actionTypes.LOGOUT: {
-      return {
-        taskData: {},
-      };
+      return initialState;
     }
     case actionTypes.ARCHIVED_TASK_SUCCESS: {
       const { channelId, res } = payload;
@@ -43,6 +43,12 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
         },
       };
     }
+    case actionTypes.TASK_REQUEST: {
+      return {
+        ...state,
+        apiController: payload.controller,
+      };
+    }
     case actionTypes.TASK_SUCCESS: {
       const { channelId, tasks, archivedCount } = payload;
       return {
@@ -55,6 +61,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
             archivedCount,
           },
         },
+        apiController: null,
       };
     }
     case actionTypes.DELETE_TASK_REQUEST: {
@@ -112,7 +119,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       const taskStatus = data?.status || task?.status;
       const { channel } = data;
       if (channelUserId && channelUserId === data.assignee_id) {
-        if (taskStatus === 'archived') {
+        if (taskStatus === "archived") {
           if (newArchivedCount !== null) {
             newArchivedCount += 1;
           } else {
@@ -136,7 +143,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       ) {
         newTasks = newTasks.filter((t) => t.task_id !== taskId);
         newArchivedTasks = newArchivedTasks.filter((t) => t.task_id !== taskId);
-      } else if (taskStatus === 'archived') {
+      } else if (taskStatus === "archived") {
         newTasks = newTasks.filter((t) => t.task_id !== taskId);
         if (newArchivedCount !== null) {
           newArchivedCount += 1;
@@ -185,15 +192,17 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       let newArchivedCount = archivedCount;
       if (!isFilterStatus(destination.droppableId)) {
         const newDate = moment(destination.droppableId).format(
-          'YYYY-MM-DD HH:mm:ss.SSSZ'
+          "YYYY-MM-DD HH:mm:ss.SSSZ"
         );
-        if (source.droppableId === 'archived') {
-          const task: any = archivedTasks.find((t) => t.task_id === draggableId);
+        if (source.droppableId === "archived") {
+          const task: any = archivedTasks.find(
+            (t) => t.task_id === draggableId
+          );
           newArchivedTasks = archivedTasks.filter(
             (t) => t.task_id !== draggableId
           );
           newTasks = [
-            { ...task, status: 'todo', due_date: newDate, up_votes: upVote },
+            { ...task, status: "todo", due_date: newDate, up_votes: upVote },
             ...tasks,
           ];
         } else {
@@ -211,7 +220,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       } else {
         const newStatus = destination.droppableId;
         const oldStatus = source.droppableId;
-        if (newStatus === 'archived') {
+        if (newStatus === "archived") {
           const task: any = tasks.find((t) => t.task_id === draggableId);
           newTasks = tasks.filter((t) => t.task_id !== draggableId);
           if (archivedTasks != null) {
@@ -222,8 +231,10 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
           } else {
             newArchivedCount = archivedCount + 1;
           }
-        } else if (oldStatus === 'archived') {
-          const task: any = archivedTasks.find((t) => t.task_id === draggableId);
+        } else if (oldStatus === "archived") {
+          const task: any = archivedTasks.find(
+            (t) => t.task_id === draggableId
+          );
           newArchivedTasks = archivedTasks.filter(
             (t) => t.task_id !== draggableId
           );

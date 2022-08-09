@@ -25,6 +25,8 @@ import MemberSpace from "renderer/shared/MemberSpace";
 import images from "renderer/common/images";
 import useMatchCommunityId from "renderer/hooks/useMatchCommunityId";
 import useSpaceChannel from "renderer/hooks/useSpaceChannel";
+import useCurrentChannel from "renderer/hooks/useCurrentChannel";
+import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
 
 type SideBarProps = {
   onEditGroupChannel: (group: any) => void;
@@ -55,11 +57,14 @@ const SideBar = forwardRef(
     }: SideBarProps,
     ref
   ) => {
-    const { directChannel, currentChannel, team, currentTeam } = useAppSelector(
-      (state) => state.user
-    );
+    const { directChannel, team } = useAppSelector((state) => state.user);
+    const currentTeam = useCurrentCommunity();
+    const currentChannel = useCurrentChannel();
     const communityId = useMatchCommunityId();
     const spaceChannel = useSpaceChannel();
+    const spaceExpandMap = useAppSelector(
+      (state) => state.toggleSidebar.spaceExpandMap
+    );
     const [isOpenConfirmRemoveMember, setOpenConfirmRemoveMember] =
       useState(false);
     const [selectedMenuChannel, setSelectedMenuChannel] = useState<any>(null);
@@ -214,7 +219,7 @@ const SideBar = forwardRef(
                   onSpaceBadgeClick={onSpaceBadgeClick}
                   onCreateChannelClick={onCreateChannel}
                   channel_ids={space.channel_ids}
-                  isCollapsed={!space.is_expand}
+                  isCollapsed={!spaceExpandMap[space.space_id]}
                 />
               </div>
             )}
@@ -227,6 +232,7 @@ const SideBar = forwardRef(
         isOwner,
         onCreateChannel,
         onSpaceBadgeClick,
+        spaceExpandMap,
       ]
     );
     return (

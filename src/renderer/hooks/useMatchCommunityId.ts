@@ -7,15 +7,15 @@ function useMatchCommunityId() {
     match_channel_id?: string;
     match_community_id?: string;
   }>();
-  const currentTeam = useAppSelector((state) => state.user.currentTeam);
+  const currentTeamId = useAppSelector((state) => state.user.currentTeamId);
   const { match_community_id } = useMemo(() => match.params, [match.params]);
 
   return React.useMemo(
     () =>
       match_community_id === "user"
-        ? currentTeam.team_id
-        : match_community_id || currentTeam.team_id,
-    [currentTeam.team_id, match_community_id]
+        ? currentTeamId
+        : match_community_id || currentTeamId,
+    [currentTeamId, match_community_id]
   );
 }
 

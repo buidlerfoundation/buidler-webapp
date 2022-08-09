@@ -31,6 +31,7 @@ import AppTitleBar from "renderer/shared/AppTitleBar";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import { utils } from "ethers";
 import SwitchAccountMetaMask from "renderer/components/SwitchAccountMetaMask";
+import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
 
 const PublicRoute = ({ component: Component, ...rest }: any) => {
   const history = useHistory();
@@ -75,7 +76,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
     currentTeamLoadingSelector(state)
   );
   const team = useAppSelector((state) => state.user.team);
-  const currentTeam = useAppSelector((state) => state.user.currentTeam);
+  const currentTeam = useCurrentCommunity();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const history = useHistory();
@@ -222,6 +223,7 @@ const RedirectToHome = () => {
       history.replace(`/channels/${teamId}/${channelId}`);
     } else if (teamId) {
       history.replace(`/channels/${teamId}`);
+      setEmpty(true);
     } else {
       setEmpty(true);
     }

@@ -15,7 +15,8 @@ async function requestAPI<T = any>(
   method: string,
   uri: string,
   body?: any,
-  serviceBaseUrl?: string
+  serviceBaseUrl?: string,
+  controller?: AbortController
 ): Promise<BaseDataApi<T>> {
   // Build API header
   const headers: any = {
@@ -72,7 +73,10 @@ async function requestAPI<T = any>(
     }
   }
   // Construct fetch options
-  const fetchOptions = { method, headers, body: contentBody };
+  const fetchOptions: RequestInit = { method, headers, body: contentBody };
+  if (!!controller) {
+    fetchOptions.signal = controller.signal;
+  }
   // Run the fetching
   return fetch(apiUrl, fetchOptions)
     .then((res) => {
@@ -107,9 +111,12 @@ async function requestAPI<T = any>(
         err.statusCode,
         body
       );
-      toast.error(err.message || err);
+      const msg = err.message || err;
+      if (!msg.includes("user aborted a request")) {
+        toast.error(err.message || err);
+      }
       return {
-        message: err,
+        message: msg,
       };
     });
 }
@@ -117,24 +124,44 @@ async function requestAPI<T = any>(
 const timeRequestMap: { [key: string]: any } = {};
 
 const Caller = {
-  get<T>(url: string, baseUrl?: string) {
-    return requestAPI<T>(METHOD_GET, url, undefined, baseUrl);
+  get<T>(url: string, baseUrl?: string, controller?: AbortController) {
+    return requestAPI<T>(METHOD_GET, url, undefined, baseUrl, controller);
   },
 
-  post<T>(url: string, data?: any, baseUrl?: string) {
-    return requestAPI<T>(METHOD_POST, url, data, baseUrl);
+  post<T>(
+    url: string,
+    data?: any,
+    baseUrl?: string,
+    controller?: AbortController
+  ) {
+    return requestAPI<T>(METHOD_POST, url, data, baseUrl, controller);
   },
 
-  patch<T>(url: string, data?: any, baseUrl?: string) {
-    return requestAPI<T>(METHOD_PATCH, url, data, baseUrl);
+  patch<T>(
+    url: string,
+    data?: any,
+    baseUrl?: string,
+    controller?: AbortController
+  ) {
+    return requestAPI<T>(METHOD_PATCH, url, data, baseUrl, controller);
   },
 
-  put<T>(url: string, data?: any, baseUrl?: string) {
-    return requestAPI<T>(METHOD_PUT, url, data, baseUrl);
+  put<T>(
+    url: string,
+    data?: any,
+    baseUrl?: string,
+    controller?: AbortController
+  ) {
+    return requestAPI<T>(METHOD_PUT, url, data, baseUrl, controller);
   },
 
-  delete<T>(url: string, data?: any, baseUrl?: string) {
-    return requestAPI<T>(METHOD_DELETE, url, data, baseUrl);
+  delete<T>(
+    url: string,
+    data?: any,
+    baseUrl?: string,
+    controller?: AbortController
+  ) {
+    return requestAPI<T>(METHOD_DELETE, url, data, baseUrl, controller);
   },
 
   getWithLatestResponse(url: string, baseUrl?: string): Promise<any> {

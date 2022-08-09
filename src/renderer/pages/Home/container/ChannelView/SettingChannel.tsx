@@ -6,8 +6,8 @@ import {
   updateChannel,
 } from "renderer/actions/UserActions";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
-import useAppSelector from "renderer/hooks/useAppSelector";
 import useChannel from "renderer/hooks/useChannel";
+import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
 import { Channel } from "renderer/models";
 import api from "../../../../api";
 import images from "../../../../common/images";
@@ -29,7 +29,7 @@ const SettingChannel = ({
 }: SettingChannelProps) => {
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const currentTeam = useAppSelector((state) => state.user.currentTeam);
+  const currentTeam = useCurrentCommunity();
   const channels = useChannel();
   const [isOpenConfirm, setOpenConfirm] = useState(false);
   const [currentName, setCurrentName] = useState("");

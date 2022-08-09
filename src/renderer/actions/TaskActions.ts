@@ -1,10 +1,10 @@
-import { Dispatch } from 'redux';
-import api from '../api';
-import { isFilterStatus } from '../helpers/TaskHelper';
-import actionTypes from './ActionTypes';
-import moment from 'moment';
-import store from '../store';
-import toast from 'react-hot-toast';
+import { Dispatch } from "redux";
+import api from "../api";
+import { isFilterStatus } from "../helpers/TaskHelper";
+import actionTypes from "./ActionTypes";
+import moment from "moment";
+import store from "../store";
+import toast from "react-hot-toast";
 
 export const getTaskFromUser =
   (userId: string, channelId: string, teamId: string) =>
@@ -27,7 +27,7 @@ export const getTaskFromUser =
       } else {
         dispatch({
           type: actionTypes.TASK_FAIL,
-          payload: { message: 'Error', taskRes, archivedCountRes },
+          payload: { message: "Error", taskRes, archivedCountRes },
         });
       }
     } catch (e) {
@@ -36,11 +36,17 @@ export const getTaskFromUser =
   };
 
 export const getTasks = (channelId: string) => async (dispatch: Dispatch) => {
-  dispatch({ type: actionTypes.TASK_REQUEST, payload: { channelId } });
+  const lastController = store.getState().task.apiController;
+  lastController?.abort?.();
+  const controller = new AbortController();
+  dispatch({
+    type: actionTypes.TASK_REQUEST,
+    payload: { channelId, controller: controller },
+  });
   try {
     const [taskRes, archivedCountRes] = await Promise.all([
-      api.getTasks(channelId),
-      api.getArchivedTaskCount(channelId),
+      api.getTasks(channelId, controller),
+      api.getArchivedTaskCount(channelId, controller),
     ]);
     if (taskRes.statusCode === 200 && archivedCountRes.statusCode === 200) {
       dispatch({
@@ -54,7 +60,7 @@ export const getTasks = (channelId: string) => async (dispatch: Dispatch) => {
     } else {
       dispatch({
         type: actionTypes.TASK_FAIL,
-        payload: { message: 'Error', taskRes, archivedCountRes },
+        payload: { message: "Error", taskRes, archivedCountRes },
       });
     }
   } catch (e) {
@@ -75,14 +81,14 @@ export const dropTask =
       api.updateTask({ up_votes: upVote, team_id: teamId }, draggableId);
     } else if (!isFilterStatus(destination.droppableId)) {
       const newDate = moment(destination.droppableId).format(
-        'YYYY-MM-DD HH:mm:ss.SSSZ'
+        "YYYY-MM-DD HH:mm:ss.SSSZ"
       );
-      if (source.droppableId === 'archived') {
+      if (source.droppableId === "archived") {
         api.updateTask(
           {
             due_date: newDate,
             up_votes: upVote,
-            status: 'todo',
+            status: "todo",
             team_id: teamId,
           },
           draggableId
@@ -133,7 +139,7 @@ export const createTask =
       delete data.attachments;
       const res = await api.createTask(data);
       if (res.statusCode === 200) {
-        toast.success('Created!');
+        toast.success("Created!");
       }
     } catch (e) {
       dispatch({

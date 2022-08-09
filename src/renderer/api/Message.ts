@@ -11,14 +11,15 @@ export const getMessages = async (
   channelId: string,
   limit = 50,
   before = new Date().toISOString(),
-  after?: string
+  after?: string,
+  controller?: AbortController
 ) => {
   const deviceCode = await getDeviceCode();
   let uri = `messages/${channelId}?page[size]=${limit}&page[before]=${before}&device_code=${deviceCode}`;
   if (after) {
     uri += `&page[after]=${after}`;
   }
-  return Caller.get<Array<MessageData>>(uri);
+  return Caller.get<Array<MessageData>>(uri, undefined, controller);
 };
 
 export const getConversation = (
