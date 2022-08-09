@@ -1,3 +1,4 @@
+import { TaskData } from "renderer/models";
 import ApiCaller from "./ApiCaller";
 import Caller from "./Caller";
 
@@ -17,14 +18,21 @@ export const updateTask = (body: any, id: string) =>
 
 export const deleteTask = (id: string) => ApiCaller.delete(`task/${id}`);
 
-export const getTasks = (channelId: string) =>
-  ApiCaller.get(`tasks/${channelId}`);
+export const getTasks = (channelId: string, controller?: AbortController) =>
+  Caller.get<Array<TaskData>>(`tasks/${channelId}`, undefined, controller);
 
 export const getArchivedTasks = (channelId: string) =>
   ApiCaller.get(`tasks/${channelId}?archived=true`);
 
-export const getArchivedTaskCount = (channelId: string) =>
-  Caller.get<{ total: number }>(`task/${channelId}/count?archived=true`);
+export const getArchivedTaskCount = (
+  channelId: string,
+  controller?: AbortController
+) =>
+  Caller.get<{ total: number }>(
+    `task/${channelId}/count?archived=true`,
+    undefined,
+    controller
+  );
 
 export const getTaskActivity = (taskId: string) =>
   ApiCaller.get(`task/${taskId}/task_activity`);

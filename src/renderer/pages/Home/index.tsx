@@ -49,7 +49,10 @@ import ChannelView from "./container/ChannelView";
 import TaskListView from "./container/TaskListView";
 import "./index.scss";
 import ModalCreateChannel from "../../shared/ModalCreateChannel";
-import { createLoadMoreSelector } from "../../reducers/selectors";
+import {
+  createLoadingSelector,
+  createLoadMoreSelector,
+} from "../../reducers/selectors";
 import actionTypes from "../../actions/ActionTypes";
 import { PopoverItem } from "../../shared/PopoverButton";
 import ModalTaskView from "../../shared/ModalTaskView";
@@ -71,9 +74,16 @@ import useTeamUserData from "renderer/hooks/useTeamUserData";
 import useMatchChannelId from "renderer/hooks/useMatchChannelId";
 import AppTitleBar from "renderer/shared/AppTitleBar";
 import useMatchCommunityId from "renderer/hooks/useMatchCommunityId";
+import HomeLoading from "renderer/shared/HomeLoading";
+import useCurrentChannel from "renderer/hooks/useCurrentChannel";
+import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
 
 const loadMoreMessageSelector = createLoadMoreSelector([
   actionTypes.MESSAGE_PREFIX,
+]);
+
+const loadingSelector = createLoadingSelector([
+  actionTypes.CURRENT_TEAM_PREFIX,
 ]);
 
 const filterTask: Array<PopoverItem> = [
@@ -99,13 +109,14 @@ const Home = () => {
   const loadMoreMessage = useAppSelector((state) =>
     loadMoreMessageSelector(state)
   );
+  const loading = useAppSelector((state) => loadingSelector(state));
   const [currentUserId, setCurrentUserId] = useState("");
   const community = useAppSelector((state) => state.user.team);
-  const { currentChannel, currentTeam, userData } = useAppSelector(
-    (state) => state.user
-  );
+  const { userData } = useAppSelector((state) => state.user);
+  const currentTeam = useCurrentCommunity();
   const channels = useChannel();
   const spaceChannel = useSpaceChannel();
+  const currentChannel = useCurrentChannel();
   const currentChannelId = useMemo(
     () => currentChannel?.channel_id || currentChannel?.user?.user_id || "",
     [currentChannel?.channel_id, currentChannel?.user?.user_id]
@@ -646,25 +657,26 @@ const Home = () => {
     match_community_id,
   ]);
   useEffect(() => {
-    if (currentChannel?.channel_id || currentChannel?.user) {
-      if (currentChannel?.user) {
-        dispatch(
-          getTaskFromUser(
-            currentChannel.user.user_id,
-            currentChannel.channel_id || currentChannel.user.user_id,
-            currentTeam?.team_id
-          )
-        );
-      } else {
-        dispatch(getTasks(currentChannel.channel_id));
-      }
+    if (currentChannel?.user) {
+      dispatch(
+        getTaskFromUser(
+          currentChannel.user.user_id,
+          currentChannel.channel_id || currentChannel.user.user_id,
+          currentTeam?.team_id
+        )
+      );
     }
   }, [
-    currentChannel?.channel_id,
-    currentChannel?.user,
+    currentChannel.channel_id,
+    currentChannel.user,
     currentTeam?.team_id,
     dispatch,
   ]);
+  useEffect(() => {
+    if (channelId) {
+      dispatch(getTasks(channelId));
+    }
+  }, [channelId, dispatch]);
   useEffect(() => {
     setOpenConversation(false);
     inputRef.current?.focus();
@@ -751,6 +763,15 @@ const Home = () => {
     taskData,
     currentChannelId,
   ]);
+
+  if (loading && channels.length === 0) {
+    return (
+      <PageWrapper>
+        <AppTitleBar />
+        <HomeLoading />
+      </PageWrapper>
+    );
+  }
 
   return (
     <PageWrapper>

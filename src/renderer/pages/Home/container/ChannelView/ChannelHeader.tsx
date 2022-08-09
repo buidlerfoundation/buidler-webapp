@@ -21,10 +21,11 @@ import AvatarView from "../../../../shared/AvatarView";
 import PopoverButton from "../../../../shared/PopoverButton";
 import ChannelSettings from "./ChannelSettings";
 import "./index.scss";
+import { Channel, UserData } from "renderer/models";
 
 type ChannelHeaderProps = {
-  currentChannel?: any;
-  teamUserData: Array<any>;
+  currentChannel?: Channel;
+  teamUserData: Array<UserData>;
   teamId: string;
 };
 
@@ -128,15 +129,17 @@ const ChannelHeader = forwardRef(
     );
     const onAddFiles = useCallback(
       async (fs) => {
-        if (fs == null || fs.length === 0) return;
+        if (fs == null || fs.length === 0 || !currentChannel?.channel_id)
+          return;
         const file = [...fs][0];
-        dispatch(uploadChannelAvatar(teamId, currentChannel.channel_id, file));
+        dispatch(uploadChannelAvatar(teamId, currentChannel?.channel_id, file));
         popupChannelIconRef.current?.hide();
       },
       [currentChannel?.channel_id, dispatch, teamId]
     );
     const onSelectRecentFile = useCallback(
       async (file) => {
+        if (!currentChannel?.channel_id) return;
         await dispatch(
           updateChannel(currentChannel.channel_id, {
             channel_emoji: "",
@@ -149,6 +152,7 @@ const ChannelHeader = forwardRef(
     );
     const onAddEmoji = useCallback(
       async (emoji) => {
+        if (!currentChannel?.channel_id) return;
         await dispatch(
           updateChannel(currentChannel.channel_id, {
             channel_emoji: emoji.id,
@@ -231,7 +235,7 @@ const ChannelHeader = forwardRef(
                       onAddFiles={onAddFiles}
                       onAddEmoji={onAddEmoji}
                       onSelectRecentFile={onSelectRecentFile}
-                      channelId={currentChannel.channel_id}
+                      channelId={currentChannel?.channel_id}
                     />
                   </div>
                 }

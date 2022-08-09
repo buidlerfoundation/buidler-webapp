@@ -222,35 +222,47 @@ const actionSetCurrentTeam = async (
   dispatch: Dispatch,
   channelId?: string
 ) => {
+  const lastController = store.getState().user?.apiTeamController;
+  lastController?.abort?.();
+  const controller = new AbortController();
   dispatch({
     type: ActionTypes.CURRENT_TEAM_REQUEST,
+    payload: { controller },
   });
-  const teamUsersRes = await api.getTeamUsers(team.team_id);
-  let lastChannelId: any = null;
-  const resSpace = await api.getSpaceChannel(team.team_id);
-  const resChannel = await api.findChannel(team.team_id);
-  const lastChannel = store.getState().user?.lastChannel?.[team.team_id];
-  if (channelId) {
-    lastChannelId = channelId;
-  } else if (lastChannel) {
-    lastChannelId = lastChannel.channel_id;
-  } else {
-    lastChannelId = resChannel.data?.[0]?.channel_id;
-  }
-  await setCookie(AsyncKey.lastChannelId, lastChannelId);
-  if (teamUsersRes.statusCode === 200) {
+  try {
+    const teamUsersRes = await api.getTeamUsers(team.team_id, controller);
+    let lastChannelId: any = null;
+    const resSpace = await api.getSpaceChannel(team.team_id, controller);
+    const resChannel = await api.findChannel(team.team_id, controller);
+    const lastChannel = store.getState().user?.lastChannel?.[team.team_id];
+    if (channelId) {
+      lastChannelId = channelId;
+    } else if (lastChannel) {
+      lastChannelId = lastChannel.channel_id;
+    } else {
+      lastChannelId = resChannel.data?.find(
+        (el) => el.channel_type !== "Direct"
+      )?.[0]?.channel_id;
+    }
+    await setCookie(AsyncKey.lastChannelId, lastChannelId);
+    if (teamUsersRes.statusCode === 200) {
+      dispatch({
+        type: ActionTypes.GET_TEAM_USER,
+        payload: { teamUsers: teamUsersRes, teamId: team.team_id },
+      });
+    }
+    SocketUtils.changeTeam(team.team_id);
     dispatch({
-      type: ActionTypes.GET_TEAM_USER,
-      payload: { teamUsers: teamUsersRes, teamId: team.team_id },
+      type: ActionTypes.CURRENT_TEAM_SUCCESS,
+      payload: { team, resChannel, lastChannelId, teamUsersRes, resSpace },
+    });
+    setCookie(AsyncKey.lastTeamId, team.team_id);
+  } catch (error) {
+    dispatch({
+      type: ActionTypes.CURRENT_TEAM_FAIL,
+      payload: { message: error },
     });
   }
-  SocketUtils.changeTeam(team.team_id);
-  dispatch({
-    type: ActionTypes.CURRENT_TEAM_SUCCESS,
-    payload: { team, resChannel, lastChannelId, teamUsersRes, resSpace },
-  });
-  setCookie(AsyncKey.lastTeamId, team.team_id);
-  return { lastChannelId };
 };
 
 export const setCurrentTeam =

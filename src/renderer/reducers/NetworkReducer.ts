@@ -14,7 +14,7 @@ const initialState: NetworkReducerState = {
   metaMaskAccount: "",
 };
 
-const messageReducers: Reducer<NetworkReducerState, AnyAction> = (
+const networkReducers: Reducer<NetworkReducerState, AnyAction> = (
   state = initialState,
   action
 ) => {
@@ -38,4 +38,4 @@ const messageReducers: Reducer<NetworkReducerState, AnyAction> = (
   }
 };
 
-export default messageReducers;
+export default networkReducers;
