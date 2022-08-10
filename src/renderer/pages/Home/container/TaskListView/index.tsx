@@ -3,9 +3,7 @@ import { getArchivedTasks } from "renderer/actions/TaskActions";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import { TaskData } from "renderer/models";
 import images from "../../../../common/images";
-import PopoverButton, {
-  PopoverItem,
-} from "../../../../shared/PopoverButton";
+import PopoverButton, { PopoverItem } from "../../../../shared/PopoverButton";
 import {
   getGroupTask,
   getToggleState,
@@ -13,6 +11,7 @@ import {
 } from "../../../../helpers/TaskHelper";
 import "./index.scss";
 import TaskGroupItem from "./TaskGroupItem";
+import useTeamUserData from "renderer/hooks/useTeamUserData";
 
 type TaskListViewProps = {
   onAddTask: (title: string) => void;
@@ -49,6 +48,7 @@ const TaskListView = ({
 }: TaskListViewProps) => {
   const dispatch = useAppDispatch();
   const [showArchived, setShowArchived] = useState(false);
+  const teamUserData = useTeamUserData();
   const taskGrouped = useMemo(
     () => groupTaskByFiltered(filter.value, tasks),
     [filter.value, tasks]
@@ -107,6 +107,7 @@ const TaskListView = ({
           onUpdateStatus={onUpdateStatus}
           onMenuSelected={handleMenuSelected}
           onReplyTask={onReplyTask}
+          teamUserData={teamUserData}
         />
       );
     },
@@ -122,6 +123,7 @@ const TaskListView = ({
       taskGrouped,
       teamId,
       toggleState,
+      teamUserData,
     ]
   );
   return (
@@ -141,7 +143,7 @@ const TaskListView = ({
       </div>
       <div className="task-list__body">
         {Object.keys(taskGrouped)
-          .filter((key) => taskGrouped[key].length > 0 || key === "pinned")
+          .filter((key) => taskGrouped[key].length > 0)
           .map(renderTaskGroup)}
         {shouldArchived && (
           <TaskGroupItem
@@ -158,6 +160,7 @@ const TaskListView = ({
             onUpdateStatus={onUpdateStatus}
             onMenuSelected={handleMenuSelected}
             onReplyTask={onReplyTask}
+            teamUserData={teamUserData}
           />
         )}
       </div>

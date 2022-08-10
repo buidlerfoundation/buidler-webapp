@@ -1,6 +1,6 @@
 import { uniqBy } from "lodash";
 import { AnyAction, Reducer } from "redux";
-import { getChannelId, getCommunityId } from "renderer/helpers/StoreHelper";
+import { getChannelId } from "renderer/helpers/StoreHelper";
 import {
   BalanceApiData,
   Channel,
@@ -120,6 +120,16 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     defaultChannel;
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.UPDATE_LAST_CHANNEL: {
+      const newLastChannel = channelMap?.[payload.communityId]?.find(
+        (el) => el.channel_id === payload.channelId
+      );
+      state.lastChannel = {
+        ...state.lastChannel,
+        [payload.communityId]: newLastChannel,
+      };
+      return state;
+    }
     case actionTypes.MEMBER_DATA_SUCCESS: {
       const { role, page, data, total } = payload;
       memberData[role] = {
@@ -221,10 +231,8 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
     }
     case actionTypes.SPACE_MEMBER_SUCCESS: {
-      return {
-        ...state,
-        spaceMembers: payload.data,
-      };
+      state.spaceMembers = payload.data;
+      return state;
     }
     case actionTypes.UPDATE_USER_SUCCESS: {
       return {
@@ -533,10 +541,8 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
     }
     case actionTypes.CURRENT_TEAM_REQUEST: {
-      return {
-        ...state,
-        apiTeamController: payload.controller,
-      };
+      state.apiTeamController = payload.controller;
+      return state;
     }
     case actionTypes.CURRENT_TEAM_SUCCESS: {
       const {
@@ -642,16 +648,6 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         ...state,
         currentChannelId: payload.channel.channel_id,
         lastChannel,
-        channelMap: {
-          ...channelMap,
-          [currentTeamId]: channelMap[currentTeamId]?.map((c) => {
-            if (c.channel_id === payload.channel.channel_id) {
-              c.seen = true;
-              return { ...c };
-            }
-            return c;
-          }),
-        },
       };
     }
     case actionTypes.UPDATE_GROUP_CHANNEL: {
@@ -677,21 +673,19 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     }
     case actionTypes.MARK_SEEN_CHANNEL: {
       const { channel_id } = payload;
-      return {
-        ...state,
-        channelMap: {
-          ...channelMap,
-          [currentTeamId]: channelMap[currentTeamId]?.map((el) => {
-            if (el.channel_id === channel_id) {
-              return {
-                ...el,
-                seen: true,
-              };
-            }
-            return el;
-          }),
-        },
+      state.channelMap = {
+        ...channelMap,
+        [currentTeamId]: channelMap[currentTeamId]?.map((el) => {
+          if (el.channel_id === channel_id) {
+            return {
+              ...el,
+              seen: true,
+            };
+          }
+          return el;
+        }),
       };
+      return state;
     }
     case actionTypes.MARK_UN_SEEN_CHANNEL: {
       const { channelId } = payload;

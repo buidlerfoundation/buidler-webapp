@@ -16,6 +16,7 @@ import {
   ConversationData,
   MessageData,
   MessageGroup,
+  UserData,
 } from "renderer/models";
 import { PopoverItem } from "renderer/shared/PopoverButton";
 import { debounce } from "lodash";
@@ -69,7 +70,7 @@ type ChannelViewProps = {
   openTaskView: boolean;
   isOpenConversation: boolean;
   onSelectTask: (task: any) => void;
-  teamUserData: Array<any>;
+  teamUserData: Array<UserData>;
 };
 
 const ChannelView = forwardRef(
@@ -554,6 +555,8 @@ const ChannelView = forwardRef(
               reacts={reactData?.[msg.message_id]}
               replyCount={msg.conversation_data?.length - 1}
               task={msg.task}
+              sender={teamUserData.find((el) => el.user_id === msg.sender_id)}
+              communityId={communityId}
             />
           );
         }
@@ -561,13 +564,15 @@ const ChannelView = forwardRef(
           <MessageItem
             key={msg.message_id}
             message={msg}
+            content={msg.content}
+            reacts={reactData?.[msg.message_id]}
+            task={msg.task}
             onCreateTask={onCreateTaskFromMessage}
             onReplyPress={onReplyPress}
             onMenuSelected={onMenuMessage}
             onSelectTask={onSelectTask}
-            content={msg.content}
-            reacts={reactData?.[msg.message_id]}
-            task={msg.task}
+            sender={teamUserData.find((el) => el.user_id === msg.sender_id)}
+            communityId={communityId}
           />
         );
       },
@@ -578,6 +583,8 @@ const ChannelView = forwardRef(
         onSelectTask,
         openConversation,
         reactData,
+        teamUserData,
+        communityId,
       ]
     );
 
