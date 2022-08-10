@@ -61,8 +61,9 @@ const SwitchAccountMetaMask = () => {
         <div className="side-bar-view" />
         <div className="switch-account-view">
           <span className="switch-account-text">
-            You've changed primary address in your wallet. You should sign new
-            authentication message
+            You've changed primary address in your wallet. You should
+            <br />
+            sign new authentication message
           </span>
           <div className="switch-account-buttons">
             <NormalButton
@@ -70,7 +71,12 @@ const SwitchAccountMetaMask = () => {
               onPress={handleSignMessage}
               type="main"
             />
-            <NormalButton title="Logout" onPress={toggleLogout} type="danger" />
+            <div style={{ width: 15 }} />
+            <NormalButton
+              title="Logout"
+              onPress={toggleLogout}
+              type="primary"
+            />
           </div>
         </div>
       </div>
