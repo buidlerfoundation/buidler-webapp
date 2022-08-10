@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import TaskHeader from "renderer/shared/TaskHeader";
 import { Droppable, Draggable } from "react-beautiful-dnd";
-import { TaskData } from "renderer/models";
+import { TaskData, UserData } from "renderer/models";
 import TaskItem from "renderer/shared/TaskItem";
 import { PopoverItem } from "renderer/shared/PopoverButton";
 import useAppSelector from "renderer/hooks/useAppSelector";
@@ -21,6 +21,7 @@ type TaskGroupItemProps = {
   onUpdateStatus: (task: TaskData, status: string) => void;
   onMenuSelected: (menu: PopoverItem, task: TaskData) => void;
   onReplyTask: (task: TaskData) => void;
+  teamUserData: Array<UserData>;
 };
 
 const TaskGroupItem = ({
@@ -38,6 +39,7 @@ const TaskGroupItem = ({
   onUpdateStatus,
   onMenuSelected,
   onReplyTask,
+  teamUserData,
 }: TaskGroupItemProps) => {
   const reactData = useAppSelector((state) => state.reactReducer.reactData);
   const handleToggle = useCallback(() => toggle(keyProp), [keyProp, toggle]);
@@ -71,6 +73,9 @@ const TaskGroupItem = ({
               onMenuSelected={onMenuSelected}
               onReplyTask={onReplyTask}
               reacts={reactData?.[task.task_id]}
+              assignee={teamUserData.find(
+                (el) => el.user_id === task.assignee?.user_id
+              )}
             />
           </div>
         )}
@@ -85,6 +90,7 @@ const TaskGroupItem = ({
       onUpdateStatus,
       reactData,
       teamId,
+      teamUserData,
     ]
   );
   return (

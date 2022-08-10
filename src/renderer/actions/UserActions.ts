@@ -7,7 +7,7 @@ import { AsyncKey, UserRole } from "../common/AppConfig";
 import { getCookie, removeCookie, setCookie } from "../common/Cookie";
 import ImageHelper from "../common/ImageHelper";
 import SocketUtils from "../utils/SocketUtils";
-import { Channel, Community, UserData, UserRoleType } from "renderer/models";
+import { Community, UserData, UserRoleType } from "renderer/models";
 import store from "renderer/store";
 
 export const getInitial: ActionCreator<any> =

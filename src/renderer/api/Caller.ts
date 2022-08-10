@@ -112,7 +112,7 @@ async function requestAPI<T = any>(
         body
       );
       const msg = err.message || err;
-      if (!msg.includes("user aborted a request")) {
+      if (!msg.includes("aborted")) {
         toast.error(err.message || err);
       }
       return {
