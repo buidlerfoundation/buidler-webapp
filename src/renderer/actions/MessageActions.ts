@@ -86,7 +86,13 @@ export const getMessages: ActionCreator<any> =
       if (messageRes.statusCode === 200) {
         dispatch({
           type: actionTypes.MESSAGE_SUCCESS,
-          payload: { data: messageData, channelId, before, isFresh },
+          payload: {
+            data: messageData,
+            channelId,
+            before,
+            isFresh,
+            reloadSocket: !before,
+          },
         });
       } else {
         dispatch({

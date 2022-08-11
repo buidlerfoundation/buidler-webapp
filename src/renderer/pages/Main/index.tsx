@@ -32,6 +32,7 @@ import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import { utils } from "ethers";
 import SwitchAccountMetaMask from "renderer/components/SwitchAccountMetaMask";
 import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
+import PageNotFound from "renderer/shared/PageNotFound";
 
 const PublicRoute = ({ component: Component, ...rest }: any) => {
   const history = useHistory();
@@ -293,6 +294,7 @@ const Main = () => {
             component={Home}
           />
           <PublicRoute exact path="/started" component={Started} />
+          <Route exact path="*" component={PageNotFound} />
         </Switch>
       </MainWrapper>
     </div>
