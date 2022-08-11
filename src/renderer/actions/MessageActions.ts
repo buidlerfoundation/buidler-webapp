@@ -52,8 +52,12 @@ export const onRemoveAttachment: ActionCreator<any> =
 export const getMessages: ActionCreator<any> =
   (channelId: string, channelType: string, before?: string, isFresh = false) =>
   async (dispatch: Dispatch) => {
-    const lastController = store.getState().message.apiController;
-    lastController?.abort?.();
+    const { apiController, messageData } = store.getState().message;
+    apiController?.abort?.();
+    if (!before) {
+      const messages = messageData?.[channelId]?.data;
+      SocketUtils.emitSeenChannel(messages?.[0]?.message_id, channelId);
+    }
     const controller = new AbortController();
     if (before) {
       dispatch({ type: actionTypes.MESSAGE_MORE, payload: { channelId } });
