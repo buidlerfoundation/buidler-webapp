@@ -26,6 +26,11 @@
       .switch-account-buttons {
         display: flex;
         align-items: center;
+        .normal-button__container {
+          padding: 0;
+          width: 140px;
+          height: 35px;
+        }
       }
       .switch-account-text {
         color: var(--color-secondary-text);

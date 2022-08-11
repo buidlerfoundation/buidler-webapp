@@ -693,6 +693,9 @@ class SocketUtil {
       const channelNotification = channel.find(
         (c: any) => c.channel_id === message_data.channel_id
       );
+      if (currentChannel.channel_id === message_data.channel_id) {
+        this.emitSeenChannel(message_data.message_id, message_data.channel_id);
+      }
       if (!currentChannel.channel_id) {
         if (currentChannel.channel_type === "Direct") {
           return;

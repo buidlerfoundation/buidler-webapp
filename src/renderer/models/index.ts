@@ -56,6 +56,7 @@ export interface UserData {
   user_channels?: Array<string>;
   user_bio?: string;
   spaces?: Array<Space>;
+  address?: string;
 }
 
 export interface Channel {

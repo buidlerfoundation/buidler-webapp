@@ -56,7 +56,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
       if (reloadSocket) {
         const diff = differenceBy(
           currentData.filter(
-            (el) => el.createdAt >= data[data.length - 1].createdAt
+            (el) => el.createdAt >= data?.[data.length - 1]?.createdAt
           ),
           data,
           "message_id"
