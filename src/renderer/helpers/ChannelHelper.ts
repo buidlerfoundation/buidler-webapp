@@ -123,14 +123,12 @@ export const getPrivateChannel = async (privateKey: string) => {
 };
 
 export const normalizePublicMessageItem = (item: any, key: string) => {
-  const content = decrypt(key, Buffer.from(item.content, "hex")).toString();
-  const plain_text = decrypt(
-    key,
-    Buffer.from(item.plain_text, "hex")
-  ).toString();
-  if ((!content || !plain_text) && !!item.content && !!item.plain_text) {
-    console.log("Encrypt Failed: ", content, plain_text, item, key);
-  }
+  const content = item.content
+    ? decrypt(key, Buffer.from(item.content, "hex")).toString()
+    : "";
+  const plain_text = item.plain_text
+    ? decrypt(key, Buffer.from(item.plain_text, "hex")).toString()
+    : "";
   if (item?.conversation_data?.length > 0) {
     item.conversation_data = normalizePublicMessageData(item.conversation_data);
   }
