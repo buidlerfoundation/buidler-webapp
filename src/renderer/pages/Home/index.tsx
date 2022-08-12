@@ -112,6 +112,7 @@ const Home = () => {
   const loading = useAppSelector((state) => loadingSelector(state));
   const [currentUserId, setCurrentUserId] = useState("");
   const community = useAppSelector((state) => state.user.team);
+  const storeChannelId = useAppSelector((state) => state.user.currentChannelId);
   const { userData } = useAppSelector((state) => state.user);
   const currentTeam = useCurrentCommunity();
   const channels = useChannel();
@@ -637,7 +638,7 @@ const Home = () => {
           );
           if (matchChannel) {
             setCurrentUserId("");
-            if (matchChannel.channel_id !== currentChannel.channel_id) {
+            if (matchChannel.channel_id !== storeChannelId) {
               dispatch(setCurrentChannel?.(matchChannel, match_community_id));
             }
           } else {
@@ -651,7 +652,7 @@ const Home = () => {
     history,
     community,
     channels,
-    currentChannel.channel_id,
+    storeChannelId,
     dispatch,
     match_channel_id,
     match_community_id,
