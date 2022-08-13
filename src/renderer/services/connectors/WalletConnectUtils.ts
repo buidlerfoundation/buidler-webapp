@@ -90,6 +90,33 @@ class WalletConnectUtils {
 
     return this.connector?.sendCustomRequest(customRequest);
   };
+
+  sendERC721Transaction = async (sendData: SendData, from: string) => {
+    const inf = new utils.Interface(MinABI);
+    const transferData = inf.encodeFunctionData("transferFrom", [
+      from,
+      sendData.recipientAddress,
+      sendData.nft?.token_id,
+    ]);
+
+    const customRequest = {
+      id: 1337,
+      jsonrpc: "2.0",
+      method: "eth_sendTransaction",
+      params: [
+        {
+          gasPrice: sendData.gasPrice?.toHexString(),
+          gas: sendData.gasLimit.toHexString(),
+          to: sendData.nft?.contract_address,
+          from,
+          value: "0x00",
+          data: transferData,
+        },
+      ],
+    };
+
+    return this.connector?.sendCustomRequest(customRequest);
+  };
 }
 
 export default new WalletConnectUtils();

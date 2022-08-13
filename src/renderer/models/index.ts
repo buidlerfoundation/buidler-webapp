@@ -338,6 +338,7 @@ export interface NFTCollectionDataApi {
   symbol: string;
   network: string;
   nft: Array<UserNFTCollection>;
+  slug: string;
 }
 
 export interface NFTAsset {
