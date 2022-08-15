@@ -86,7 +86,7 @@ export const getMessages: ActionCreator<any> =
       const isPrivate = channelType === "Private" || channelType === "Direct";
       const messageData = isPrivate
         ? await normalizeMessageData(messageRes.data || [], channelId)
-        : await normalizePublicMessageData(messageRes.data || []);
+        : normalizePublicMessageData(messageRes.data || []);
       if (messageRes.statusCode === 200) {
         dispatch({
           type: actionTypes.MESSAGE_SUCCESS,

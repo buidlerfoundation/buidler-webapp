@@ -105,7 +105,7 @@ const getMessages = async (
   const isPrivate = channelType === "Private" || channelType === "Direct";
   const messageData = isPrivate
     ? await normalizeMessageData(messageRes.data || [], channelId)
-    : await normalizePublicMessageData(messageRes.data || []);
+    : normalizePublicMessageData(messageRes.data || []);
   if (messageRes.statusCode === 200) {
     dispatch({
       type: actionTypes.MESSAGE_SUCCESS,
@@ -162,7 +162,7 @@ const loadMessageIfNeeded = async () => {
           messageRes.data || [],
           currentChannel.channel_id
         )
-      : await normalizePublicMessageData(messageRes.data || []);
+      : normalizePublicMessageData(messageRes.data || []);
   if (messageRes.statusCode === 200) {
     store.dispatch({
       type: actionTypes.MESSAGE_SUCCESS,
@@ -698,27 +698,7 @@ class SocketUtil {
       if (currentChannel.channel_id === message_data.channel_id) {
         this.emitSeenChannel(message_data.message_id, message_data.channel_id);
       }
-      if (!currentChannel.channel_id) {
-        if (currentChannel.channel_type === "Direct") {
-          return;
-        }
-        store.dispatch({
-          type: actionTypes.SET_CURRENT_CHANNEL,
-          payload: {
-            channel: {
-              ...currentChannel,
-              channel_id: message_data.channel_id,
-              user: {
-                ...currentChannel.user,
-                direct_channel: message_data.channel_id,
-              },
-            },
-          },
-        });
-        setCookie(AsyncKey.lastChannelId, message_data.channel_id);
-      } else if (
-        userData?.user_id !== notification_data?.sender_data?.user_id
-      ) {
+      if (userData?.user_id !== notification_data?.sender_data?.user_id) {
         if (notification_type !== "Muted") {
           if (currentChannel.channel_id !== message_data.channel_id) {
             store.dispatch({
