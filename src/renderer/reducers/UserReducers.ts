@@ -324,7 +324,6 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             data: newTeamUserData,
           },
         },
-        currentChannel,
         spaceChannelMap: {
           ...spaceChannelMap,
           [currentTeamId]: spaceChannelMap[currentTeamId].map((el) => {
