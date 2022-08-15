@@ -835,7 +835,7 @@ class SocketUtil {
   }
   emitSeenChannel(messageId: string | undefined, channelId: string) {
     if (!messageId) return;
-    this.socket.emit("ON_VIEW_MESSAGE_IN_CHANNEL", {
+    this.socket?.emit?.("ON_VIEW_MESSAGE_IN_CHANNEL", {
       message_id: messageId,
       channel_id: channelId,
     });

@@ -42,6 +42,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
         },
       };
     }
+    case actionTypes.MESSAGE_FRESH:
     case actionTypes.MESSAGE_REQUEST: {
       return {
         ...state,

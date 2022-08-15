@@ -44,6 +44,7 @@ interface UserReducerState {
     member: MemberRoleData;
   };
   apiTeamController?: AbortController | null;
+  apiSpaceMemberController?: AbortController | null;
 }
 
 const defaultChannel: Channel = {
@@ -230,8 +231,13 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         walletBalance: payload,
       };
     }
+    case actionTypes.SPACE_MEMBER_REQUEST: {
+      state.apiSpaceMemberController = payload.controller;
+      return state;
+    }
     case actionTypes.SPACE_MEMBER_SUCCESS: {
       state.spaceMembers = payload.data;
+      state.apiSpaceMemberController = null;
       return state;
     }
     case actionTypes.UPDATE_USER_SUCCESS: {

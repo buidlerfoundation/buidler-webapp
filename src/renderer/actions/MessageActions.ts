@@ -62,7 +62,10 @@ export const getMessages: ActionCreator<any> =
     if (before) {
       dispatch({ type: actionTypes.MESSAGE_MORE, payload: { channelId } });
     } else if (isFresh) {
-      dispatch({ type: actionTypes.MESSAGE_FRESH, payload: { channelId } });
+      dispatch({
+        type: actionTypes.MESSAGE_FRESH,
+        payload: { channelId, controller },
+      });
     } else {
       dispatch({
         type: actionTypes.MESSAGE_REQUEST,
