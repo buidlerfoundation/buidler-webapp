@@ -12,6 +12,7 @@ import {
 import "./index.scss";
 import TaskGroupItem from "./TaskGroupItem";
 import useTeamUserData from "renderer/hooks/useTeamUserData";
+import useAppSelector from "renderer/hooks/useAppSelector";
 
 type TaskListViewProps = {
   onAddTask: (title: string) => void;
@@ -49,6 +50,7 @@ const TaskListView = ({
   const dispatch = useAppDispatch();
   const [showArchived, setShowArchived] = useState(false);
   const teamUserData = useTeamUserData();
+  const community = useAppSelector((state) => state.user.team || []);
   const taskGrouped = useMemo(
     () => groupTaskByFiltered(filter.value, tasks),
     [filter.value, tasks]
@@ -141,29 +143,37 @@ const TaskListView = ({
           />
         </div>
       </div>
-      <div className="task-list__body">
-        {Object.keys(taskGrouped)
-          .filter((key) => taskGrouped[key].length > 0)
-          .map(renderTaskGroup)}
-        {shouldArchived && (
-          <TaskGroupItem
-            keyProp="archived"
-            title="Archived"
-            filterValue={filter.value}
-            count={showArchived ? null : archivedCount || archivedTasks?.length}
-            toggle={toggleArchived}
-            tasks={archivedTasks}
-            isShow={showArchived}
-            channelId={channelId || ""}
-            teamId={teamId}
-            onSelectTask={onSelectTask}
-            onUpdateStatus={onUpdateStatus}
-            onMenuSelected={handleMenuSelected}
-            onReplyTask={onReplyTask}
-            teamUserData={teamUserData}
-          />
-        )}
-      </div>
+      {community?.length > 0 && (
+        <div className="task-list__body">
+          {Object.keys(taskGrouped)
+            .filter((key) => {
+              return (
+                (taskGrouped[key].length > 0 || key === "pinned") && !!channelId
+              );
+            })
+            .map(renderTaskGroup)}
+          {shouldArchived && (
+            <TaskGroupItem
+              keyProp="archived"
+              title="Archived"
+              filterValue={filter.value}
+              count={
+                showArchived ? null : archivedCount || archivedTasks?.length
+              }
+              toggle={toggleArchived}
+              tasks={archivedTasks}
+              isShow={showArchived}
+              channelId={channelId || ""}
+              teamId={teamId}
+              onSelectTask={onSelectTask}
+              onUpdateStatus={onUpdateStatus}
+              onMenuSelected={handleMenuSelected}
+              onReplyTask={onReplyTask}
+              teamUserData={teamUserData}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };
