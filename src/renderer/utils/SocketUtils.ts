@@ -182,8 +182,27 @@ class SocketUtil {
     this.firstLoad = false;
     if (this.socket?.connected) return;
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
+    const deviceCode = await getDeviceCode();
+    const generatedPrivateKey = await GeneratedPrivateKey();
+    let publicKey = "";
+    const loginType =
+      (await getCookie(AsyncKey.loginType)) || GlobalVariable.loginType;
+    if (
+      loginType === LoginType.WalletConnect ||
+      loginType === LoginType.Metamask
+    ) {
+      publicKey = utils.computePublicKey(generatedPrivateKey, true);
+      store.dispatch({
+        type: actionTypes.SET_PRIVATE_KEY,
+        payload: generatedPrivateKey,
+      });
+    }
     this.socket = io(`${AppConfig.apiBaseUrl}`, {
-      query: { token: accessToken },
+      query: {
+        token: accessToken,
+        device_code: deviceCode,
+        encrypt_message_key: publicKey,
+      },
       transports: ["websocket"],
       upgrade: false,
       reconnectionAttempts: 5,
@@ -231,7 +250,7 @@ class SocketUtil {
         this.socket.off("ON_USER_LEAVE_TEAM");
         this.socket.off("disconnect");
       });
-      this.emitOnline(teamId || store.getState().user?.currentTeamId);
+      // this.emitOnline(teamId || store.getState().user?.currentTeamId);
     });
   }
   reloadData = async () => {
@@ -829,9 +848,8 @@ class SocketUtil {
   async changeTeam(teamId: string) {
     if (!this.socket) {
       await this.init(teamId);
-      return;
     }
-    this.emitOnline(teamId);
+    // this.emitOnline(teamId);
   }
   emitSeenChannel(messageId: string | undefined, channelId: string) {
     if (!messageId) return;
