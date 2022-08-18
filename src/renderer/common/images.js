@@ -100,6 +100,7 @@ import icCrown from "../assets/images/ic_crown.svg";
 import WalletConnectLogo2 from "../assets/images/wallet_connect_logo_2.svg";
 import MetaMaskLogo2 from "../assets/images/metamask_logo_2.svg";
 import IconCircleCheck from "../assets/images/ic_circle_check.svg";
+import iconVideoPlay from "../assets/images/ic_video_play.svg";
 
 const images = {
   icTeamDefault,
@@ -204,6 +205,7 @@ const images = {
   WalletConnectLogo2,
   MetaMaskLogo2,
   IconCircleCheck,
+  iconVideoPlay,
 };
 
 export default images;

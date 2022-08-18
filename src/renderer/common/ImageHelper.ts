@@ -5,6 +5,7 @@ type imageOptions = {
   w?: number;
   h?: number;
   radius?: number;
+  fm?: string;
 };
 
 class ImageHelper {
@@ -40,9 +41,9 @@ class ImageHelper {
     if (name?.includes?.(".gif") || noParams) {
       return `${this.imgDomain}${id}/${name}`;
     }
-    let params = "?auto=format&fit=crop";
+    let params = "?auto=compress&fit=crop";
     if (options.w || options.h) {
-      params += `&dpr=1.0&fm=jpg&q=90`;
+      params += `&dpr=1.0&fm=jpg`;
     }
     if (options.w) {
       params += `&w=${options.w}`;
@@ -52,6 +53,9 @@ class ImageHelper {
     }
     if (options.radius) {
       params += `&corner-radius=${options.radius},${options.radius},${options.radius},${options.radius}&mask=corners`;
+    }
+    if (options.fm) {
+      params += `&fm=${options.fm}`;
     }
     return `${this.imgDomain}${id}/${name}${params}`;
   };
