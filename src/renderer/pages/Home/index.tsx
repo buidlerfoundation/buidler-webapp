@@ -10,7 +10,10 @@ import { DragDropContext } from "react-beautiful-dnd";
 import moment from "moment";
 import PageWrapper from "renderer/shared/PageWrapper";
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { createMemberChannelData } from "renderer/helpers/ChannelHelper";
+import {
+  createMemberChannelData,
+  validateUUID,
+} from "renderer/helpers/ChannelHelper";
 import { getCookie, removeCookie } from "renderer/common/Cookie";
 import { AsyncKey, SpaceBadge } from "renderer/common/AppConfig";
 import ModalOTP from "renderer/shared/ModalOTP";
@@ -112,6 +115,7 @@ const Home = () => {
   const loading = useAppSelector((state) => loadingSelector(state));
   const [currentUserId, setCurrentUserId] = useState("");
   const community = useAppSelector((state) => state.user.team);
+  const storeChannelId = useAppSelector((state) => state.user.currentChannelId);
   const { userData } = useAppSelector((state) => state.user);
   const currentTeam = useCurrentCommunity();
   const channels = useChannel();
@@ -305,15 +309,9 @@ const Home = () => {
     (createdAt?: string) => {
       if (!createdAt) return;
 
-      dispatch(
-        getMessages(
-          currentChannel.channel_id,
-          currentChannel.channel_type,
-          createdAt
-        )
-      );
+      dispatch(getMessages(channelId, "Public", createdAt));
     },
-    [currentChannel?.channel_id, currentChannel?.channel_type, dispatch]
+    [channelId, dispatch]
   );
   const onDeleteTask = useCallback(
     (task: any) => {
@@ -620,10 +618,16 @@ const Home = () => {
     if (currentChannel.channel_id) channelViewRef.current?.clearText?.();
   }, [currentChannel.channel_id]);
   useEffect(() => {
+    if (match_community_id === "user" && match_channel_id) {
+      setCurrentUserId(match_channel_id);
+    } else {
+      setCurrentUserId("");
+    }
+  }, [match_community_id, match_channel_id]);
+  useEffect(() => {
+    handleCloseModalSpaceDetail();
     if (match_channel_id && !!community) {
-      if (match_community_id === "user") {
-        setCurrentUserId(match_channel_id);
-      } else {
+      if (match_community_id !== "user") {
         const matchCommunity = community?.find(
           (c) => c.team_id === match_community_id
         );
@@ -636,8 +640,7 @@ const Home = () => {
             (c) => c.channel_id === match_channel_id
           );
           if (matchChannel) {
-            setCurrentUserId("");
-            if (matchChannel.channel_id !== currentChannel.channel_id) {
+            if (matchChannel.channel_id !== storeChannelId) {
               dispatch(setCurrentChannel?.(matchChannel, match_community_id));
             }
           } else {
@@ -651,10 +654,11 @@ const Home = () => {
     history,
     community,
     channels,
-    currentChannel.channel_id,
+    storeChannelId,
     dispatch,
     match_channel_id,
     match_community_id,
+    handleCloseModalSpaceDetail,
   ]);
   useEffect(() => {
     if (currentChannel?.user) {
@@ -673,33 +677,20 @@ const Home = () => {
     dispatch,
   ]);
   useEffect(() => {
-    if (channelId) {
+    if (channelId && validateUUID(channelId) && !!userData.user_id) {
       dispatch(getTasks(channelId));
     }
-  }, [channelId, dispatch]);
+  }, [channelId, dispatch, userData.user_id]);
   useEffect(() => {
     setOpenConversation(false);
     inputRef.current?.focus();
-    if (currentChannel?.channel_id || currentChannel?.user) {
+    if (channelId && validateUUID(channelId)) {
       setOpenTask(false);
-      if (currentChannel.channel_id && privateKey) {
-        dispatch(
-          getMessages(
-            currentChannel.channel_id,
-            currentChannel.channel_type,
-            undefined,
-            true
-          )
-        );
+      if (privateKey) {
+        dispatch(getMessages(channelId, "Public", undefined, true));
       }
     }
-  }, [
-    currentChannel?.channel_id,
-    currentChannel?.channel_type,
-    currentChannel?.user,
-    dispatch,
-    privateKey,
-  ]);
+  }, [channelId, dispatch, privateKey]);
 
   useEffect(() => {
     if (!!userData.user_id) {

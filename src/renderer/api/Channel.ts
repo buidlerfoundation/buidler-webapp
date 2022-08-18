@@ -40,8 +40,8 @@ export const updateSpaceChannel = (spaceId: string, body: any) =>
 export const deleteSpaceChannel = (spaceId: string) =>
   ApiCaller.delete(`space/${spaceId}`);
 
-export const getSpaceMembers = (id: string) =>
-  Caller.get<Array<SpaceMember>>(`space/${id}/member`);
+export const getSpaceMembers = (id: string, controller?: AbortController) =>
+  Caller.get<Array<SpaceMember>>(`space/${id}/member`, undefined, controller);
 
 export const getChannelFromSpace = (id: string) =>
   Caller.get<Array<Channel>>(`space/${id}/channel`);

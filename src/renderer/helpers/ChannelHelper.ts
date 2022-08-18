@@ -156,7 +156,7 @@ export const normalizeMessageItem = async (
         channelId
       );
     } else {
-      item.conversation_data = await normalizePublicMessageData(
+      item.conversation_data = normalizePublicMessageData(
         item.conversation_data
       );
     }
@@ -168,7 +168,7 @@ export const normalizeMessageItem = async (
   };
 };
 
-export const normalizePublicMessageData = async (messages: Array<any>) => {
+export const normalizePublicMessageData = (messages: Array<any>) => {
   const configs: any = store.getState()?.configs;
   const { privateKey } = configs;
   const res =
@@ -224,3 +224,8 @@ export const spaceNameToAvatar = (name: string) => {
   if (split.length > 1) return `${split[0].charAt(0)}${split[1].charAt(0)}`;
   return `${split[0].charAt(0)}`;
 };
+
+export const validateUUID = (id: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    id
+  );

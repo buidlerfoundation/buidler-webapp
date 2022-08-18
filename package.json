@@ -1,6 +1,6 @@
 {
   "name": "buidler-web",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "private": true,
   "dependencies": {
     "@date-io/date-fns": "1.3.13",
@@ -48,7 +48,7 @@
     "redux": "^4.2.0",
     "redux-thunk": "^2.4.1",
     "sass": "^1.52.1",
-    "socket.io-client": "3.1.2",
+    "socket.io-client": "4.5.1",
     "stream": "^0.0.2",
     "typescript": "^4.4.2",
     "uuid": "^8.3.2",

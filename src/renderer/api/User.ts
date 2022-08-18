@@ -127,6 +127,9 @@ export const getTokenPrice = (contractAddress: string) =>
 
 export const getGasPrice = () => Caller.get<number>("price/gas");
 
+export const getGasLimit = (tx) =>
+  Caller.post<number>("price/estimate/gas", tx);
+
 export const getMembersByRole = (
   teamId: string,
   roles: Array<UserRoleType> = [],

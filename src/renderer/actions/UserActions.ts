@@ -508,12 +508,22 @@ export const updateUser = (userData: any) => async (dispatch: Dispatch) => {
 
 export const getSpaceMembers =
   (spaceId: string) => async (dispatch: Dispatch) => {
-    dispatch({ type: ActionTypes.SPACE_MEMBER_REQUEST, payload: spaceId });
-    const res = await api.getSpaceMembers(spaceId);
-    if (res.statusCode === 200) {
-      dispatch({ type: ActionTypes.SPACE_MEMBER_SUCCESS, payload: res });
-    } else {
-      dispatch({ type: ActionTypes.SPACE_MEMBER_FAIL, payload: res });
+    const { apiSpaceMemberController } = store.getState().user;
+    apiSpaceMemberController?.abort?.();
+    const controller = new AbortController();
+    dispatch({
+      type: ActionTypes.SPACE_MEMBER_REQUEST,
+      payload: { spaceId, controller },
+    });
+    try {
+      const res = await api.getSpaceMembers(spaceId, controller);
+      if (res.statusCode === 200) {
+        dispatch({ type: ActionTypes.SPACE_MEMBER_SUCCESS, payload: res });
+      } else {
+        dispatch({ type: ActionTypes.SPACE_MEMBER_FAIL, payload: res });
+      }
+    } catch (error) {
+      dispatch({ type: ActionTypes.SPACE_MEMBER_FAIL, payload: error });
     }
   };
 

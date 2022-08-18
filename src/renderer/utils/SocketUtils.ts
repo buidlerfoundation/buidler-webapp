@@ -35,6 +35,7 @@ import {
   getCurrentChannel,
   getCurrentCommunity,
 } from "renderer/helpers/StoreHelper";
+import { getCollectibles } from "renderer/actions/CollectibleActions";
 
 const getTasks = async (channelId: string, dispatch: Dispatch) => {
   dispatch({ type: actionTypes.TASK_REQUEST, payload: { channelId } });
@@ -104,7 +105,7 @@ const getMessages = async (
   const isPrivate = channelType === "Private" || channelType === "Direct";
   const messageData = isPrivate
     ? await normalizeMessageData(messageRes.data || [], channelId)
-    : await normalizePublicMessageData(messageRes.data || []);
+    : normalizePublicMessageData(messageRes.data || []);
   if (messageRes.statusCode === 200) {
     dispatch({
       type: actionTypes.MESSAGE_SUCCESS,
@@ -161,7 +162,7 @@ const loadMessageIfNeeded = async () => {
           messageRes.data || [],
           currentChannel.channel_id
         )
-      : await normalizePublicMessageData(messageRes.data || []);
+      : normalizePublicMessageData(messageRes.data || []);
   if (messageRes.statusCode === 200) {
     store.dispatch({
       type: actionTypes.MESSAGE_SUCCESS,
@@ -181,8 +182,27 @@ class SocketUtil {
     this.firstLoad = false;
     if (this.socket?.connected) return;
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
+    const deviceCode = await getDeviceCode();
+    const generatedPrivateKey = await GeneratedPrivateKey();
+    let publicKey = "";
+    const loginType =
+      (await getCookie(AsyncKey.loginType)) || GlobalVariable.loginType;
+    if (
+      loginType === LoginType.WalletConnect ||
+      loginType === LoginType.Metamask
+    ) {
+      publicKey = utils.computePublicKey(generatedPrivateKey, true);
+      store.dispatch({
+        type: actionTypes.SET_PRIVATE_KEY,
+        payload: generatedPrivateKey,
+      });
+    }
     this.socket = io(`${AppConfig.apiBaseUrl}`, {
-      query: { token: accessToken },
+      query: {
+        token: accessToken,
+        device_code: deviceCode,
+        encrypt_message_key: publicKey,
+      },
       transports: ["websocket"],
       upgrade: false,
       reconnectionAttempts: 5,
@@ -230,7 +250,7 @@ class SocketUtil {
         this.socket.off("ON_USER_LEAVE_TEAM");
         this.socket.off("disconnect");
       });
-      this.emitOnline(teamId || store.getState().user?.currentTeamId);
+      // this.emitOnline(teamId || store.getState().user?.currentTeamId);
     });
   }
   reloadData = async () => {
@@ -382,6 +402,7 @@ class SocketUtil {
         payload: toastData,
       });
       store.dispatch(getTransactions(1));
+      store.dispatch(getCollectibles());
       actionFetchWalletBalance(store.dispatch);
     });
     this.socket.on(
@@ -696,27 +717,7 @@ class SocketUtil {
       if (currentChannel.channel_id === message_data.channel_id) {
         this.emitSeenChannel(message_data.message_id, message_data.channel_id);
       }
-      if (!currentChannel.channel_id) {
-        if (currentChannel.channel_type === "Direct") {
-          return;
-        }
-        store.dispatch({
-          type: actionTypes.SET_CURRENT_CHANNEL,
-          payload: {
-            channel: {
-              ...currentChannel,
-              channel_id: message_data.channel_id,
-              user: {
-                ...currentChannel.user,
-                direct_channel: message_data.channel_id,
-              },
-            },
-          },
-        });
-        setCookie(AsyncKey.lastChannelId, message_data.channel_id);
-      } else if (
-        userData?.user_id !== notification_data?.sender_data?.user_id
-      ) {
+      if (userData?.user_id !== notification_data?.sender_data?.user_id) {
         if (notification_type !== "Muted") {
           if (currentChannel.channel_id !== message_data.channel_id) {
             store.dispatch({
@@ -847,13 +848,12 @@ class SocketUtil {
   async changeTeam(teamId: string) {
     if (!this.socket) {
       await this.init(teamId);
-      return;
     }
-    this.emitOnline(teamId);
+    // this.emitOnline(teamId);
   }
   emitSeenChannel(messageId: string | undefined, channelId: string) {
     if (!messageId) return;
-    this.socket.emit("ON_VIEW_MESSAGE_IN_CHANNEL", {
+    this.socket?.emit?.("ON_VIEW_MESSAGE_IN_CHANNEL", {
       message_id: messageId,
       channel_id: channelId,
     });

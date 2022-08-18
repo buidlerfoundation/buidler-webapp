@@ -42,6 +42,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
         },
       };
     }
+    case actionTypes.MESSAGE_FRESH:
     case actionTypes.MESSAGE_REQUEST: {
       return {
         ...state,
@@ -196,8 +197,8 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
               msg.task = task;
               msg.message_attachment = message_attachment;
             }
-            if (msg.parent_id === parent_id) {
-              msg.conversation_data = msg.conversation_data.map((el) => {
+            if (msg.parent_id === parent_id && msg.conversation_data) {
+              msg.conversation_data = msg.conversation_data.map?.((el) => {
                 if (el.message_id === message_id) {
                   el.content = content;
                   el.plain_text = plain_text;

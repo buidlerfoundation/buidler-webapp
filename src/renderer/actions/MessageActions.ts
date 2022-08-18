@@ -62,7 +62,10 @@ export const getMessages: ActionCreator<any> =
     if (before) {
       dispatch({ type: actionTypes.MESSAGE_MORE, payload: { channelId } });
     } else if (isFresh) {
-      dispatch({ type: actionTypes.MESSAGE_FRESH, payload: { channelId } });
+      dispatch({
+        type: actionTypes.MESSAGE_FRESH,
+        payload: { channelId, controller },
+      });
     } else {
       dispatch({
         type: actionTypes.MESSAGE_REQUEST,
@@ -86,7 +89,7 @@ export const getMessages: ActionCreator<any> =
       const isPrivate = channelType === "Private" || channelType === "Direct";
       const messageData = isPrivate
         ? await normalizeMessageData(messageRes.data || [], channelId)
-        : await normalizePublicMessageData(messageRes.data || []);
+        : normalizePublicMessageData(messageRes.data || []);
       if (messageRes.statusCode === 200) {
         dispatch({
           type: actionTypes.MESSAGE_SUCCESS,

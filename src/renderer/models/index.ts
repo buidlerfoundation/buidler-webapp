@@ -40,6 +40,7 @@ export interface UserNFTCollection {
   symbol: string;
   network: string;
   token_id: string;
+  nft_collection?: NFTCollection;
 }
 
 export interface UserData {
@@ -337,6 +338,7 @@ export interface NFTCollectionDataApi {
   symbol: string;
   network: string;
   nft: Array<UserNFTCollection>;
+  slug: string;
 }
 
 export interface NFTAsset {
@@ -364,6 +366,7 @@ export interface CollectibleDataApi {
 export type SendData = {
   recipientAddress?: string;
   asset?: Token | null;
+  nft?: UserNFTCollection | null;
   amount?: number | string;
   amountUSD?: number | string;
   gasPrice?: ethers.BigNumber;
@@ -383,3 +386,8 @@ export interface BaseDataApi<T> {
 }
 
 export type UserRoleType = "owner" | "admin" | "member";
+
+export type AssetTypeItem = {
+  label: string;
+  id: string;
+};
