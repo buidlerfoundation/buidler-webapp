@@ -78,6 +78,9 @@ async function requestAPI<T = any>(
     fetchOptions.signal = controller.signal;
   }
   // Run the fetching
+  if (!navigator.onLine) {
+    return Promise.reject(Error("No internet connection"));
+  }
   return fetch(apiUrl, fetchOptions)
     .then((res) => {
       return res
