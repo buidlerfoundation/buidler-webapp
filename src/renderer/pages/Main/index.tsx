@@ -63,6 +63,9 @@ const errorUserSelector = createErrorMessageSelector([actionTypes.USER_PREFIX]);
 const currentTeamLoadingSelector = createLoadingSelector([
   actionTypes.CURRENT_TEAM_PREFIX,
 ]);
+const currentTeamErrorSelector = createErrorMessageSelector([
+  actionTypes.CURRENT_TEAM_PREFIX,
+]);
 
 const PrivateRoute = ({ component: Component, ...rest }: any) => {
   const query = useQuery();
@@ -75,6 +78,9 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
   const userError = useAppSelector((state) => errorUserSelector(state));
   const currentTeamLoading = useAppSelector((state) =>
     currentTeamLoadingSelector(state)
+  );
+  const currentTeamError = useAppSelector((state) =>
+    currentTeamErrorSelector(state)
   );
   const team = useAppSelector((state) => state.user.team);
   const currentTeam = useCurrentCommunity();
@@ -117,12 +123,13 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
       const matchCommunity = team?.find(
         (t) => t.team_id === match_community_id
       );
-      if (matchCommunity && !currentTeamLoading) {
+      if (matchCommunity && !currentTeamLoading && !currentTeamError) {
         await dispatch(setCurrentTeam(matchCommunity));
       }
     }
     setLoading(false);
   }, [
+    currentTeamError,
     currentTeamLoading,
     rest.redirect,
     userData.user_id,
