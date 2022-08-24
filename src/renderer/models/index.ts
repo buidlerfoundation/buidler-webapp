@@ -4,6 +4,10 @@ export type LocalAttachment = {
   file?: any;
   loading?: boolean;
   type?: string;
+  fileName?: string;
+  id?: string;
+  randomId?: string;
+  url?: string;
 };
 
 export type SpaceType = "Public" | "Exclusive";
@@ -206,6 +210,7 @@ export interface TaskData {
   assignee?: UserData;
   due_date?: Date | string;
   isHighLight?: boolean;
+  createdAt?: string;
 }
 
 export interface ConversationData {
@@ -390,4 +395,12 @@ export type UserRoleType = "owner" | "admin" | "member";
 export type AssetTypeItem = {
   label: string;
   id: string;
+};
+
+export type PinPostData = {
+  title: string;
+  description?: string;
+  attachments?: Array<LocalAttachment>;
+  channels?: Array<Channel>;
+  id?: string;
 };

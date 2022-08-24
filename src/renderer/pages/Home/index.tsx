@@ -80,6 +80,8 @@ import useMatchCommunityId from "renderer/hooks/useMatchCommunityId";
 import HomeLoading from "renderer/shared/HomeLoading";
 import useCurrentChannel from "renderer/hooks/useCurrentChannel";
 import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
+import PinPostList from "renderer/shared/PinPostList";
+import ModalCreatePinPost from "renderer/shared/ModalCreatePinPost";
 
 const loadMoreMessageSelector = createLoadMoreSelector([
   actionTypes.MESSAGE_PREFIX,
@@ -158,6 +160,11 @@ const Home = () => {
   const [openTaskView, setOpenTask] = useState(false);
   const [currentMessageId, setCurrentMessageId] = useState<string | null>(null);
   const [openConversation, setOpenConversation] = useState(false);
+  const [openCreatePinPost, setOpenCreatePinPost] = useState(false);
+  const toggleCreatePinPost = useCallback(
+    () => setOpenCreatePinPost((current) => !current),
+    []
+  );
   const toggleOpenMembers = useCallback(
     () => setOpeMembers((current) => !current),
     []
@@ -806,22 +813,23 @@ const Home = () => {
               teamUserData={teamUserData}
             />
             {currentChannel.channel_type !== "Direct" && (
-              <TaskListView
-                channelId={channelId}
-                archivedCount={taskData?.[channelId]?.archivedCount}
-                teamId={communityId}
-                tasks={taskData?.[channelId]?.tasks || []}
-                archivedTasks={taskData?.[channelId]?.archivedTasks || []}
-                onAddTask={handleAddTask}
-                onUpdateStatus={onUpdateStatus}
-                filter={filter}
-                filterData={filterTask}
-                onUpdateFilter={handleTaskUpdateFilter}
-                onDeleteTask={onDeleteTask}
-                onSelectTask={openTaskDetail}
-                onReplyTask={onReplyTask}
-                directUserId={currentChannel?.user?.user_id}
-              />
+              <PinPostList onCreate={toggleCreatePinPost} />
+              // <TaskListView
+              //   channelId={channelId}
+              //   archivedCount={taskData?.[channelId]?.archivedCount}
+              //   teamId={communityId}
+              //   tasks={taskData?.[channelId]?.tasks || []}
+              //   archivedTasks={taskData?.[channelId]?.archivedTasks || []}
+              //   onAddTask={handleAddTask}
+              //   onUpdateStatus={onUpdateStatus}
+              //   filter={filter}
+              //   filterData={filterTask}
+              //   onUpdateFilter={handleTaskUpdateFilter}
+              //   onDeleteTask={onDeleteTask}
+              //   onSelectTask={openTaskDetail}
+              //   onReplyTask={onReplyTask}
+              //   directUserId={currentChannel?.user?.user_id}
+              // />
             )}
           </div>
           <ModalSpaceDetail
@@ -907,6 +915,10 @@ const Home = () => {
             open={!!currentUserId}
             handleClose={handleCloseModalUserProfile}
             userId={currentUserId}
+          />
+          <ModalCreatePinPost
+            open={openCreatePinPost}
+            handleClose={toggleCreatePinPost}
           />
         </div>
       </DragDropContext>
