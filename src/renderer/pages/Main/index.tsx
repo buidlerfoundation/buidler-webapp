@@ -300,6 +300,11 @@ const Main = () => {
             path="/channels/:match_community_id/:match_channel_id"
             component={Home}
           />
+          <PrivateRoute
+            exact
+            path="/channels/:match_community_id/:match_channel_id/:entity_type/:post_id"
+            component={Home}
+          />
           <PublicRoute exact path="/started" component={Started} />
           <Route exact path="*" component={PageNotFound} />
         </Switch>

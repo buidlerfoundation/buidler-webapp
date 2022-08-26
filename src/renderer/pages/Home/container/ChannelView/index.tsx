@@ -14,6 +14,7 @@ import {
   Channel,
   Community,
   ConversationData,
+  LocalAttachment,
   MessageData,
   MessageGroup,
   UserData,
@@ -113,7 +114,7 @@ const ChannelView = forwardRef(
       MessageData | ConversationData | null
     >(null);
     const [isScrolling, setScrolling] = useState(false);
-    const [files, setFiles] = useState<Array<any>>([]);
+    const [files, setFiles] = useState<Array<LocalAttachment>>([]);
     const timeoutScrollRef = useRef<any>(null);
     const msgListRef = useRef<any>();
     const headerRef = useRef<any>();
@@ -129,12 +130,12 @@ const ChannelView = forwardRef(
         }
         const data = [...fs];
         data.forEach((f) => {
-          const attachment = {
+          const attachment: LocalAttachment = {
             file: URL.createObjectURL(f),
-            randomId: Math.random(),
+            randomId: `${Math.random()}`,
             loading: true,
             type: f.type || "application",
-            name: f.name,
+            fileName: f.name,
           };
           setFiles((current) => [...current, attachment]);
           api
@@ -273,11 +274,12 @@ const ChannelView = forwardRef(
           setReplyTask(null);
           setMessageEdit(msg);
           setFiles(
-            msg.message_attachment.map((el: any) => ({
+            msg.message_attachment.map((el) => ({
               ...el,
               type: el.mimetype,
               id: el.file_id,
-              name: el.original_name,
+              fileName: el.original_name,
+              url: el.file_url,
             }))
           );
           setText(msg.content);
@@ -387,7 +389,7 @@ const ChannelView = forwardRef(
           messageEdit.message_id,
           content,
           plain_text,
-          files.map((el) => el.id)
+          files.map((el) => el.id || "")
         );
         GoogleAnalytics.tracking("Message Edited", {
           category: "Message",
@@ -471,13 +473,13 @@ const ChannelView = forwardRef(
         if (message.content) {
           gaLabel += "text";
         }
-        if (files?.find((el) => el.type.includes("image"))) {
+        if (files?.find((el) => el?.type?.includes("image"))) {
           gaLabel += ", image";
         }
-        if (files?.find((el) => el.type.includes("video"))) {
+        if (files?.find((el) => el?.type?.includes("video"))) {
           gaLabel += ", video";
         }
-        if (files?.find((el) => el.type.includes("application"))) {
+        if (files?.find((el) => el?.type?.includes("application"))) {
           gaLabel += ", file";
         }
         GoogleAnalytics.tracking("Message Sent", {
@@ -541,26 +543,6 @@ const ChannelView = forwardRef(
 
     const renderMessage = useCallback(
       (msg: MessageData) => {
-        if (msg.conversation_data?.length > 0) {
-          return (
-            <MessageReplyItem
-              key={msg.message_id}
-              message={msg}
-              onCreateTask={onCreateTaskFromMessage}
-              onClick={openConversation}
-              onReplyPress={onReplyPress}
-              onMenuSelected={onMenuMessage}
-              onSelectTask={onSelectTask}
-              content={msg.content}
-              reacts={reactData?.[msg.message_id]}
-              replyCount={msg.conversation_data?.length - 1}
-              task={msg.task}
-              sender={teamUserData.find((el) => el.user_id === msg.sender_id)}
-              communityId={communityId}
-              userId={userData.user_id}
-            />
-          );
-        }
         return (
           <MessageItem
             key={msg.message_id}
@@ -572,7 +554,6 @@ const ChannelView = forwardRef(
             onReplyPress={onReplyPress}
             onMenuSelected={onMenuMessage}
             onSelectTask={onSelectTask}
-            sender={teamUserData.find((el) => el.user_id === msg.sender_id)}
             communityId={communityId}
             userId={userData.user_id}
           />
@@ -584,10 +565,8 @@ const ChannelView = forwardRef(
         onReplyPress,
         onMenuMessage,
         onSelectTask,
-        teamUserData,
         communityId,
         userData.user_id,
-        openConversation,
       ]
     );
 

@@ -49,7 +49,6 @@ import { getMessages } from "renderer/actions/MessageActions";
 import ModalCreateTask from "../../shared/ModalCreateTask";
 import SideBar from "../Main/Layout/SideBar";
 import ChannelView from "./container/ChannelView";
-import TaskListView from "./container/TaskListView";
 import "./index.scss";
 import ModalCreateChannel from "../../shared/ModalCreateChannel";
 import {
@@ -76,12 +75,13 @@ import useSpaceChannel from "renderer/hooks/useSpaceChannel";
 import useTeamUserData from "renderer/hooks/useTeamUserData";
 import useMatchChannelId from "renderer/hooks/useMatchChannelId";
 import AppTitleBar from "renderer/shared/AppTitleBar";
-import useMatchCommunityId from "renderer/hooks/useMatchCommunityId";
 import HomeLoading from "renderer/shared/HomeLoading";
 import useCurrentChannel from "renderer/hooks/useCurrentChannel";
 import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
 import PinPostList from "renderer/shared/PinPostList";
 import ModalCreatePinPost from "renderer/shared/ModalCreatePinPost";
+import PinPostDetail from "renderer/shared/PinPostDetail";
+import useMatchPostId from "renderer/hooks/useMatchPostId";
 
 const loadMoreMessageSelector = createLoadMoreSelector([
   actionTypes.MESSAGE_PREFIX,
@@ -89,6 +89,7 @@ const loadMoreMessageSelector = createLoadMoreSelector([
 
 const loadingSelector = createLoadingSelector([
   actionTypes.CURRENT_TEAM_PREFIX,
+  actionTypes.TEAM_PREFIX,
 ]);
 
 const filterTask: Array<PopoverItem> = [
@@ -123,6 +124,7 @@ const Home = () => {
   const channels = useChannel();
   const spaceChannel = useSpaceChannel();
   const currentChannel = useCurrentChannel();
+  const matchPostId = useMatchPostId();
   const currentChannelId = useMemo(
     () => currentChannel?.channel_id || currentChannel?.user?.user_id || "",
     [currentChannel?.channel_id, currentChannel?.user?.user_id]
@@ -131,7 +133,6 @@ const Home = () => {
     (state) => state.message
   );
   const teamUserData = useTeamUserData();
-  const communityId = useMatchCommunityId();
   const channelId = useMatchChannelId();
   const { taskData } = useAppSelector((state) => state.task);
   const { activityData } = useAppSelector((state) => state.activity);
@@ -594,9 +595,8 @@ const Home = () => {
     setOpenConfirmDeleteSpace(false);
   }, []);
   const handleCloseModalUserProfile = useCallback(async () => {
-    const lastChannelId = await getCookie(AsyncKey.lastChannelId);
-    history.replace(`/channels/${currentTeam.team_id}/${lastChannelId}`);
-  }, [currentTeam?.team_id, history]);
+    history.goBack();
+  }, [history]);
   const handleDeleteSpace = useCallback(async () => {
     if (!selectedSpace?.space_id) return;
     const success = await dispatch(deleteSpaceChannel(selectedSpace?.space_id));
@@ -920,6 +920,7 @@ const Home = () => {
             open={openCreatePinPost}
             handleClose={toggleCreatePinPost}
           />
+          {!!matchPostId && <PinPostDetail postId={matchPostId} />}
         </div>
       </DragDropContext>
       <ModalOTP metamaskConnected={MetamaskUtils.connected} />

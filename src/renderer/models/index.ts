@@ -398,8 +398,7 @@ export type AssetTypeItem = {
 };
 
 export type PinPostData = {
-  title: string;
-  description?: string;
+  content: string;
   attachments?: Array<LocalAttachment>;
   channels?: Array<Channel>;
   id?: string;

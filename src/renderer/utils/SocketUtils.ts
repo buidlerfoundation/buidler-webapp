@@ -205,8 +205,6 @@ class SocketUtil {
       },
       transports: ["websocket"],
       upgrade: false,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
     });
     this.socket.on("connect", () => {
       console.log("socket connected");
