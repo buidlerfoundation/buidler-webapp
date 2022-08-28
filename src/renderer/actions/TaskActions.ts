@@ -44,23 +44,19 @@ export const getTasks = (channelId: string) => async (dispatch: Dispatch) => {
     payload: { channelId, controller: controller },
   });
   try {
-    const [taskRes, archivedCountRes] = await Promise.all([
-      api.getTasks(channelId, controller),
-      api.getArchivedTaskCount(channelId, controller),
-    ]);
-    if (taskRes.statusCode === 200 && archivedCountRes.statusCode === 200) {
+    const taskRes = await api.getTasks(channelId, controller);
+    if (taskRes.statusCode === 200) {
       dispatch({
         type: actionTypes.TASK_SUCCESS,
         payload: {
           channelId,
           tasks: taskRes.data,
-          archivedCount: archivedCountRes.data?.total,
         },
       });
     } else {
       dispatch({
         type: actionTypes.TASK_FAIL,
-        payload: { message: "Error", taskRes, archivedCountRes },
+        payload: { message: "Error", taskRes },
       });
     }
   } catch (e) {
@@ -141,38 +137,24 @@ export const createTask =
       if (res.statusCode === 200) {
         toast.success("Created!");
       }
+      return res.statusCode === 200;
     } catch (e) {
       dispatch({
         type: actionTypes.CREATE_TASK_FAIL,
         payload: { message: e },
       });
+      return false;
     }
   };
 
 export const updateTask =
   (taskId: string, channelId: string, data: any) =>
   async (dispatch: Dispatch) => {
-    const user: any = store.getState()?.user;
-    const { currentChannel } = user || {};
     try {
-      if (data.channel) {
-        data.channel_ids = data.channel.map((c: any) => c.channel_id);
+      if (data.channels) {
+        data.channel_ids = data.channels.map((c: any) => c.channel_id);
       }
-      const res = await api.updateTask(
-        { ...data, assignee: null, channel: null, task_attachment: null },
-        taskId
-      );
-      if (res.statusCode === 200) {
-        dispatch({
-          type: actionTypes.UPDATE_TASK_REQUEST,
-          payload: {
-            taskId,
-            data,
-            channelId,
-            direct_channel: currentChannel?.user?.direct_channel,
-          },
-        });
-      }
+      const res = await api.updateTask(data, taskId);
       return res.statusCode === 200;
     } catch (e) {
       dispatch({

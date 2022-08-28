@@ -117,7 +117,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
         newTasks.find((t) => t.task_id === taskId) ||
         newArchivedTasks.find((t) => t.task_id === taskId);
       const taskStatus = data?.status || task?.status;
-      const { channel } = data;
+      const { channels } = data;
       if (channelUserId && channelUserId === data.assignee_id) {
         if (taskStatus === "archived") {
           if (newArchivedCount !== null) {
@@ -136,8 +136,8 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
         }
       } else if (
         (!direct_channel &&
-          channel != null &&
-          !channel.find((c) => c.channel_id === channelId)) ||
+          channels != null &&
+          !channels.find((c) => c.channel_id === channelId)) ||
         (channelUserId && channelUserId !== data.assignee_id) ||
         (direct_channel && (data.assignee_id || data.assignee_id === null))
       ) {

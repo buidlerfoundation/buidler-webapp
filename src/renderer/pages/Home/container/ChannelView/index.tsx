@@ -47,7 +47,6 @@ import "./index.scss";
 import { getUniqueId } from "../../../../helpers/GenerateUUID";
 import api from "../../../../api";
 import MessageInput from "../../../../shared/MessageInput";
-import MessageReplyItem from "../../../../shared/MessageReplyItem";
 import ChannelHeader from "./ChannelHeader";
 import DirectDescription from "./DirectDescription";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
@@ -61,16 +60,12 @@ type ChannelViewProps = {
   messages: Array<MessageData>;
   inputRef: any;
   currentTeam: Community;
-  openConversation: (message: MessageData) => void;
   onMoreMessage: (lastCreatedAt: string) => void;
   loadMoreMessage: boolean;
   messageCanMore: boolean;
   scrollData?: any;
   replyTask?: any;
   setReplyTask: (task?: any) => void;
-  openTaskView: boolean;
-  isOpenConversation: boolean;
-  onSelectTask: (task: any) => void;
   teamUserData: Array<UserData>;
 };
 
@@ -81,17 +76,13 @@ const ChannelView = forwardRef(
       messages,
       inputRef,
       currentTeam,
-      openConversation,
       onMoreMessage,
       loadMoreMessage,
       messageCanMore,
       scrollData,
       replyTask,
       setReplyTask,
-      openTaskView,
-      onSelectTask,
       teamUserData,
-      isOpenConversation,
     }: ChannelViewProps,
     ref
   ) => {
@@ -218,17 +209,14 @@ const ChannelView = forwardRef(
     const onCreateTaskFromMessage = useCallback(
       (msg: MessageData | ConversationData) => {
         const body: any = {
-          title: msg?.content,
+          content: msg?.content,
           status: "pinned",
           channel_ids:
             currentChannel.channel_type === "Direct"
               ? currentChannel?.user?.user_channels
               : [currentChannel?.channel_id],
-          file_ids: msg?.message_attachment?.map?.(
-            (a: AttachmentData) => a.file_id
-          ),
           task_id: msg.message_id,
-          team_id: currentTeam.team_id,
+          team_id: communityId,
           assignee_id:
             msg.message_tag?.[0]?.mention_id || currentChannel?.user?.user_id,
         };
@@ -243,7 +231,7 @@ const ChannelView = forwardRef(
         currentChannel.channel_type,
         currentChannel?.user?.user_channels,
         currentChannel?.user?.user_id,
-        currentTeam.team_id,
+        communityId,
       ]
     );
     const onReplyPress = useCallback(
@@ -274,7 +262,7 @@ const ChannelView = forwardRef(
           setReplyTask(null);
           setMessageEdit(msg);
           setFiles(
-            msg.message_attachment.map((el) => ({
+            msg.message_attachments.map((el) => ({
               ...el,
               type: el.mimetype,
               id: el.file_id,
@@ -418,6 +406,7 @@ const ChannelView = forwardRef(
           plain_text: extractContent(text),
           mentions: getMentionData(text.trim()),
           text,
+          entity_type: "channel",
         };
         if (
           currentChannel.channel_type === "Private" ||
@@ -441,7 +430,7 @@ const ChannelView = forwardRef(
           message.plain_text = plain_text;
         }
         if (currentChannel.channel_id) {
-          message.channel_id = currentChannel.channel_id;
+          message.entity_id = currentChannel.channel_id;
         } else if (currentChannel.user) {
           message.other_user_id = currentChannel?.user?.user_id;
           message.team_id = currentTeam.team_id;
@@ -553,7 +542,6 @@ const ChannelView = forwardRef(
             onCreateTask={onCreateTaskFromMessage}
             onReplyPress={onReplyPress}
             onMenuSelected={onMenuMessage}
-            onSelectTask={onSelectTask}
             communityId={communityId}
             userId={userData.user_id}
           />
@@ -564,7 +552,6 @@ const ChannelView = forwardRef(
         onCreateTaskFromMessage,
         onReplyPress,
         onMenuMessage,
-        onSelectTask,
         communityId,
         userData.user_id,
       ]
@@ -629,8 +616,6 @@ const ChannelView = forwardRef(
               <div className="message-bottom">
                 <div style={{ position: "relative" }}>
                   {scrollData?.showScrollDown &&
-                    !openTaskView &&
-                    !isOpenConversation &&
                     !location.pathname.includes("user") && (
                       <div className="message-scroll-down__wrapper">
                         {scrollData?.unreadCount > 0 && (

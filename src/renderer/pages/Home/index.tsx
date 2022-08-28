@@ -7,20 +7,19 @@ import React, {
   memo,
 } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
-import moment from "moment";
 import PageWrapper from "renderer/shared/PageWrapper";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import {
   createMemberChannelData,
   validateUUID,
 } from "renderer/helpers/ChannelHelper";
-import { getCookie, removeCookie } from "renderer/common/Cookie";
+import { removeCookie } from "renderer/common/Cookie";
 import { AsyncKey, SpaceBadge } from "renderer/common/AppConfig";
 import ModalOTP from "renderer/shared/ModalOTP";
 import ModalCreateSpace from "renderer/shared/ModalCreateSpace";
 import toast from "react-hot-toast";
 import { uniqBy } from "lodash";
-import { CreateSpaceData, MessageData, Space, TaskData } from "renderer/models";
+import { CreateSpaceData, Space, TaskData } from "renderer/models";
 import ModalSpaceSetting from "renderer/shared/ModalSpaceSetting";
 import ModalSpaceDetail from "renderer/shared/ModalSpaceDetail";
 import { getSpaceBackgroundColor } from "renderer/helpers/SpaceHelper";
@@ -38,7 +37,6 @@ import {
   setCurrentChannel,
 } from "renderer/actions/UserActions";
 import {
-  createTask,
   deleteTask,
   dropTask,
   getTaskFromUser,
@@ -46,7 +44,6 @@ import {
   updateTask,
 } from "renderer/actions/TaskActions";
 import { getMessages } from "renderer/actions/MessageActions";
-import ModalCreateTask from "../../shared/ModalCreateTask";
 import SideBar from "../Main/Layout/SideBar";
 import ChannelView from "./container/ChannelView";
 import "./index.scss";
@@ -56,10 +53,6 @@ import {
   createLoadMoreSelector,
 } from "../../reducers/selectors";
 import actionTypes from "../../actions/ActionTypes";
-import { PopoverItem } from "../../shared/PopoverButton";
-import ModalTaskView from "../../shared/ModalTaskView";
-import { groupTaskByFiltered } from "../../helpers/TaskHelper";
-import ModalConversation from "../../shared/ModalConversation";
 import GlobalVariable from "../../services/GlobalVariable";
 import ModalConfirmDeleteGroupChannel from "../../shared/ModalConfirmDeleteGroupChannel";
 import ModalConfirmDeleteChannel from "../../shared/ModalConfirmDeleteChannel";
@@ -82,6 +75,8 @@ import PinPostList from "renderer/shared/PinPostList";
 import ModalCreatePinPost from "renderer/shared/ModalCreatePinPost";
 import PinPostDetail from "renderer/shared/PinPostDetail";
 import useMatchPostId from "renderer/hooks/useMatchPostId";
+import ModalConfirmDelete from "renderer/shared/ModalConfirmDelete";
+import { PopoverItem } from "renderer/shared/PopoverButton";
 
 const loadMoreMessageSelector = createLoadMoreSelector([
   actionTypes.MESSAGE_PREFIX,
@@ -91,16 +86,6 @@ const loadingSelector = createLoadingSelector([
   actionTypes.CURRENT_TEAM_PREFIX,
   actionTypes.TEAM_PREFIX,
 ]);
-
-const filterTask: Array<PopoverItem> = [
-  {
-    label: "Status",
-    value: "Status",
-  },
-  { label: "Due Date", value: "Due Date" },
-  { label: "Channel", value: "Channel" },
-  { label: "Assignee", value: "Assignee" },
-];
 
 const Home = () => {
   const match = useRouteMatch<{
@@ -129,18 +114,17 @@ const Home = () => {
     () => currentChannel?.channel_id || currentChannel?.user?.user_id || "",
     [currentChannel?.channel_id, currentChannel?.user?.user_id]
   );
-  const { messageData, conversationData } = useAppSelector(
-    (state) => state.message
-  );
+  const { messageData } = useAppSelector((state) => state.message);
   const teamUserData = useTeamUserData();
   const channelId = useMatchChannelId();
   const { taskData } = useAppSelector((state) => state.task);
-  const { activityData } = useAppSelector((state) => state.activity);
   const { privateKey } = useAppSelector((state) => state.configs);
   const history = useHistory();
   const inputRef = useRef<any>();
   const channelViewRef = useRef<any>();
   const sideBarRef = useRef<any>();
+  const [selectedPost, setSelectedPost] = useState<TaskData | null>(null);
+  const [openConfirmDeletePost, setOpenConfirmDeletePost] = useState(false);
   const [replyTask, setReplyTask] = useState<any>(null);
   const [initialSpace, setInitialSpace] = useState(null);
   const [isOpenSpaceDetail, setOpenSpaceDetail] = useState(false);
@@ -151,17 +135,14 @@ const Home = () => {
   const [isOpenConfirmDeleteSpace, setOpenConfirmDeleteSpace] = useState(false);
   const [isOpenConfirmDeleteChannel, setOpenConfirmDeleteChannel] =
     useState(false);
-  const [filter, setFilter] = useState(filterTask[0]);
-  const [openCreateTask, setOpenCreateTask] = useState(false);
-  const [currentTitle, setCurrentTitle] = useState<string | null>(null);
   const [openCreateChannel, setOpenCreateChannel] = useState(false);
   const [openCreateSpace, setOpenCreateSpace] = useState(false);
   const [openEditSpaceChannel, setOpenEditSpaceChannel] = useState(false);
-  const [currentTask, setCurrentTask] = useState<TaskData | null>(null);
-  const [openTaskView, setOpenTask] = useState(false);
-  const [currentMessageId, setCurrentMessageId] = useState<string | null>(null);
-  const [openConversation, setOpenConversation] = useState(false);
   const [openCreatePinPost, setOpenCreatePinPost] = useState(false);
+  const toggleConfirmDeletePost = useCallback(
+    () => setOpenConfirmDeletePost((current) => !current),
+    []
+  );
   const toggleCreatePinPost = useCallback(
     () => setOpenCreatePinPost((current) => !current),
     []
@@ -218,29 +199,30 @@ const Home = () => {
         return;
       }
       let currentVote = task?.up_votes || 0;
-      if (destination.droppableId !== "archived") {
-        const taskGrouped = groupTaskByFiltered(filter.value, tasks);
-        if (source.droppableId === destination.droppableId) {
-          if (source.index !== destination.index) {
-            const sourceList = taskGrouped[source.droppableId];
-            if (source.index < destination.index) {
-              currentVote = sourceList[destination.index].up_votes - 1;
-            } else {
-              currentVote = sourceList[destination.index].up_votes + 1;
-            }
-          }
-        } else {
-          const destinationList = taskGrouped[destination.droppableId];
-          if (destinationList.length === destination.index) {
-            if (destinationList.length > 0) {
-              currentVote =
-                destinationList[destinationList.length - 1].up_votes - 1;
-            }
-          } else {
-            currentVote = destinationList[destination.index].up_votes + 1;
-          }
-        }
-      }
+      // TODO handle dnd pin post
+      // if (destination.droppableId !== "archived") {
+      //   const taskGrouped = groupTaskByFiltered(filter.value, tasks);
+      //   if (source.droppableId === destination.droppableId) {
+      //     if (source.index !== destination.index) {
+      //       const sourceList = taskGrouped[source.droppableId];
+      //       if (source.index < destination.index) {
+      //         currentVote = sourceList[destination.index].up_votes - 1;
+      //       } else {
+      //         currentVote = sourceList[destination.index].up_votes + 1;
+      //       }
+      //     }
+      //   } else {
+      //     const destinationList = taskGrouped[destination.droppableId];
+      //     if (destinationList.length === destination.index) {
+      //       if (destinationList.length > 0) {
+      //         currentVote =
+      //           destinationList[destinationList.length - 1].up_votes - 1;
+      //       }
+      //     } else {
+      //       currentVote = destinationList[destination.index].up_votes + 1;
+      //     }
+      //   }
+      // }
       dispatch(
         dropTask(
           result,
@@ -251,11 +233,10 @@ const Home = () => {
       );
     },
     [
-      currentChannel?.channel_id,
+      currentChannel.channel_id,
       currentChannelId,
-      currentTeam?.team_id,
+      currentTeam.team_id,
       dispatch,
-      filter.value,
       handleDragChannel,
       handleDragTaskToChannel,
       taskData,
@@ -309,10 +290,6 @@ const Home = () => {
     setSelectedSpace(s);
     setOpenSpaceDetail(true);
   }, []);
-  const handleOpenConversation = useCallback((message: MessageData) => {
-    setCurrentMessageId(message.message_id);
-    setOpenConversation(true);
-  }, []);
   const onMoreMessage = useCallback(
     (createdAt?: string) => {
       if (!createdAt) return;
@@ -321,104 +298,21 @@ const Home = () => {
     },
     [channelId, dispatch]
   );
-  const onDeleteTask = useCallback(
-    (task: any) => {
-      if (!currentChannel?.channel_id) return;
-      dispatch(deleteTask(task.task_id, currentChannel?.channel_id));
-    },
-    [dispatch, currentChannel?.channel_id]
-  );
-  const onUpdateStatus = useCallback(
-    (task: any, status: string) => {
-      if (!currentChannel?.channel_id) return;
-      dispatch(
-        updateTask(task.task_id, currentChannel?.channel_id, {
-          status,
-          team_id: currentTeam.team_id,
-        })
-      );
-    },
-    [currentChannel?.channel_id, dispatch, currentTeam?.team_id]
-  );
-  const handleTaskUpdateFilter = useCallback((st) => setFilter(st), []);
-  const openTaskDetail = useCallback((task: any) => {
-    setOpenTask(true);
-    setCurrentTask(task);
-  }, []);
-  const onReplyTask = useCallback((task: any) => {
-    setReplyTask(task);
-  }, []);
-  const handleAddTask = useCallback((title) => {
-    setCurrentTitle(title);
-    setOpenCreateTask(true);
-  }, []);
+  const onDeleteTask = useCallback(async () => {
+    if (!selectedPost?.task_id) return;
+    await dispatch(deleteTask(selectedPost?.task_id, channelId));
+    toggleConfirmDeletePost();
+    toggleCreatePinPost();
+  }, [
+    selectedPost?.task_id,
+    dispatch,
+    channelId,
+    toggleConfirmDeletePost,
+    toggleCreatePinPost,
+  ]);
   const handleCloseModalSpaceDetail = useCallback(() => {
     setOpenSpaceDetail(false);
     setSelectedSpace(null);
-  }, []);
-  const handleCloseModalConversation = useCallback(() => {
-    setOpenConversation(false);
-    setCurrentMessageId(null);
-  }, []);
-  const handleCloseModalTaskView = useCallback(() => {
-    setOpenTask(false);
-    setCurrentTask(null);
-  }, []);
-  const onCreateTask = useCallback(
-    (taskCreateData: any, id: string) => {
-      const loadingAttachment = taskCreateData.attachments.find(
-        (att: any) => att.loading
-      );
-      if (loadingAttachment != null) {
-        return;
-      }
-      const channel_ids = taskCreateData.channels
-        .filter((c: any) => c.channel_id !== currentChannel.channel_id)
-        .map((c: any) => c.channel_id);
-      if (
-        currentChannel.channel_type !== "Direct" &&
-        currentChannel?.channel_id
-      ) {
-        channel_ids.unshift(currentChannel?.channel_id);
-      }
-      if (channel_ids.length === 0) {
-        toast.error("Channels cannot be empty");
-        return;
-      }
-      if (!taskCreateData?.title) {
-        toast.error("Title cannot be empty");
-        return;
-      }
-      const body: any = {
-        title: taskCreateData?.title,
-        notes: taskCreateData?.notes,
-        status: taskCreateData?.currentStatus?.id,
-        due_date: taskCreateData?.dueDate
-          ? moment(taskCreateData?.dueDate || new Date()).format(
-              "YYYY-MM-DD HH:mm:ss.SSSZ"
-            )
-          : null,
-        channel_ids,
-        assignee_id: taskCreateData?.assignee?.user_id,
-        attachments: taskCreateData.attachments.map((att: any) => att.url),
-        team_id: currentTeam.team_id,
-      };
-      if (id !== "") {
-        body.task_id = id;
-      }
-      dispatch(createTask(currentChannel?.channel_id, body));
-      setOpenCreateTask(false);
-    },
-    [
-      dispatch,
-      currentChannel?.channel_id,
-      currentChannel?.channel_type,
-      currentTeam?.team_id,
-    ]
-  );
-  const handleCloseModalCreateTask = useCallback(() => {
-    setCurrentTitle(null);
-    setOpenCreateTask(false);
   }, []);
   const handleCloseModalCreateSpace = useCallback(
     () => setOpenCreateSpace(false),
@@ -689,10 +583,8 @@ const Home = () => {
     }
   }, [channelId, dispatch, userData.user_id]);
   useEffect(() => {
-    setOpenConversation(false);
     inputRef.current?.focus();
     if (channelId && validateUUID(channelId)) {
-      setOpenTask(false);
       if (privateKey) {
         dispatch(getMessages(channelId, "Public", undefined, true));
       }
@@ -714,10 +606,7 @@ const Home = () => {
   useEffect(() => {
     const keyDownListener = (e: any) => {
       if (e.key === "Escape") {
-        setOpenCreateTask(false);
         setOpenCreateChannel(false);
-      } else if (e.metaKey && e.key === "t") {
-        setOpenCreateTask(true);
       } else {
         const taskElement = document.getElementById("task-list");
         const taskHoverElement = taskElement?.querySelector(
@@ -762,6 +651,33 @@ const Home = () => {
     currentChannelId,
   ]);
 
+  const onMenuPostSelected = useCallback(
+    (menu: PopoverItem, post: TaskData) => {
+      setSelectedPost(post);
+      switch (menu.value) {
+        case "Delete":
+          toggleConfirmDeletePost();
+          break;
+        default:
+          break;
+      }
+    },
+    [toggleConfirmDeletePost]
+  );
+
+  const handleCreatePinPost = useCallback(() => {
+    setSelectedPost(null);
+    toggleCreatePinPost();
+  }, [toggleCreatePinPost]);
+
+  const onEditPost = useCallback(
+    (data: TaskData) => {
+      setSelectedPost(data);
+      toggleCreatePinPost();
+    },
+    [toggleCreatePinPost]
+  );
+
   if (loading && channels.length === 0) {
     return (
       <PageWrapper>
@@ -800,78 +716,26 @@ const Home = () => {
                 "message_id"
               )}
               currentTeam={currentTeam}
-              openConversation={handleOpenConversation}
               onMoreMessage={onMoreMessage}
               loadMoreMessage={loadMoreMessage}
               messageCanMore={messageData?.[channelId]?.canMore}
               scrollData={messageData?.[channelId]?.scrollData}
               replyTask={replyTask}
               setReplyTask={setReplyTask}
-              openTaskView={openTaskView}
-              onSelectTask={openTaskDetail}
-              isOpenConversation={openConversation}
               teamUserData={teamUserData}
             />
             {currentChannel.channel_type !== "Direct" && (
-              <PinPostList onCreate={toggleCreatePinPost} />
-              // <TaskListView
-              //   channelId={channelId}
-              //   archivedCount={taskData?.[channelId]?.archivedCount}
-              //   teamId={communityId}
-              //   tasks={taskData?.[channelId]?.tasks || []}
-              //   archivedTasks={taskData?.[channelId]?.archivedTasks || []}
-              //   onAddTask={handleAddTask}
-              //   onUpdateStatus={onUpdateStatus}
-              //   filter={filter}
-              //   filterData={filterTask}
-              //   onUpdateFilter={handleTaskUpdateFilter}
-              //   onDeleteTask={onDeleteTask}
-              //   onSelectTask={openTaskDetail}
-              //   onReplyTask={onReplyTask}
-              //   directUserId={currentChannel?.user?.user_id}
-              // />
+              <PinPostList
+                onMenuSelected={onMenuPostSelected}
+                onCreate={handleCreatePinPost}
+                onEdit={onEditPost}
+              />
             )}
           </div>
           <ModalSpaceDetail
             space={selectedSpace}
             open={isOpenSpaceDetail}
             handleClose={handleCloseModalSpaceDetail}
-          />
-          <ModalConversation
-            open={openConversation}
-            handleClose={handleCloseModalConversation}
-            conversations={
-              messageData?.[currentChannelId]?.data?.find(
-                (el) => el.message_id === currentMessageId
-              )?.conversation_data || []
-            }
-          />
-          <ModalTaskView
-            task={currentTask}
-            conversations={
-              currentTask?.task_id
-                ? conversationData?.[currentTask?.task_id] || []
-                : []
-            }
-            open={openTaskView}
-            handleClose={handleCloseModalTaskView}
-            teamId={currentTeam?.team_id}
-            channelId={currentChannel?.channel_id}
-            activities={
-              currentTask?.task_id
-                ? activityData?.[currentTask?.task_id]?.data || []
-                : []
-            }
-            onDeleteTask={onDeleteTask}
-          />
-          <ModalCreateTask
-            onCreateTask={onCreateTask}
-            open={openCreateTask}
-            handleClose={handleCloseModalCreateTask}
-            currentTitle={currentTitle}
-            currentTeam={currentTeam}
-            currentChannel={currentChannel}
-            channels={channels}
           />
           <ModalCreateSpace
             open={openCreateSpace}
@@ -894,6 +758,14 @@ const Home = () => {
           <ModalInviteMember
             open={isOpenInvite}
             handleClose={handleCloseModalInviteMember}
+          />
+          <ModalConfirmDelete
+            open={openConfirmDeletePost}
+            handleClose={toggleConfirmDeletePost}
+            title="Delete post"
+            description="Are you sure you want to delete this post?"
+            contentDelete="Delete"
+            onDelete={onDeleteTask}
           />
           <ModalConfirmDeleteChannel
             open={isOpenConfirmDeleteChannel}
@@ -919,8 +791,16 @@ const Home = () => {
           <ModalCreatePinPost
             open={openCreatePinPost}
             handleClose={toggleCreatePinPost}
+            selectedPost={selectedPost}
+            onMenuPostSelected={onMenuPostSelected}
           />
-          {!!matchPostId && <PinPostDetail postId={matchPostId} />}
+          {!!matchPostId && (
+            <PinPostDetail
+              onMenuSelected={onMenuPostSelected}
+              postId={matchPostId}
+              onEdit={onEditPost}
+            />
+          )}
         </div>
       </DragDropContext>
       <ModalOTP metamaskConnected={MetamaskUtils.connected} />

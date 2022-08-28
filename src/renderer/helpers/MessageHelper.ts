@@ -1,5 +1,4 @@
 import moment from "moment";
-import images from "../common/images";
 
 export const normalizeMessage = (messages: Array<any>) => {
   return messages.map((msg, index) => {
@@ -15,9 +14,6 @@ export const normalizeMessage = (messages: Array<any>) => {
       date !== dateCompare
     ) {
       msg.isHead = true;
-    }
-    if (msg.parent_id !== messages?.[index + 1]?.parent_id) {
-      msg.isConversationHead = true;
     }
     return msg;
   });
@@ -49,32 +45,54 @@ export const extractContent = (s: string) => {
   return span.textContent || span.innerText;
 };
 
-export const normalizeMessageText = (text: string, isShowNote = false) => {
+export const normalizeMessageTextPlain = (text: string) => {
   if (!text) return "";
-  let res = text?.replaceAll?.("<br>", "\n");
-  const regexLink = /(http|https):\/\/(\S+)\.([a-z]{2,}?)(.*?)( |$)/gim;
-  const linkMatches = res.match(regexLink);
-  linkMatches?.forEach((el) => {
-    const linkMatch = /(http|https):\/\/(\S+)\.([a-z]{2,}?)(.*?)( |$)/.exec(el);
-    if (linkMatch && linkMatch?.length >= 5) {
-      res = res?.replace(
-        el,
-        `<a onclick='event.stopPropagation();' target='_blank' href='${extractContent(
-          `${linkMatch[1]}://${linkMatch[2]}.${linkMatch[3]}${linkMatch[4]}`
-        )}'>${linkMatch[1]}://${linkMatch[2]}.${linkMatch[3]}${
-          linkMatch[4]
-        }</a>${linkMatch[5]}`
-      );
-    }
-  });
-  res = res?.replace?.(
-    /\$mention_location/g,
-    `${window.location.origin}/channels/user`
-  );
-  if (isShowNote) {
-    return `<div style='display: flex; align-items: flex-start'><span class='enable-user-select'>${res}</span><img src='${images.icNote}' style='margin-left: 15px; margin-top: 7px' /></div>`;
+  let res = text
+    .replace(/^#### (.*$)/gim, "$1")
+    .replace(/^### (.*$)/gim, "$1")
+    .replace(/^## (.*$)/gim, "$1")
+    .replace(/^# (.*$)/gim, "$1")
+    .replace(/^\> (.*$)/gim, "$1")
+    .replace(/\*\*(.*)\*\*/gim, "$1")
+    .replace(/\*(.*)\*/gim, "$1")
+    .replace(/!\[(.*?)\]\((.*?)\)/gim, "$1")
+    .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>")
+    .replace(/\n$/gim, "<br />")
+    .replace(
+      /((https?|ftps?):\/\/[^"<\s]+)(?![^<>]*>|[^"]*?<\/a)/gim,
+      "<a onclick='event.stopPropagation();' target='_blank' href='$1'>$1</a>"
+    )
+    .replace(/\$mention_location/g, `${window.location.origin}/channels/user`);
+  return `<div class='enable-user-select'>${res}</div>`;
+};
+
+export const normalizeMessageText = (text: string, wrapParagraph?: boolean) => {
+  if (!text) return "";
+  let res = text
+    .replace(/<br>/gim, "\n")
+    .replace(/^#### (.*$)/gim, "<h4>$1</h4>")
+    .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+    .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+    .replace(/^# (.*$)/gim, "<h1>$1</h1>")
+    .replace(/^\> (.*$)/gim, "<blockquote>$1</blockquote>")
+    .replace(/\*\*(.*)\*\*/gim, "<b>$1</b>")
+    .replace(/\*(.*)\*/gim, "<i>$1</i>")
+    .replace(
+      /!\[(.*?)\]\((.*?)\)/gim,
+      "<p><img class='image-inline' alt='$1' src='$2' /></p>"
+    )
+    .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>")
+    .replace(/\n$/gim, "<br />")
+    .replace(
+      /((https?|ftps?):\/\/[^"<\s]+)(?![^<>]*>|[^"]*?<\/a)/gim,
+      "<a onclick='event.stopPropagation();' target='_blank' href='$1'>$1</a>"
+    )
+    .replace(/\$mention_location/g, `${window.location.origin}/channels/user`);
+
+  if (wrapParagraph) {
+    res = res.replace(/^([^<]*)([^<]*)$/gim, "<p>$1</p>");
   }
-  return `<span class='enable-user-select'>${res}</span>`;
+  return `<div class='enable-user-select'>${res}</div>`;
 };
 
 export const getMentionData = (s: string) => {
