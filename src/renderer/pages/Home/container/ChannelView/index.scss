@@ -104,6 +104,15 @@
       }
     }
   }
+  .message-load-more-after {
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background-color: var(--color-lighter-background);
+    color: var(--color-secondary-text);
+  }
   .message-load-more {
     position: absolute;
     top: 60px;

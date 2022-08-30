@@ -50,3 +50,6 @@ export const getArchivedTaskCountFromUser = (userId: string, teamId: string) =>
   Caller.get<{ total: number }>(
     `task/${userId}/user/${teamId}/count?archived=true`
   );
+
+export const getPostById = (postId: string) =>
+  Caller.get<TaskData>(`task/${postId}`);

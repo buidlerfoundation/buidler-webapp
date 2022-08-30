@@ -10,14 +10,20 @@ type MessageReducerState = {
       canMore: boolean;
       data: Array<MessageData>;
       scrollData: { showScrollDown: boolean; unreadCount?: number };
+      canMoreAfter: boolean;
     };
   };
   apiController?: AbortController | null;
+  ppApiController?: AbortController | null;
+  highlightMessageId?: string;
+  loadMoreAfterMessage?: boolean;
 };
 
 const initialState: MessageReducerState = {
   messageData: {},
   apiController: null,
+  ppApiController: null,
+  loadMoreAfterMessage: false,
 };
 
 const messageReducers: Reducer<MessageReducerState, AnyAction> = (
@@ -26,6 +32,12 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.UPDATE_HIGHLIGHT_MESSAGE: {
+      return {
+        ...state,
+        highlightMessageId: payload,
+      };
+    }
     case actionTypes.DELETE_TASK_REQUEST: {
       const { taskId, channelId } = payload;
       const newMessageData = state.messageData;
@@ -45,15 +57,25 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
         messageData: newMessageData,
       };
     }
+    case actionTypes.MESSAGE_PP_FRESH:
+    case actionTypes.MESSAGE_PP_REQUEST: {
+      return {
+        ...state,
+        ppApiController: payload.controller,
+      };
+    }
     case actionTypes.MESSAGE_FRESH:
     case actionTypes.MESSAGE_REQUEST: {
       return {
         ...state,
         apiController: payload.controller,
+        loadMoreAfterMessage: !!payload.after,
       };
     }
+    case actionTypes.MESSAGE_PP_SUCCESS:
     case actionTypes.MESSAGE_SUCCESS: {
-      const { channelId, data, before, reloadSocket } = payload;
+      const { channelId, data, before, reloadSocket, messageId, after } =
+        payload;
       let msg = data || [];
       let scrollData = state.messageData?.[channelId]?.scrollData;
       const currentData = state.messageData[channelId]?.data || [];
@@ -69,11 +91,15 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           showScrollDown: false,
         };
         msg = [...diff, ...msg];
-      } else if (
-        (before || data.length === 0) &&
-        state.messageData?.[channelId]?.data
-      ) {
-        msg = [...currentData, ...data];
+      } else if (state.messageData?.[channelId]?.data) {
+        if (before || data.length === 0) {
+          msg = [...currentData, ...data];
+        } else if (after || data.length === 0) {
+          msg = [...data, ...currentData];
+          scrollData = {
+            showScrollDown: data > 0,
+          };
+        }
       } else {
         scrollData = {
           showScrollDown: false,
@@ -85,11 +111,20 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           ...state.messageData,
           [channelId]: {
             data: normalizeMessage(msg),
-            canMore: data.length !== 0,
+            canMore: !after
+              ? data.length !== 0
+              : state.messageData?.[channelId]?.canMore,
+            canMoreAfter: messageId
+              ? true
+              : after
+              ? data.length !== 0
+              : state.messageData?.[channelId]?.canMoreAfter,
             scrollData,
           },
         },
         apiController: null,
+        ppApiController: null,
+        loadMoreAfterMessage: false,
       };
     }
     case actionTypes.REMOVE_MESSAGE_ATTACHMENT: {
@@ -143,7 +178,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           data: newMessageData[channelId].data
             .filter((el) => el.message_id !== messageId)
             .map((el, index) => {
-              if (el.parent_id === parentId) {
+              if (el.reply_message_id === parentId) {
                 el.conversation_data = undefined;
               }
               if (currentIdx === index + 1) {
@@ -169,7 +204,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
         message_id,
         content,
         task,
-        parent_id,
+        reply_message_id,
         message_attachments,
         plain_text,
       } = data;
@@ -189,7 +224,10 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
                 : null;
               msg.message_attachments = message_attachments;
             }
-            if (msg.parent_id === parent_id && msg.conversation_data) {
+            if (
+              msg.reply_message_id === reply_message_id &&
+              msg.conversation_data
+            ) {
               msg.conversation_data = {
                 ...msg.conversation_data,
                 content,
@@ -214,21 +252,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           ...newMessageData[payload.entity_id],
           data: normalizeMessage([
             payload,
-            ...newMessageData[payload.entity_id].data.map((msg) => {
-              if (
-                msg.parent_id === payload.parent_id ||
-                msg.message_id === payload.parent_id
-              ) {
-                msg.conversation_data = payload.conversation_data;
-              }
-              if (
-                msg.message_id === payload.parent_id ||
-                msg.parent_id === payload.parent_id
-              ) {
-                msg.parent_id = payload.parent_id;
-              }
-              return msg;
-            }),
+            ...newMessageData[payload.entity_id].data,
           ]),
         };
       } else {
@@ -236,6 +260,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           data: normalizeMessage([payload]),
           canMore: true,
           scrollData: { showScrollDown: false, unreadCount: 0 },
+          canMoreAfter: true,
         };
       }
       return {
@@ -267,21 +292,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
             ...newMessageData[data.entity_id],
             data: normalizeMessage([
               data,
-              ...newMessageData[data.entity_id].data.map((msg) => {
-                if (
-                  msg.parent_id === data.parent_id ||
-                  msg.message_id === data.parent_id
-                ) {
-                  msg.conversation_data = data.conversation_data;
-                }
-                if (
-                  msg.message_id === data.parent_id ||
-                  msg.parent_id === data.parent_id
-                ) {
-                  msg.parent_id = data.parent_id;
-                }
-                return msg;
-              }),
+              ...newMessageData[data.entity_id].data,
             ]),
           };
         }
@@ -290,6 +301,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           data: normalizeMessage([data]),
           canMore: true,
           scrollData: { showScrollDown: false, unreadCount: 0 },
+          canMoreAfter: true,
         };
       }
       return {

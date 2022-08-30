@@ -210,6 +210,10 @@ export interface TaskData {
   due_date?: Date | string;
   isHighLight?: boolean;
   createdAt?: string;
+  total_messages?: string;
+  latest_reply_message_at?: string;
+  latest_reply_senders?: Array<string>;
+  total_reply_sender?: string;
 }
 
 export interface ConversationData {
@@ -218,7 +222,7 @@ export interface ConversationData {
   message_attachments: Array<AttachmentData>;
   message_id: string;
   message_tag: Array<TagData>;
-  parent_id: string;
+  reply_message_id: string;
   plain_text: string;
   sender_id: string;
   updatedAt: string;
@@ -229,6 +233,12 @@ export interface ConversationData {
   reaction_data: Array<ReactionData>;
   user_reaction: Array<UserReaction>;
   entity_id: string;
+  entity_type: string;
+}
+
+export interface MessageDateData {
+  type: "date";
+  value: string;
 }
 
 export interface MessageData extends ConversationData {

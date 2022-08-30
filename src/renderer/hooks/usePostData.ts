@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import api from "renderer/api";
 import { TaskData } from "renderer/models";
 import useArchivedPinPosts from "./useArchivedPinPosts";
 import useMatchPostId from "./useMatchPostId";
@@ -15,10 +16,13 @@ const usePostData = () => {
   const archivedPosts = useArchivedPinPosts();
   const fetchPost = useCallback(async () => {
     setData({ data: null, fetchingPost: true, errorPost: "" });
-    // TODO API get post by id
-    // const post = await api.getPost
-    setData({ data: posts[0], fetchingPost: false, errorPost: "" });
-  }, [posts]);
+    const postRes = await api.getPostById(postId);
+    if (postRes.success) {
+      setData({ data: postRes.data, fetchingPost: false, errorPost: "" });
+    } else {
+      setData({ data: null, fetchingPost: false, errorPost: postRes.message });
+    }
+  }, [postId]);
   useEffect(() => {
     const post =
       posts.find((el) => el.task_id === postId) ||

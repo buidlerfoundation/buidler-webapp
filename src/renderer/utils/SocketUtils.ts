@@ -710,7 +710,7 @@ class SocketUtil {
       const teamUserData = teamUserMap?.[currentTeamId]?.data || [];
       const messageData: any = store.getState()?.message.messageData;
       const channelNotification = channel.find(
-        (c: any) => c.channel_id === message_data.entity_id
+        (c) => c.channel_id === message_data.entity_id
       );
       if (currentChannel.channel_id === message_data.entity_id) {
         this.emitSeenChannel(message_data.message_id, message_data.entity_id);
@@ -753,9 +753,10 @@ class SocketUtil {
       }
       let res = message_data;
       if (
-        !channelNotification ||
-        channelNotification?.channel_type === "Private" ||
-        channelNotification?.channel_type === "Direct"
+        message_data.entity_type !== "post" &&
+        (!channelNotification ||
+          channelNotification?.channel_type === "Private" ||
+          channelNotification?.channel_type === "Direct")
       ) {
         const keys = channelPrivateKey[message_data.entity_id];
         if (keys?.length > 0) {
@@ -879,7 +880,7 @@ class SocketUtil {
     mentions?: Array<any>;
     message_id?: string;
     member_data?: Array<{ key: string; timestamp: number; user_id: string }>;
-    parent_id?: string;
+    reply_message_id?: string;
     text?: string;
     entity_type?: string;
   }) => {
@@ -888,8 +889,8 @@ class SocketUtil {
     const { userData } = user;
     const conversationData = messageData?.[message.entity_id]?.data?.find(
       (el) =>
-        el.parent_id === message.parent_id ||
-        el.message_id === message.parent_id
+        el.reply_message_id === message.reply_message_id ||
+        el.message_id === message.reply_message_id
     );
     store.dispatch({
       type: actionTypes.EMIT_NEW_MESSAGE,
@@ -898,7 +899,7 @@ class SocketUtil {
         createdAt: new Date(),
         sender_id: userData.user_id,
         isSending: true,
-        conversation_data: message.parent_id ? conversationData : null,
+        conversation_data: message.reply_message_id ? conversationData : null,
         content: message.text,
         plain_text: message.text,
       },

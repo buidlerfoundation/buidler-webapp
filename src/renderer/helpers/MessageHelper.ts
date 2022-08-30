@@ -1,4 +1,5 @@
 import moment from "moment";
+import { MessageData, MessageDateData } from "renderer/models";
 
 export const normalizeMessage = (messages: Array<any>) => {
   return messages.map((msg, index) => {
@@ -19,20 +20,24 @@ export const normalizeMessage = (messages: Array<any>) => {
   });
 };
 
-export const normalizeMessages = (messages: Array<any>) => {
-  return messages.reduce((result: Array<any>, val) => {
-    const date = moment(new Date(val.createdAt)).format("YYYY-MM-DD");
-    const index = result.findIndex((el) => el.date === date);
-    if (index >= 0) {
-      result[index].messages =
-        result[index]?.messages?.length > 0
-          ? [...result[index].messages, val]
-          : [val];
-    } else {
-      result.push({ date, messages: [val] });
-    }
-    return result;
-  }, []);
+export const normalizeMessages = (messages: Array<MessageData>) => {
+  return messages.reduce(
+    (result: Array<MessageData | MessageDateData>, val, idx) => {
+      const previousVal: any = messages?.[idx - 1];
+      const previousDate =
+        previousVal && !previousVal.type
+          ? moment(new Date(previousVal.createdAt)).format("YYYY-MM-DD")
+          : null;
+      const date = moment(new Date(val.createdAt)).format("YYYY-MM-DD");
+      if (previousDate && previousDate !== date) {
+        result.push({ type: "date", value: previousDate }, val);
+      } else {
+        result.push(val);
+      }
+      return result;
+    },
+    []
+  );
 };
 
 export const removeTagHTML = (s: string) => {

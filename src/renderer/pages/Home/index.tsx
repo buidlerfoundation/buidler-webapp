@@ -19,7 +19,7 @@ import ModalOTP from "renderer/shared/ModalOTP";
 import ModalCreateSpace from "renderer/shared/ModalCreateSpace";
 import toast from "react-hot-toast";
 import { uniqBy } from "lodash";
-import { CreateSpaceData, Space, TaskData } from "renderer/models";
+import { CreateSpaceData, MessageData, Space, TaskData } from "renderer/models";
 import ModalSpaceSetting from "renderer/shared/ModalSpaceSetting";
 import ModalSpaceDetail from "renderer/shared/ModalSpaceDetail";
 import { getSpaceBackgroundColor } from "renderer/helpers/SpaceHelper";
@@ -43,7 +43,10 @@ import {
   getTasks,
   updateTask,
 } from "renderer/actions/TaskActions";
-import { getMessages } from "renderer/actions/MessageActions";
+import {
+  getMessages,
+  getPinPostMessages,
+} from "renderer/actions/MessageActions";
 import SideBar from "../Main/Layout/SideBar";
 import ChannelView from "./container/ChannelView";
 import "./index.scss";
@@ -100,6 +103,9 @@ const Home = () => {
   const loadMoreMessage = useAppSelector((state) =>
     loadMoreMessageSelector(state)
   );
+  const loadMoreAfterMessage = useAppSelector(
+    (state) => state.message.loadMoreAfterMessage
+  );
   const loading = useAppSelector((state) => loadingSelector(state));
   const [currentUserId, setCurrentUserId] = useState("");
   const community = useAppSelector((state) => state.user.team);
@@ -125,7 +131,6 @@ const Home = () => {
   const sideBarRef = useRef<any>();
   const [selectedPost, setSelectedPost] = useState<TaskData | null>(null);
   const [openConfirmDeletePost, setOpenConfirmDeletePost] = useState(false);
-  const [replyTask, setReplyTask] = useState<any>(null);
   const [initialSpace, setInitialSpace] = useState(null);
   const [isOpenSpaceDetail, setOpenSpaceDetail] = useState(false);
   const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
@@ -290,10 +295,23 @@ const Home = () => {
     setSelectedSpace(s);
     setOpenSpaceDetail(true);
   }, []);
+  const onMoreAfterMessage = useCallback(
+    async (message: MessageData) => {
+      if (!message.createdAt) return;
+      const messageId = await dispatch(
+        getMessages(channelId, "Public", undefined, message.createdAt)
+      );
+      console.log("XXX: ", messageId);
+      if (messageId) {
+        const element = document.getElementById(messageId);
+        element?.scrollIntoView({ block: "end" });
+      }
+    },
+    [channelId, dispatch]
+  );
   const onMoreMessage = useCallback(
     (createdAt?: string) => {
       if (!createdAt) return;
-
       dispatch(getMessages(channelId, "Public", createdAt));
     },
     [channelId, dispatch]
@@ -302,14 +320,8 @@ const Home = () => {
     if (!selectedPost?.task_id) return;
     await dispatch(deleteTask(selectedPost?.task_id, channelId));
     toggleConfirmDeletePost();
-    toggleCreatePinPost();
-  }, [
-    selectedPost?.task_id,
-    dispatch,
-    channelId,
-    toggleConfirmDeletePost,
-    toggleCreatePinPost,
-  ]);
+    setOpenCreatePinPost(false);
+  }, [selectedPost?.task_id, dispatch, channelId, toggleConfirmDeletePost]);
   const handleCloseModalSpaceDetail = useCallback(() => {
     setOpenSpaceDetail(false);
     setSelectedSpace(null);
@@ -526,6 +538,11 @@ const Home = () => {
     }
   }, [match_community_id, match_channel_id]);
   useEffect(() => {
+    if (matchPostId) {
+      dispatch(getPinPostMessages(matchPostId));
+    }
+  }, [dispatch, matchPostId]);
+  useEffect(() => {
     handleCloseModalSpaceDetail();
     if (match_channel_id && !!community) {
       if (match_community_id !== "user") {
@@ -586,7 +603,7 @@ const Home = () => {
     inputRef.current?.focus();
     if (channelId && validateUUID(channelId)) {
       if (privateKey) {
-        dispatch(getMessages(channelId, "Public", undefined, true));
+        dispatch(getMessages(channelId, "Public", undefined));
       }
     }
   }, [channelId, dispatch, privateKey]);
@@ -658,6 +675,9 @@ const Home = () => {
         case "Delete":
           toggleConfirmDeletePost();
           break;
+        case "Jump to original message":
+          channelViewRef.current.onJumpToMessage?.(post.task_id);
+          break;
         default:
           break;
       }
@@ -717,12 +737,14 @@ const Home = () => {
               )}
               currentTeam={currentTeam}
               onMoreMessage={onMoreMessage}
+              onMoreAfterMessage={onMoreAfterMessage}
               loadMoreMessage={loadMoreMessage}
+              loadMoreAfterMessage={loadMoreAfterMessage}
               messageCanMore={messageData?.[channelId]?.canMore}
+              messageCanMoreAfter={messageData?.[channelId]?.canMoreAfter}
               scrollData={messageData?.[channelId]?.scrollData}
-              replyTask={replyTask}
-              setReplyTask={setReplyTask}
               teamUserData={teamUserData}
+              onEditPinPost={onEditPost}
             />
             {currentChannel.channel_type !== "Direct" && (
               <PinPostList
@@ -799,6 +821,10 @@ const Home = () => {
               onMenuSelected={onMenuPostSelected}
               postId={matchPostId}
               onEdit={onEditPost}
+              messages={uniqBy(
+                messageData[matchPostId]?.data || [],
+                "message_id"
+              )}
             />
           )}
         </div>
