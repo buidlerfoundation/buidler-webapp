@@ -302,7 +302,7 @@ const Main = () => {
           />
           <PrivateRoute
             exact
-            path="/channels/:match_community_id/:match_channel_id/:entity_type/:post_id"
+            path="/channels/:match_community_id/:match_channel_id/:entity_type/:entity_id"
             component={Home}
           />
           <PublicRoute exact path="/started" component={Started} />

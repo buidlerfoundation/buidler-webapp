@@ -44,6 +44,7 @@ import {
   updateTask,
 } from "renderer/actions/TaskActions";
 import {
+  getAroundMessage,
   getMessages,
   getPinPostMessages,
 } from "renderer/actions/MessageActions";
@@ -80,6 +81,7 @@ import PinPostDetail from "renderer/shared/PinPostDetail";
 import useMatchPostId from "renderer/hooks/useMatchPostId";
 import ModalConfirmDelete from "renderer/shared/ModalConfirmDelete";
 import { PopoverItem } from "renderer/shared/PopoverButton";
+import useMatchMessageId from "renderer/hooks/useMatchMessageId";
 
 const loadMoreMessageSelector = createLoadMoreSelector([
   actionTypes.MESSAGE_PREFIX,
@@ -116,6 +118,7 @@ const Home = () => {
   const spaceChannel = useSpaceChannel();
   const currentChannel = useCurrentChannel();
   const matchPostId = useMatchPostId();
+  const matchMessageId = useMatchMessageId();
   const currentChannelId = useMemo(
     () => currentChannel?.channel_id || currentChannel?.user?.user_id || "",
     [currentChannel?.channel_id, currentChannel?.user?.user_id]
@@ -301,7 +304,6 @@ const Home = () => {
       const messageId = await dispatch(
         getMessages(channelId, "Public", undefined, message.createdAt)
       );
-      console.log("XXX: ", messageId);
       if (messageId) {
         const element = document.getElementById(messageId);
         element?.scrollIntoView({ block: "end" });
@@ -596,17 +598,40 @@ const Home = () => {
   ]);
   useEffect(() => {
     if (channelId && validateUUID(channelId) && !!userData.user_id) {
-      dispatch(getTasks(channelId));
+      dispatch(getTasks(channelId, 1));
     }
   }, [channelId, dispatch, userData.user_id]);
+  const handleMessagesById = useCallback(async () => {
+    dispatch({
+      type: actionTypes.UPDATE_HIGHLIGHT_MESSAGE,
+      payload: matchMessageId,
+    });
+    const success = await dispatch(getAroundMessage(matchMessageId, channelId));
+    if (!!success) {
+      setTimeout(() => {
+        const element = document.getElementById(matchMessageId);
+        element?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 600);
+    }
+    setTimeout(() => {
+      dispatch({
+        type: actionTypes.UPDATE_HIGHLIGHT_MESSAGE,
+        payload: null,
+      });
+    }, 2000);
+  }, [channelId, dispatch, matchMessageId]);
   useEffect(() => {
     inputRef.current?.focus();
     if (channelId && validateUUID(channelId)) {
       if (privateKey) {
-        dispatch(getMessages(channelId, "Public", undefined));
+        if (matchMessageId) {
+          handleMessagesById();
+        } else {
+          dispatch(getMessages(channelId, "Public", undefined));
+        }
       }
     }
-  }, [channelId, dispatch, privateKey]);
+  }, [channelId, dispatch, handleMessagesById, matchMessageId, privateKey]);
 
   useEffect(() => {
     if (!!userData.user_id) {

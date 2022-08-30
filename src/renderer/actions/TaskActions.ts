@@ -35,34 +35,48 @@ export const getTaskFromUser =
     }
   };
 
-export const getTasks = (channelId: string) => async (dispatch: Dispatch) => {
-  const lastController = store.getState().task.apiController;
-  lastController?.abort?.();
-  const controller = new AbortController();
-  dispatch({
-    type: actionTypes.TASK_REQUEST,
-    payload: { channelId, controller: controller },
-  });
-  try {
-    const taskRes = await api.getTasks(channelId, controller);
-    if (taskRes.statusCode === 200) {
+export const getTasks =
+  (channelId: string, page: number) => async (dispatch: Dispatch) => {
+    const lastController = store.getState().task.apiController;
+    lastController?.abort?.();
+    const controller = new AbortController();
+    if (page > 1) {
       dispatch({
-        type: actionTypes.TASK_SUCCESS,
-        payload: {
-          channelId,
-          tasks: taskRes.data,
-        },
+        type: actionTypes.TASK_MORE,
+        payload: { channelId, controller: controller },
       });
     } else {
       dispatch({
-        type: actionTypes.TASK_FAIL,
-        payload: { message: "Error", taskRes },
+        type: actionTypes.TASK_REQUEST,
+        payload: { channelId, controller: controller },
       });
     }
-  } catch (e) {
-    dispatch({ type: actionTypes.TASK_FAIL, payload: { message: e } });
-  }
-};
+    try {
+      const taskRes = await api.getTasks(
+        channelId,
+        page,
+        undefined,
+        controller
+      );
+      if (taskRes.statusCode === 200) {
+        dispatch({
+          type: actionTypes.TASK_SUCCESS,
+          payload: {
+            channelId,
+            tasks: taskRes.data,
+            page,
+          },
+        });
+      } else {
+        dispatch({
+          type: actionTypes.TASK_FAIL,
+          payload: { message: "Error", taskRes },
+        });
+      }
+    } catch (e) {
+      dispatch({ type: actionTypes.TASK_FAIL, payload: { message: e } });
+    }
+  };
 
 export const dropTask =
   (result: any, channelId: string, upVote: number, teamId: string) =>
@@ -168,24 +182,32 @@ export const updateTask =
   };
 
 export const getArchivedTasks =
-  (channelId: string, userId?: string, teamId?: string) =>
-  async (dispatch: Dispatch) => {
-    dispatch({
-      type: actionTypes.ARCHIVED_TASK_REQUEST,
-      payload: {
-        channelId,
-        userId,
-      },
-    });
+  (channelId: string, page: number) => async (dispatch: Dispatch) => {
+    if (page > 1) {
+      dispatch({
+        type: actionTypes.ARCHIVED_TASK_MORE,
+        payload: {
+          channelId,
+          page,
+        },
+      });
+    } else {
+      dispatch({
+        type: actionTypes.ARCHIVED_TASK_REQUEST,
+        payload: {
+          channelId,
+          page,
+        },
+      });
+    }
     try {
-      const res = userId
-        ? await api.getArchivedTaskFromUser(userId, teamId)
-        : await api.getArchivedTasks(channelId);
+      const res = await api.getArchivedTasks(channelId, page);
       dispatch({
         type: actionTypes.ARCHIVED_TASK_SUCCESS,
         payload: {
           res: res.data,
           channelId,
+          page,
         },
       });
     } catch (e) {

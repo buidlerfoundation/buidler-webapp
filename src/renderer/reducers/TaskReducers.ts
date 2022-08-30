@@ -10,6 +10,10 @@ type TaskReducerState = {
       archivedCount: number;
       tasks: Array<TaskData>;
       archivedTasks: Array<TaskData>;
+      currentTaskPage: number;
+      currentArchivedTaskPage: number;
+      canMoreTask: boolean;
+      canMoreArchivedTask: boolean;
     };
   };
   apiController?: AbortController | null;
@@ -30,15 +34,19 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       return initialState;
     }
     case actionTypes.ARCHIVED_TASK_SUCCESS: {
-      const { channelId, res } = payload;
+      const { channelId, res, page } = payload;
       return {
         ...state,
         taskData: {
           ...state.taskData,
           [channelId]: {
             ...(state.taskData[channelId] || {}),
-            archivedTasks: res,
-            archivedCount: null,
+            archivedTasks:
+              page === 1
+                ? res
+                : [...(state.taskData[channelId].archivedTasks || []), ...res],
+            currentArchivedTaskPage: page,
+            canMoreArchivedTask: res.length === 10,
           },
         },
       };
@@ -50,15 +58,19 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       };
     }
     case actionTypes.TASK_SUCCESS: {
-      const { channelId, tasks, archivedCount } = payload;
+      const { channelId, tasks, page } = payload;
       return {
         ...state,
         taskData: {
           ...state.taskData,
           [channelId]: {
             ...(state.taskData[channelId] || {}),
-            tasks,
-            archivedCount,
+            tasks:
+              page === 1
+                ? tasks
+                : [...(state.taskData[channelId].tasks || []), ...tasks],
+            currentTaskPage: page,
+            canMoreTask: tasks.length === 10,
           },
         },
         apiController: null,

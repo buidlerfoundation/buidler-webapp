@@ -1,6 +1,4 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { getArchivedTasks } from "renderer/actions/TaskActions";
-import useAppDispatch from "renderer/hooks/useAppDispatch";
 import { TaskData } from "renderer/models";
 import images from "../../../../common/images";
 import PopoverButton, { PopoverItem } from "../../../../shared/PopoverButton";
@@ -47,7 +45,6 @@ const TaskListView = ({
   onReplyTask,
   directUserId,
 }: TaskListViewProps) => {
-  const dispatch = useAppDispatch();
   const [showArchived, setShowArchived] = useState(false);
   const teamUserData = useTeamUserData();
   const community = useAppSelector((state) => state.user.team || []);
@@ -66,12 +63,7 @@ const TaskListView = ({
   useEffect(() => {
     setShowArchived(false);
   }, [channelId]);
-  const toggleArchived = useCallback(() => {
-    if (archivedCount !== null && channelId) {
-      dispatch(getArchivedTasks(channelId, directUserId, teamId));
-    }
-    setShowArchived((current) => !current);
-  }, [archivedCount, channelId, directUserId, dispatch, teamId]);
+  const toggleArchived = useCallback(() => {}, []);
   const shouldArchived = useMemo(
     () => (archivedCount || 0) > 0 || (archivedTasks?.length || 0) > 0,
     [archivedCount, archivedTasks?.length]

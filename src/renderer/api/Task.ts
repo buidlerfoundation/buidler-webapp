@@ -18,11 +18,26 @@ export const updateTask = (body: any, id: string) =>
 
 export const deleteTask = (id: string) => ApiCaller.delete(`task/${id}`);
 
-export const getTasks = (channelId: string, controller?: AbortController) =>
-  Caller.get<Array<TaskData>>(`tasks/${channelId}`, undefined, controller);
+export const getTasks = (
+  channelId: string,
+  page?: number,
+  limit?: number,
+  controller?: AbortController
+) =>
+  Caller.get<Array<TaskData>>(
+    `tasks/${channelId}?page=${page || 1}&limit=${limit || 10}`,
+    undefined,
+    controller
+  );
 
-export const getArchivedTasks = (channelId: string) =>
-  ApiCaller.get(`tasks/${channelId}?archived=true`);
+export const getArchivedTasks = (
+  channelId: string,
+  page?: number,
+  limit?: number
+) =>
+  ApiCaller.get(
+    `tasks/${channelId}?archived=true&page=${page || 1}&limit=${limit || 10}`
+  );
 
 export const getArchivedTaskCount = (
   channelId: string,
