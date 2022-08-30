@@ -92,12 +92,12 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
         };
         msg = [...diff, ...msg];
       } else if (state.messageData?.[channelId]?.data) {
-        if (before || data.length === 0) {
+        if (!after && (before || data.length === 0)) {
           msg = [...currentData, ...data];
         } else if (after || data.length === 0) {
           msg = [...data, ...currentData];
           scrollData = {
-            showScrollDown: data > 0,
+            showScrollDown: data.length > 0,
           };
         }
       } else {

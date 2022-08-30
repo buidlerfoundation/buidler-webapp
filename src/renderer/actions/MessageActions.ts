@@ -201,7 +201,7 @@ export const getMessages: ActionCreator<any> =
           payload: messageRes,
         });
       }
-      return messageRes.data?.[messageRes.data.length - 1].message_id;
+      return messageRes.data?.[messageRes.data.length - 1]?.message_id;
     } catch (error) {
       dispatch({
         type: actionTypes.MESSAGE_FAIL,
