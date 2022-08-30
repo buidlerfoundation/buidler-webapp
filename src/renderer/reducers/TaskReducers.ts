@@ -44,7 +44,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
             archivedTasks:
               page === 1
                 ? res
-                : [...(state.taskData[channelId].archivedTasks || []), ...res],
+                : [...(state.taskData[channelId]?.archivedTasks || []), ...res],
             currentArchivedTaskPage: page,
             canMoreArchivedTask: res.length === 10,
           },
@@ -68,7 +68,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
             tasks:
               page === 1
                 ? tasks
-                : [...(state.taskData[channelId].tasks || []), ...tasks],
+                : [...(state.taskData[channelId]?.tasks || []), ...tasks],
             currentTaskPage: page,
             canMoreTask: tasks.length === 10,
           },
@@ -118,53 +118,19 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       };
     }
     case actionTypes.UPDATE_TASK_REQUEST: {
-      const { taskId, data, channelId, direct_channel, channelUserId } =
-        payload;
+      const { taskId, data, channelId } = payload;
       if (!state.taskData[channelId]) return state;
-      const { tasks, archivedTasks, archivedCount } = state.taskData[channelId];
+      const { tasks, archivedTasks } = state.taskData[channelId];
       let newTasks = [...(tasks || [])];
       let newArchivedTasks = [...(archivedTasks || [])];
-      let newArchivedCount = archivedCount;
       const task =
         newTasks.find((t) => t.task_id === taskId) ||
         newArchivedTasks.find((t) => t.task_id === taskId);
       const taskStatus = data?.status || task?.status;
-      const { channels } = data;
-      if (channelUserId && channelUserId === data.assignee_id) {
-        if (taskStatus === "archived") {
-          if (newArchivedCount !== null) {
-            newArchivedCount += 1;
-          } else {
-            newArchivedTasks = newArchivedTasks.filter(
-              (t) => t.task_id !== taskId
-            );
-            newArchivedTasks.push({ ...task, ...data });
-          }
-        } else {
-          newTasks = newTasks.map((t) => {
-            if (t.task_id !== taskId) return t;
-            return { ...t, ...data };
-          });
-        }
-      } else if (
-        (!direct_channel &&
-          channels != null &&
-          !channels.find((c) => c.channel_id === channelId)) ||
-        (channelUserId && channelUserId !== data.assignee_id) ||
-        (direct_channel && (data.assignee_id || data.assignee_id === null))
-      ) {
+      if (taskStatus === "archived") {
         newTasks = newTasks.filter((t) => t.task_id !== taskId);
         newArchivedTasks = newArchivedTasks.filter((t) => t.task_id !== taskId);
-      } else if (taskStatus === "archived") {
-        newTasks = newTasks.filter((t) => t.task_id !== taskId);
-        if (newArchivedCount !== null) {
-          newArchivedCount += 1;
-        } else {
-          newArchivedTasks = newArchivedTasks.filter(
-            (t) => t.task_id !== taskId
-          );
-          newArchivedTasks.push({ ...task, ...data });
-        }
+        newArchivedTasks.push({ ...task, ...data });
       } else {
         const archivedTask = newArchivedTasks.find((t) => t.task_id === taskId);
         if (archivedTask) {
@@ -189,7 +155,6 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
           ...state.taskData,
           [channelId]: {
             tasks: newTasks,
-            archivedCount: newArchivedCount,
             archivedTasks: newArchivedTasks,
           },
         },
