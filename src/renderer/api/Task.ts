@@ -25,12 +25,12 @@ export const getTasks = (
   limit?: number,
   controller?: AbortController
 ) => {
-  let uri = `tasks/${channelId}?limit=${limit || 10}`;
+  let uri = `tasks/${channelId}?page[size]=${limit || 10}`;
   if (before) {
-    uri += `&before=${before}`;
+    uri += `&page[before]=${before}`;
   }
   if (createdAt) {
-    uri += `&createdAt=${createdAt}`;
+    uri += `&page[created_at]=${createdAt}`;
   }
   return Caller.get<Array<TaskData>>(uri, undefined, controller);
 };
@@ -41,12 +41,12 @@ export const getArchivedTasks = (
   createdAt?: string,
   limit?: number
 ) => {
-  let uri = `tasks/${channelId}?archived=true&limit=${limit || 10}`;
+  let uri = `tasks/${channelId}?archived=true&page[size]=${limit || 10}`;
   if (before) {
-    uri += `&before=${before}`;
+    uri += `&page[before]=${before}`;
   }
   if (createdAt) {
-    uri += `&createdAt=${createdAt}`;
+    uri += `&page[created_at]=${createdAt}`;
   }
   return ApiCaller.get(uri);
 };

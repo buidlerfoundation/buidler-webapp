@@ -598,7 +598,7 @@ const Home = () => {
   ]);
   useEffect(() => {
     if (channelId && validateUUID(channelId) && !!userData.user_id) {
-      dispatch(getTasks(channelId, 1));
+      dispatch(getTasks(channelId));
     }
   }, [channelId, dispatch, userData.user_id]);
   const handleMessagesById = useCallback(async () => {
