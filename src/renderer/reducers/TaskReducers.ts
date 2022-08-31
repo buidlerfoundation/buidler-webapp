@@ -28,6 +28,40 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.RECEIVE_MESSAGE: {
+      const { data, currentChannelId } = payload;
+      const newTasks = state.taskData[currentChannelId]?.tasks;
+      if (!newTasks || data.entity_type !== "post") {
+        return {
+          ...state,
+        };
+      }
+      return {
+        ...state,
+        taskData: {
+          ...state.taskData,
+          [currentChannelId]: {
+            ...state.taskData[currentChannelId],
+            tasks: newTasks.map((el) => {
+              if (el.task_id === data.entity_id) {
+                return {
+                  ...el,
+                  total_messages: `${parseInt(el.total_messages || "0") + 1}`,
+                  latest_reply_senders: [
+                    data.sender_id,
+                    ...(el.latest_reply_senders?.filter(
+                      (uId) => uId !== data.sender_id
+                    ) || []),
+                  ],
+                  latest_reply_message_at: data.createdAt,
+                };
+              }
+              return el;
+            }),
+          },
+        },
+      };
+    }
     case actionTypes.LOGOUT: {
       return initialState;
     }
@@ -84,6 +118,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
         taskData: {
           ...state.taskData,
           [channelId]: {
+            ...state.taskData[channelId],
             tasks: newTasks,
             archivedTasks: newArchivedTasks,
           },
@@ -121,6 +156,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
         newTasks.find((t) => t.task_id === taskId) ||
         newArchivedTasks.find((t) => t.task_id === taskId);
       const taskStatus = data?.status || task?.status;
+      console.log("XXX: ", task, data);
       if (taskStatus === "archived") {
         newTasks = newTasks.filter((t) => t.task_id !== taskId);
         newArchivedTasks = newArchivedTasks.filter((t) => t.task_id !== taskId);

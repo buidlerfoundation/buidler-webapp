@@ -768,7 +768,7 @@ class SocketUtil {
       if (res) {
         store.dispatch({
           type: actionTypes.RECEIVE_MESSAGE,
-          payload: { data: res },
+          payload: { data: res, currentChannelId: currentChannel.channel_id },
         });
       }
     });
@@ -817,7 +817,8 @@ class SocketUtil {
         payload: {
           taskId: data.task_id,
           data,
-          channelId: data?.channels?.[0]?.channel_id,
+          channelId:
+            currentChannel.channel_id || data?.channels?.[0]?.channel_id,
         },
       });
     });

@@ -216,12 +216,10 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
             if (msg.message_id === message_id) {
               msg.content = content;
               msg.plain_text = plain_text;
-              msg.task = msg.task
-                ? {
-                    ...msg.task,
-                    ...task,
-                  }
-                : null;
+              msg.task = {
+                ...(msg.task || {}),
+                ...task,
+              };
               msg.message_attachments = message_attachments;
             }
             if (
@@ -269,8 +267,35 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
       };
     }
     case actionTypes.RECEIVE_MESSAGE: {
-      const { data } = payload;
+      const { data, currentChannelId } = payload;
       const newMessageData = state.messageData;
+      if (data.entity_type === "post") {
+        if (newMessageData[currentChannelId]?.data) {
+          newMessageData[currentChannelId] = {
+            ...newMessageData[currentChannelId],
+            data: normalizeMessage(
+              newMessageData[currentChannelId].data.map((msg) => {
+                if (msg.message_id === data.entity_id && msg.task) {
+                  msg.task = {
+                    ...msg.task,
+                    latest_reply_senders: [
+                      data.sender_id,
+                      ...(msg.task.latest_reply_senders?.filter(
+                        (el) => el !== data.sender_id
+                      ) || []),
+                    ],
+                    latest_reply_message_at: data.createdAt,
+                    total_messages: `${
+                      parseInt(msg.task.total_messages || "0") + 1
+                    }`,
+                  };
+                }
+                return msg;
+              })
+            ),
+          };
+        }
+      }
       if (newMessageData[data.entity_id]?.data) {
         const isExited = !!newMessageData[data.entity_id]?.data?.find?.(
           (el) => el.message_id === data.message_id

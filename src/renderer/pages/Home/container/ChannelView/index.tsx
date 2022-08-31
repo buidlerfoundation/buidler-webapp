@@ -22,7 +22,7 @@ import {
 import { PopoverItem } from "renderer/shared/PopoverButton";
 import { debounce } from "lodash";
 import { CircularProgress } from "@material-ui/core";
-import { createTask } from "renderer/actions/TaskActions";
+import { createTask, updateTask } from "renderer/actions/TaskActions";
 import {
   deleteMessage,
   getAroundMessage,
@@ -288,17 +288,35 @@ const ChannelView = forwardRef(
     );
     const onMenuMessage = useCallback(
       (menu: PopoverItem, msg: MessageData | ConversationData) => {
-        if (menu.value === "Delete") {
-          dispatch(
-            deleteMessage(
-              msg.message_id,
-              msg.reply_message_id,
-              currentChannel.channel_id
-            )
-          );
-          GoogleAnalytics.tracking("Message Deleted", {
-            category: "Message",
-          });
+        switch (menu.value) {
+          case "Delete":
+            dispatch(
+              deleteMessage(
+                msg.message_id,
+                msg.reply_message_id,
+                currentChannel.channel_id
+              )
+            );
+            GoogleAnalytics.tracking("Message Deleted", {
+              category: "Message",
+            });
+            break;
+          case "Archive":
+            dispatch(
+              updateTask(msg.message_id, currentChannel.channel_id, {
+                status: "archived",
+              })
+            );
+            break;
+          case "Unarchive":
+            dispatch(
+              updateTask(msg.message_id, currentChannel.channel_id, {
+                status: "pinned",
+              })
+            );
+            break;
+          default:
+            break;
         }
       },
       [currentChannel.channel_id, dispatch]
@@ -368,7 +386,7 @@ const ChannelView = forwardRef(
       };
     });
     const editMessage = useCallback(async () => {
-      const loadingAttachment = files.find((att: any) => att.loading);
+      const loadingAttachment = files?.find?.((att: any) => att.loading);
       if (loadingAttachment != null || !messageEdit?.message_id) return;
       if (extractContent(text).trim() !== "" || files.length > 0) {
         let content = text.trim();
