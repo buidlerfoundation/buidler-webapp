@@ -36,14 +36,15 @@ export const getTaskFromUser =
   };
 
 export const getTasks =
-  (channelId: string, page: number) => async (dispatch: Dispatch) => {
+  (channelId: string, before?: number, createdAt?: string) =>
+  async (dispatch: Dispatch) => {
     const lastController = store.getState().task.apiController;
     lastController?.abort?.();
     const controller = new AbortController();
-    if (page > 1) {
+    if (before && createdAt) {
       dispatch({
         type: actionTypes.TASK_MORE,
-        payload: { channelId, controller: controller },
+        payload: { channelId, before, createdAt, controller: controller },
       });
     } else {
       dispatch({
@@ -54,7 +55,8 @@ export const getTasks =
     try {
       const taskRes = await api.getTasks(
         channelId,
-        page,
+        before,
+        createdAt,
         undefined,
         controller
       );
@@ -64,7 +66,8 @@ export const getTasks =
           payload: {
             channelId,
             tasks: taskRes.data,
-            page,
+            before,
+            createdAt,
           },
         });
       } else {
@@ -182,13 +185,15 @@ export const updateTask =
   };
 
 export const getArchivedTasks =
-  (channelId: string, page: number) => async (dispatch: Dispatch) => {
-    if (page > 1) {
+  (channelId: string, before?: number, createdAt?: string) =>
+  async (dispatch: Dispatch) => {
+    if (before && createdAt) {
       dispatch({
         type: actionTypes.ARCHIVED_TASK_MORE,
         payload: {
           channelId,
-          page,
+          before,
+          createdAt,
         },
       });
     } else {
@@ -196,18 +201,18 @@ export const getArchivedTasks =
         type: actionTypes.ARCHIVED_TASK_REQUEST,
         payload: {
           channelId,
-          page,
         },
       });
     }
     try {
-      const res = await api.getArchivedTasks(channelId, page);
+      const res = await api.getArchivedTasks(channelId, before, createdAt);
       dispatch({
         type: actionTypes.ARCHIVED_TASK_SUCCESS,
         payload: {
           res: res.data,
           channelId,
-          page,
+          before,
+          createdAt,
         },
       });
     } catch (e) {

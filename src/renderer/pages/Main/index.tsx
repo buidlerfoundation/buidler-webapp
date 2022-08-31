@@ -240,7 +240,12 @@ const RedirectToHome = () => {
     gotoChannel();
   }, [gotoChannel]);
   if (isEmpty && team?.length === 0) {
-    return <EmptyTeamView />;
+    return (
+      <>
+        <AppTitleBar />
+        <EmptyTeamView />
+      </>
+    );
   }
   if (isEmpty && channel?.length === 0) {
     return <Home />;

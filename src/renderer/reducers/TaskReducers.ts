@@ -2,7 +2,7 @@ import moment from "moment";
 import { AnyAction, Reducer } from "redux";
 import { TaskData } from "renderer/models";
 import actionTypes from "../actions/ActionTypes";
-import { isFilterStatus } from "../helpers/TaskHelper";
+import { isFilterStatus, sortPinPost } from "../helpers/TaskHelper";
 
 type TaskReducerState = {
   taskData: {
@@ -10,8 +10,6 @@ type TaskReducerState = {
       archivedCount: number;
       tasks: Array<TaskData>;
       archivedTasks: Array<TaskData>;
-      currentTaskPage: number;
-      currentArchivedTaskPage: number;
       canMoreTask: boolean;
       canMoreArchivedTask: boolean;
     };
@@ -34,18 +32,16 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       return initialState;
     }
     case actionTypes.ARCHIVED_TASK_SUCCESS: {
-      const { channelId, res, page } = payload;
+      const { channelId, res, before } = payload;
       return {
         ...state,
         taskData: {
           ...state.taskData,
           [channelId]: {
             ...(state.taskData[channelId] || {}),
-            archivedTasks:
-              page === 1
-                ? res
-                : [...(state.taskData[channelId]?.archivedTasks || []), ...res],
-            currentArchivedTaskPage: page,
+            archivedTasks: !before
+              ? res
+              : [...(state.taskData[channelId]?.archivedTasks || []), ...res],
             canMoreArchivedTask: res.length === 10,
           },
         },
@@ -58,18 +54,16 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       };
     }
     case actionTypes.TASK_SUCCESS: {
-      const { channelId, tasks, page } = payload;
+      const { channelId, tasks, before } = payload;
       return {
         ...state,
         taskData: {
           ...state.taskData,
           [channelId]: {
             ...(state.taskData[channelId] || {}),
-            tasks:
-              page === 1
-                ? tasks
-                : [...(state.taskData[channelId]?.tasks || []), ...tasks],
-            currentTaskPage: page,
+            tasks: !before
+              ? tasks
+              : [...(state.taskData[channelId]?.tasks || []), ...tasks],
             canMoreTask: tasks.length === 10,
           },
         },
@@ -154,8 +148,8 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
         taskData: {
           ...state.taskData,
           [channelId]: {
-            tasks: newTasks,
-            archivedTasks: newArchivedTasks,
+            tasks: newTasks.sort(sortPinPost),
+            archivedTasks: newArchivedTasks.sort(sortPinPost),
           },
         },
       };
