@@ -216,10 +216,13 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
             if (msg.message_id === message_id) {
               msg.content = content;
               msg.plain_text = plain_text;
-              msg.task = {
-                ...(msg.task || {}),
-                ...task,
-              };
+              msg.task =
+                msg.task || task
+                  ? {
+                      ...(msg.task || {}),
+                      ...task,
+                    }
+                  : null;
               msg.message_attachments = message_attachments;
             }
             if (
