@@ -225,10 +225,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
                   : null;
               msg.message_attachments = message_attachments;
             }
-            if (
-              msg.reply_message_id === reply_message_id &&
-              msg.conversation_data
-            ) {
+            if (msg.reply_message_id === message_id && msg.conversation_data) {
               msg.conversation_data = {
                 ...msg.conversation_data,
                 content,
