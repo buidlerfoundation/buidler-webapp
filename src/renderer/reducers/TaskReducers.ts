@@ -1,8 +1,7 @@
-import moment from "moment";
 import { AnyAction, Reducer } from "redux";
 import { TaskData } from "renderer/models";
 import actionTypes from "../actions/ActionTypes";
-import { isFilterStatus, sortPinPost } from "../helpers/TaskHelper";
+import { sortPinPost } from "../helpers/TaskHelper";
 
 type TaskReducerState = {
   taskData: {
@@ -156,7 +155,6 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
         newTasks.find((t) => t.task_id === taskId) ||
         newArchivedTasks.find((t) => t.task_id === taskId);
       const taskStatus = data?.status || task?.status;
-      console.log("XXX: ", task, data);
       if (taskStatus === "archived") {
         newTasks = newTasks.filter((t) => t.task_id !== taskId);
         newArchivedTasks = newArchivedTasks.filter((t) => t.task_id !== taskId);
@@ -193,82 +191,22 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
     }
     case actionTypes.DROP_TASK: {
       const { channelId, result, upVote } = payload;
-      const { source, destination, draggableId } = result;
-      const { tasks, archivedTasks, archivedCount } = state.taskData[channelId];
-      let newTasks = tasks;
-      let newArchivedTasks = archivedTasks;
-      let newArchivedCount = archivedCount;
-      if (!isFilterStatus(destination.droppableId)) {
-        const newDate = moment(destination.droppableId).format(
-          "YYYY-MM-DD HH:mm:ss.SSSZ"
-        );
-        if (source.droppableId === "archived") {
-          const task: any = archivedTasks.find(
-            (t) => t.task_id === draggableId
-          );
-          newArchivedTasks = archivedTasks.filter(
-            (t) => t.task_id !== draggableId
-          );
-          newTasks = [
-            { ...task, status: "todo", due_date: newDate, up_votes: upVote },
-            ...tasks,
-          ];
-        } else {
-          newTasks = tasks.map((t) => {
-            if (t.task_id === draggableId) {
-              return {
-                ...t,
-                due_date: newDate,
-                up_votes: upVote,
-              };
-            }
-            return t;
-          });
-        }
-      } else {
-        const newStatus = destination.droppableId;
-        const oldStatus = source.droppableId;
-        if (newStatus === "archived") {
-          const task: any = tasks.find((t) => t.task_id === draggableId);
-          newTasks = tasks.filter((t) => t.task_id !== draggableId);
-          if (archivedTasks != null) {
-            newArchivedTasks = [
-              { ...task, status: newStatus, up_votes: upVote },
-              ...archivedTasks,
-            ];
-          } else {
-            newArchivedCount = archivedCount + 1;
-          }
-        } else if (oldStatus === "archived") {
-          const task: any = archivedTasks.find(
-            (t) => t.task_id === draggableId
-          );
-          newArchivedTasks = archivedTasks.filter(
-            (t) => t.task_id !== draggableId
-          );
-          newTasks = [
-            { ...task, status: newStatus, up_votes: upVote },
-            ...tasks,
-          ];
-        } else {
-          newTasks = tasks.map((t) => {
-            if (t.task_id === draggableId) {
-              t.status = newStatus;
-              t.up_votes = upVote;
-            }
-            return t;
-          });
-        }
-      }
+      const { draggableId } = result;
+      const { tasks } = state.taskData[channelId];
       return {
         ...state,
         taskData: {
           ...state.taskData,
           [channelId]: {
             ...(state.taskData[channelId] || {}),
-            tasks: newTasks,
-            archivedTasks: newArchivedTasks,
-            archivedCount: newArchivedCount,
+            tasks: tasks
+              .map((el) => {
+                if (el.task_id === draggableId) {
+                  el.up_votes = upVote;
+                }
+                return el;
+              })
+              .sort(sortPinPost),
           },
         },
       };

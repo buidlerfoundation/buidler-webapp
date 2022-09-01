@@ -207,30 +207,17 @@ const Home = () => {
         return;
       }
       let currentVote = task?.up_votes || 0;
-      // TODO handle dnd pin post
-      // if (destination.droppableId !== "archived") {
-      //   const taskGrouped = groupTaskByFiltered(filter.value, tasks);
-      //   if (source.droppableId === destination.droppableId) {
-      //     if (source.index !== destination.index) {
-      //       const sourceList = taskGrouped[source.droppableId];
-      //       if (source.index < destination.index) {
-      //         currentVote = sourceList[destination.index].up_votes - 1;
-      //       } else {
-      //         currentVote = sourceList[destination.index].up_votes + 1;
-      //       }
-      //     }
-      //   } else {
-      //     const destinationList = taskGrouped[destination.droppableId];
-      //     if (destinationList.length === destination.index) {
-      //       if (destinationList.length > 0) {
-      //         currentVote =
-      //           destinationList[destinationList.length - 1].up_votes - 1;
-      //       }
-      //     } else {
-      //       currentVote = destinationList[destination.index].up_votes + 1;
-      //     }
-      //   }
-      // }
+      if (destination.droppableId === "pin-post-list") {
+        if (source.droppableId === destination.droppableId) {
+          if (source.index !== destination.index) {
+            if (source.index < destination.index) {
+              currentVote = tasks[destination.index].up_votes - 1;
+            } else {
+              currentVote = tasks[destination.index].up_votes + 1;
+            }
+          }
+        }
+      }
       dispatch(
         dropTask(
           result,
