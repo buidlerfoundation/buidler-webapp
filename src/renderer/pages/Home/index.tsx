@@ -87,6 +87,10 @@ const loadMoreMessageSelector = createLoadMoreSelector([
   actionTypes.MESSAGE_PREFIX,
 ]);
 
+const loadMorePinPostMessageSelector = createLoadMoreSelector([
+  actionTypes.MESSAGE_PP_PREFIX,
+]);
+
 const loadingSelector = createLoadingSelector([
   actionTypes.CURRENT_TEAM_PREFIX,
   actionTypes.TEAM_PREFIX,
@@ -104,6 +108,9 @@ const Home = () => {
   const dispatch = useAppDispatch();
   const loadMoreMessage = useAppSelector((state) =>
     loadMoreMessageSelector(state)
+  );
+  const loadMorePPMessage = useAppSelector((state) =>
+    loadMorePinPostMessageSelector(state)
   );
   const loadMoreAfterMessage = useAppSelector(
     (state) => state.message.loadMoreAfterMessage
@@ -304,6 +311,13 @@ const Home = () => {
       dispatch(getMessages(channelId, "Public", createdAt));
     },
     [channelId, dispatch]
+  );
+  const onMorePinPostMessage = useCallback(
+    (createdAt?: string) => {
+      if (!createdAt) return;
+      dispatch(getPinPostMessages(matchPostId, createdAt));
+    },
+    [dispatch, matchPostId]
   );
   const onDeleteTask = useCallback(async () => {
     if (!selectedPost?.task_id) return;
@@ -837,6 +851,9 @@ const Home = () => {
                 messageData[matchPostId]?.data || [],
                 "message_id"
               )}
+              loadMoreMessage={loadMorePPMessage}
+              messageCanMore={messageData?.[matchPostId]?.canMore}
+              onMoreMessage={onMorePinPostMessage}
             />
           )}
         </div>
