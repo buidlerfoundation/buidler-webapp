@@ -27,6 +27,33 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.DELETE_MESSAGE: {
+      const { entityType, channelId, currentChannelId } = payload;
+      const newTasks = state.taskData[currentChannelId]?.tasks;
+      if (!newTasks || entityType !== "post") {
+        return {
+          ...state,
+        };
+      }
+      return {
+        ...state,
+        taskData: {
+          ...state.taskData,
+          [currentChannelId]: {
+            ...state.taskData[currentChannelId],
+            tasks: newTasks.map((el) => {
+              if (el.task_id === channelId) {
+                return {
+                  ...el,
+                  total_messages: `${parseInt(el.total_messages || "0") - 1}`,
+                };
+              }
+              return el;
+            }),
+          },
+        },
+      };
+    }
     case actionTypes.RECEIVE_MESSAGE: {
       const { data, currentChannelId } = payload;
       const newTasks = state.taskData[currentChannelId]?.tasks;

@@ -46,10 +46,6 @@ export const deleteMessage: ActionCreator<any> =
   (messageId: string, parentId: string, channelId: string) =>
   async (dispatch: Dispatch) => {
     api.deleteMessage(messageId);
-    dispatch({
-      type: actionTypes.DELETE_MESSAGE,
-      payload: { messageId, parentId, channelId },
-    });
   };
 
 export const getConversations: ActionCreator<any> =

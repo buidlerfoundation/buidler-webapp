@@ -166,7 +166,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
       };
     }
     case actionTypes.DELETE_MESSAGE: {
-      const { messageId, channelId, parentId } = payload;
+      const { messageId, channelId } = payload;
       const newMessageData = state.messageData;
       if (newMessageData[channelId]) {
         const currentIdx = newMessageData[channelId].data.findIndex(
@@ -178,8 +178,11 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           data: newMessageData[channelId].data
             .filter((el) => el.message_id !== messageId)
             .map((el, index) => {
-              if (el.reply_message_id === parentId) {
+              if (el.reply_message_id === messageId) {
                 el.conversation_data = undefined;
+                return {
+                  ...el,
+                };
               }
               if (currentIdx === index + 1) {
                 return {

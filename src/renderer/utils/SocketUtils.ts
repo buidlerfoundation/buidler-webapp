@@ -672,12 +672,16 @@ class SocketUtil {
       });
     });
     this.socket.on("ON_DELETE_MESSAGE", (data: any) => {
+      const currentChannel = getCurrentChannel();
+      if (!currentChannel) return;
       store.dispatch({
         type: actionTypes.DELETE_MESSAGE,
         payload: {
           messageId: data.message_id,
           channelId: data.entity_id,
           parentId: data.parent_id,
+          currentChannelId: currentChannel.channel_id,
+          entityType: data.entity_type,
         },
       });
     });
