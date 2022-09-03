@@ -46,7 +46,18 @@ export const removeTagHTML = (s: string) => {
 
 export const extractContent = (s: string) => {
   const span = document.createElement("span");
-  span.innerHTML = s.replaceAll("<br>", "\n");
+  span.innerHTML = s.replace(/<br>/gim, "\n");
+  return span.textContent || span.innerText;
+};
+
+export const extractContentMessage = (s: string) => {
+  const span = document.createElement("span");
+  span.innerHTML = s
+    .replace(
+      /(<a href="\$mention_location\/)(.*?)(" class="mention-string">)(.*?)(<\/a>)/gim,
+      `<$4-$2>`
+    )
+    .replace(/<br>/gim, "\n");
   return span.textContent || span.innerText;
 };
 
@@ -65,9 +76,13 @@ export const normalizeMessageTextPlain = (text: string) => {
     .replace(/\n$/gim, "<br />")
     .replace(
       /((https?|ftps?):\/\/[^"<\s]+)(?![^<>]*>|[^"]*?<\/a)/gim,
-      "<a onclick='event.stopPropagation();' target='_blank' href='$1'>$1</a>"
+      "<a onclick='event.stopPropagation();' target='_blank' href='$1'><span class='text-ellipsis' style='white-space: pre-line;'>$1</span></a>"
     )
-    .replace(/\$mention_location/g, `${window.location.origin}/channels/user`);
+    .replace(/\$mention_location/g, `${window.location.origin}/channels/user`)
+    .replace(
+      /(<@)(.*?)(-)(.*?)(>)/gim,
+      `<a href="${window.location.origin}/channels/user/$4" class="mention-string">@$2</a>`
+    );
   return `<div class='enable-user-select'>${res}</div>`;
 };
 
@@ -92,7 +107,11 @@ export const normalizeMessageText = (text: string, wrapParagraph?: boolean) => {
       /((https?|ftps?):\/\/[^"<\s]+)(?![^<>]*>|[^"]*?<\/a)/gim,
       "<a onclick='event.stopPropagation();' target='_blank' href='$1'>$1</a>"
     )
-    .replace(/\$mention_location/g, `${window.location.origin}/channels/user`);
+    .replace(/\$mention_location/g, `${window.location.origin}/channels/user`)
+    .replace(
+      /(<@)(.*?)(-)(.*?)(>)/gim,
+      `<a href="${window.location.origin}/channels/user/$4" class="mention-string">@$2</a>`
+    );
 
   if (wrapParagraph) {
     res = res.replace(/^([^<]*)([^<]*)$/gim, "<p>$1</p>");

@@ -41,6 +41,7 @@ import images from "../../../../common/images";
 import MessageItem from "../../../../shared/MessageItem";
 import {
   extractContent,
+  extractContentMessage,
   getMentionData,
   normalizeMessages,
 } from "../../../../helpers/MessageHelper";
@@ -363,17 +364,6 @@ const ChannelView = forwardRef(
     const onCircleClick = useCallback(() => {
       openFile();
     }, [openFile]);
-    useEffect(() => {
-      const keyDownListener = (e: any) => {
-        if (e.key === "Escape") {
-          onRemoveReply();
-        }
-      };
-      window.addEventListener("keydown", keyDownListener);
-      return () => {
-        window.removeEventListener("keydown", keyDownListener);
-      };
-    }, [onRemoveReply]);
     useImperativeHandle(ref, () => {
       return {
         onJumpToMessage,
@@ -389,7 +379,7 @@ const ChannelView = forwardRef(
       const loadingAttachment = files?.find?.((att: any) => att.loading);
       if (loadingAttachment != null || !messageEdit?.message_id) return;
       if (extractContent(text).trim() !== "" || files.length > 0) {
-        let content = text.trim();
+        let content = extractContentMessage(text.trim());
         let plain_text = extractContent(text.trim());
         if (currentChannel.channel_type === "Private") {
           const { key } =
@@ -428,7 +418,7 @@ const ChannelView = forwardRef(
       if (loadingAttachment != null) return;
       if (extractContent(text).trim() !== "" || files.length > 0) {
         const message: any = {
-          content: text.trim(),
+          content: extractContentMessage(text.trim()),
           plain_text: extractContent(text),
           mentions: getMentionData(text.trim()),
           text,
@@ -541,7 +531,9 @@ const ChannelView = forwardRef(
     );
     const onKeyDown = useCallback(
       (e: any) => {
-        if (e.code === "Enter" && !e.shiftKey) {
+        if (e.key === "Escape") {
+          onRemoveReply();
+        } else if (e.code === "Enter" && !e.shiftKey) {
           e.preventDefault();
           if (messageEdit) {
             editMessage();
@@ -550,7 +542,7 @@ const ChannelView = forwardRef(
           }
         }
       },
-      [editMessage, messageEdit, submitMessage]
+      [editMessage, messageEdit, onRemoveReply, submitMessage]
     );
 
     const onJumpToMessage = useCallback(

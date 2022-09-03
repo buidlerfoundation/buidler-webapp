@@ -324,7 +324,17 @@ const Home = () => {
     await dispatch(deleteTask(selectedPost?.task_id, channelId));
     toggleConfirmDeletePost();
     setOpenCreatePinPost(false);
-  }, [selectedPost?.task_id, dispatch, channelId, toggleConfirmDeletePost]);
+    const path = history.location.pathname;
+    if (path.includes("/post")) {
+      history.replace(path.split("/post")[0]);
+    }
+  }, [
+    selectedPost?.task_id,
+    dispatch,
+    channelId,
+    toggleConfirmDeletePost,
+    history,
+  ]);
   const handleCloseModalSpaceDetail = useCallback(() => {
     setOpenSpaceDetail(false);
     setSelectedSpace(null);
@@ -613,6 +623,8 @@ const Home = () => {
         const element = document.getElementById(matchMessageId);
         element?.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 600);
+    } else {
+      dispatch(getMessages(channelId, "Public", undefined));
     }
     setTimeout(() => {
       dispatch({
@@ -842,20 +854,18 @@ const Home = () => {
             selectedPost={selectedPost}
             onMenuPostSelected={onMenuPostSelected}
           />
-          {!!matchPostId && (
-            <PinPostDetail
-              onMenuSelected={onMenuPostSelected}
-              postId={matchPostId}
-              onEdit={onEditPost}
-              messages={uniqBy(
-                messageData[matchPostId]?.data || [],
-                "message_id"
-              )}
-              loadMoreMessage={loadMorePPMessage}
-              messageCanMore={messageData?.[matchPostId]?.canMore}
-              onMoreMessage={onMorePinPostMessage}
-            />
-          )}
+          <PinPostDetail
+            onMenuSelected={onMenuPostSelected}
+            postId={matchPostId}
+            onEdit={onEditPost}
+            messages={uniqBy(
+              messageData[matchPostId]?.data || [],
+              "message_id"
+            )}
+            loadMoreMessage={loadMorePPMessage}
+            messageCanMore={messageData?.[matchPostId]?.canMore}
+            onMoreMessage={onMorePinPostMessage}
+          />
         </div>
       </DragDropContext>
       <ModalOTP metamaskConnected={MetamaskUtils.connected} />

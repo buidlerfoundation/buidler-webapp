@@ -204,6 +204,11 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
           });
         }
       }
+      if (!data.channels.find((el) => el.channel_id === channelId)) {
+        newTasks = newTasks.filter((el) => el.task_id !== taskId);
+      } else if (!newTasks.find((el) => el.task_id === taskId)) {
+        newTasks.push(data);
+      }
       return {
         ...state,
         taskData: {

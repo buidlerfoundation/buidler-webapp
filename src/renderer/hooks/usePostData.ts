@@ -15,6 +15,7 @@ const usePostData = () => {
   const posts = usePinPosts();
   const archivedPosts = useArchivedPinPosts();
   const fetchPost = useCallback(async () => {
+    if (!postId) return;
     setData({ data: null, fetchingPost: true, errorPost: "" });
     const postRes = await api.getPostById(postId);
     if (postRes.success) {
@@ -24,6 +25,7 @@ const usePostData = () => {
     }
   }, [postId]);
   useEffect(() => {
+    if (!postId) return;
     const post =
       posts.find((el) => el.task_id === postId) ||
       archivedPosts.find((el) => el.task_id === postId);
