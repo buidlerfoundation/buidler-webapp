@@ -714,13 +714,19 @@ const Home = () => {
           toggleConfirmDeletePost();
           break;
         case "Jump to original message":
-          channelViewRef.current.onJumpToMessage?.(post.task_id);
+          const { pathname } = history.location;
+          if (pathname.includes("/message")) {
+            history.replace(pathname.split("/message")[0]);
+          }
+          history.push(
+            `/channels/${match_community_id}/${post.root_message_channel_id}/message/${post.task_id}`
+          );
           break;
         default:
           break;
       }
     },
-    [toggleConfirmDeletePost]
+    [history, match_community_id, toggleConfirmDeletePost]
   );
 
   const handleCreatePinPost = useCallback(() => {
