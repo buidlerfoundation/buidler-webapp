@@ -46,13 +46,18 @@ export const removeTagHTML = (s: string) => {
 
 export const extractContent = (s: string) => {
   const span = document.createElement("span");
-  span.innerHTML = s.replace(/<br>/gim, "\n");
+  span.innerHTML = s
+    .replace(/<div><br><\/div>/g, "<br>")
+    .replace(/<div>/g, "<br>")
+    .replace(/<br>/gim, "\n");
   return span.textContent || span.innerText;
 };
 
 export const extractContentMessage = (s: string) => {
   const span = document.createElement("span");
   span.innerHTML = s
+    .replace(/<div><br><\/div>/g, "<br>")
+    .replace(/<div>/g, "<br>")
     .replace(
       /(<a href="\$mention_location\/)(.*?)(" class="mention-string">)(.*?)(<\/a>)/gim,
       `<$4-$2>`
