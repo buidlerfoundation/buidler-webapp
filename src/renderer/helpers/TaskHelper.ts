@@ -150,8 +150,8 @@ export const getGroupTask = (filterName: string, title: any) => {
 };
 
 export const sortPinPost = (v1: TaskData, v2: TaskData) => {
-  if (v1.up_votes > v2.up_votes) return -1;
-  if (v1.up_votes < v2.up_votes) return 1;
+  // if (v1.up_votes > v2.up_votes) return -1;
+  // if (v1.up_votes < v2.up_votes) return 1;
   if ((v1.createdAt || "") > (v2.createdAt || "")) return -1;
   if ((v1.createdAt || "") < (v2.createdAt || "")) return 1;
   return 0;

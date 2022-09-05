@@ -20,15 +20,11 @@ export const deleteTask = (id: string) => ApiCaller.delete(`task/${id}`);
 
 export const getTasks = (
   channelId: string,
-  before?: number,
   createdAt?: string,
   limit?: number,
   controller?: AbortController
 ) => {
   let uri = `tasks/${channelId}?page[size]=${limit || 10}`;
-  if (before) {
-    uri += `&page[before]=${before}`;
-  }
   if (createdAt) {
     uri += `&page[created_at]=${createdAt}`;
   }
@@ -37,14 +33,10 @@ export const getTasks = (
 
 export const getArchivedTasks = (
   channelId: string,
-  before?: number,
   createdAt?: string,
   limit?: number
 ) => {
   let uri = `tasks/${channelId}?archived=true&page[size]=${limit || 10}`;
-  if (before) {
-    uri += `&page[before]=${before}`;
-  }
   if (createdAt) {
     uri += `&page[created_at]=${createdAt}`;
   }

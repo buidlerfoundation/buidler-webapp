@@ -55,15 +55,14 @@ export const getTaskFromUser =
   };
 
 export const getTasks =
-  (channelId: string, before?: number, createdAt?: string) =>
-  async (dispatch: Dispatch) => {
+  (channelId: string, createdAt?: string) => async (dispatch: Dispatch) => {
     const lastController = store.getState().task.apiController;
     lastController?.abort?.();
     const controller = new AbortController();
-    if (before && createdAt) {
+    if (createdAt) {
       dispatch({
         type: actionTypes.TASK_MORE,
-        payload: { channelId, before, createdAt, controller: controller },
+        payload: { channelId, createdAt, controller: controller },
       });
     } else {
       dispatch({
@@ -74,7 +73,6 @@ export const getTasks =
     try {
       const taskRes = await api.getTasks(
         channelId,
-        before,
         createdAt,
         undefined,
         controller
@@ -85,7 +83,6 @@ export const getTasks =
           payload: {
             channelId,
             tasks: taskRes.data,
-            before,
             createdAt,
           },
         });
@@ -178,14 +175,12 @@ export const updateTask =
   };
 
 export const getArchivedTasks =
-  (channelId: string, before?: number, createdAt?: string) =>
-  async (dispatch: Dispatch) => {
-    if (before && createdAt) {
+  (channelId: string, createdAt?: string) => async (dispatch: Dispatch) => {
+    if (createdAt) {
       dispatch({
         type: actionTypes.ARCHIVED_TASK_MORE,
         payload: {
           channelId,
-          before,
           createdAt,
         },
       });
@@ -198,13 +193,12 @@ export const getArchivedTasks =
       });
     }
     try {
-      const res = await api.getArchivedTasks(channelId, before, createdAt);
+      const res = await api.getArchivedTasks(channelId, createdAt);
       dispatch({
         type: actionTypes.ARCHIVED_TASK_SUCCESS,
         payload: {
           res: res.data,
           channelId,
-          before,
           createdAt,
         },
       });

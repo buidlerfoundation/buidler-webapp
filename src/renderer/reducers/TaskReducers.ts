@@ -100,14 +100,14 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       return initialState;
     }
     case actionTypes.ARCHIVED_TASK_SUCCESS: {
-      const { channelId, res, before } = payload;
+      const { channelId, res, createdAt } = payload;
       return {
         ...state,
         taskData: {
           ...state.taskData,
           [channelId]: {
             ...(state.taskData[channelId] || {}),
-            archivedTasks: !before
+            archivedTasks: !createdAt
               ? res
               : [...(state.taskData[channelId]?.archivedTasks || []), ...res],
             canMoreArchivedTask: res.length === 10,
@@ -122,14 +122,14 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       };
     }
     case actionTypes.TASK_SUCCESS: {
-      const { channelId, tasks, before } = payload;
+      const { channelId, tasks, createdAt } = payload;
       return {
         ...state,
         taskData: {
           ...state.taskData,
           [channelId]: {
             ...(state.taskData[channelId] || {}),
-            tasks: !before
+            tasks: !createdAt
               ? tasks
               : [...(state.taskData[channelId]?.tasks || []), ...tasks],
             canMoreTask: tasks.length === 10,
