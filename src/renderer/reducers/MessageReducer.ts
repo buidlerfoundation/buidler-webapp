@@ -166,8 +166,46 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
       };
     }
     case actionTypes.DELETE_MESSAGE: {
-      const { messageId, channelId } = payload;
+      const { messageId, channelId, currentChannelId } = payload;
       const newMessageData = state.messageData;
+      if (currentChannelId !== channelId && newMessageData[currentChannelId]) {
+        const currentIdx = newMessageData[currentChannelId].data.findIndex(
+          (el) => el.message_id === messageId
+        );
+        const currentMsg = newMessageData[currentChannelId].data?.[currentIdx];
+        newMessageData[currentChannelId] = {
+          ...newMessageData[currentChannelId],
+          data: newMessageData[currentChannelId].data
+            .filter((el) => el.message_id !== messageId)
+            .map((el, index) => {
+              if (el.reply_message_id === messageId) {
+                el.conversation_data = undefined;
+                return {
+                  ...el,
+                };
+              }
+              if (el.message_id === channelId && el.task) {
+                el.task = {
+                  ...el.task,
+                  total_messages: `${
+                    parseInt(el.task.total_messages || "0") - 1
+                  }`,
+                };
+                return {
+                  ...el,
+                };
+              }
+              if (currentIdx === index + 1) {
+                return {
+                  ...el,
+                  isHead: currentMsg?.isHead,
+                  isConversationHead: currentMsg?.isConversationHead,
+                };
+              }
+              return el;
+            }),
+        };
+      }
       if (newMessageData[channelId]) {
         const currentIdx = newMessageData[channelId].data.findIndex(
           (el) => el.message_id === messageId
@@ -207,7 +245,6 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
         message_id,
         content,
         task,
-        reply_message_id,
         message_attachments,
         plain_text,
       } = data;

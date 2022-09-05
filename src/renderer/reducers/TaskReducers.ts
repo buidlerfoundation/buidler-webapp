@@ -37,10 +37,19 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
     }
     case actionTypes.DELETE_MESSAGE: {
       const { entityType, channelId, currentChannelId } = payload;
+      let pinPostDetail = state.pinPostDetail;
       const newTasks = state.taskData[currentChannelId]?.tasks;
       if (!newTasks || entityType !== "post") {
         return {
           ...state,
+        };
+      }
+      if (pinPostDetail && pinPostDetail?.task_id === channelId) {
+        pinPostDetail = {
+          ...pinPostDetail,
+          total_messages: `${
+            parseInt(pinPostDetail.total_messages || "0") - 1
+          }`,
         };
       }
       return {
@@ -60,14 +69,31 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
             }),
           },
         },
+        pinPostDetail,
       };
     }
     case actionTypes.RECEIVE_MESSAGE: {
       const { data, currentChannelId } = payload;
       const newTasks = state.taskData[currentChannelId]?.tasks;
+      let pinPostDetail = state.pinPostDetail;
       if (!newTasks || data.entity_type !== "post") {
         return {
           ...state,
+        };
+      }
+      if (pinPostDetail && pinPostDetail?.task_id === data.entity_id) {
+        pinPostDetail = {
+          ...pinPostDetail,
+          total_messages: `${
+            parseInt(pinPostDetail.total_messages || "0") + 1
+          }`,
+          latest_reply_senders: [
+            data.sender_id,
+            ...(pinPostDetail.latest_reply_senders?.filter(
+              (uId) => uId !== data.sender_id
+            ) || []),
+          ],
+          latest_reply_message_at: data.createdAt,
         };
       }
       return {
@@ -94,6 +120,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
             }),
           },
         },
+        pinPostDetail,
       };
     }
     case actionTypes.LOGOUT: {
