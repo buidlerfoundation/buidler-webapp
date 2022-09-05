@@ -1,7 +1,6 @@
 import React, {
   useState,
   useRef,
-  useEffect,
   forwardRef,
   useImperativeHandle,
   useCallback,
@@ -109,12 +108,8 @@ const ChannelView = forwardRef(
     const channelPrivateKey = useAppSelector(
       (state) => state.configs.channelPrivateKey
     );
-    const [messageReply, setMessageReply] = useState<
-      MessageData | ConversationData | null
-    >(null);
-    const [messageEdit, setMessageEdit] = useState<
-      MessageData | ConversationData | null
-    >(null);
+    const [messageReply, setMessageReply] = useState<MessageData | null>(null);
+    const [messageEdit, setMessageEdit] = useState<MessageData | null>(null);
     const [isScrolling, setScrolling] = useState(false);
     const [files, setFiles] = useState<Array<LocalAttachment>>([]);
     const timeoutScrollRef = useRef<any>(null);
