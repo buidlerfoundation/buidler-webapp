@@ -1,10 +1,29 @@
 import { Dispatch } from "redux";
 import api from "../api";
-import { isFilterStatus } from "../helpers/TaskHelper";
 import actionTypes from "./ActionTypes";
-import moment from "moment";
 import store from "../store";
 import toast from "react-hot-toast";
+
+export const getPinPostDetail =
+  (postId: string) => async (dispatch: Dispatch) => {
+    dispatch({ type: actionTypes.PP_DETAIL_REQUEST, payload: { postId } });
+    try {
+      const postRes = await api.getPostById(postId);
+      if (postRes.success) {
+        dispatch({ type: actionTypes.PP_DETAIL_SUCCESS, payload: postRes });
+      } else {
+        dispatch({ type: actionTypes.PP_DETAIL_FAIL, payload: postRes });
+      }
+      return postRes;
+    } catch (error: any) {
+      const postRes = { success: false, message: error };
+      dispatch({
+        type: actionTypes.PP_DETAIL_FAIL,
+        payload: postRes,
+      });
+      return postRes;
+    }
+  };
 
 export const getTaskFromUser =
   (userId: string, channelId: string, teamId: string) =>

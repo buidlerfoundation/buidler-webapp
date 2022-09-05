@@ -14,11 +14,13 @@ type TaskReducerState = {
     };
   };
   apiController?: AbortController | null;
+  pinPostDetail?: TaskData | null;
 };
 
 const initialState: TaskReducerState = {
   taskData: {},
   apiController: null,
+  pinPostDetail: null,
 };
 
 const taskReducers: Reducer<TaskReducerState, AnyAction> = (
@@ -27,6 +29,12 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.PP_DETAIL_SUCCESS: {
+      return {
+        ...state,
+        pinPostDetail: payload.data,
+      };
+    }
     case actionTypes.DELETE_MESSAGE: {
       const { entityType, channelId, currentChannelId } = payload;
       const newTasks = state.taskData[currentChannelId]?.tasks;
@@ -181,6 +189,17 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       const task =
         newTasks.find((t) => t.task_id === taskId) ||
         newArchivedTasks.find((t) => t.task_id === taskId);
+      if (data.task_id === state.pinPostDetail?.task_id) {
+        state.pinPostDetail = {
+          ...state.pinPostDetail,
+          ...data,
+        };
+      }
+      if (!task?.channels?.find((el) => el.channel_id === channelId)) {
+        return {
+          ...state,
+        };
+      }
       const taskStatus = data?.status || task?.status;
       if (taskStatus === "archived") {
         newTasks = newTasks.filter((t) => t.task_id !== taskId);
@@ -203,11 +222,11 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
             return { ...t, ...data };
           });
         }
-      }
-      if (!data.channels.find((el) => el.channel_id === channelId)) {
-        newTasks = newTasks.filter((el) => el.task_id !== taskId);
-      } else if (!newTasks.find((el) => el.task_id === taskId)) {
-        newTasks.push(data);
+        if (!data.channels.find((el) => el.channel_id === channelId)) {
+          newTasks = newTasks.filter((el) => el.task_id !== taskId);
+        } else if (!newTasks.find((el) => el.task_id === taskId)) {
+          newTasks.push(data);
+        }
       }
       return {
         ...state,
