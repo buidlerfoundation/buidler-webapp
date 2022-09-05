@@ -25,7 +25,7 @@ const usePostData = () => {
     }
   }, [postId]);
   useEffect(() => {
-    if (!postId) return;
+    if (!postId || postId === data.data?.task_id) return;
     const post =
       posts.find((el) => el.task_id === postId) ||
       archivedPosts.find((el) => el.task_id === postId);
@@ -34,7 +34,7 @@ const usePostData = () => {
     } else {
       fetchPost();
     }
-  }, [fetchPost, postId, posts, archivedPosts]);
+  }, [fetchPost, postId, posts, archivedPosts, data.data?.task_id]);
   return useMemo(() => data, [data]);
 };
 
