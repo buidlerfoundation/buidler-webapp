@@ -26,7 +26,7 @@ export const getTasks = (
 ) => {
   let uri = `tasks/${channelId}?page[size]=${limit || 10}`;
   if (createdAt) {
-    uri += `&page[created_at]=${createdAt}`;
+    uri += `&page[before]=${createdAt}`;
   }
   return Caller.get<Array<TaskData>>(uri, undefined, controller);
 };
@@ -38,7 +38,7 @@ export const getArchivedTasks = (
 ) => {
   let uri = `tasks/${channelId}?archived=true&page[size]=${limit || 10}`;
   if (createdAt) {
-    uri += `&page[created_at]=${createdAt}`;
+    uri += `&page[before]=${createdAt}`;
   }
   return ApiCaller.get(uri);
 };
