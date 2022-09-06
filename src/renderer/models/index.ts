@@ -4,6 +4,10 @@ export type LocalAttachment = {
   file?: any;
   loading?: boolean;
   type?: string;
+  fileName?: string;
+  id?: string;
+  randomId?: string;
+  url?: string;
 };
 
 export type SpaceType = "Public" | "Exclusive";
@@ -190,44 +194,57 @@ export interface ReactionData {
 }
 
 export interface TaskData {
-  channel?: Array<Channel>;
+  channels?: Array<Channel>;
   comment_count: number;
   creator: UserData;
   creator_id: string;
-  notes: string;
   reaction_data: Array<ReactionData>;
   status: "pinned" | "todo" | "doing" | "done" | "archived";
-  task_attachment: Array<AttachmentData>;
+  task_attachments?: Array<AttachmentData>;
   task_id: string;
-  task_tag: Array<TagData>;
-  title: string;
+  task_tags: Array<TagData>;
+  content: string;
   up_votes: number;
   user_reaction: Array<UserReaction>;
   assignee?: UserData;
   due_date?: Date | string;
   isHighLight?: boolean;
+  createdAt?: string;
+  total_messages?: string;
+  latest_reply_message_at?: string;
+  latest_reply_senders?: Array<string>;
+  total_reply_sender?: string;
+  root_message_channel_id: string;
+  message_created_at: string;
 }
 
 export interface ConversationData {
   content: string;
   createdAt: string;
-  message_attachment: Array<AttachmentData>;
+  message_attachments: Array<AttachmentData>;
   message_id: string;
   message_tag: Array<TagData>;
-  parent_id: string;
+  reply_message_id: string;
   plain_text: string;
   sender_id: string;
   updatedAt: string;
-  task: TaskData;
+  task?: TaskData;
   isHead: boolean;
   isSending?: boolean;
-  isConversationHead: boolean;
+  isConversationHead?: boolean;
   reaction_data: Array<ReactionData>;
   user_reaction: Array<UserReaction>;
+  entity_id: string;
+  entity_type: string;
+}
+
+export interface MessageDateData {
+  type: "date";
+  value: string;
 }
 
 export interface MessageData extends ConversationData {
-  conversation_data: Array<ConversationData>;
+  conversation_data?: ConversationData;
 }
 
 export interface ReactUserApiData {
@@ -390,4 +407,11 @@ export type UserRoleType = "owner" | "admin" | "member";
 export type AssetTypeItem = {
   label: string;
   id: string;
+};
+
+export type PinPostData = {
+  content: string;
+  attachments?: Array<LocalAttachment>;
+  channels?: Array<Channel>;
+  id?: string;
 };

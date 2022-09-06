@@ -119,16 +119,18 @@ export const findTeamAndChannel =
           communities.find((t: Community) => t.team_id === lastTeamId) ||
           communities[0];
         const teamId = currentTeam.team_id;
-        const resSpace = await api.getSpaceChannel(teamId);
-        const resChannel = await api.findChannel(teamId);
         const lastChannelId = await getCookie(AsyncKey.lastChannelId);
-        const teamUsersRes = await api.getTeamUsers(currentTeam.team_id);
+        const [resSpace, resChannel, teamUsersRes] = await Promise.all([
+          api.getSpaceChannel(teamId),
+          api.findChannel(teamId),
+          api.getTeamUsers(teamId),
+        ]);
         if (teamUsersRes.statusCode === 200) {
           dispatch({
             type: ActionTypes.GET_TEAM_USER,
             payload: {
               teamUsers: teamUsersRes,
-              teamId: currentTeam.team_id,
+              teamId,
             },
           });
         }

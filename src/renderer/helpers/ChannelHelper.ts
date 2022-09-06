@@ -129,8 +129,13 @@ export const normalizePublicMessageItem = (item: any, key: string) => {
   const plain_text = item.plain_text
     ? decrypt(key, Buffer.from(item.plain_text, "hex")).toString()
     : "";
-  if (item?.conversation_data?.length > 0) {
-    item.conversation_data = normalizePublicMessageData(item.conversation_data);
+  if (item?.conversation_data) {
+    const configs: any = store.getState()?.configs;
+    const { privateKey } = configs;
+    item.conversation_data = normalizePublicMessageItem(
+      item.conversation_data,
+      privateKey
+    );
   }
   return {
     ...item,
@@ -149,18 +154,6 @@ export const normalizeMessageItem = async (
   if ((!content || !plain_text) && !!item.content && !!item.plain_text) {
     console.log("Encrypt Failed: ", content, plain_text, item, key, channelId);
   }
-  if (item?.conversation_data?.length > 0) {
-    if (channelId) {
-      item.conversation_data = await normalizeMessageData(
-        item.conversation_data,
-        channelId
-      );
-    } else {
-      item.conversation_data = normalizePublicMessageData(
-        item.conversation_data
-      );
-    }
-  }
   return {
     ...item,
     content,
@@ -173,7 +166,7 @@ export const normalizePublicMessageData = (messages: Array<any>) => {
   const { privateKey } = configs;
   const res =
     messages?.map?.((el) => normalizePublicMessageItem(el, privateKey)) || [];
-  return res.filter((el) => !!el.content || el?.message_attachment?.length > 0);
+  return res.filter((el) => !!el.content || el?.message_attachments?.length > 0);
 };
 
 export const normalizeMessageData = async (
@@ -193,7 +186,7 @@ export const normalizeMessageData = async (
       )
     ) || [];
   const res = await Promise.all(req);
-  return res.filter((el) => !!el.content || el?.message_attachment?.length > 0);
+  return res.filter((el) => !!el.content || el?.message_attachments?.length > 0);
 };
 
 const findKey = (keys: Array<any>, created: number) => {

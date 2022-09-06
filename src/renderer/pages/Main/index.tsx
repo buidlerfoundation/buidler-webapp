@@ -240,7 +240,12 @@ const RedirectToHome = () => {
     gotoChannel();
   }, [gotoChannel]);
   if (isEmpty && team?.length === 0) {
-    return <EmptyTeamView />;
+    return (
+      <>
+        <AppTitleBar />
+        <EmptyTeamView />
+      </>
+    );
   }
   if (isEmpty && channel?.length === 0) {
     return <Home />;
@@ -298,6 +303,11 @@ const Main = () => {
           <PrivateRoute
             exact
             path="/channels/:match_community_id/:match_channel_id"
+            component={Home}
+          />
+          <PrivateRoute
+            exact
+            path="/channels/:match_community_id/:match_channel_id/:entity_type/:entity_id"
             component={Home}
           />
           <PublicRoute exact path="/started" component={Started} />

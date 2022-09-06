@@ -20,7 +20,7 @@ const reactReducers: Reducer<ReactReducerState, AnyAction> = (
       const { tasks } = payload;
       const currentReact = {};
       tasks?.map?.((task) => {
-        if (task.reaction_data.length > 0) {
+        if (task.reaction_data?.length > 0) {
           currentReact[task.task_id] = task.reaction_data.map((react) => ({
             reactName: react.emoji_id,
             count: parseInt(react.reaction_count),
@@ -43,7 +43,7 @@ const reactReducers: Reducer<ReactReducerState, AnyAction> = (
       const { data } = payload;
       const currentReact = {};
       data.map((dt) => {
-        if (dt.reaction_data.length > 0) {
+        if (dt.reaction_data?.length > 0) {
           currentReact[dt.message_id] = dt.reaction_data.map((react) => ({
             reactName: react.emoji_id,
             count: parseInt(react.reaction_count),

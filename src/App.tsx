@@ -101,7 +101,11 @@ function App() {
     const eventClick = (e: any) => {
       const href = e?.target?.href;
       if (href?.includes("channels/user")) {
-        history.replace(`/channels/user/${href.split("/channels/user/")[1]}`);
+        const { pathname } = history.location;
+        if (pathname.includes("/message")) {
+          history.replace(pathname.split("/message")[0]);
+        }
+        history.push(`/channels/user/${href.split("/channels/user/")[1]}`);
         e.preventDefault();
       }
     };

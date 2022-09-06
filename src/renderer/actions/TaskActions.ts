@@ -1,10 +1,29 @@
 import { Dispatch } from "redux";
 import api from "../api";
-import { isFilterStatus } from "../helpers/TaskHelper";
 import actionTypes from "./ActionTypes";
-import moment from "moment";
 import store from "../store";
 import toast from "react-hot-toast";
+
+export const getPinPostDetail =
+  (postId: string) => async (dispatch: Dispatch) => {
+    dispatch({ type: actionTypes.PP_DETAIL_REQUEST, payload: { postId } });
+    try {
+      const postRes = await api.getPostById(postId);
+      if (postRes.success) {
+        dispatch({ type: actionTypes.PP_DETAIL_SUCCESS, payload: postRes });
+      } else {
+        dispatch({ type: actionTypes.PP_DETAIL_FAIL, payload: postRes });
+      }
+      return postRes;
+    } catch (error: any) {
+      const postRes = { success: false, message: error };
+      dispatch({
+        type: actionTypes.PP_DETAIL_FAIL,
+        payload: postRes,
+      });
+      return postRes;
+    }
+  };
 
 export const getTaskFromUser =
   (userId: string, channelId: string, teamId: string) =>
@@ -35,38 +54,48 @@ export const getTaskFromUser =
     }
   };
 
-export const getTasks = (channelId: string) => async (dispatch: Dispatch) => {
-  const lastController = store.getState().task.apiController;
-  lastController?.abort?.();
-  const controller = new AbortController();
-  dispatch({
-    type: actionTypes.TASK_REQUEST,
-    payload: { channelId, controller: controller },
-  });
-  try {
-    const [taskRes, archivedCountRes] = await Promise.all([
-      api.getTasks(channelId, controller),
-      api.getArchivedTaskCount(channelId, controller),
-    ]);
-    if (taskRes.statusCode === 200 && archivedCountRes.statusCode === 200) {
+export const getTasks =
+  (channelId: string, createdAt?: string) => async (dispatch: Dispatch) => {
+    const lastController = store.getState().task.apiController;
+    lastController?.abort?.();
+    const controller = new AbortController();
+    if (createdAt) {
       dispatch({
-        type: actionTypes.TASK_SUCCESS,
-        payload: {
-          channelId,
-          tasks: taskRes.data,
-          archivedCount: archivedCountRes.data?.total,
-        },
+        type: actionTypes.TASK_MORE,
+        payload: { channelId, createdAt, controller: controller },
       });
     } else {
       dispatch({
-        type: actionTypes.TASK_FAIL,
-        payload: { message: "Error", taskRes, archivedCountRes },
+        type: actionTypes.TASK_REQUEST,
+        payload: { channelId, controller: controller },
       });
     }
-  } catch (e) {
-    dispatch({ type: actionTypes.TASK_FAIL, payload: { message: e } });
-  }
-};
+    try {
+      const taskRes = await api.getTasks(
+        channelId,
+        createdAt,
+        undefined,
+        controller
+      );
+      if (taskRes.statusCode === 200) {
+        dispatch({
+          type: actionTypes.TASK_SUCCESS,
+          payload: {
+            channelId,
+            tasks: taskRes.data,
+            createdAt,
+          },
+        });
+      } else {
+        dispatch({
+          type: actionTypes.TASK_FAIL,
+          payload: { message: "Error", taskRes },
+        });
+      }
+    } catch (e) {
+      dispatch({ type: actionTypes.TASK_FAIL, payload: { message: e } });
+    }
+  };
 
 export const dropTask =
   (result: any, channelId: string, upVote: number, teamId: string) =>
@@ -79,32 +108,6 @@ export const dropTask =
     if (!destination) return;
     if (source.droppableId === destination.droppableId) {
       api.updateTask({ up_votes: upVote, team_id: teamId }, draggableId);
-    } else if (!isFilterStatus(destination.droppableId)) {
-      const newDate = moment(destination.droppableId).format(
-        "YYYY-MM-DD HH:mm:ss.SSSZ"
-      );
-      if (source.droppableId === "archived") {
-        api.updateTask(
-          {
-            due_date: newDate,
-            up_votes: upVote,
-            status: "todo",
-            team_id: teamId,
-          },
-          draggableId
-        );
-      } else {
-        api.updateTask(
-          { due_date: newDate, up_votes: upVote, team_id: teamId },
-          draggableId
-        );
-      }
-    } else {
-      const newStatus = destination.droppableId;
-      api.updateTask(
-        { status: newStatus, up_votes: upVote, team_id: teamId },
-        draggableId
-      );
     }
   };
 
@@ -141,38 +144,24 @@ export const createTask =
       if (res.statusCode === 200) {
         toast.success("Created!");
       }
+      return res.statusCode === 200;
     } catch (e) {
       dispatch({
         type: actionTypes.CREATE_TASK_FAIL,
         payload: { message: e },
       });
+      return false;
     }
   };
 
 export const updateTask =
   (taskId: string, channelId: string, data: any) =>
   async (dispatch: Dispatch) => {
-    const user: any = store.getState()?.user;
-    const { currentChannel } = user || {};
     try {
-      if (data.channel) {
-        data.channel_ids = data.channel.map((c: any) => c.channel_id);
+      if (data.channels) {
+        data.channel_ids = data.channels.map((c: any) => c.channel_id);
       }
-      const res = await api.updateTask(
-        { ...data, assignee: null, channel: null, task_attachment: null },
-        taskId
-      );
-      if (res.statusCode === 200) {
-        dispatch({
-          type: actionTypes.UPDATE_TASK_REQUEST,
-          payload: {
-            taskId,
-            data,
-            channelId,
-            direct_channel: currentChannel?.user?.direct_channel,
-          },
-        });
-      }
+      const res = await api.updateTask(data, taskId);
       return res.statusCode === 200;
     } catch (e) {
       dispatch({
@@ -186,24 +175,31 @@ export const updateTask =
   };
 
 export const getArchivedTasks =
-  (channelId: string, userId?: string, teamId?: string) =>
-  async (dispatch: Dispatch) => {
-    dispatch({
-      type: actionTypes.ARCHIVED_TASK_REQUEST,
-      payload: {
-        channelId,
-        userId,
-      },
-    });
+  (channelId: string, createdAt?: string) => async (dispatch: Dispatch) => {
+    if (createdAt) {
+      dispatch({
+        type: actionTypes.ARCHIVED_TASK_MORE,
+        payload: {
+          channelId,
+          createdAt,
+        },
+      });
+    } else {
+      dispatch({
+        type: actionTypes.ARCHIVED_TASK_REQUEST,
+        payload: {
+          channelId,
+        },
+      });
+    }
     try {
-      const res = userId
-        ? await api.getArchivedTaskFromUser(userId, teamId)
-        : await api.getArchivedTasks(channelId);
+      const res = await api.getArchivedTasks(channelId, createdAt);
       dispatch({
         type: actionTypes.ARCHIVED_TASK_SUCCESS,
         payload: {
           res: res.data,
           channelId,
+          createdAt,
         },
       });
     } catch (e) {

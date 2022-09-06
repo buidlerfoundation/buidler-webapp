@@ -1,7 +1,6 @@
 import React, {
   useState,
   useRef,
-  useEffect,
   forwardRef,
   useImperativeHandle,
   useCallback,
@@ -10,20 +9,23 @@ import React, {
 } from "react";
 import Dropzone from "react-dropzone";
 import {
-  AttachmentData,
   Channel,
   Community,
   ConversationData,
+  LocalAttachment,
   MessageData,
-  MessageGroup,
+  MessageDateData,
+  TaskData,
   UserData,
 } from "renderer/models";
 import { PopoverItem } from "renderer/shared/PopoverButton";
 import { debounce } from "lodash";
 import { CircularProgress } from "@material-ui/core";
-import { createTask } from "renderer/actions/TaskActions";
+import { createTask, updateTask } from "renderer/actions/TaskActions";
 import {
   deleteMessage,
+  getAroundMessage,
+  getMessages,
   onRemoveAttachment,
   setScrollData,
 } from "renderer/actions/MessageActions";
@@ -38,6 +40,7 @@ import images from "../../../../common/images";
 import MessageItem from "../../../../shared/MessageItem";
 import {
   extractContent,
+  extractContentMessage,
   getMentionData,
   normalizeMessages,
 } from "../../../../helpers/MessageHelper";
@@ -46,7 +49,6 @@ import "./index.scss";
 import { getUniqueId } from "../../../../helpers/GenerateUUID";
 import api from "../../../../api";
 import MessageInput from "../../../../shared/MessageInput";
-import MessageReplyItem from "../../../../shared/MessageReplyItem";
 import ChannelHeader from "./ChannelHeader";
 import DirectDescription from "./DirectDescription";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
@@ -54,23 +56,22 @@ import { useLocation } from "react-router-dom";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import useMatchCommunityId from "renderer/hooks/useMatchCommunityId";
 import useTotalTeamUserData from "renderer/hooks/useTotalMemberUser";
+import actionTypes from "renderer/actions/ActionTypes";
 
 type ChannelViewProps = {
   currentChannel: Channel;
   messages: Array<MessageData>;
   inputRef: any;
   currentTeam: Community;
-  openConversation: (message: MessageData) => void;
   onMoreMessage: (lastCreatedAt: string) => void;
+  onMoreAfterMessage: (message: MessageData) => void;
   loadMoreMessage: boolean;
+  loadMoreAfterMessage?: boolean;
   messageCanMore: boolean;
+  messageCanMoreAfter: boolean;
   scrollData?: any;
-  replyTask?: any;
-  setReplyTask: (task?: any) => void;
-  openTaskView: boolean;
-  isOpenConversation: boolean;
-  onSelectTask: (task: any) => void;
   teamUserData: Array<UserData>;
+  onEditPinPost?: (data: TaskData) => void;
 };
 
 const ChannelView = forwardRef(
@@ -80,17 +81,15 @@ const ChannelView = forwardRef(
       messages,
       inputRef,
       currentTeam,
-      openConversation,
       onMoreMessage,
+      onMoreAfterMessage,
       loadMoreMessage,
+      loadMoreAfterMessage,
       messageCanMore,
+      messageCanMoreAfter,
       scrollData,
-      replyTask,
-      setReplyTask,
-      openTaskView,
-      onSelectTask,
       teamUserData,
-      isOpenConversation,
+      onEditPinPost,
     }: ChannelViewProps,
     ref
   ) => {
@@ -99,21 +98,20 @@ const ChannelView = forwardRef(
     const totalTeamUser = useTotalTeamUserData();
     const communityId = useMatchCommunityId();
     const reactData = useAppSelector((state) => state.reactReducer.reactData);
-    const messagesGroup = useMemo<Array<MessageGroup>>(() => {
+    const messageHighLightId = useAppSelector(
+      (state) => state.message.highlightMessageId
+    );
+    const messagesGroup = useMemo<Array<MessageData | MessageDateData>>(() => {
       return normalizeMessages(messages);
     }, [messages]);
     const userData = useAppSelector((state) => state.user.userData);
     const channelPrivateKey = useAppSelector(
       (state) => state.configs.channelPrivateKey
     );
-    const [messageReply, setMessageReply] = useState<
-      MessageData | ConversationData | null
-    >(null);
-    const [messageEdit, setMessageEdit] = useState<
-      MessageData | ConversationData | null
-    >(null);
+    const [messageReply, setMessageReply] = useState<MessageData | null>(null);
+    const [messageEdit, setMessageEdit] = useState<MessageData | null>(null);
     const [isScrolling, setScrolling] = useState(false);
-    const [files, setFiles] = useState<Array<any>>([]);
+    const [files, setFiles] = useState<Array<LocalAttachment>>([]);
     const timeoutScrollRef = useRef<any>(null);
     const msgListRef = useRef<any>();
     const headerRef = useRef<any>();
@@ -129,12 +127,12 @@ const ChannelView = forwardRef(
         }
         const data = [...fs];
         data.forEach((f) => {
-          const attachment = {
+          const attachment: LocalAttachment = {
             file: URL.createObjectURL(f),
-            randomId: Math.random(),
+            randomId: `${Math.random()}`,
             loading: true,
             type: f.type || "application",
-            name: f.name,
+            fileName: f.name,
           };
           setFiles((current) => [...current, attachment]);
           api
@@ -181,21 +179,25 @@ const ChannelView = forwardRef(
           return current;
         });
         const { scrollTop, scrollHeight, clientHeight } = e.target;
-        const showScrollDown = scrollTop < 0;
-        if (showScrollDown !== scrollData?.showScrollDown) {
-          dispatch(
-            setScrollData(currentChannel?.channel_id, {
-              showScrollDown,
-              unreadCount: showScrollDown ? scrollData?.unreadCount : 0,
-            })
-          );
-        }
-        const compare = Math.round(scrollTop + scrollHeight);
-        if (
-          (compare === clientHeight + 1 || compare === clientHeight) &&
-          messageCanMore
-        ) {
-          onMoreMessage(messages?.[messages?.length - 1].createdAt);
+        if (scrollTop === 0 && messageCanMoreAfter && !loadMoreAfterMessage) {
+          onMoreAfterMessage(messages?.[0]);
+        } else {
+          const showScrollDown = scrollTop < 0;
+          if (showScrollDown !== scrollData?.showScrollDown) {
+            dispatch(
+              setScrollData(currentChannel?.channel_id, {
+                showScrollDown,
+                unreadCount: showScrollDown ? scrollData?.unreadCount : 0,
+              })
+            );
+          }
+          const compare = Math.round(scrollTop + scrollHeight);
+          if (
+            (compare === clientHeight + 1 || compare === clientHeight) &&
+            messageCanMore
+          ) {
+            onMoreMessage(messages?.[messages?.length - 1].createdAt);
+          }
         }
         if (timeoutScrollRef.current) {
           clearTimeout(timeoutScrollRef.current);
@@ -205,29 +207,29 @@ const ChannelView = forwardRef(
         }, 500);
       },
       [
-        currentChannel?.channel_id,
-        messageCanMore,
+        messageCanMoreAfter,
+        onMoreAfterMessage,
         messages,
-        onMoreMessage,
         scrollData?.showScrollDown,
         scrollData?.unreadCount,
+        messageCanMore,
         dispatch,
+        currentChannel?.channel_id,
+        onMoreMessage,
+        loadMoreAfterMessage,
       ]
     );
     const onCreateTaskFromMessage = useCallback(
       (msg: MessageData | ConversationData) => {
         const body: any = {
-          title: msg?.content,
+          content: msg?.content,
           status: "pinned",
           channel_ids:
             currentChannel.channel_type === "Direct"
               ? currentChannel?.user?.user_channels
               : [currentChannel?.channel_id],
-          file_ids: msg?.message_attachment?.map?.(
-            (a: AttachmentData) => a.file_id
-          ),
           task_id: msg.message_id,
-          team_id: currentTeam.team_id,
+          team_id: communityId,
           assignee_id:
             msg.message_tag?.[0]?.mention_id || currentChannel?.user?.user_id,
         };
@@ -242,90 +244,106 @@ const ChannelView = forwardRef(
         currentChannel.channel_type,
         currentChannel?.user?.user_channels,
         currentChannel?.user?.user_id,
-        currentTeam.team_id,
+        communityId,
       ]
     );
     const onReplyPress = useCallback(
       (msg: MessageData | ConversationData) => {
         setMessageReply(msg);
-        setReplyTask(null);
         setMessageEdit(null);
         inputRef.current?.focus?.();
       },
-      [inputRef, setReplyTask]
+      [inputRef]
+    );
+    const onEditMessage = useCallback(
+      (msg: MessageData) => {
+        setMessageReply(null);
+        setMessageEdit(msg);
+        setFiles(
+          msg.message_attachments?.map?.((el) => ({
+            ...el,
+            type: el.mimetype,
+            id: el.file_id,
+            fileName: el.original_name,
+            url: el.file_url,
+          }))
+        );
+        setText(msg.content);
+        const el = inputRef.current;
+        setTimeout(() => {
+          el.focus();
+          const selection: any = window.getSelection();
+          const range = document.createRange();
+          selection.removeAllRanges();
+          range.selectNodeContents(el);
+          range.collapse(false);
+          selection.addRange(range);
+        }, 0);
+      },
+      [inputRef]
     );
     const onMenuMessage = useCallback(
       (menu: PopoverItem, msg: MessageData | ConversationData) => {
-        if (menu.value === "Delete") {
-          dispatch(
-            deleteMessage(
-              msg.message_id,
-              msg.parent_id,
-              currentChannel.channel_id
-            )
-          );
-          GoogleAnalytics.tracking("Message Deleted", {
-            category: "Message",
-          });
-        }
-        if (menu.value === "Edit") {
-          setMessageReply(null);
-          setReplyTask(null);
-          setMessageEdit(msg);
-          setFiles(
-            msg.message_attachment.map((el: any) => ({
-              ...el,
-              type: el.mimetype,
-              id: el.file_id,
-              name: el.original_name,
-            }))
-          );
-          setText(msg.content);
-          const el = inputRef.current;
-          setTimeout(() => {
-            el.focus();
-            const selection: any = window.getSelection();
-            const range = document.createRange();
-            selection.removeAllRanges();
-            range.selectNodeContents(el);
-            range.collapse(false);
-            selection.addRange(range);
-          }, 0);
+        switch (menu.value) {
+          case "Delete":
+            dispatch(
+              deleteMessage(
+                msg.message_id,
+                msg.reply_message_id,
+                currentChannel.channel_id
+              )
+            );
+            GoogleAnalytics.tracking("Message Deleted", {
+              category: "Message",
+            });
+            break;
+          case "Archive":
+            dispatch(
+              updateTask(msg.message_id, currentChannel.channel_id, {
+                status: "archived",
+              })
+            );
+            break;
+          case "Unarchive":
+            dispatch(
+              updateTask(msg.message_id, currentChannel.channel_id, {
+                status: "pinned",
+              })
+            );
+            break;
+          default:
+            break;
         }
       },
-      [currentChannel?.channel_id, dispatch, inputRef, setReplyTask]
+      [currentChannel.channel_id, dispatch]
     );
-    const scrollDown = useCallback(() => {
+    const scrollDown = useCallback(async () => {
       msgListRef.current?.scrollTo?.(0, 0);
     }, []);
+    const onScrollDownPress = useCallback(async () => {
+      if (messageCanMoreAfter) {
+        await dispatch(getMessages(currentChannel.channel_id));
+      }
+      scrollDown();
+    }, [currentChannel.channel_id, dispatch, messageCanMoreAfter, scrollDown]);
     const onClearText = useCallback(() => {
       inputRef.current?.blur();
       setText("");
       setMessageReply(null);
-      setReplyTask(null);
       setMessageEdit(null);
       setFiles([]);
       generateId.current = "";
-    }, [inputRef, setReplyTask]);
+    }, [inputRef]);
     const onRemoveReply = useCallback(() => {
-      if (messageReply || replyTask || messageEdit) {
+      if (messageReply || messageEdit) {
         setText("");
       }
       inputRef.current?.blur();
       setMessageReply(null);
-      setReplyTask(null);
       setMessageEdit(null);
       setFiles([]);
       generateId.current = "";
-    }, [
-      messageReply,
-      replyTask,
-      messageEdit,
-      inputRef,
-      setMessageReply,
-      setReplyTask,
-      setMessageEdit,
-    ]);
+    }, [messageReply, messageEdit, inputRef, setMessageReply, setMessageEdit]);
     const openFile = useCallback(() => {
       inputFileRef.current?.click();
     }, []);
@@ -341,26 +359,9 @@ const ChannelView = forwardRef(
     const onCircleClick = useCallback(() => {
       openFile();
     }, [openFile]);
-    useEffect(() => {
-      const keyDownListener = (e: any) => {
-        if (e.key === "Escape") {
-          onRemoveReply();
-        }
-      };
-      window.addEventListener("keydown", keyDownListener);
-      return () => {
-        window.removeEventListener("keydown", keyDownListener);
-      };
-    }, [onRemoveReply]);
-    useEffect(() => {
-      if (replyTask) {
-        setMessageReply(null);
-        setMessageEdit(null);
-        inputRef.current?.focus?.();
-      }
-    }, [replyTask, inputRef]);
     useImperativeHandle(ref, () => {
       return {
+        onJumpToMessage,
         hideReply: onRemoveReply,
         clearText: onClearText,
         showSetting: (action: string) => {
@@ -370,10 +371,10 @@ const ChannelView = forwardRef(
       };
     });
     const editMessage = useCallback(async () => {
-      const loadingAttachment = files.find((att: any) => att.loading);
+      const loadingAttachment = files?.find?.((att: any) => att.loading);
       if (loadingAttachment != null || !messageEdit?.message_id) return;
       if (extractContent(text).trim() !== "" || files.length > 0) {
-        let content = text.trim();
+        let content = extractContentMessage(text.trim());
         let plain_text = extractContent(text.trim());
         if (currentChannel.channel_type === "Private") {
           const { key } =
@@ -387,7 +388,7 @@ const ChannelView = forwardRef(
           messageEdit.message_id,
           content,
           plain_text,
-          files.map((el) => el.id)
+          files.map((el) => el.id || "")
         );
         GoogleAnalytics.tracking("Message Edited", {
           category: "Message",
@@ -412,10 +413,11 @@ const ChannelView = forwardRef(
       if (loadingAttachment != null) return;
       if (extractContent(text).trim() !== "" || files.length > 0) {
         const message: any = {
-          content: text.trim(),
+          content: extractContentMessage(text.trim()),
           plain_text: extractContent(text),
           mentions: getMentionData(text.trim()),
           text,
+          entity_type: "channel",
         };
         if (
           currentChannel.channel_type === "Private" ||
@@ -439,7 +441,7 @@ const ChannelView = forwardRef(
           message.plain_text = plain_text;
         }
         if (currentChannel.channel_id) {
-          message.channel_id = currentChannel.channel_id;
+          message.entity_id = currentChannel.channel_id;
         } else if (currentChannel.user) {
           message.other_user_id = currentChannel?.user?.user_id;
           message.team_id = currentTeam.team_id;
@@ -458,9 +460,7 @@ const ChannelView = forwardRef(
           message.channel_member_data = res;
         }
         if (messageReply) {
-          message.parent_id = messageReply.parent_id || messageReply.message_id;
-        } else if (replyTask) {
-          message.parent_id = replyTask.task_id;
+          message.reply_message_id = messageReply.message_id;
         }
         if (files.length > 0) {
           message.message_id = generateId.current;
@@ -471,13 +471,13 @@ const ChannelView = forwardRef(
         if (message.content) {
           gaLabel += "text";
         }
-        if (files?.find((el) => el.type.includes("image"))) {
+        if (files?.find((el) => el?.type?.includes("image"))) {
           gaLabel += ", image";
         }
-        if (files?.find((el) => el.type.includes("video"))) {
+        if (files?.find((el) => el?.type?.includes("video"))) {
           gaLabel += ", video";
         }
-        if (files?.find((el) => el.type.includes("application"))) {
+        if (files?.find((el) => el?.type?.includes("application"))) {
           gaLabel += ", file";
         }
         GoogleAnalytics.tracking("Message Sent", {
@@ -503,7 +503,6 @@ const ChannelView = forwardRef(
       currentTeam?.team_id,
       files,
       messageReply,
-      replyTask,
       text,
       userData?.user_id,
       currentChannel?.space?.space_type,
@@ -527,7 +526,9 @@ const ChannelView = forwardRef(
     );
     const onKeyDown = useCallback(
       (e: any) => {
-        if (e.code === "Enter" && !e.shiftKey) {
+        if (e.key === "Escape") {
+          onRemoveReply();
+        } else if (e.code === "Enter" && !e.shiftKey) {
           e.preventDefault();
           if (messageEdit) {
             editMessage();
@@ -536,29 +537,49 @@ const ChannelView = forwardRef(
           }
         }
       },
-      [editMessage, messageEdit, submitMessage]
+      [editMessage, messageEdit, onRemoveReply, submitMessage]
+    );
+
+    const onJumpToMessage = useCallback(
+      async (messageId: string) => {
+        dispatch({
+          type: actionTypes.UPDATE_HIGHLIGHT_MESSAGE,
+          payload: messageId,
+        });
+        if (messages.find((el) => el.message_id === messageId)) {
+          setTimeout(() => {
+            const element = document.getElementById(messageId);
+            element?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 0);
+        } else {
+          const success = await dispatch(
+            getAroundMessage(messageId, currentChannel.channel_id)
+          );
+          if (!!success) {
+            const element = document.getElementById(messageId);
+            element?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }
+        setTimeout(() => {
+          dispatch({
+            type: actionTypes.UPDATE_HIGHLIGHT_MESSAGE,
+            payload: null,
+          });
+        }, 1500);
+      },
+      [currentChannel.channel_id, dispatch, messages]
     );
 
     const renderMessage = useCallback(
-      (msg: MessageData) => {
-        if (msg.conversation_data?.length > 0) {
+      (msg: any) => {
+        if (msg.type === "date") {
           return (
-            <MessageReplyItem
-              key={msg.message_id}
-              message={msg}
-              onCreateTask={onCreateTaskFromMessage}
-              onClick={openConversation}
-              onReplyPress={onReplyPress}
-              onMenuSelected={onMenuMessage}
-              onSelectTask={onSelectTask}
-              content={msg.content}
-              reacts={reactData?.[msg.message_id]}
-              replyCount={msg.conversation_data?.length - 1}
-              task={msg.task}
-              sender={teamUserData.find((el) => el.user_id === msg.sender_id)}
-              communityId={communityId}
-              userId={userData.user_id}
-            />
+            <li className="date-title" key={msg.value}>
+              <div className="separate-line" />
+              <span>{titleMessageFromNow(msg.value)}</span>
+              <div className="separate-line" />
+              <div />
+            </li>
           );
         }
         return (
@@ -571,10 +592,12 @@ const ChannelView = forwardRef(
             onCreateTask={onCreateTaskFromMessage}
             onReplyPress={onReplyPress}
             onMenuSelected={onMenuMessage}
-            onSelectTask={onSelectTask}
-            sender={teamUserData.find((el) => el.user_id === msg.sender_id)}
+            onEditMessage={onEditMessage}
+            onEditPinPost={onEditPinPost}
             communityId={communityId}
             userId={userData.user_id}
+            onJumpToMessage={onJumpToMessage}
+            isHighlight={messageHighLightId === msg.message_id}
           />
         );
       },
@@ -583,31 +606,13 @@ const ChannelView = forwardRef(
         onCreateTaskFromMessage,
         onReplyPress,
         onMenuMessage,
-        onSelectTask,
-        teamUserData,
+        onEditMessage,
+        onEditPinPost,
         communityId,
         userData.user_id,
-        openConversation,
+        onJumpToMessage,
+        messageHighLightId,
       ]
-    );
-
-    const renderMessageGroup = useCallback(
-      (el: MessageGroup) => {
-        return (
-          <div className="column-reverse" key={el.date}>
-            <div className="column-reverse">
-              {el.messages.map(renderMessage)}
-            </div>
-            <div className="date-title">
-              <div className="separate-line" />
-              <span>{titleMessageFromNow(el.date)}</span>
-              <div className="separate-line" />
-              <div />
-            </div>
-          </div>
-        );
-      },
-      [renderMessage]
     );
 
     if (!currentChannel?.channel_name && !currentChannel?.user)
@@ -634,12 +639,17 @@ const ChannelView = forwardRef(
               onScroll={onMessageScroll}
             >
               <div style={{ marginTop: 15 }} />
-              <div
+              {loadMoreAfterMessage && (
+                <div className="message-load-more-after">
+                  <CircularProgress size={30} color="inherit" />
+                </div>
+              )}
+              <ol
                 className="channel-view-message-list"
                 style={{ pointerEvents: isScrolling ? "none" : "initial" }}
               >
-                {messagesGroup.map(renderMessageGroup)}
-              </div>
+                {messagesGroup.map(renderMessage)}
+              </ol>
             </div>
             {loadMoreMessage && (
               <div className="message-load-more">
@@ -650,8 +660,6 @@ const ChannelView = forwardRef(
               <div className="message-bottom">
                 <div style={{ position: "relative" }}>
                   {scrollData?.showScrollDown &&
-                    !openTaskView &&
-                    !isOpenConversation &&
                     !location.pathname.includes("user") && (
                       <div className="message-scroll-down__wrapper">
                         {scrollData?.unreadCount > 0 && (
@@ -661,7 +669,7 @@ const ChannelView = forwardRef(
                         )}
                         <div
                           className="btn-scroll-down normal-button"
-                          onClick={scrollDown}
+                          onClick={onScrollDownPress}
                         >
                           <img src={images.icScrollDown} alt="" />
                         </div>
@@ -683,7 +691,6 @@ const ChannelView = forwardRef(
                   setText={setText}
                   onCircleClick={onCircleClick}
                   messageReply={messageReply}
-                  replyTask={replyTask}
                   onRemoveReply={onRemoveReply}
                   messageEdit={messageEdit}
                 />

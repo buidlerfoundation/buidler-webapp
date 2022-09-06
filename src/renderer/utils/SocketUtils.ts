@@ -40,23 +40,19 @@ import { getCollectibles } from "renderer/actions/CollectibleActions";
 const getTasks = async (channelId: string, dispatch: Dispatch) => {
   dispatch({ type: actionTypes.TASK_REQUEST, payload: { channelId } });
   try {
-    const [taskRes, archivedCountRes] = await Promise.all([
-      api.getTasks(channelId),
-      api.getArchivedTaskCount(channelId),
-    ]);
-    if (taskRes.statusCode === 200 && archivedCountRes.statusCode === 200) {
+    const taskRes = await api.getTasks(channelId);
+    if (taskRes.statusCode === 200) {
       dispatch({
         type: actionTypes.TASK_SUCCESS,
         payload: {
           channelId,
           tasks: taskRes.data,
-          archivedCount: archivedCountRes.total,
         },
       });
     } else {
       dispatch({
         type: actionTypes.TASK_FAIL,
-        payload: { message: "Error", taskRes, archivedCountRes },
+        payload: { message: "Error", taskRes },
       });
     }
   } catch (e) {
@@ -205,8 +201,6 @@ class SocketUtil {
       },
       transports: ["websocket"],
       upgrade: false,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
     });
     this.socket.on("connect", () => {
       console.log("socket connected");
@@ -678,12 +672,16 @@ class SocketUtil {
       });
     });
     this.socket.on("ON_DELETE_MESSAGE", (data: any) => {
+      const currentChannel = getCurrentChannel();
+      if (!currentChannel) return;
       store.dispatch({
         type: actionTypes.DELETE_MESSAGE,
         payload: {
           messageId: data.message_id,
-          channelId: data.channel_id,
+          channelId: data.entity_id,
           parentId: data.parent_id,
+          currentChannelId: currentChannel.channel_id,
+          entityType: data.entity_type,
         },
       });
     });
@@ -712,18 +710,18 @@ class SocketUtil {
       const teamUserData = teamUserMap?.[currentTeamId]?.data || [];
       const messageData: any = store.getState()?.message.messageData;
       const channelNotification = channel.find(
-        (c: any) => c.channel_id === message_data.channel_id
+        (c) => c.channel_id === message_data.entity_id
       );
-      if (currentChannel.channel_id === message_data.channel_id) {
-        this.emitSeenChannel(message_data.message_id, message_data.channel_id);
+      if (currentChannel.channel_id === message_data.entity_id) {
+        this.emitSeenChannel(message_data.message_id, message_data.entity_id);
       }
       if (userData?.user_id !== notification_data?.sender_data?.user_id) {
         if (notification_type !== "Muted") {
-          if (currentChannel.channel_id !== message_data.channel_id) {
+          if (currentChannel.channel_id !== message_data.entity_id) {
             store.dispatch({
               type: actionTypes.MARK_UN_SEEN_CHANNEL,
               payload: {
-                channelId: message_data.channel_id,
+                channelId: message_data.entity_id,
               },
             });
           }
@@ -737,7 +735,7 @@ class SocketUtil {
               )
           );
         }
-        if (currentChannel.channel_id === message_data.channel_id) {
+        if (currentChannel.channel_id === message_data.entity_id) {
           const { scrollData } = messageData?.[currentChannel.channel_id] || {};
           if (scrollData?.showScrollDown) {
             store.dispatch({
@@ -755,16 +753,17 @@ class SocketUtil {
       }
       let res = message_data;
       if (
-        !channelNotification ||
-        channelNotification?.channel_type === "Private" ||
-        channelNotification?.channel_type === "Direct"
+        message_data.entity_type !== "post" &&
+        (!channelNotification ||
+          channelNotification?.channel_type === "Private" ||
+          channelNotification?.channel_type === "Direct")
       ) {
-        const keys = channelPrivateKey[message_data.channel_id];
+        const keys = channelPrivateKey[message_data.entity_id];
         if (keys?.length > 0) {
           res = await normalizeMessageItem(
             message_data,
             keys[keys.length - 1].key,
-            message_data.channel_id
+            message_data.entity_id
           );
         } else {
           res = null;
@@ -773,22 +772,17 @@ class SocketUtil {
       if (res) {
         store.dispatch({
           type: actionTypes.RECEIVE_MESSAGE,
-          payload: { data: res },
+          payload: { data: res, currentChannelId: currentChannel.channel_id },
         });
       }
     });
     this.socket.on("ON_NEW_TASK", (data: any) => {
       if (!data) return;
-      const currentChannel = getCurrentChannel();
-      if (!currentChannel) return;
       store.dispatch({
         type: actionTypes.CREATE_TASK_SUCCESS,
         payload: {
           res: data,
-          channelId:
-            currentChannel?.user?.user_id === data?.assignee_id
-              ? currentChannel?.channel_id
-              : data?.channel?.[0]?.channel_id,
+          channelId: data?.channels?.[0]?.channel_id,
         },
       });
     });
@@ -800,16 +794,16 @@ class SocketUtil {
       const { channelMap, currentTeamId } = user;
       const channel = channelMap?.[currentTeamId] || [];
       const channelNotification = channel.find(
-        (c: any) => c.channel_id === data.channel_id
+        (c: any) => c.channel_id === data.entity_id
       );
       let res = data;
       if (channelNotification?.channel_type === "Private") {
-        const keys = channelPrivateKey[data.channel_id];
+        const keys = channelPrivateKey[data.entity_id];
         if (keys?.length > 0) {
           res = await normalizeMessageItem(
             data,
             keys[keys.length - 1].key,
-            data.channel_id
+            data.entity_id
           );
         }
       }
@@ -826,18 +820,9 @@ class SocketUtil {
         type: actionTypes.UPDATE_TASK_REQUEST,
         payload: {
           taskId: data.task_id,
-          data: {
-            [data.updated_key]: data[data.updated_key],
-            comment_count: data.comment_count,
-          },
+          data,
           channelId:
-            currentChannel?.user?.direct_channel ||
-            data?.channel?.[0]?.channel_id,
-          channelUserId:
-            data.updated_key === "assignee_id" &&
-            currentChannel?.user?.direct_channel
-              ? currentChannel?.user?.user_id
-              : null,
+            currentChannel.channel_id || data?.channels?.[0]?.channel_id,
         },
       });
     });
@@ -890,29 +875,24 @@ class SocketUtil {
     });
   }
   sendMessage = (message: {
-    channel_id: string;
+    entity_id: string;
     content: string;
     plain_text: string;
     mentions?: Array<any>;
     message_id?: string;
     member_data?: Array<{ key: string; timestamp: number; user_id: string }>;
-    parent_id?: string;
+    reply_message_id?: string;
     text?: string;
+    entity_type?: string;
   }) => {
     const user: any = store.getState()?.user;
     const messageData: any = store.getState()?.message?.messageData;
     const { userData } = user;
-    const conversationData =
-      messageData?.[message.channel_id]?.data
-        ?.filter(
-          (el) =>
-            el.parent_id === message.parent_id ||
-            el.message_id === message.parent_id
-        )
-        .map((el) => ({ ...el, conversation_data: null })) || [];
-    if (conversationData.length > 0) {
-      conversationData.unshift({ ...message, sender_id: userData.user_id });
-    }
+    const conversationData = messageData?.[message.entity_id]?.data?.find(
+      (el) =>
+        el.reply_message_id === message.reply_message_id ||
+        el.message_id === message.reply_message_id
+    );
     store.dispatch({
       type: actionTypes.EMIT_NEW_MESSAGE,
       payload: {
@@ -920,7 +900,7 @@ class SocketUtil {
         createdAt: new Date(),
         sender_id: userData.user_id,
         isSending: true,
-        conversation_data: message.parent_id ? conversationData : [],
+        conversation_data: message.reply_message_id ? conversationData : null,
         content: message.text,
         plain_text: message.text,
       },
