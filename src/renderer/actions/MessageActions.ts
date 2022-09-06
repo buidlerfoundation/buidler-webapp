@@ -101,7 +101,7 @@ export const getPinPostMessages: ActionCreator<any> =
     try {
       const messageRes = await api.getPinPostMessage(
         postId,
-        50,
+        20,
         before,
         undefined,
         controller
