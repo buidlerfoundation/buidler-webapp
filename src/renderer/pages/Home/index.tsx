@@ -865,7 +865,6 @@ const Home = () => {
             onEdit={onEditPost}
             messages={messageData[matchPostId]?.data}
             loadMoreMessage={loadMorePPMessage}
-            messageCanMore={messageData?.[matchPostId]?.canMore}
             onMoreMessage={onMorePinPostMessage}
           />
         </div>
