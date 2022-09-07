@@ -216,6 +216,7 @@ export interface TaskData {
   total_reply_sender?: string;
   root_message_channel_id: string;
   message_created_at: string;
+  message_sender_id: string;
 }
 
 export interface ConversationData {

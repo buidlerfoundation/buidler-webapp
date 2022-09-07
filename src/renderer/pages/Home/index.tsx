@@ -551,11 +551,6 @@ const Home = () => {
     }
   }, [match_community_id, match_channel_id]);
   useEffect(() => {
-    if (matchPostId) {
-      dispatch(getPinPostMessages(matchPostId));
-    }
-  }, [dispatch, matchPostId]);
-  useEffect(() => {
     handleCloseModalSpaceDetail();
     if (match_channel_id && !!community) {
       if (match_community_id !== "user") {
