@@ -7,7 +7,10 @@ export const normalizeMessage = (messages: Array<any>) => {
     const dateCompare = messages?.[index + 1]
       ? moment(new Date(messages?.[index + 1].createdAt)).format("YYYY-MM-DD")
       : null;
-    if (msg.sender_id !== messages?.[index + 1]?.sender_id) {
+    if (
+      msg.sender_id !== messages?.[index + 1]?.sender_id ||
+      !!messages?.[index + 1]?.task
+    ) {
       msg.isHead = true;
     }
     if (
