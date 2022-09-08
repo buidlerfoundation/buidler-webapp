@@ -45,6 +45,7 @@ interface UserReducerState {
   };
   apiTeamController?: AbortController | null;
   apiSpaceMemberController?: AbortController | null;
+  currentUserProfileId?: string | null;
 }
 
 const defaultChannel: Channel = {
@@ -95,6 +96,7 @@ const initialState: UserReducerState = {
     },
   },
   apiTeamController: null,
+  currentUserProfileId: null,
 };
 
 const userReducers: Reducer<UserReducerState, AnyAction> = (
@@ -121,6 +123,12 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     defaultChannel;
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.UPDATE_CURRENT_USER_PROFILE_ID: {
+      return {
+        ...state,
+        currentUserProfileId: payload,
+      };
+    }
     case actionTypes.UPDATE_LAST_CHANNEL: {
       const newLastChannel = channelMap?.[payload.communityId]?.find(
         (el) => el.channel_id === payload.channelId
