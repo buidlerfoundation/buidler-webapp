@@ -65,6 +65,10 @@ export const extractContentMessage = (s: string) => {
       /(<a href="\$mention_location\/)(.*?)(" class="mention-string">)(.*?)(<\/a>)/gim,
       `<$4-$2>`
     )
+    .replace(
+      /(<a href='\$mention_location\/)(.*?)(' class='mention-string'>)(.*?)(<\/a>)/gim,
+      `<$4-$2>`
+    )
     .replace(/<br>/gim, "\n");
   return span.textContent || span.innerText;
 };
@@ -94,7 +98,11 @@ export const normalizeMessageTextPlain = (text: string) => {
   return `<div class='enable-user-select'>${res}</div>`;
 };
 
-export const normalizeMessageText = (text: string, wrapParagraph?: boolean) => {
+export const normalizeMessageText = (
+  text: string,
+  wrapParagraph?: boolean,
+  messageEdit?: boolean
+) => {
   if (!text) return "";
   let res = text
     .replace(/<br>/gim, "\n")
@@ -124,13 +132,17 @@ export const normalizeMessageText = (text: string, wrapParagraph?: boolean) => {
   if (wrapParagraph) {
     res = res.replace(/^([^<]*)([^<]*)$/gim, "<p>$1</p>");
   }
+  if (messageEdit) {
+    res = res.replace(/href=".*?\/channels\/user/g, `href="$mention_location`);
+    return res;
+  }
   return `<div class='enable-user-select'>${res}</div>`;
 };
 
 export const getMentionData = (s: string) => {
   const mentionRegex =
     /(<a href="\$mention_location\/\?*)(.*?)(" class="mention-string">)/g;
-  const mentionMatches = s.match(mentionRegex);
+  const mentionMatches = s.replace(/'/g, '"').match(mentionRegex);
   return mentionMatches?.map((el) => {
     const match =
       /(<a href="\$mention_location\/\?*)(.*?)(" class="mention-string">)/.exec(

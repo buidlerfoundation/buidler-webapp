@@ -43,6 +43,7 @@ import {
   extractContentMessage,
   getMentionData,
   normalizeMessages,
+  normalizeMessageText,
 } from "../../../../helpers/MessageHelper";
 import SocketUtils from "../../../../utils/SocketUtils";
 import "./index.scss";
@@ -268,7 +269,7 @@ const ChannelView = forwardRef(
             url: el.file_url,
           }))
         );
-        setText(msg.content);
+        setText(normalizeMessageText(msg.content, undefined, true));
         const el = inputRef.current;
         setTimeout(() => {
           el.focus();
