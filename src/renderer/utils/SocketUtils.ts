@@ -188,10 +188,6 @@ class SocketUtil {
       loginType === LoginType.Metamask
     ) {
       publicKey = utils.computePublicKey(generatedPrivateKey, true);
-      store.dispatch({
-        type: actionTypes.SET_PRIVATE_KEY,
-        payload: generatedPrivateKey,
-      });
     }
     this.socket = io(`${AppConfig.apiBaseUrl}`, {
       query: {
@@ -204,6 +200,12 @@ class SocketUtil {
     });
     this.socket.on("connect", () => {
       console.log("socket connected");
+      if (publicKey) {
+        store.dispatch({
+          type: actionTypes.SET_PRIVATE_KEY,
+          payload: generatedPrivateKey,
+        });
+      }
       if (this.firstLoad) {
         this.reloadData();
       }
