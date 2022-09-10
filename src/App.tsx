@@ -99,14 +99,18 @@ function App() {
       if (!process.env.REACT_APP_ENABLE_INSPECT) e.preventDefault();
     };
     const eventClick = (e: any) => {
-      const href = e?.target?.href;
+      const href = e?.target?.href || e?.target?.parentElement?.href;
       if (href?.includes("channels/user")) {
         dispatch({
           type: actionTypes.UPDATE_CURRENT_USER_PROFILE_ID,
           payload: href.split("/channels/user/")[1],
         });
-        e.preventDefault();
+      } else if (href?.includes(window.location.origin)) {
+        history.push(href.replace(window.location.origin, ""));
+      } else if (href) {
+        window.open(href, "_blank");
       }
+      e.preventDefault();
     };
     const changeRouteListener = (e) => {
       const { detail: path } = e;

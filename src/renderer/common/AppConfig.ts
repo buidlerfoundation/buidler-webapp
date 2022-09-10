@@ -77,3 +77,10 @@ export const UserRole: {
   Admin: "admin",
   Member: "member",
 };
+
+export const importantApis = [
+  { uri: "get-space", exact: false },
+  { uri: "get-channel", exact: false },
+  { uri: "get-user/team", exact: true },
+  { uri: "get-user", exact: true },
+];

@@ -96,7 +96,7 @@ export const normalizeMessageTextPlain = (
     res = res
       .replace(
         /((https?|ftps?):\/\/[^"<\s]+)(?![^<>]*>|[^"]*?<\/a)/gim,
-        "<a onclick='event.stopPropagation();' target='_blank' href='$1'><span class='text-ellipsis' style='white-space: pre-line;'>$1</span></a>"
+        "<a class='text-ellipsis' style='white-space: pre-line;' href='$1'>$1</a>"
       )
       .replace(/\$mention_location/g, `${window.location.origin}/channels/user`)
       .replace(
@@ -138,7 +138,7 @@ export const normalizeMessageText = (
     .replace(/\n$/gim, "<br />")
     .replace(
       /((https?|ftps?):\/\/[^"<\s]+)(?![^<>]*>|[^"]*?<\/a)/gim,
-      "<a onclick='event.stopPropagation();' target='_blank' href='$1'>$1</a>"
+      "<a href='$1'>$1</a>"
     )
     .replace(/\$mention_location/g, `${window.location.origin}/channels/user`)
     .replace(

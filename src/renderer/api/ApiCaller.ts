@@ -1,6 +1,8 @@
 import toast from "react-hot-toast";
+import actionTypes from "renderer/actions/ActionTypes";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
-import AppConfig, { AsyncKey } from "../common/AppConfig";
+import store from "renderer/store";
+import AppConfig, { AsyncKey, importantApis } from "../common/AppConfig";
 import { getCookie } from "../common/Cookie";
 
 const METHOD_GET = "get";
@@ -10,6 +12,23 @@ const METHOD_DELETE = "delete";
 const METHOD_PATCH = "patch";
 
 const unauthorizedUri = ["initial", "user/address", "user"];
+
+const handleError = (message: string, apiData: any) => {
+  const { uri, fetchOptions } = apiData;
+  const compareUri = `${fetchOptions.method}-${uri}`;
+  const importantApi = importantApis.find((el) => {
+    if (el.exact) {
+      return compareUri === el.uri;
+    }
+    return compareUri.includes(el.uri);
+  });
+  if (importantApi) {
+    store.dispatch({ type: actionTypes.SOMETHING_WRONG });
+    throw new Error("Something wrong");
+  } else {
+    toast.error(message);
+  }
+};
 
 async function requestAPI<T = any>(
   method: string,
@@ -80,7 +99,7 @@ async function requestAPI<T = any>(
         .json()
         .then((data) => {
           if (res.status !== 200) {
-            toast.error(data.message || data);
+            return handleError(data.message || data, { uri, fetchOptions });
           }
           if (data.length >= 0) {
             return { data, statusCode: res.status };
@@ -99,9 +118,12 @@ async function requestAPI<T = any>(
         err.statusCode,
         body
       );
-      toast.error(err.message || err);
+      const msg = err.message || err;
+      if (!msg.includes("aborted")) {
+        handleError(msg, { uri, fetchOptions });
+      }
       return {
-        message: err,
+        message: msg,
       };
     });
 }
