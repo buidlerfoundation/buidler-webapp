@@ -91,10 +91,7 @@ export const normalizeMessageTextPlain = (
     .replace(/\n$/gim, "<br />");
 
   if (messageReply) {
-    res = res.replace(
-      /(<@)(.*?)(-)(.*?)(>)/gim,
-      `<span class="mention-string">@$2</span>`
-    );
+    res = res.replace(/(<@)(.*?)(-)(.*?)(>)/gim, `@$2`);
   } else {
     res = res
       .replace(
