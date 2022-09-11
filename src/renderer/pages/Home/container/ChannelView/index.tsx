@@ -43,6 +43,7 @@ import {
   extractContentMessage,
   getMentionData,
   normalizeMessages,
+  normalizeMessageText,
 } from "../../../../helpers/MessageHelper";
 import SocketUtils from "../../../../utils/SocketUtils";
 import "./index.scss";
@@ -268,7 +269,7 @@ const ChannelView = forwardRef(
             url: el.file_url,
           }))
         );
-        setText(msg.content);
+        setText(normalizeMessageText(msg.content, undefined, true));
         const el = inputRef.current;
         setTimeout(() => {
           el.focus();
@@ -397,7 +398,6 @@ const ChannelView = forwardRef(
         setFiles([]);
         setMessageEdit(null);
         generateId.current = "";
-        scrollDown();
       }
     }, [
       files,
@@ -405,12 +405,14 @@ const ChannelView = forwardRef(
       currentChannel?.channel_type,
       currentChannel?.channel_id,
       messageEdit?.message_id,
-      scrollDown,
       channelPrivateKey,
     ]);
     const submitMessage = useCallback(async () => {
       const loadingAttachment = files.find((att: any) => att.loading);
       if (loadingAttachment != null) return;
+      if (messageCanMoreAfter) {
+        await dispatch(getMessages(currentChannel.channel_id));
+      }
       if (extractContent(text).trim() !== "" || files.length > 0) {
         const message: any = {
           content: extractContentMessage(text.trim()),
@@ -496,18 +498,20 @@ const ChannelView = forwardRef(
         scrollDown();
       }
     }, [
-      channelPrivateKey,
-      currentChannel?.channel_id,
-      currentChannel?.channel_type,
-      currentChannel?.user,
-      currentTeam?.team_id,
       files,
-      messageReply,
+      messageCanMoreAfter,
       text,
-      userData?.user_id,
+      dispatch,
+      currentChannel.channel_id,
+      currentChannel.channel_type,
+      currentChannel.user,
       currentChannel?.space?.space_type,
+      messageReply,
       totalTeamUser,
       scrollDown,
+      channelPrivateKey,
+      currentTeam.team_id,
+      userData.user_id,
     ]);
     const handleRemoveFile = useCallback(
       (file) => {

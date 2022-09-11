@@ -99,15 +99,18 @@ function App() {
       if (!process.env.REACT_APP_ENABLE_INSPECT) e.preventDefault();
     };
     const eventClick = (e: any) => {
-      const href = e?.target?.href;
+      const href = e?.target?.href || e?.target?.parentElement?.href;
       if (href?.includes("channels/user")) {
-        const { pathname } = history.location;
-        if (pathname.includes("/message")) {
-          history.replace(pathname.split("/message")[0]);
-        }
-        history.push(`/channels/user/${href.split("/channels/user/")[1]}`);
-        e.preventDefault();
+        dispatch({
+          type: actionTypes.UPDATE_CURRENT_USER_PROFILE_ID,
+          payload: href.split("/channels/user/")[1],
+        });
+      } else if (href?.includes(window.location.origin)) {
+        history.push(href.replace(window.location.origin, ""));
+      } else if (href) {
+        window.open(href, "_blank");
       }
+      e.preventDefault();
     };
     const changeRouteListener = (e) => {
       const { detail: path } = e;
@@ -130,7 +133,7 @@ function App() {
         changeRouteListener
       );
     };
-  }, [user, initApp, history]);
+  }, [user, initApp, history, dispatch]);
   const initGeneratedPrivateKey = useCallback(async () => {
     const generatedPrivateKey = await GeneratedPrivateKey();
     dispatch({
@@ -139,8 +142,10 @@ function App() {
     });
   }, [dispatch]);
   useEffect(() => {
-    initGeneratedPrivateKey();
-  }, [initGeneratedPrivateKey]);
+    if (!!user.user_id) {
+      initGeneratedPrivateKey();
+    }
+  }, [user.user_id, initGeneratedPrivateKey]);
   const connectLogout = useCallback(async () => {
     const deviceCode = await getDeviceCode();
     await api.removeDevice({

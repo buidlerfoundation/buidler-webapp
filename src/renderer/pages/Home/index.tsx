@@ -66,7 +66,6 @@ import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 import ModalUserProfile from "renderer/shared/ModalUserProfile";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import ModalAllMembers from "renderer/shared/ModalAllMembers";
-import { getTransactions } from "renderer/actions/TransactionActions";
 import useChannel from "renderer/hooks/useChannel";
 import useSpaceChannel from "renderer/hooks/useSpaceChannel";
 import useTeamUserData from "renderer/hooks/useTeamUserData";
@@ -116,7 +115,12 @@ const Home = () => {
     (state) => state.message.loadMoreAfterMessage
   );
   const loading = useAppSelector((state) => loadingSelector(state));
-  const [currentUserId, setCurrentUserId] = useState("");
+  const currentUserProfileId = useAppSelector(
+    (state) => state.user.currentUserProfileId
+  );
+  const [currentUserId, setCurrentUserId] = useState<string | undefined | null>(
+    ""
+  );
   const community = useAppSelector((state) => state.user.team);
   const storeChannelId = useAppSelector((state) => state.user.currentChannelId);
   const { userData } = useAppSelector((state) => state.user);
@@ -514,8 +518,11 @@ const Home = () => {
     setOpenConfirmDeleteSpace(false);
   }, []);
   const handleCloseModalUserProfile = useCallback(async () => {
-    history.goBack();
-  }, [history]);
+    dispatch({ type: actionTypes.UPDATE_CURRENT_USER_PROFILE_ID, payload: "" });
+    if (history.location.pathname.includes("user")) {
+      history.goBack();
+    }
+  }, [dispatch, history]);
   const handleDeleteSpace = useCallback(async () => {
     if (!selectedSpace?.space_id) return;
     const success = await dispatch(deleteSpaceChannel(selectedSpace?.space_id));
@@ -544,10 +551,11 @@ const Home = () => {
     if (currentChannel.channel_id) channelViewRef.current?.clearText?.();
   }, [currentChannel.channel_id]);
   useEffect(() => {
+    setCurrentUserId(currentUserProfileId);
+  }, [currentUserProfileId]);
+  useEffect(() => {
     if (match_community_id === "user" && match_channel_id) {
       setCurrentUserId(match_channel_id);
-    } else {
-      setCurrentUserId("");
     }
   }, [match_community_id, match_channel_id]);
   useEffect(() => {
@@ -640,12 +648,6 @@ const Home = () => {
       }
     }
   }, [channelId, dispatch, handleMessagesById, matchMessageId, privateKey]);
-
-  useEffect(() => {
-    if (!!userData.user_id) {
-      dispatch(getTransactions(1));
-    }
-  }, [dispatch, userData.user_id]);
 
   useEffect(() => {
     if (currentChannel?.space_id) {
@@ -865,7 +867,6 @@ const Home = () => {
             onEdit={onEditPost}
             messages={messageData[matchPostId]?.data}
             loadMoreMessage={loadMorePPMessage}
-            messageCanMore={messageData?.[matchPostId]?.canMore}
             onMoreMessage={onMorePinPostMessage}
           />
         </div>
