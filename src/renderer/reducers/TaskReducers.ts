@@ -222,6 +222,9 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
           ...data,
         };
       }
+      if (!data.channels) {
+        data.channels = task?.channels || [];
+      }
       if (!task?.channels?.find((el) => el.channel_id === channelId)) {
         return {
           ...state,

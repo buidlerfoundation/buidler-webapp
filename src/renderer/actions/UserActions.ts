@@ -12,7 +12,7 @@ import store from "renderer/store";
 
 export const getInitial: ActionCreator<any> =
   () => async (dispatch: Dispatch) => {
-    const { data } = await api.getInitial();
+    const { data } = (await api.getInitial()) || {};
     ImageHelper.initial(data?.img_domain || "", data?.img_config || "");
     if (data?.force_update && data?.version > GlobalVariable.version) {
       // Update Desktop App

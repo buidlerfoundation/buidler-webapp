@@ -21,7 +21,7 @@ import {
 import { PopoverItem } from "renderer/shared/PopoverButton";
 import { debounce } from "lodash";
 import { CircularProgress } from "@material-ui/core";
-import { createTask, updateTask } from "renderer/actions/TaskActions";
+import { updateTask, uploadToIPFS } from "renderer/actions/TaskActions";
 import {
   deleteMessage,
   getAroundMessage,
@@ -58,6 +58,7 @@ import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import useMatchCommunityId from "renderer/hooks/useMatchCommunityId";
 import useTotalTeamUserData from "renderer/hooks/useTotalMemberUser";
 import actionTypes from "renderer/actions/ActionTypes";
+import ModalConfirmPin from "renderer/shared/ModalConfirmPin";
 
 type ChannelViewProps = {
   currentChannel: Channel;
@@ -109,6 +110,10 @@ const ChannelView = forwardRef(
     const channelPrivateKey = useAppSelector(
       (state) => state.configs.channelPrivateKey
     );
+    const [openConfirmPin, setOpenConfirmPin] = useState(false);
+    const [selectedMessage, setSelectedMessage] = useState<MessageData | null>(
+      null
+    );
     const [messageReply, setMessageReply] = useState<MessageData | null>(null);
     const [messageEdit, setMessageEdit] = useState<MessageData | null>(null);
     const [isScrolling, setScrolling] = useState(false);
@@ -119,6 +124,10 @@ const ChannelView = forwardRef(
     const generateId = useRef<string>("");
     const [text, setText] = useState("");
     const inputFileRef = useRef<any>();
+    const toggleConfirmPin = useCallback(
+      () => setOpenConfirmPin((current) => !current),
+      []
+    );
     const onAddFiles = useCallback(
       (fs: any) => {
         inputRef.current?.focus();
@@ -221,32 +230,11 @@ const ChannelView = forwardRef(
       ]
     );
     const onCreateTaskFromMessage = useCallback(
-      (msg: MessageData | ConversationData) => {
-        const body: any = {
-          content: msg?.content,
-          status: "pinned",
-          channel_ids:
-            currentChannel.channel_type === "Direct"
-              ? currentChannel?.user?.user_channels
-              : [currentChannel?.channel_id],
-          task_id: msg.message_id,
-          team_id: communityId,
-          assignee_id:
-            msg.message_tag?.[0]?.mention_id || currentChannel?.user?.user_id,
-        };
-        dispatch(createTask(currentChannel?.channel_id, body));
-        GoogleAnalytics.tracking("Message Pinned", {
-          category: "Message",
-        });
+      (msg: MessageData) => {
+        setSelectedMessage(msg);
+        toggleConfirmPin();
       },
-      [
-        dispatch,
-        currentChannel?.channel_id,
-        currentChannel.channel_type,
-        currentChannel?.user?.user_channels,
-        currentChannel?.user?.user_id,
-        communityId,
-      ]
+      [toggleConfirmPin]
     );
     const onReplyPress = useCallback(
       (msg: MessageData | ConversationData) => {
@@ -286,6 +274,13 @@ const ChannelView = forwardRef(
     const onMenuMessage = useCallback(
       (menu: PopoverItem, msg: MessageData | ConversationData) => {
         switch (menu.value) {
+          case "Upload to IPFS":
+            if (msg.task?.task_id) {
+              dispatch(
+                uploadToIPFS(msg.task?.task_id, currentChannel.channel_id)
+              );
+            }
+            break;
           case "Delete":
             dispatch(
               deleteMessage(
@@ -705,6 +700,11 @@ const ChannelView = forwardRef(
               ref={inputFileRef}
               accept="image/*,video/*,application/*"
               onChange={onChangeFiles}
+            />
+            <ModalConfirmPin
+              open={openConfirmPin}
+              handleClose={toggleConfirmPin}
+              selectedMessage={selectedMessage}
             />
           </div>
         )}

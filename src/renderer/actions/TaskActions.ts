@@ -2,7 +2,67 @@ import { Dispatch } from "redux";
 import api from "../api";
 import actionTypes from "./ActionTypes";
 import store from "../store";
+import { getCookie } from "renderer/common/Cookie";
+import { AsyncKey, LoginType } from "renderer/common/AppConfig";
+import { ethers, utils } from "ethers";
+import WalletConnectUtils from "renderer/services/connectors/WalletConnectUtils";
 import toast from "react-hot-toast";
+
+export const uploadToIPFS =
+  (pinPostId: string, channelId: string) => async (dispatch: Dispatch) => {
+    dispatch({
+      type: actionTypes.UPDATE_TASK_REQUEST,
+      payload: {
+        taskId: pinPostId,
+        data: { uploadingIPFS: true },
+        channelId,
+      },
+    });
+    try {
+      const loginType = await getCookie(AsyncKey.loginType);
+      const timestamp = new Date().getTime();
+      const message = `Nonce: ${timestamp}`;
+      let signature = "";
+      if (loginType === LoginType.Metamask) {
+        const metamaskProvider: any = window.ethereum;
+        const provider = new ethers.providers.Web3Provider(metamaskProvider);
+        const signer = provider.getSigner();
+        signature = await signer.signMessage(message);
+      } else if (loginType === LoginType.WalletConnect) {
+        const { accounts } = WalletConnectUtils.connector || {};
+        const address = accounts?.[0];
+        const params = [utils.hexlify(utils.toUtf8Bytes(message)), address];
+        signature = await WalletConnectUtils.connector?.signPersonalMessage(
+          params
+        );
+      }
+      if (signature) {
+        await api.uploadToIPFS(pinPostId, {
+          timestamp,
+          signature,
+          sign_message: message,
+        });
+      }
+      dispatch({
+        type: actionTypes.UPDATE_TASK_REQUEST,
+        payload: {
+          taskId: pinPostId,
+          data: { uploadingIPFS: false },
+          channelId,
+        },
+      });
+    } catch (error: any) {
+      toast.error(error.message);
+      dispatch({
+        type: actionTypes.UPDATE_TASK_REQUEST,
+        payload: {
+          taskId: pinPostId,
+          data: { uploadingIPFS: false },
+          channelId,
+        },
+      });
+    }
+  };
 
 export const getPinPostDetail =
   (postId: string) => async (dispatch: Dispatch) => {
@@ -141,9 +201,6 @@ export const createTask =
       const data = body;
       delete data.attachments;
       const res = await api.createTask(data);
-      if (res.statusCode === 200) {
-        toast.success("Created!");
-      }
       return res.statusCode === 200;
     } catch (e) {
       dispatch({

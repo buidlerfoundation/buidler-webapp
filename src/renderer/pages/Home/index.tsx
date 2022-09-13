@@ -42,6 +42,7 @@ import {
   getTaskFromUser,
   getTasks,
   updateTask,
+  uploadToIPFS,
 } from "renderer/actions/TaskActions";
 import {
   getAroundMessage,
@@ -707,6 +708,9 @@ const Home = () => {
     (menu: PopoverItem, post: TaskData) => {
       setSelectedPost(post);
       switch (menu.value) {
+        case "Upload to IPFS":
+          dispatch(uploadToIPFS(post.task_id, channelId));
+          break;
         case "Delete":
           toggleConfirmDeletePost();
           break;
@@ -727,7 +731,7 @@ const Home = () => {
           break;
       }
     },
-    [channelId, history, match_community_id, toggleConfirmDeletePost]
+    [channelId, dispatch, history, match_community_id, toggleConfirmDeletePost]
   );
 
   const handleCreatePinPost = useCallback(() => {

@@ -123,6 +123,10 @@ export const normalizeMessageText = (
   }
   let res = text
     .replace(/<br>/gim, "\n")
+    .replace(/^#### (.*$)(\n)/gim, "<h4>$1</h4>")
+    .replace(/^### (.*$)(\n)/gim, "<h3>$1</h3>")
+    .replace(/^## (.*$)(\n)/gim, "<h2>$1</h2>")
+    .replace(/^# (.*$)(\n)/gim, "<h1>$1</h1>")
     .replace(/^#### (.*$)/gim, "<h4>$1</h4>")
     .replace(/^### (.*$)/gim, "<h3>$1</h3>")
     .replace(/^## (.*$)/gim, "<h2>$1</h2>")

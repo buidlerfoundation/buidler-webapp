@@ -2,14 +2,8 @@ import { TaskData } from "renderer/models";
 import ApiCaller from "./ApiCaller";
 import Caller from "./Caller";
 
-// {
-//   "title": "notification not working",
-//   "notes": "trên desktop app không nhận được push notification",
-//   "status": 0,
-//   "due_date": "2021-04-08T03:09:32.209Z",
-//   "channel_id": "{{CHANNEL_ID}}",
-//   "member_id": "{{USER_ID}}"
-// }
+export const uploadToIPFS = (taskId: string, body: any) =>
+  Caller.post(`task/${taskId}/ipfs`, body);
 
 export const createTask = (body: any) => ApiCaller.post("task", body);
 

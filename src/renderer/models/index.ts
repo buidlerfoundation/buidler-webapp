@@ -71,8 +71,8 @@ export interface Channel {
   channel_member: Array<string>;
   channel_name: string;
   channel_type: "Public" | "Private" | "Direct";
-  notification_type: string;
-  seen: boolean;
+  notification_type?: string;
+  seen?: boolean;
   space?: Space;
   space_id?: string;
   user?: UserData;
@@ -217,6 +217,8 @@ export interface TaskData {
   root_message_channel_id: string;
   message_created_at: string;
   message_sender_id: string;
+  cid?: string;
+  uploadingIPFS?: boolean;
 }
 
 export interface ConversationData {
