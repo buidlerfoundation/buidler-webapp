@@ -37,20 +37,34 @@ export const uploadToIPFS =
         );
       }
       if (signature) {
-        await api.uploadToIPFS(pinPostId, {
-          timestamp,
-          signature,
-          sign_message: message,
-        });
+        api
+          .uploadToIPFS(pinPostId, {
+            timestamp,
+            signature,
+            sign_message: message,
+          })
+          .then(() => {
+            dispatch({
+              type: actionTypes.UPDATE_TASK_REQUEST,
+              payload: {
+                taskId: pinPostId,
+                data: { uploadingIPFS: false },
+                channelId,
+              },
+            });
+          })
+          .catch((error) => {
+            toast.error(error.message);
+            dispatch({
+              type: actionTypes.UPDATE_TASK_REQUEST,
+              payload: {
+                taskId: pinPostId,
+                data: { uploadingIPFS: false },
+                channelId,
+              },
+            });
+          });
       }
-      dispatch({
-        type: actionTypes.UPDATE_TASK_REQUEST,
-        payload: {
-          taskId: pinPostId,
-          data: { uploadingIPFS: false },
-          channelId,
-        },
-      });
     } catch (error: any) {
       toast.error(error.message);
       dispatch({
