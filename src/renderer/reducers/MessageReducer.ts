@@ -38,6 +38,25 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
         highlightMessageId: payload,
       };
     }
+    case actionTypes.UPDATE_TASK_REQUEST: {
+      const { taskId, channelId, data } = payload;
+      const newMessageData = state.messageData;
+      if (newMessageData[channelId]) {
+        newMessageData[channelId] = {
+          ...newMessageData[channelId],
+          data: newMessageData[channelId]?.data?.map?.((msg) => {
+            if (msg.message_id === taskId && msg.task) {
+              msg.task = { ...msg.task, ...data };
+            }
+            return msg;
+          }),
+        };
+      }
+      return {
+        ...state,
+        messageData: newMessageData,
+      };
+    }
     case actionTypes.DELETE_TASK_REQUEST: {
       const { taskId, channelId } = payload;
       const newMessageData = state.messageData;
