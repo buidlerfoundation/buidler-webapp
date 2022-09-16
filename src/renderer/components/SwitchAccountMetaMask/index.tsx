@@ -5,7 +5,12 @@ import { useHistory } from "react-router-dom";
 import { logout } from "renderer/actions/UserActions";
 import api from "renderer/api";
 import { AsyncKey } from "renderer/common/AppConfig";
-import { clearData, getDeviceCode, setCookie } from "renderer/common/Cookie";
+import {
+  clearData,
+  getDeviceCode,
+  removeCookie,
+  setCookie,
+} from "renderer/common/Cookie";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import ModalConfirmDelete from "renderer/shared/ModalConfirmDelete";
@@ -37,6 +42,7 @@ const SwitchAccountMetaMask = () => {
       const signature = await signer.signMessage(message);
       const res = await api.verifyNonce(message, signature);
       if (res.statusCode === 200) {
+        removeCookie(AsyncKey.socketConnectKey);
         await setCookie(AsyncKey.accessTokenKey, res?.token);
         window.location.reload();
       }

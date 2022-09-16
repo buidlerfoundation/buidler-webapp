@@ -28,6 +28,7 @@ export const AsyncKey = {
   lastTimeFocus: `${Prefix}_last_time_focus`,
   generatedPrivateKey: `${Prefix}_generated_private_key`,
   loginType: `${Prefix}_login_key`,
+  socketConnectKey: `${Prefix}_socket_connect_key`,
 };
 
 export const ProgressStatus = [

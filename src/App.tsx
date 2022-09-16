@@ -142,10 +142,12 @@ function App() {
     });
   }, [dispatch]);
   useEffect(() => {
-    if (!!user.user_id) {
-      initGeneratedPrivateKey();
-    }
-  }, [user.user_id, initGeneratedPrivateKey]);
+    getCookie(AsyncKey.socketConnectKey).then((res) => {
+      if (res) {
+        initGeneratedPrivateKey();
+      }
+    });
+  }, [initGeneratedPrivateKey]);
   const connectLogout = useCallback(async () => {
     const deviceCode = await getDeviceCode();
     await api.removeDevice({
