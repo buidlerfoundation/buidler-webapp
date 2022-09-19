@@ -281,7 +281,12 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         teamUserMap: {
           ...teamUserMap,
           [currentTeamId]: {
-            data: [...(teamUserMap[currentTeamId]?.data || []), payload],
+            data: [
+              ...(teamUserMap[currentTeamId]?.data || []).filter(
+                (el) => el.user_id !== payload.user_id
+              ),
+              payload,
+            ],
             total: teamUserMap[currentTeamId]?.total + 1,
           },
         },
@@ -856,9 +861,15 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         teamUserMap: {
           ...teamUserMap,
           [payload.teamId]: {
-            data: teamUserMap[payload.teamId]?.data?.filter(
-              (el) => el.user_id !== payload.userId
-            ),
+            data: teamUserMap[payload.teamId]?.data?.map((el) => {
+              if (el.user_id === payload.userId) {
+                return {
+                  ...el,
+                  is_deleted: true,
+                };
+              }
+              return el;
+            }),
             total: teamUserMap[payload.teamId]?.total - 1,
           },
         },

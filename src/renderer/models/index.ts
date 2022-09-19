@@ -64,6 +64,7 @@ export interface UserData {
   address?: string;
   verified_avatar_asset_collection?: NFTCollection;
   verified_username_asset_collection?: NFTCollection;
+  is_deleted?: boolean;
 }
 
 export interface Channel {
@@ -404,7 +405,7 @@ export interface BaseDataApi<T> {
   message?: string;
   total?: number;
   token?: string;
-  metadata?: { total?: number };
+  metadata?: { total?: number; encrypt_message_key?: string };
 }
 
 export type UserRoleType = "owner" | "admin" | "member";

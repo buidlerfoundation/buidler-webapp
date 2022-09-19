@@ -16,7 +16,10 @@ export const getAroundMessage =
     });
     try {
       const messageRes = await api.getAroundMessageById(messageId);
-      const messageData = normalizePublicMessageData(messageRes.data || []);
+      const messageData = normalizePublicMessageData(
+        messageRes.data || [],
+        messageRes.metadata?.encrypt_message_key
+      );
       if (messageRes.statusCode === 200) {
         dispatch({
           type: actionTypes.MESSAGE_SUCCESS,
@@ -106,7 +109,10 @@ export const getPinPostMessages: ActionCreator<any> =
         undefined,
         controller
       );
-      const messageData = normalizePublicMessageData(messageRes.data || []);
+      const messageData = normalizePublicMessageData(
+        messageRes.data || [],
+        messageRes.metadata?.encrypt_message_key
+      );
       if (messageRes.statusCode === 200) {
         dispatch({
           type: actionTypes.MESSAGE_PP_SUCCESS,
@@ -178,7 +184,10 @@ export const getMessages: ActionCreator<any> =
       const isPrivate = channelType === "Private" || channelType === "Direct";
       const messageData = isPrivate
         ? await normalizeMessageData(messageRes.data || [], channelId)
-        : normalizePublicMessageData(messageRes.data || []);
+        : normalizePublicMessageData(
+            messageRes.data || [],
+            messageRes.metadata?.encrypt_message_key
+          );
       if (messageRes.statusCode === 200) {
         dispatch({
           type: actionTypes.MESSAGE_SUCCESS,
