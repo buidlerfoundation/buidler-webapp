@@ -50,8 +50,7 @@ export const removeTagHTML = (s: string) => {
 export const extractContent = (s: string) => {
   const span = document.createElement("span");
   span.innerHTML = s
-    .replace(/<div><br><\/div>/g, "<br>")
-    .replace(/<div>/g, "<br>")
+    .replace(/<div>(.*?)<\/div>/gim, "<br>$1")
     .replace(/<br>/gim, "\n");
   return span.textContent || span.innerText;
 };
@@ -59,8 +58,7 @@ export const extractContent = (s: string) => {
 export const extractContentMessage = (s: string) => {
   const span = document.createElement("span");
   span.innerHTML = s
-    .replace(/<div><br><\/div>/g, "<br>")
-    .replace(/<div>/g, "<br>")
+    .replace(/<div>(.*?)<\/div>/gim, "<br>$1")
     .replace(
       /(<a href="\$mention_location\/)(.*?)(" class="mention-string">)(.*?)(<\/a>)/gim,
       `<$4-$2>`
@@ -75,7 +73,8 @@ export const extractContentMessage = (s: string) => {
 
 export const normalizeMessageTextPlain = (
   text: string,
-  messageReply?: boolean
+  messageReply?: boolean,
+  isEdited?: boolean
 ) => {
   if (!text) return "";
   let res = text
@@ -104,13 +103,16 @@ export const normalizeMessageTextPlain = (
         `<a href="${window.location.origin}/channels/user/$4" class="mention-string">@$2</a>`
       );
   }
-  return `<div class='enable-user-select'>${res}</div>`;
+  return `<div class='enable-user-select'>${res}${
+    isEdited ? ' <span class="edited-string">edited</span>' : ""
+  }</div>`;
 };
 
 export const normalizeMessageText = (
   text: string,
   wrapParagraph?: boolean,
-  messageEdit?: boolean
+  messageEdit?: boolean,
+  isEdited?: boolean
 ) => {
   if (!text) return "";
   if (messageEdit) {
@@ -153,7 +155,9 @@ export const normalizeMessageText = (
   if (wrapParagraph) {
     res = res.replace(/^([^<]*)([^<]*)$/gim, "<p>$1</p>");
   }
-  return `<div class='enable-user-select'>${res}</div>`;
+  return `<div class='enable-user-select'>${res}${
+    isEdited ? ' <span class="edited-string">edited</span>' : ""
+  }</div>`;
 };
 
 export const getMentionData = (s: string) => {

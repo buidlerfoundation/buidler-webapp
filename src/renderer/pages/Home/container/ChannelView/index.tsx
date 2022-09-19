@@ -59,6 +59,7 @@ import useMatchCommunityId from "renderer/hooks/useMatchCommunityId";
 import useTotalTeamUserData from "renderer/hooks/useTotalMemberUser";
 import actionTypes from "renderer/actions/ActionTypes";
 import ModalConfirmPin from "renderer/shared/ModalConfirmPin";
+import ModalConfirmDelete from "renderer/shared/ModalConfirmDelete";
 
 type ChannelViewProps = {
   currentChannel: Channel;
@@ -110,6 +111,8 @@ const ChannelView = forwardRef(
     const channelPrivateKey = useAppSelector(
       (state) => state.configs.channelPrivateKey
     );
+    const [openConfirmDeleteMessage, setOpenConfirmDeleteMessage] =
+      useState(false);
     const [openConfirmPin, setOpenConfirmPin] = useState(false);
     const [selectedMessage, setSelectedMessage] = useState<MessageData | null>(
       null
@@ -124,6 +127,10 @@ const ChannelView = forwardRef(
     const generateId = useRef<string>("");
     const [text, setText] = useState("");
     const inputFileRef = useRef<any>();
+    const toggleConfirmDeleteMessage = useCallback(
+      () => setOpenConfirmDeleteMessage((current) => !current),
+      []
+    );
     const toggleConfirmPin = useCallback(
       () => setOpenConfirmPin((current) => !current),
       []
@@ -282,16 +289,8 @@ const ChannelView = forwardRef(
             }
             break;
           case "Delete":
-            dispatch(
-              deleteMessage(
-                msg.message_id,
-                msg.reply_message_id,
-                currentChannel.channel_id
-              )
-            );
-            GoogleAnalytics.tracking("Message Deleted", {
-              category: "Message",
-            });
+            setSelectedMessage(msg);
+            toggleConfirmDeleteMessage();
             break;
           case "Archive":
             dispatch(
@@ -613,7 +612,25 @@ const ChannelView = forwardRef(
         messageHighLightId,
       ]
     );
-
+    const onDeleteMessage = useCallback(() => {
+      if (!selectedMessage) return;
+      dispatch(
+        deleteMessage(
+          selectedMessage.message_id,
+          selectedMessage.reply_message_id,
+          currentChannel.channel_id
+        )
+      );
+      GoogleAnalytics.tracking("Message Deleted", {
+        category: "Message",
+      });
+      toggleConfirmDeleteMessage();
+    }, [
+      currentChannel.channel_id,
+      dispatch,
+      selectedMessage,
+      toggleConfirmDeleteMessage,
+    ]);
     if (!currentChannel?.channel_name && !currentChannel?.user)
       return <div className="channel-view-container" />;
     return (
@@ -705,6 +722,14 @@ const ChannelView = forwardRef(
               open={openConfirmPin}
               handleClose={toggleConfirmPin}
               selectedMessage={selectedMessage}
+            />
+            <ModalConfirmDelete
+              open={openConfirmDeleteMessage}
+              handleClose={toggleConfirmDeleteMessage}
+              title="Delete message"
+              description="Are you sure you want delete this message"
+              onDelete={onDeleteMessage}
+              contentDelete="Delete"
             />
           </div>
         )}
