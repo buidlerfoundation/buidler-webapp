@@ -82,6 +82,7 @@ import useMatchPostId from "renderer/hooks/useMatchPostId";
 import ModalConfirmDelete from "renderer/shared/ModalConfirmDelete";
 import { PopoverItem } from "renderer/shared/PopoverButton";
 import useMatchMessageId from "renderer/hooks/useMatchMessageId";
+import ModalTransactionDetail from "renderer/shared/ModalTransactionDetail";
 
 const loadMoreMessageSelector = createLoadMoreSelector([
   actionTypes.MESSAGE_PREFIX,
@@ -122,6 +123,7 @@ const Home = () => {
   const [currentUserId, setCurrentUserId] = useState<string | undefined | null>(
     ""
   );
+  const appTitleBarRef = useRef<any>();
   const community = useAppSelector((state) => state.user.team);
   const storeChannelId = useAppSelector((state) => state.user.currentChannelId);
   const { userData } = useAppSelector((state) => state.user);
@@ -145,6 +147,8 @@ const Home = () => {
   const channelViewRef = useRef<any>();
   const sideBarRef = useRef<any>();
   const [selectedPost, setSelectedPost] = useState<TaskData | null>(null);
+  const [selectedHash, setSelectedHash] = useState<string | null>(null);
+  const [openTxDetail, setOpenTxDetail] = useState(false);
   const [openConfirmDeletePost, setOpenConfirmDeletePost] = useState(false);
   const [initialSpace, setInitialSpace] = useState(null);
   const [isOpenSpaceDetail, setOpenSpaceDetail] = useState(false);
@@ -159,6 +163,18 @@ const Home = () => {
   const [openCreateSpace, setOpenCreateSpace] = useState(false);
   const [openEditSpaceChannel, setOpenEditSpaceChannel] = useState(false);
   const [openCreatePinPost, setOpenCreatePinPost] = useState(false);
+  const viewTxDetail = useCallback(() => setOpenTxDetail(true), []);
+  const closeTxDetail = useCallback(() => setOpenTxDetail(false), []);
+  const onSent = useCallback(() => {
+    appTitleBarRef.current?.openTransaction?.();
+  }, []);
+  const onViewTxDetail = useCallback(
+    (hash: string) => {
+      setSelectedHash(hash);
+      viewTxDetail();
+    },
+    [viewTxDetail]
+  );
   const toggleConfirmDeletePost = useCallback(
     () => setOpenConfirmDeletePost((current) => !current),
     []
@@ -758,7 +774,7 @@ const Home = () => {
 
   return (
     <PageWrapper>
-      <AppTitleBar />
+      <AppTitleBar ref={appTitleBarRef} />
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="home-container">
           <SideBar
@@ -858,6 +874,8 @@ const Home = () => {
             open={!!currentUserId}
             handleClose={handleCloseModalUserProfile}
             userId={currentUserId}
+            onSent={onSent}
+            onViewTxDetail={onViewTxDetail}
           />
           <ModalCreatePinPost
             open={openCreatePinPost}
@@ -872,6 +890,11 @@ const Home = () => {
             messages={messageData[matchPostId]?.data}
             loadMoreMessage={loadMorePPMessage}
             onMoreMessage={onMorePinPostMessage}
+          />
+          <ModalTransactionDetail
+            open={openTxDetail}
+            handleClose={closeTxDetail}
+            txHash={selectedHash}
           />
         </div>
       </DragDropContext>
