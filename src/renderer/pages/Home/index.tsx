@@ -308,11 +308,21 @@ const Home = () => {
     },
     [currentTeam?.team_id, history]
   );
+  const handleCloseModalUserProfile = useCallback(async () => {
+    dispatch({ type: actionTypes.UPDATE_CURRENT_USER_PROFILE_ID, payload: "" });
+    if (history.location.pathname.includes("user")) {
+      history.goBack();
+    }
+  }, [dispatch, history]);
   const handleOpenInviteMember = useCallback(() => setOpenInvite(true), []);
-  const handleSpaceBadgeClick = useCallback((s: Space) => {
-    setSelectedSpace(s);
-    setOpenSpaceDetail(true);
-  }, []);
+  const handleSpaceBadgeClick = useCallback(
+    (s: Space) => {
+      handleCloseModalUserProfile();
+      setSelectedSpace(s);
+      setOpenSpaceDetail(true);
+    },
+    [handleCloseModalUserProfile]
+  );
   const onMoreAfterMessage = useCallback(
     async (message: MessageData) => {
       if (!message.createdAt) return;
@@ -534,12 +544,6 @@ const Home = () => {
   const handleCloseModalConfirmDeleteSpace = useCallback(() => {
     setOpenConfirmDeleteSpace(false);
   }, []);
-  const handleCloseModalUserProfile = useCallback(async () => {
-    dispatch({ type: actionTypes.UPDATE_CURRENT_USER_PROFILE_ID, payload: "" });
-    if (history.location.pathname.includes("user")) {
-      history.goBack();
-    }
-  }, [dispatch, history]);
   const handleDeleteSpace = useCallback(async () => {
     if (!selectedSpace?.space_id) return;
     const success = await dispatch(deleteSpaceChannel(selectedSpace?.space_id));
@@ -569,7 +573,10 @@ const Home = () => {
   }, [currentChannel.channel_id]);
   useEffect(() => {
     setCurrentUserId(currentUserProfileId);
-  }, [currentUserProfileId]);
+    if (currentUserProfileId) {
+      handleCloseModalSpaceDetail();
+    }
+  }, [currentUserProfileId, handleCloseModalSpaceDetail]);
   useEffect(() => {
     if (match_community_id === "user" && match_channel_id) {
       setCurrentUserId(match_channel_id);
@@ -876,6 +883,7 @@ const Home = () => {
             userId={currentUserId}
             onSent={onSent}
             onViewTxDetail={onViewTxDetail}
+            onSpaceClick={handleSpaceBadgeClick}
           />
           <ModalCreatePinPost
             open={openCreatePinPost}
