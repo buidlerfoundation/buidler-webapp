@@ -324,11 +324,11 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             ? channelMap
             : {
                 ...channelMap,
-                [currentTeamId]: newChannels,
+                [currentTeamId]: uniqBy(newChannels, "channel_id"),
               },
         directChannel:
           payload.channel_type === "Direct"
-            ? [...directChannel, payload]
+            ? uniqBy([...directChannel, payload], "channel_id")
             : directChannel,
         teamUserMap: {
           ...teamUserMap,
@@ -843,8 +843,50 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
     }
     case actionTypes.CREATE_CHANNEL_SUCCESS: {
+      let newTeamUserData = teamUserMap[currentTeamId]?.data;
+      if (payload.channel_type === "Direct" && !!newTeamUserData) {
+        newTeamUserData = newTeamUserData.map((el) => {
+          if (
+            !!payload.channel_member.find((id) => id === el.user_id) &&
+            (el.user_id !== userData.user_id ||
+              payload.channel_member.length === 1)
+          ) {
+            el.direct_channel = payload.channel_id;
+          }
+          return el;
+        });
+        if (
+          !!payload.channel_member.find(
+            (el) => el === currentChannel.user?.user_id
+          )
+        ) {
+          currentChannel.channel_id = payload.channel_id;
+        }
+      }
+      const newChannels = channelMap[currentTeamId] || [];
+      if (payload.channel_type !== "Direct") {
+        newChannels.push(payload);
+      }
       return {
         ...state,
+        channelMap:
+          payload.channel_type === "Direct"
+            ? channelMap
+            : {
+                ...channelMap,
+                [currentTeamId]: uniqBy(newChannels, "channel_id"),
+              },
+        directChannel:
+          payload.channel_type === "Direct"
+            ? uniqBy([...directChannel, payload], "channel_id")
+            : directChannel,
+        teamUserMap: {
+          ...teamUserMap,
+          [currentTeamId]: {
+            ...teamUserMap[currentTeamId],
+            data: newTeamUserData,
+          },
+        },
         lastChannel: {
           ...lastChannel,
           [currentTeamId]: payload,
