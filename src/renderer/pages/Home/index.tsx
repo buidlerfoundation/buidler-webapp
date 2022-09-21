@@ -392,15 +392,14 @@ const Home = () => {
         const colorAverage = await getSpaceBackgroundColor(url);
         body.space_background_color = colorAverage;
       }
+      const conditionAmount =
+        spaceData?.condition?.amount || spaceData?.condition?.amountInput || "";
       if (spaceData.spaceType === "Exclusive") {
         if (!spaceData.spaceBadgeId) {
           error = "Badge cannot be empty";
         } else if (!spaceData.condition) {
           error = "Condition cannot be empty";
-        } else if (
-          !spaceData.condition.amount &&
-          !spaceData.condition.amountInput
-        ) {
+        } else if (!conditionAmount || parseInt(`${conditionAmount}`) === 0) {
           error = "Amount cannot be empty";
         }
         if (error) {
