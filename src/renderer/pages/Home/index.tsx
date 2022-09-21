@@ -818,13 +818,14 @@ const Home = () => {
               teamUserData={teamUserData}
               onEditPinPost={onEditPost}
             />
-            {currentChannel.channel_type !== "Direct" && (
-              <PinPostList
-                onMenuSelected={onMenuPostSelected}
-                onCreate={handleCreatePinPost}
-                onEdit={onEditPost}
-              />
-            )}
+            {currentChannel.channel_id &&
+              currentChannel.channel_type !== "Direct" && (
+                <PinPostList
+                  onMenuSelected={onMenuPostSelected}
+                  onCreate={handleCreatePinPost}
+                  onEdit={onEditPost}
+                />
+              )}
           </div>
           <ModalSpaceDetail
             space={selectedSpace}

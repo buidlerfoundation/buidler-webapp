@@ -912,9 +912,7 @@ class SocketUtil {
     const messageData: any = store.getState()?.message?.messageData;
     const { userData } = user;
     const conversationData = messageData?.[message.entity_id]?.data?.find(
-      (el) =>
-        el.reply_message_id === message.reply_message_id ||
-        el.message_id === message.reply_message_id
+      (el) => el.message_id === message.reply_message_id
     );
     store.dispatch({
       type: actionTypes.EMIT_NEW_MESSAGE,
