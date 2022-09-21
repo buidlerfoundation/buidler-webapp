@@ -123,6 +123,20 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     defaultChannel;
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.UPDATE_USER_PERMISSION: {
+      const { role, team_id } = payload;
+      return {
+        ...state,
+        team: state.team?.map((el) => {
+          if (el.team_id === team_id)
+            return {
+              ...el,
+              role,
+            };
+          return el;
+        }),
+      };
+    }
     case actionTypes.UPDATE_CURRENT_USER_PROFILE_ID: {
       return {
         ...state,

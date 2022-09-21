@@ -34,6 +34,7 @@ import SwitchAccountMetaMask from "renderer/components/SwitchAccountMetaMask";
 import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
 import PageNotFound from "renderer/shared/PageNotFound";
 import ErrorPage from "renderer/shared/ErrorBoundary/ErrorPage";
+import UnSupportPage from "../UnSupportPage";
 
 const PublicRoute = ({ component: Component, ...rest }: any) => {
   const history = useHistory();
@@ -259,6 +260,10 @@ const RedirectToHome = () => {
 };
 
 const Main = () => {
+  const unSupport = useMemo(
+    () => /iPhone|Android/g.test(window.navigator.userAgent),
+    []
+  );
   const imgDomain = useAppSelector((state) => state.user.imgDomain);
   const { chainId, metaMaskAccount } = useAppSelector((state) => state.network);
   const userData = useAppSelector((state) => state.user.userData);
@@ -273,6 +278,7 @@ const Main = () => {
   useEffect(() => {
     dispatch(getInitial?.());
   }, [dispatch]);
+  if (unSupport) return <UnSupportPage />;
   if (somethingWrong) return <ErrorPage />;
   if (!imgDomain) {
     return <div className="main-load-page" />;

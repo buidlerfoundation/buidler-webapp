@@ -1,0 +1,27 @@
+.un-support-page__container {
+  display: flex;
+  width: 100%;
+  background-color: var(--color-darkest-background);
+  height: 100vh;
+  flex-direction: column;
+  .un-support-text {
+    color: var(--color-primary-text);
+    font-weight: 600;
+    font-size: 24px;
+    padding: 20px;
+    text-align: center;
+    line-height: 34px;
+  }
+  .bottom-button {
+    color: var(--color-primary-text);
+    font-size: 18px;
+    font-weight: 600;
+    background-color: var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    margin: 0 20px 20px 20px;
+    border-radius: 5px;
+  }
+}
