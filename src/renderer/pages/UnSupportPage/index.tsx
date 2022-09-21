@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import images from "renderer/common/images";
 import "./index.scss";
 
 const UnSupportPage = () => {
@@ -7,14 +8,17 @@ const UnSupportPage = () => {
   }, []);
   return (
     <div className="un-support-page__container">
-      <div style={{ height: 200 }} />
-      <span className="un-support-text">
-        Hi there, Mobile version is coming soon. Let's try again with your
-        desktop.
-      </span>
-      <div style={{ flex: 1 }} />
-      <div className="bottom-button" onClick={handleBackToHome}>
-        <span>Back to home page</span>
+      <div className="un-support-body">
+        <img src={images.icLogoSquare} className="app-logo" alt="" />
+        <span className="un-support-text">
+          Hi there!
+          <br />
+          Mobile version is coming soon. Let’s try again with your desktop.
+        </span>
+
+        <div className="bottom-button" onClick={handleBackToHome}>
+          <span>Back to homepage</span>
+        </div>
       </div>
     </div>
   );

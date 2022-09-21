@@ -1,27 +1,41 @@
 .un-support-page__container {
   display: flex;
   width: 100%;
-  background-color: var(--color-darkest-background);
+  background-color: var(--color-lighter-background);
   height: 100vh;
   flex-direction: column;
-  .un-support-text {
-    color: var(--color-primary-text);
-    font-weight: 600;
-    font-size: 24px;
-    padding: 20px;
-    text-align: center;
-    line-height: 34px;
-  }
-  .bottom-button {
-    color: var(--color-primary-text);
-    font-size: 18px;
-    font-weight: 600;
-    background-color: var(--color-accent);
+  .un-support-body {
+    margin: 140px 20px 0 20px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 50px;
-    margin: 0 20px 20px 20px;
+    flex-direction: column;
     border-radius: 5px;
+    background-color: var(--color-highlight);
+    padding: 20px;
+    .app-logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 30px;
+    }
+    .un-support-text {
+      color: var(--color-primary-text);
+      font-weight: 500;
+      font-size: 18px;
+      line-height: 26px;
+      margin-top: 15px;
+    }
+    .bottom-button {
+      color: var(--color-primary-text);
+      font-size: 16px;
+      font-weight: 600;
+      background-color: var(--color-stroke);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 60px;
+      margin-top: 25px;
+      border-radius: 5px;
+      line-height: 26px;
+      border-radius: 5px;
+    }
   }
 }
