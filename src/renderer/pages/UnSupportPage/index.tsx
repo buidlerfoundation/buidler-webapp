@@ -4,7 +4,7 @@ import "./index.scss";
 
 const UnSupportPage = () => {
   const handleBackToHome = useCallback(() => {
-    window.location.replace("https://www.buidler.app/");
+    window.location.replace("https://buidler.app/");
   }, []);
   return (
     <div className="un-support-page__container">
