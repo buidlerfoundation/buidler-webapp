@@ -32,6 +32,9 @@ const networkReducers: Reducer<NetworkReducerState, AnyAction> = (
         chainId: payload,
       };
     }
+    case actionTypes.LOGOUT: {
+      return initialState;
+    }
 
     default:
       return state;
