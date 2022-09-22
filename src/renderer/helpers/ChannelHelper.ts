@@ -1,4 +1,4 @@
-import { ethers, utils } from "ethers";
+import { ethers } from "ethers";
 import EthCrypto from "eth-crypto";
 import { getCookie, setCookie } from "renderer/common/Cookie";
 import { AsyncKey } from "renderer/common/AppConfig";
@@ -8,18 +8,11 @@ import { decrypt } from "eciesjs";
 import CryptoJS from "crypto-js";
 
 export const encryptMessage = async (str: string, key: string) => {
-  const pubKey = utils.computePublicKey(key, true);
-  const res = await EthCrypto.encryptWithPublicKey(pubKey.slice(2), str);
-  return JSON.stringify(res);
+  return CryptoJS.AES.encrypt(str, key).toString();
 };
 
 export const decryptMessage = async (str: string, key: string) => {
-  try {
-    const res = await EthCrypto.decryptWithPrivateKey(key, JSON.parse(str));
-    return res;
-  } catch (error) {
-    return null;
-  }
+  return CryptoJS.AES.decrypt(str, key).toString(CryptoJS.enc.Utf8);
 };
 
 const memberData = async (

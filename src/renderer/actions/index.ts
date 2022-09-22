@@ -1,4 +1,3 @@
-import * as ConfigActions from "./ConfigActions";
 import * as UserActions from "./UserActions";
 import * as TaskActions from "./TaskActions";
 import * as ReactActions from "./ReactActions";
@@ -9,7 +8,6 @@ import * as CollectibleActions from "./CollectibleActions";
 import { ActionCreatorsMapObject } from "redux";
 
 const actions: ActionCreatorsMapObject<any> = {
-  ...ConfigActions,
   ...UserActions,
   ...TaskActions,
   ...ReactActions,

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import "./index.scss";
 import "./App.scss";
 import "../src/renderer/styles/spacing.scss";
