@@ -159,3 +159,14 @@ export const modifyRole = (
 
 export const addPendingTx = (tx: TransactionApiData) =>
   Caller.post<TransactionApiData>("user/transaction", tx);
+
+export const refreshToken = (token: string) => {
+  return Caller.post<{
+    token: string;
+    token_expire_at: number;
+    refresh_token: string;
+    refresh_token_expire_at: number;
+  }>("user/refresh", undefined, undefined, undefined, {
+    "Refresh-Token": token,
+  });
+};

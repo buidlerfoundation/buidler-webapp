@@ -18,6 +18,7 @@ export default AppConfig;
 
 export const AsyncKey = {
   accessTokenKey: `${Prefix}_access_token`,
+  refreshTokenKey: `${Prefix}_refresh_token`,
   lastChannelId: `${Prefix}_last_channel_id`,
   lastTeamId: `${Prefix}_last_team_id`,
   ivKey: `${Prefix}_iv_key`,
@@ -29,6 +30,8 @@ export const AsyncKey = {
   generatedPrivateKey: `${Prefix}_generated_private_key`,
   loginType: `${Prefix}_login_key`,
   socketConnectKey: `${Prefix}_socket_connect_key`,
+  tokenExpire: `${Prefix}_token_expire_key`,
+  refreshTokenExpire: `${Prefix}_refresh_token_expire_key`,
 };
 
 export const ProgressStatus = [
@@ -84,4 +87,11 @@ export const importantApis = [
   { uri: "get-channel", exact: false },
   { uri: "get-user/team", exact: true },
   { uri: "get-user", exact: true },
+];
+
+export const whiteListRefreshTokenApis = [
+  "get-initial",
+  "post-user/refresh",
+  "post-user/address",
+  "post-user",
 ];

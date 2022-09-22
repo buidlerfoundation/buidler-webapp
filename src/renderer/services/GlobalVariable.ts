@@ -3,6 +3,7 @@ class GlobalVariable {
   isWindowFocus = true;
   loginType = "";
   version = "1.9.1";
+  sessionExpired = false;
 }
 
 export default new GlobalVariable();

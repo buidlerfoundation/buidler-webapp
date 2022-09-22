@@ -406,6 +406,9 @@ export interface BaseDataApi<T> {
   total?: number;
   token?: string;
   metadata?: { total?: number; encrypt_message_key?: string };
+  refresh_token?: string;
+  token_expire_at?: number;
+  refresh_token_expire_at?: number;
 }
 
 export type UserRoleType = "owner" | "admin" | "member";

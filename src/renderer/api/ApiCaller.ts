@@ -1,9 +1,15 @@
 import toast from "react-hot-toast";
 import actionTypes from "renderer/actions/ActionTypes";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
+import GlobalVariable from "renderer/services/GlobalVariable";
 import store from "renderer/store";
-import AppConfig, { AsyncKey, importantApis } from "../common/AppConfig";
-import { getCookie } from "../common/Cookie";
+import api from ".";
+import AppConfig, {
+  AsyncKey,
+  importantApis,
+  whiteListRefreshTokenApis,
+} from "../common/AppConfig";
+import { clearData, getCookie, setCookie } from "../common/Cookie";
 
 const METHOD_GET = "get";
 const METHOD_POST = "post";
@@ -30,6 +36,35 @@ const handleError = (message: string, apiData: any) => {
   }
 };
 
+const handleRefreshToken = async () => {
+  const refreshTokenExpire = await getCookie(AsyncKey.refreshTokenExpire);
+  const refreshToken = await getCookie(AsyncKey.refreshTokenKey);
+  if (
+    !refreshTokenExpire ||
+    !refreshToken ||
+    new Date().getTime() / 1000 > refreshTokenExpire
+  ) {
+    return false;
+  }
+  const refreshTokenRes = await api.refreshToken(refreshToken);
+  if (refreshTokenRes.success) {
+    await setCookie(AsyncKey.accessTokenKey, refreshTokenRes?.data?.token);
+    await setCookie(
+      AsyncKey.refreshTokenKey,
+      refreshTokenRes?.data?.refresh_token
+    );
+    await setCookie(
+      AsyncKey.tokenExpire,
+      refreshTokenRes?.data?.token_expire_at
+    );
+    await setCookie(
+      AsyncKey.refreshTokenExpire,
+      refreshTokenRes?.data?.refresh_token_expire_at
+    );
+  }
+  return refreshTokenRes.success;
+};
+
 async function requestAPI<T = any>(
   method: string,
   uri: string,
@@ -41,6 +76,31 @@ async function requestAPI<T = any>(
   statusCode: number;
   message?: string;
 }> {
+  if (GlobalVariable.sessionExpired) {
+    return {
+      success: false,
+      statusCode: 403,
+    };
+  }
+  if (!whiteListRefreshTokenApis.includes(`${method}-${uri}`)) {
+    const expireTokenTime = await getCookie(AsyncKey.tokenExpire);
+    if (!expireTokenTime || new Date().getTime() / 1000 > expireTokenTime) {
+      const success = await handleRefreshToken();
+      if (!success) {
+        if (!GlobalVariable.sessionExpired) {
+          GlobalVariable.sessionExpired = true;
+          handleError("Session expired", { uri, fetchOptions: { method } });
+          clearData(() => {
+            window.location.reload();
+          });
+        }
+        return {
+          success: false,
+          statusCode: 403,
+        };
+      }
+    }
+  }
   // Build API header
   const headers: any = {
     Accept: "*/*",

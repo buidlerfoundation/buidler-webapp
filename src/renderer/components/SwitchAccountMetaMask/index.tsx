@@ -44,6 +44,12 @@ const SwitchAccountMetaMask = () => {
       if (res.statusCode === 200) {
         removeCookie(AsyncKey.socketConnectKey);
         await setCookie(AsyncKey.accessTokenKey, res?.token);
+        await setCookie(AsyncKey.refreshTokenKey, res?.refresh_token);
+        await setCookie(AsyncKey.tokenExpire, res?.token_expire_at);
+        await setCookie(
+          AsyncKey.refreshTokenExpire,
+          res?.refresh_token_expire_at
+        );
         window.location.reload();
       }
     } catch (error: any) {

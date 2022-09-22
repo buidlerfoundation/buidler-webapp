@@ -59,6 +59,12 @@ const Started = () => {
       dispatch({ type: actionTypes.UPDATE_CURRENT_TOKEN, payload: res?.token });
       await setCookie(AsyncKey.accessTokenKey, res?.token);
       await setCookie(AsyncKey.loginType, loginType);
+      await setCookie(AsyncKey.refreshTokenKey, res?.refresh_token);
+      await setCookie(AsyncKey.tokenExpire, res?.token_expire_at);
+      await setCookie(
+        AsyncKey.refreshTokenExpire,
+        res?.refresh_token_expire_at
+      );
       if (dataFromUrl?.includes?.("invitation")) {
         const invitationId = dataFromUrl.split("=")[1];
         const acceptRes = await api.acceptInvitation(invitationId);
