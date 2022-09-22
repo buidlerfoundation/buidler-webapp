@@ -85,7 +85,7 @@ async function requestAPI<T = any>(
       if (!success) {
         if (!GlobalVariable.sessionExpired) {
           GlobalVariable.sessionExpired = true;
-          handleError("Session expired", { uri, fetchOptions: { method } });
+          toast.error("Session expired");
           clearData(() => {
             window.location.reload();
           });
