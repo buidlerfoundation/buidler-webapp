@@ -11,6 +11,7 @@ interface ConfigReducerState {
   isFullScreen: boolean;
   currentToken?: string;
   somethingWrong?: boolean | null;
+  isOpenModalConfirmSignMessage: boolean;
 }
 
 const initialState: ConfigReducerState = {
@@ -23,6 +24,7 @@ const initialState: ConfigReducerState = {
   isFullScreen: true,
   currentToken: undefined,
   somethingWrong: null,
+  isOpenModalConfirmSignMessage: false,
 };
 
 const configReducers: Reducer<ConfigReducerState, AnyAction> = (
@@ -31,6 +33,12 @@ const configReducers: Reducer<ConfigReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.TOGGLE_MODAL_CONFIRM_SIGN_MESSAGE: {
+      return {
+        ...state,
+        isOpenModalConfirmSignMessage: payload,
+      };
+    }
     case actionTypes.SOMETHING_WRONG: {
       return {
         ...state,

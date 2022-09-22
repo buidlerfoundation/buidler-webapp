@@ -10,6 +10,7 @@ if (process.env.NODE_ENV === "development") {
 const store = createStore(reducers, applyMiddleware(...logs, thunk));
 
 export type AppRootState = ReturnType<typeof store.getState>;
+export type AppGetState = typeof store.getState;
 export type AppDispatch = typeof store.dispatch;
 
 export default store;

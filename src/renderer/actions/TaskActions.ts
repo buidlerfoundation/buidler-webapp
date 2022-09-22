@@ -18,6 +18,10 @@ export const uploadToIPFS =
         channelId,
       },
     });
+    dispatch({
+      type: actionTypes.TOGGLE_MODAL_CONFIRM_SIGN_MESSAGE,
+      payload: true,
+    });
     try {
       const loginType = await getCookie(AsyncKey.loginType);
       const timestamp = new Date().getTime();
@@ -36,6 +40,10 @@ export const uploadToIPFS =
           params
         );
       }
+      dispatch({
+        type: actionTypes.TOGGLE_MODAL_CONFIRM_SIGN_MESSAGE,
+        payload: false,
+      });
       if (signature) {
         api
           .uploadToIPFS(pinPostId, {
@@ -43,18 +51,10 @@ export const uploadToIPFS =
             signature,
             sign_message: message,
           })
-          .then(() => {
-            dispatch({
-              type: actionTypes.UPDATE_TASK_REQUEST,
-              payload: {
-                taskId: pinPostId,
-                data: { uploadingIPFS: false },
-                channelId,
-              },
-            });
-          })
           .catch((error) => {
             toast.error(error.message);
+          })
+          .finally(() => {
             dispatch({
               type: actionTypes.UPDATE_TASK_REQUEST,
               payload: {
@@ -74,6 +74,10 @@ export const uploadToIPFS =
           data: { uploadingIPFS: false },
           channelId,
         },
+      });
+      dispatch({
+        type: actionTypes.TOGGLE_MODAL_CONFIRM_SIGN_MESSAGE,
+        payload: false,
       });
     }
   };
