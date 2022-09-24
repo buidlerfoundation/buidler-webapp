@@ -178,7 +178,8 @@ function App() {
   );
   const metamaskConnected = useCallback(() => {
     setTimeout(() => {
-      const chainId = window.ethereum?.chainId || "";
+      const chainId =
+        window.ethereum?.chainId || window.ethereum?.networkVersion || "";
       const account = window.ethereum?.selectedAddress;
       dispatch({
         type: actionTypes.SET_METAMASK_ACCOUNT,
