@@ -15,6 +15,7 @@ import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 import { ethers, utils } from "ethers";
 import GlobalVariable from "renderer/services/GlobalVariable";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
+import ChainId from "renderer/services/connectors/ChainId";
 
 const Started = () => {
   useEffect(() => {
@@ -174,7 +175,10 @@ const Started = () => {
   );
   const metamaskConnected = useCallback(() => {
     const chainId =
-      window.ethereum?.chainId || window.ethereum?.networkVersion || "";
+      window.ethereum?.chainId ||
+      window.ethereum?.networkVersion ||
+      process.env.REACT_APP_DEFAULT_CHAIN_ID ||
+      `${ChainId.EthereumMainnet}`;
     const account = window.ethereum?.selectedAddress;
     dispatch({
       type: actionTypes.SET_METAMASK_ACCOUNT,

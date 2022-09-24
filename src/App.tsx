@@ -28,6 +28,7 @@ import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 import ErrorBoundary from "renderer/shared/ErrorBoundary";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import { CustomEventName } from "renderer/services/events/WindowEvent";
+import ChainId from "renderer/services/connectors/ChainId";
 
 function App() {
   const history = useHistory();
@@ -179,7 +180,10 @@ function App() {
   const metamaskConnected = useCallback(() => {
     setTimeout(() => {
       const chainId =
-        window.ethereum?.chainId || window.ethereum?.networkVersion || "";
+        window.ethereum?.chainId ||
+        window.ethereum?.networkVersion ||
+        process.env.REACT_APP_DEFAULT_CHAIN_ID ||
+        `${ChainId.EthereumMainnet}`;
       const account = window.ethereum?.selectedAddress;
       dispatch({
         type: actionTypes.SET_METAMASK_ACCOUNT,
