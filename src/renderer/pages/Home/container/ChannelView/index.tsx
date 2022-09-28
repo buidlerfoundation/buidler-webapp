@@ -310,7 +310,7 @@ const ChannelView = forwardRef(
             break;
         }
       },
-      [currentChannel.channel_id, dispatch]
+      [currentChannel.channel_id, dispatch, toggleConfirmDeleteMessage]
     );
     const scrollDown = useCallback(async () => {
       msgListRef.current?.scrollTo?.(0, 0);
