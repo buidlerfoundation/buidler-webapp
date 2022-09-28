@@ -45,6 +45,8 @@ export interface UserNFTCollection {
   network: string;
   token_id: string;
   nft_collection?: NFTCollection;
+  can_set_username?: boolean;
+  can_set_avatar?: boolean;
 }
 
 export interface UserData {

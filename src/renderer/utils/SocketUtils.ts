@@ -102,8 +102,8 @@ const getMessages = async (
   const messageData = isPrivate
     ? await normalizeMessageData(messageRes.data || [], channelId)
     : normalizePublicMessageData(
-        messageRes.data || [],
-        messageRes.metadata?.encrypt_message_key
+        messageRes?.data || [],
+        messageRes?.metadata?.encrypt_message_key
       );
   if (messageRes.statusCode === 200) {
     dispatch({

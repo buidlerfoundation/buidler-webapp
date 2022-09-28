@@ -484,7 +484,11 @@ export const updateUser = (userData: any) => async (dispatch: Dispatch) => {
   dispatch({ type: ActionTypes.UPDATE_USER_REQUEST, payload: userData });
   const dataUpdate: any = {};
   if (userData.isUpdateENS && userData?.ensAsset) {
-    dataUpdate.ens_asset = userData?.ensAsset;
+    dataUpdate.ens_asset = {
+      contract_address: userData?.ensAsset?.contract_address,
+      token_id: userData?.ensAsset?.token_id,
+      network: userData?.ensAsset?.network,
+    };
   }
   if (!userData?.ensAsset && userData?.userName) {
     dataUpdate.username = userData?.userName;
