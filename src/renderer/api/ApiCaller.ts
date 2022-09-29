@@ -48,6 +48,10 @@ const handleRefreshToken = async () => {
   }
   const refreshTokenRes = await api.refreshToken(refreshToken);
   if (refreshTokenRes.success) {
+    store.dispatch({
+      type: actionTypes.UPDATE_CURRENT_TOKEN,
+      payload: refreshTokenRes?.data?.token,
+    });
     await setCookie(AsyncKey.accessTokenKey, refreshTokenRes?.data?.token);
     await setCookie(
       AsyncKey.refreshTokenKey,

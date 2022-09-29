@@ -6,6 +6,7 @@ import React, {
   useCallback,
   useMemo,
   memo,
+  useEffect,
 } from "react";
 import Dropzone from "react-dropzone";
 import {
@@ -315,6 +316,11 @@ const ChannelView = forwardRef(
     const scrollDown = useCallback(async () => {
       msgListRef.current?.scrollTo?.(0, 0);
     }, []);
+    useEffect(() => {
+      if (currentChannel.channel_id) {
+        scrollDown();
+      }
+    }, [currentChannel.channel_id, scrollDown]);
     const onScrollDownPress = useCallback(async () => {
       if (messageCanMoreAfter) {
         await dispatch(getMessages(currentChannel.channel_id));

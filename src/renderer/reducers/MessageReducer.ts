@@ -137,7 +137,9 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
               ? true
               : after
               ? data.length !== 0
-              : state.messageData?.[channelId]?.canMoreAfter,
+              : before
+              ? state.messageData?.[channelId]?.canMoreAfter
+              : false,
             scrollData,
           },
         },
