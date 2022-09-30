@@ -3,6 +3,7 @@ import actionTypes from "renderer/actions/ActionTypes";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import GlobalVariable from "renderer/services/GlobalVariable";
 import store from "renderer/store";
+import SocketUtils from "renderer/utils/SocketUtils";
 import api from ".";
 import AppConfig, {
   AsyncKey,
@@ -65,6 +66,7 @@ const handleRefreshToken = async () => {
       AsyncKey.refreshTokenExpire,
       refreshTokenRes?.data?.refresh_token_expire_at
     );
+    SocketUtils.init();
   }
   return refreshTokenRes.success;
 };
