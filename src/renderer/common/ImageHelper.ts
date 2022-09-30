@@ -1,5 +1,5 @@
 import { utils } from "ethers";
-import blockies from "ethereum-blockies-png";
+import makeBlockie from "ethereum-blockies-base64";
 
 type imageOptions = {
   w?: number;
@@ -18,9 +18,7 @@ class ImageHelper {
   }
 
   normalizeEthImage = (address) => {
-    return blockies.createDataURL({
-      seed: address,
-    });
+    return makeBlockie(address);
   };
 
   normalizeImage = (
@@ -30,10 +28,8 @@ class ImageHelper {
     noParams = false
   ) => {
     if (!name && id?.substring(0, 2) === "0x") {
-      const data = blockies.createDataURL({
-        seed: utils.computeAddress(id),
-      });
-      return data;
+      const address = utils.computeAddress(id);
+      return makeBlockie(address);
     }
     if (name?.includes?.("http")) return name;
     if (this.imgDomain === "" || this.imgConfig == null || name == null)
