@@ -1,16 +1,16 @@
 import toast from "react-hot-toast";
 import actionTypes from "renderer/actions/ActionTypes";
+import { refreshToken } from "renderer/actions/UserActions";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import GlobalVariable from "renderer/services/GlobalVariable";
 import store from "renderer/store";
 import SocketUtils from "renderer/utils/SocketUtils";
-import api from ".";
 import AppConfig, {
   AsyncKey,
   importantApis,
   whiteListRefreshTokenApis,
 } from "../common/AppConfig";
-import { clearData, getCookie, setCookie } from "../common/Cookie";
+import { clearData, getCookie } from "../common/Cookie";
 
 const METHOD_GET = "get";
 const METHOD_POST = "post";
@@ -37,40 +37,6 @@ const handleError = (message: string, apiData: any) => {
   }
 };
 
-const handleRefreshToken = async () => {
-  const refreshTokenExpire = await getCookie(AsyncKey.refreshTokenExpire);
-  const refreshToken = await getCookie(AsyncKey.refreshTokenKey);
-  if (
-    !refreshTokenExpire ||
-    !refreshToken ||
-    new Date().getTime() / 1000 > refreshTokenExpire
-  ) {
-    return false;
-  }
-  const refreshTokenRes = await api.refreshToken(refreshToken);
-  if (refreshTokenRes.success) {
-    store.dispatch({
-      type: actionTypes.UPDATE_CURRENT_TOKEN,
-      payload: refreshTokenRes?.data?.token,
-    });
-    await setCookie(AsyncKey.accessTokenKey, refreshTokenRes?.data?.token);
-    await setCookie(
-      AsyncKey.refreshTokenKey,
-      refreshTokenRes?.data?.refresh_token
-    );
-    await setCookie(
-      AsyncKey.tokenExpire,
-      refreshTokenRes?.data?.token_expire_at
-    );
-    await setCookie(
-      AsyncKey.refreshTokenExpire,
-      refreshTokenRes?.data?.refresh_token_expire_at
-    );
-    SocketUtils.init();
-  }
-  return refreshTokenRes.success;
-};
-
 async function requestAPI<T = any>(
   method: string,
   uri: string,
@@ -91,7 +57,7 @@ async function requestAPI<T = any>(
   if (!whiteListRefreshTokenApis.includes(`${method}-${uri}`)) {
     const expireTokenTime = await getCookie(AsyncKey.tokenExpire);
     if (!expireTokenTime || new Date().getTime() / 1000 > expireTokenTime) {
-      const success = await handleRefreshToken();
+      const success: any = await store.dispatch(refreshToken());
       if (!success) {
         if (!GlobalVariable.sessionExpired) {
           GlobalVariable.sessionExpired = true;
@@ -104,6 +70,8 @@ async function requestAPI<T = any>(
           success: false,
           statusCode: 403,
         };
+      } else {
+        SocketUtils.init();
       }
     }
   }

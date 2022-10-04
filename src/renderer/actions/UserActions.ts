@@ -27,6 +27,50 @@ export const logout: ActionCreator<any> = () => (dispatch: Dispatch) => {
   dispatch({ type: ActionTypes.LOGOUT });
 };
 
+export const refreshToken = () => async (dispatch: Dispatch) => {
+  dispatch({ type: ActionTypes.REFRESH_TOKEN_REQUEST });
+  try {
+    const refreshTokenExpire = await getCookie(AsyncKey.refreshTokenExpire);
+    const refreshToken = await getCookie(AsyncKey.refreshTokenKey);
+    if (
+      !refreshTokenExpire ||
+      !refreshToken ||
+      new Date().getTime() / 1000 > refreshTokenExpire
+    ) {
+      return false;
+    }
+    const refreshTokenRes = await api.refreshToken(refreshToken);
+    if (refreshTokenRes.success) {
+      dispatch({
+        type: ActionTypes.UPDATE_CURRENT_TOKEN,
+        payload: refreshTokenRes?.data?.token,
+      });
+      await setCookie(AsyncKey.accessTokenKey, refreshTokenRes?.data?.token);
+      await setCookie(
+        AsyncKey.refreshTokenKey,
+        refreshTokenRes?.data?.refresh_token
+      );
+      await setCookie(
+        AsyncKey.tokenExpire,
+        refreshTokenRes?.data?.token_expire_at
+      );
+      await setCookie(
+        AsyncKey.refreshTokenExpire,
+        refreshTokenRes?.data?.refresh_token_expire_at
+      );
+    } else {
+      dispatch({
+        type: ActionTypes.REFRESH_TOKEN_FAIL,
+        payload: refreshTokenRes,
+      });
+    }
+    return refreshTokenRes.success;
+  } catch (error) {
+    dispatch({ type: ActionTypes.REFRESH_TOKEN_FAIL, payload: error });
+    return false;
+  }
+};
+
 export const getMemberData =
   (teamId: string, role: UserRoleType, page: number) =>
   async (dispatch: Dispatch) => {
