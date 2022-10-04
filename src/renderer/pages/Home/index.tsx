@@ -586,6 +586,7 @@ const Home = () => {
     }
   }, [currentUserProfileId, handleCloseModalSpaceDetail]);
   useEffect(() => {
+    setOpeMembers(false);
     if (match_community_id === "user" && match_channel_id) {
       setCurrentUserId(match_channel_id);
     }
