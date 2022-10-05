@@ -607,11 +607,12 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         };
       } else if (resChannel?.data?.length > 0) {
         channel =
+          resChannel.data.find((c) => c.channel_id === lastChannelId) ||
           resChannel.data.find(
             (c) =>
-              c.channel_id === lastChannelId ||
               c.channel_id === lastChannel?.[payload.team.team_id]?.channel_id
-          ) || resChannel.data.filter((c) => c.channel_type !== "Direct")[0];
+          ) ||
+          resChannel.data.filter((c) => c.channel_type !== "Direct")[0];
         if (channel?.channel_type === "Direct") {
           channel.user = teamUsersRes?.data?.find(
             (u) => u.direct_channel === channel.channel_id
