@@ -17,6 +17,11 @@ const getPathNameWithoutPostOrMessage = () => {
   return pathname;
 };
 
+export const getPostId = () => {
+  const { pathname } = window.location;
+  return pathname.split("post/")?.[1];
+};
+
 export const getCommunityId = () => {
   const pathname = getPathNameWithoutPostOrMessage();
   const index = pathname.lastIndexOf("channels/") + 8;
