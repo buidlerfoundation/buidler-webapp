@@ -62,6 +62,7 @@ function App() {
       if (token !== currentToken) {
         window.location.reload();
       }
+      SocketUtils.reconnectIfNeeded();
       dispatch({ type: actionTypes.UPDATE_CURRENT_TOKEN, payload: token });
     };
     window.addEventListener("focus", eventFocus);
