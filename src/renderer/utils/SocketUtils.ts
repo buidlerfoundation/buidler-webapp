@@ -43,6 +43,7 @@ import {
 } from "renderer/helpers/StoreHelper";
 import { getCollectibles } from "renderer/actions/CollectibleActions";
 import { getPinPostMessages } from "renderer/actions/MessageActions";
+import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 
 const getTasks = async (channelId: string, dispatch: Dispatch) => {
   dispatch({ type: actionTypes.TASK_REQUEST, payload: { channelId } });
@@ -218,6 +219,7 @@ class SocketUtil {
     this.socket?.on("connect_error", async (err) => {
       this.connecting = false;
       const message = err.message || err;
+      GoogleAnalytics.tracking("Socket error: ", { message: `${message}` });
       if (message === "Authentication error") {
         const res: any = await store.dispatch(refreshToken());
         if (!!res) {

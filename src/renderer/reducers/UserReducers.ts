@@ -163,7 +163,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
       return {
         ...state,
-        memberData,
+        memberData: { ...memberData },
       };
     }
     case actionTypes.ACCEPT_TEAM_SUCCESS: {

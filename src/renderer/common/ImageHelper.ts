@@ -1,4 +1,3 @@
-import { utils } from "ethers";
 import makeBlockie from "ethereum-blockies-base64";
 
 type imageOptions = {
@@ -28,8 +27,7 @@ class ImageHelper {
     noParams = false
   ) => {
     if (!name && id?.substring(0, 2) === "0x") {
-      const address = utils.computeAddress(id);
-      return makeBlockie(address);
+      return `${this.imgDomain}${id}/ethereum_blockies.png`;
     }
     if (name?.includes?.("http")) return name;
     if (this.imgDomain === "" || this.imgConfig == null || name == null)

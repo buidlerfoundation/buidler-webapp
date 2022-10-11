@@ -363,29 +363,31 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
         }
       }
       if (newMessageData[data.entity_id]?.data) {
-        const isExited = !!newMessageData[data.entity_id]?.data?.find?.(
-          (el) => el.message_id === data.message_id
-        );
-        if (isExited) {
-          newMessageData[data.entity_id] = {
-            ...newMessageData[data.entity_id],
-            data: normalizeMessage(
-              newMessageData[data.entity_id].data.map((msg) => {
-                if (msg.message_id === data.message_id) {
-                  return data;
-                }
-                return msg;
-              })
-            ),
-          };
-        } else {
-          newMessageData[data.entity_id] = {
-            ...newMessageData[data.entity_id],
-            data: normalizeMessage([
-              data,
-              ...newMessageData[data.entity_id].data,
-            ]),
-          };
+        if (!newMessageData[data.entity_id]?.canMoreAfter) {
+          const isExited = !!newMessageData[data.entity_id]?.data?.find?.(
+            (el) => el.message_id === data.message_id
+          );
+          if (isExited) {
+            newMessageData[data.entity_id] = {
+              ...newMessageData[data.entity_id],
+              data: normalizeMessage(
+                newMessageData[data.entity_id].data.map((msg) => {
+                  if (msg.message_id === data.message_id) {
+                    return data;
+                  }
+                  return msg;
+                })
+              ),
+            };
+          } else {
+            newMessageData[data.entity_id] = {
+              ...newMessageData[data.entity_id],
+              data: normalizeMessage([
+                data,
+                ...newMessageData[data.entity_id].data,
+              ]),
+            };
+          }
         }
       } else {
         newMessageData[data.entity_id] = {
