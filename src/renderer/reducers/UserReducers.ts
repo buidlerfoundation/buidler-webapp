@@ -124,11 +124,11 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
   const { type, payload } = action;
   switch (type) {
     case actionTypes.UPDATE_USER_PERMISSION: {
-      const { role, team_id } = payload;
+      const { role, team_id, user_id } = payload;
       return {
         ...state,
         team: state.team?.map((el) => {
-          if (el.team_id === team_id)
+          if (el.team_id === team_id && user_id === userData.user_id)
             return {
               ...el,
               role,
