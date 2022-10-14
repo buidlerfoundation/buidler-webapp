@@ -165,14 +165,14 @@ const ChannelHeader = forwardRef(
     );
     const handleChannelClick = useCallback(
       (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        if (!currentChannel?.user && isOwner) {
+        if (!currentChannel?.user) {
           settingRef.current?.show(e.currentTarget, {
             x: 570,
             y: 110,
           });
         }
       },
-      [currentChannel?.user, isOwner]
+      [currentChannel?.user]
     );
     const handleMemberClick = useCallback(
       (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -293,6 +293,7 @@ const ChannelHeader = forwardRef(
                 isActiveMember={isActiveMember}
                 isActiveName={isActiveName}
                 onClose={handleCloseChannelSetting}
+                isOwner={isOwner}
               />
             }
           />
