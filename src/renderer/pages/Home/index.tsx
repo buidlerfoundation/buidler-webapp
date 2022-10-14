@@ -587,10 +587,11 @@ const Home = () => {
   }, [currentUserProfileId, handleCloseModalSpaceDetail]);
   useEffect(() => {
     setOpeMembers(false);
+    setCurrentUserId("");
     if (match_community_id === "user" && match_channel_id) {
       setCurrentUserId(match_channel_id);
     }
-  }, [match_community_id, match_channel_id]);
+  }, [match_community_id, match_channel_id, dispatch]);
   useEffect(() => {
     handleCloseModalSpaceDetail();
     if (match_channel_id && !!community) {

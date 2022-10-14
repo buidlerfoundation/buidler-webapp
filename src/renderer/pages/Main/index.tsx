@@ -75,6 +75,10 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
     () => rest?.computedMatch?.params?.match_community_id,
     [rest?.computedMatch?.params?.match_community_id]
   );
+  const match_channel_id = useMemo(
+    () => rest?.computedMatch?.params?.match_channel_id,
+    [rest?.computedMatch?.params?.match_channel_id]
+  );
   const invitationId = useMemo(() => query.get("invitation"), [query]);
   const userData = useAppSelector((state) => state.user.userData);
   const userError = useAppSelector((state) => errorUserSelector(state));
@@ -125,14 +129,17 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
       const matchCommunity = team?.find(
         (t) => t.team_id === match_community_id
       );
-      if (matchCommunity && !currentTeamLoading && !currentTeamError) {
+      if (
+        matchCommunity &&
+        !currentTeamLoading &&
+        !currentTeamError &&
+        match_channel_id
+      ) {
         await dispatch(setCurrentTeam(matchCommunity));
       }
     }
     setLoading(false);
   }, [
-    currentTeamError,
-    currentTeamLoading,
     rest.redirect,
     userData.user_id,
     userError,
@@ -142,6 +149,9 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
     invitationId,
     team,
     history,
+    currentTeamLoading,
+    currentTeamError,
+    match_channel_id,
   ]);
   useEffect(() => {
     if (window.location.pathname !== "/") {
