@@ -9,6 +9,7 @@ import ImageHelper from "../common/ImageHelper";
 import SocketUtils from "../utils/SocketUtils";
 import { Community, UserData, UserRoleType } from "renderer/models";
 import store from "renderer/store";
+import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 
 export const getInitial: ActionCreator<any> =
   () => async (dispatch: Dispatch) => {
@@ -29,14 +30,18 @@ export const logout: ActionCreator<any> = () => (dispatch: Dispatch) => {
 
 export const refreshToken = () => async (dispatch: Dispatch) => {
   dispatch({ type: ActionTypes.REFRESH_TOKEN_REQUEST });
+  const refreshTokenExpire = await getCookie(AsyncKey.refreshTokenExpire);
+  const refreshToken = await getCookie(AsyncKey.refreshTokenKey);
   try {
-    const refreshTokenExpire = await getCookie(AsyncKey.refreshTokenExpire);
-    const refreshToken = await getCookie(AsyncKey.refreshTokenKey);
     if (
       !refreshTokenExpire ||
       !refreshToken ||
       new Date().getTime() / 1000 > refreshTokenExpire
     ) {
+      GoogleAnalytics.tracking("Refresh failed", {
+        refreshTokenExpire,
+        message: "refresh token expire",
+      });
       return false;
     }
     const refreshTokenRes = await api.refreshToken(refreshToken);
@@ -59,13 +64,21 @@ export const refreshToken = () => async (dispatch: Dispatch) => {
         refreshTokenRes?.data?.refresh_token_expire_at
       );
     } else {
+      GoogleAnalytics.tracking("Refresh failed", {
+        refreshTokenExpire,
+        message: refreshTokenRes.message || "Some thing wrong",
+      });
       dispatch({
         type: ActionTypes.REFRESH_TOKEN_FAIL,
         payload: refreshTokenRes,
       });
     }
     return refreshTokenRes.success;
-  } catch (error) {
+  } catch (error: any) {
+    GoogleAnalytics.tracking("Refresh failed", {
+      refreshTokenExpire,
+      message: error.message || error,
+    });
     dispatch({ type: ActionTypes.REFRESH_TOKEN_FAIL, payload: error });
     return false;
   }
