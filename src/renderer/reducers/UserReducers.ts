@@ -646,7 +646,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
           ...lastChannel,
           [payload.team.team_id]: channel,
         },
-        memberData: {
+        memberData: state.memberData || {
           admin: {
             data: [],
             total: 0,
