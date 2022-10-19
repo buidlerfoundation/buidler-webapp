@@ -33,17 +33,6 @@ export const refreshToken = () => async (dispatch: Dispatch) => {
   const refreshTokenExpire = await getCookie(AsyncKey.refreshTokenExpire);
   const refreshToken = await getCookie(AsyncKey.refreshTokenKey);
   try {
-    if (
-      !refreshTokenExpire ||
-      !refreshToken ||
-      new Date().getTime() / 1000 > refreshTokenExpire
-    ) {
-      GoogleAnalytics.tracking("Refresh failed", {
-        refreshTokenExpire,
-        message: "refresh token expire",
-      });
-      return false;
-    }
     const refreshTokenRes = await api.refreshToken(refreshToken);
     if (refreshTokenRes.success) {
       dispatch({
