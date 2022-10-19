@@ -155,6 +155,7 @@ const Started = () => {
       dispatch(logout());
     });
   }, [dispatch]);
+  const metamaskDisconnect = useCallback(() => {}, []);
   const onMetamaskUpdate = useCallback(
     (data) => {
       if (typeof data === "string") {
@@ -163,7 +164,7 @@ const Started = () => {
           payload: parseInt(data),
         });
       } else if (data.length === 0) {
-        onDisconnected();
+        metamaskDisconnect();
       } else if (data.length > 0) {
         dispatch({
           type: actionTypes.SET_METAMASK_ACCOUNT,
@@ -171,7 +172,7 @@ const Started = () => {
         });
       }
     },
-    [dispatch, onDisconnected]
+    [dispatch, metamaskDisconnect]
   );
   const metamaskConnected = useCallback(() => {
     const chainId =
@@ -200,7 +201,7 @@ const Started = () => {
           const success = await doingMetamaskLogin(res?.[0]);
           if (success) {
             MetamaskUtils.init(
-              onDisconnected,
+              metamaskDisconnect,
               onMetamaskUpdate,
               metamaskConnected
             );
@@ -214,7 +215,7 @@ const Started = () => {
     doingMetamaskLogin,
     gaLoginClick,
     metamaskConnected,
-    onDisconnected,
+    metamaskDisconnect,
     onMetamaskUpdate,
   ]);
   const handleWalletConnect = useCallback(() => {

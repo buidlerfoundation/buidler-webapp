@@ -160,6 +160,7 @@ function App() {
       dispatch(logout?.());
     });
   }, [dispatch]);
+  const metamaskDisconnect = useCallback(() => {}, []);
   const metamaskUpdate = useCallback(
     (data) => {
       if (typeof data === "string") {
@@ -168,7 +169,7 @@ function App() {
           payload: parseInt(data),
         });
       } else if (data.length === 0) {
-        connectLogout();
+        metamaskDisconnect();
       } else if (data.length > 0) {
         dispatch({
           type: actionTypes.SET_METAMASK_ACCOUNT,
@@ -176,7 +177,7 @@ function App() {
         });
       }
     },
-    [connectLogout, dispatch]
+    [metamaskDisconnect, dispatch]
   );
   const metamaskConnected = useCallback(() => {
     setTimeout(() => {
@@ -206,13 +207,23 @@ function App() {
           }
         } else if (res === LoginType.Metamask) {
           MetamaskUtils.connected = true;
-          MetamaskUtils.init(connectLogout, metamaskUpdate, metamaskConnected);
+          MetamaskUtils.init(
+            metamaskDisconnect,
+            metamaskUpdate,
+            metamaskConnected
+          );
         }
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [connectLogout, dispatch, metamaskConnected, metamaskUpdate]);
+  }, [
+    connectLogout,
+    dispatch,
+    metamaskConnected,
+    metamaskDisconnect,
+    metamaskUpdate,
+  ]);
   const overrides: any = {
     MuiPickersDay: {
       day: {

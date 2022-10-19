@@ -28,6 +28,11 @@ export const uploadToIPFS =
       const message = `Nonce: ${timestamp}`;
       let signature = "";
       if (loginType === LoginType.Metamask) {
+        if (!window.ethereum?.selectedAddress) {
+          await window.ethereum?.request({
+            method: "eth_requestAccounts",
+          });
+        }
         const metamaskProvider: any = window.ethereum;
         const provider = new ethers.providers.Web3Provider(metamaskProvider);
         const signer = provider.getSigner();
