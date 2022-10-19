@@ -31,9 +31,9 @@ export const logout: ActionCreator<any> = () => (dispatch: Dispatch) => {
 export const refreshToken = () => async (dispatch: Dispatch) => {
   dispatch({ type: ActionTypes.REFRESH_TOKEN_REQUEST });
   const refreshTokenExpire = await getCookie(AsyncKey.refreshTokenExpire);
-  const refreshToken = await getCookie(AsyncKey.refreshTokenKey);
+  const token = await getCookie(AsyncKey.refreshTokenKey);
   try {
-    const refreshTokenRes = await api.refreshToken(refreshToken);
+    const refreshTokenRes = await api.refreshToken(token);
     if (refreshTokenRes.success) {
       dispatch({
         type: ActionTypes.UPDATE_CURRENT_TOKEN,
