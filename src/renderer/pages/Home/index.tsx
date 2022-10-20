@@ -468,7 +468,12 @@ const Home = () => {
         channel_name: channelData.name,
         space_id: channelData.space?.space_id,
         channel_type: channelData.isPrivate ? "Private" : "Public",
+        channel_emoji: channelData.emoji,
+        channel_image_url: channelData.url,
       };
+      if (channelData.channelId) {
+        body.channel_id = channelData.channelId;
+      }
       if (channelData.isPrivate) {
         const { res } = await createMemberChannelData(channelData.members);
         body.channel_member_data = res;

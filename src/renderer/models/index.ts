@@ -12,6 +12,17 @@ export type LocalAttachment = {
 
 export type SpaceType = "Public" | "Exclusive";
 
+export type CreateChannelData = {
+  name: string;
+  space?: Space;
+  isPrivate?: boolean;
+  members?: Array<UserData>;
+  channelId?: string;
+  attachment?: LocalAttachment | null;
+  emoji?: string | null;
+  url?: string | null;
+};
+
 export type CreateSpaceData = {
   spaceId?: string;
   name: string;
