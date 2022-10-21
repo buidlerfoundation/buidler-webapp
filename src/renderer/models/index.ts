@@ -14,7 +14,7 @@ export type SpaceType = "Public" | "Exclusive";
 
 export type CreateChannelData = {
   name: string;
-  space?: Space;
+  space?: Space | null;
   isPrivate?: boolean;
   members?: Array<UserData>;
   channelId?: string;
