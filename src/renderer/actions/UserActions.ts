@@ -4,7 +4,12 @@ import { getSpaceBackgroundColor } from "renderer/helpers/SpaceHelper";
 import api from "../api";
 import ActionTypes from "./ActionTypes";
 import { AsyncKey, UserRole } from "../common/AppConfig";
-import { getCookie, removeCookie, setCookie } from "../common/Cookie";
+import {
+  getCookie,
+  getDeviceCode,
+  removeCookie,
+  setCookie,
+} from "../common/Cookie";
 import ImageHelper from "../common/ImageHelper";
 import SocketUtils from "../utils/SocketUtils";
 import { Community, UserData, UserRoleType } from "renderer/models";
@@ -26,6 +31,13 @@ export const getInitial: ActionCreator<any> =
 export const logout: ActionCreator<any> = () => (dispatch: Dispatch) => {
   SocketUtils.disconnect();
   dispatch({ type: ActionTypes.LOGOUT });
+};
+
+const removeDeviceCode = async () => {
+  const deviceCode = await getDeviceCode();
+  await api.removeDevice({
+    device_code: deviceCode,
+  });
 };
 
 export const refreshToken = () => async (dispatch: Dispatch) => {
@@ -61,6 +73,7 @@ export const refreshToken = () => async (dispatch: Dispatch) => {
         type: ActionTypes.REFRESH_TOKEN_FAIL,
         payload: refreshTokenRes,
       });
+      await removeDeviceCode();
     }
     return refreshTokenRes.success;
   } catch (error: any) {
@@ -69,6 +82,7 @@ export const refreshToken = () => async (dispatch: Dispatch) => {
       message: error.message || error,
     });
     dispatch({ type: ActionTypes.REFRESH_TOKEN_FAIL, payload: error });
+    await removeDeviceCode();
     return false;
   }
 };
