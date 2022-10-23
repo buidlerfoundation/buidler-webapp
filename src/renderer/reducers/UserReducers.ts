@@ -710,22 +710,34 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     }
     case actionTypes.MARK_SEEN_CHANNEL: {
       const { channel_id } = payload;
-      state.channelMap = {
-        ...channelMap,
-        [currentTeamId]: channelMap[currentTeamId]?.map((el) => {
-          if (el.channel_id === channel_id) {
+      const channels = channelMap[currentTeamId]?.map((el) => {
+        if (el.channel_id === channel_id) {
+          return {
+            ...el,
+            seen: true,
+          };
+        }
+        return el;
+      });
+      return {
+        ...state,
+        channelMap: {
+          ...channelMap,
+          [currentTeamId]: channels,
+        },
+        team: state.team?.map((el) => {
+          if (el.team_id === currentTeamId) {
             return {
               ...el,
-              seen: true,
+              seen: channels.find((c) => !c.seen) === undefined,
             };
           }
           return el;
         }),
       };
-      return state;
     }
     case actionTypes.MARK_UN_SEEN_CHANNEL: {
-      const { channelId } = payload;
+      const { channelId, communityId } = payload;
       const unSeenChannel =
         channelMap[currentTeamId]?.find((el) => el.channel_id === channelId) ||
         directChannel.find((el) => el.channel_id === channelId);
@@ -759,6 +771,15 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             return el;
           }),
         },
+        team: state.team?.map((el) => {
+          if (el.team_id === communityId) {
+            return {
+              ...el,
+              seen: false,
+            };
+          }
+          return el;
+        }),
       };
     }
     case actionTypes.TEAM_SUCCESS: {

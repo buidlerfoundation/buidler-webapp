@@ -793,6 +793,7 @@ class SocketUtil {
               type: actionTypes.MARK_UN_SEEN_CHANNEL,
               payload: {
                 channelId: message_data.entity_id,
+                communityId: notification_data.team_id,
               },
             });
           }
