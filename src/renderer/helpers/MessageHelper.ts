@@ -201,3 +201,13 @@ export const normalizeUserName = (str: string, length = 5) => {
   }
   return str;
 };
+
+export const normalizeMemberUserName = (str: string, length = 5) => {
+  if (/^[^.]+\.\.\..*[^-_.]$/.test(str)) {
+    return `${str.substring(0, length)}...${str.substring(
+      str.length - length,
+      str.length
+    )}`;
+  }
+  return str;
+};

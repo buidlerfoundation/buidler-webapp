@@ -122,6 +122,7 @@ export interface Community {
   role: string;
   team_description?: string;
   seen?: boolean;
+  is_verified?: boolean;
 }
 
 export interface NFTCollection {
