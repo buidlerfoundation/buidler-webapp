@@ -94,4 +94,5 @@ export const whiteListRefreshTokenApis = [
   "post-user/refresh",
   "post-user/address",
   "post-user",
+  "delete-user/device",
 ];

@@ -985,7 +985,7 @@ class SocketUtil {
     }
   };
   reconnectIfNeeded = () => {
-    if (!this.socket?.connected) {
+    if (!this.socket?.connected && !this.connecting) {
       this.socket?.connect?.();
     }
   };
