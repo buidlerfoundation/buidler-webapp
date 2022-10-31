@@ -285,6 +285,7 @@ class SocketUtil {
         this.socket?.off("ON_VIEW_MESSAGE_IN_CHANNEL");
         this.socket?.off("ON_USER_LEAVE_TEAM");
         this.socket?.off("ON_UPDATE_USER_PERMISSION");
+        this.socket?.off("ON_ATTACHMENT_UPLOAD_SUCCESSFUL");
         this.socket?.off("disconnect");
         if (reason === "io server disconnect") {
           this.socket?.connect();
@@ -348,6 +349,12 @@ class SocketUtil {
     });
   };
   listenSocket() {
+    this.socket?.on("ON_ATTACHMENT_UPLOAD_SUCCESSFUL", (data) => {
+      store.dispatch({
+        type: actionTypes.UPLOAD_ATTACHMENT_SUCCESS,
+        payload: data,
+      });
+    });
     this.socket?.on("ON_UPDATE_USER_PERMISSION", (data) => {
       const { user_id, role, team_id } = data;
       const { currentTeamId } = store.getState().user;
@@ -956,6 +963,7 @@ class SocketUtil {
     reply_message_id?: string;
     text?: string;
     entity_type?: string;
+    file_ids?: string[];
   }) => {
     const user: any = store.getState()?.user;
     const messageData: any = store.getState()?.message?.messageData;

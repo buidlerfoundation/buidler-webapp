@@ -32,6 +32,36 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.UPLOAD_ATTACHMENT_SUCCESS: {
+      const { file, file_url } = payload;
+      const newMessageData = state.messageData;
+      if (file.entity_id && newMessageData?.[file.entity_id]) {
+        newMessageData[file.entity_id] = {
+          ...newMessageData?.[file.entity_id],
+          data: newMessageData?.[file.entity_id]?.data?.map((el) => {
+            if (el.message_id === file.attachment_id) {
+              return {
+                ...el,
+                message_attachments: el.message_attachments.map((att) => {
+                  if (att.file_id === file.file_id) {
+                    return {
+                      ...file,
+                      file_url,
+                    };
+                  }
+                  return att;
+                }),
+              };
+            }
+            return el;
+          }),
+        };
+      }
+      return {
+        ...state,
+        messageData: { ...newMessageData },
+      };
+    }
     case actionTypes.UPDATE_HIGHLIGHT_MESSAGE: {
       return {
         ...state,

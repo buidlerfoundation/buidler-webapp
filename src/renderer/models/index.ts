@@ -175,9 +175,10 @@ export interface ReactReducerData {
 
 export interface AttachmentData {
   file_id: string;
-  file_url: string;
-  mimetype: string;
-  original_name: string;
+  file_url?: string;
+  mimetype?: string;
+  original_name?: string;
+  is_uploaded?: boolean;
 }
 
 export interface FileApiData {

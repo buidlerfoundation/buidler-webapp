@@ -147,14 +147,20 @@ const ChannelView = forwardRef(
         data.forEach((f) => {
           const attachment: LocalAttachment = {
             file: URL.createObjectURL(f),
-            randomId: `${Math.random()}`,
+            randomId: getUniqueId(),
             loading: true,
             type: f.type || "application",
             fileName: f.name,
           };
           setFiles((current) => [...current, attachment]);
           api
-            .uploadFile(currentTeam.team_id, generateId.current, f)
+            .uploadFile(
+              currentTeam.team_id,
+              generateId.current,
+              f,
+              "channel",
+              attachment.randomId
+            )
             .then((res) => {
               setFiles((current) => {
                 let newAttachments = [...current];
@@ -408,8 +414,6 @@ const ChannelView = forwardRef(
       channelPrivateKey,
     ]);
     const submitMessage = useCallback(async () => {
-      const loadingAttachment = files.find((att: any) => att.loading);
-      if (loadingAttachment != null) return;
       if (messageCanMoreAfter) {
         await dispatch(getMessages(currentChannel.channel_id));
       }
@@ -421,6 +425,9 @@ const ChannelView = forwardRef(
           text,
           entity_type: "channel",
         };
+        if (files.length > 0) {
+          message.file_ids = files.map((el) => el.randomId);
+        }
         if (
           currentChannel.channel_type === "Private" ||
           (currentChannel.channel_type === "Direct" &&
