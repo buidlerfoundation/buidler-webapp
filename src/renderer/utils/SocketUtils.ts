@@ -198,15 +198,7 @@ class SocketUtil {
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     const deviceCode = await getDeviceCode();
     const generatedPrivateKey = await GeneratedPrivateKey();
-    let publicKey = "";
-    const loginType =
-      (await getCookie(AsyncKey.loginType)) || GlobalVariable.loginType;
-    if (
-      loginType === LoginType.WalletConnect ||
-      loginType === LoginType.Metamask
-    ) {
-      publicKey = utils.computePublicKey(generatedPrivateKey, true);
-    }
+    const publicKey = utils.computePublicKey(generatedPrivateKey, true);
     this.socket = io(`${AppConfig.apiBaseUrl}`, {
       query: {
         token: accessToken,

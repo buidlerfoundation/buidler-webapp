@@ -378,8 +378,7 @@ const ChannelView = forwardRef(
       };
     });
     const editMessage = useCallback(async () => {
-      const loadingAttachment = files?.find?.((att: any) => att.loading);
-      if (loadingAttachment != null || !messageEdit?.message_id) return;
+      if (!messageEdit?.message_id) return;
       if (extractContent(text).trim() !== "" || files.length > 0) {
         let content = extractContentMessage(text.trim());
         let plain_text = extractContent(text.trim());
