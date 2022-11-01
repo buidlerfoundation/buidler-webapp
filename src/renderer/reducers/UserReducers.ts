@@ -729,7 +729,10 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
           if (el.team_id === currentTeamId) {
             return {
               ...el,
-              seen: channels.find((c) => !c.seen) === undefined,
+              seen:
+                channels.find(
+                  (c) => !c.seen && c.notification_type !== "Muted"
+                ) === undefined,
             };
           }
           return el;
