@@ -672,7 +672,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     case actionTypes.CREATE_TEAM_SUCCESS: {
       return {
         ...state,
-        team: [...(team || []), payload],
+        team: [...(team || []), { ...payload, seen: true }],
       };
     }
     case actionTypes.SET_CURRENT_CHANNEL: {
