@@ -18,13 +18,17 @@ import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 
 export const getInitial: ActionCreator<any> =
   () => async (dispatch: Dispatch) => {
-    const { data } = (await api.getInitial()) || {};
-    ImageHelper.initial(data?.img_domain || "", data?.img_config || "");
-    if (data?.force_update && data?.version > GlobalVariable.version) {
-      // Update Desktop App
-    }
-    if (data) {
-      dispatch({ type: ActionTypes.GET_INITIAL, payload: { data } });
+    try {
+      const { data } = (await api.getInitial()) || {};
+      ImageHelper.initial(data?.img_domain || "", data?.img_config || "");
+      if (data?.force_update && data?.version > GlobalVariable.version) {
+        // Update Desktop App
+      }
+      if (data) {
+        dispatch({ type: ActionTypes.GET_INITIAL, payload: { data } });
+      }
+    } catch (error) {
+      dispatch({ type: ActionTypes.GET_INITIAL_FAILED, payload: error });
     }
   };
 

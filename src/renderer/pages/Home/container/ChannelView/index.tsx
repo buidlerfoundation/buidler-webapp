@@ -721,6 +721,7 @@ const ChannelView = forwardRef(
                   messageReply={messageReply}
                   onRemoveReply={onRemoveReply}
                   messageEdit={messageEdit}
+                  inputId="message-input-channel"
                 />
               </div>
             )}

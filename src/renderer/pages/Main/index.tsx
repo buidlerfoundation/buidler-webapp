@@ -35,6 +35,7 @@ import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
 import PageNotFound from "renderer/shared/PageNotFound";
 import ErrorPage from "renderer/shared/ErrorBoundary/ErrorPage";
 import UnSupportPage from "../UnSupportPage";
+import NoInternetPage from "renderer/shared/NoInternetPage";
 
 const PublicRoute = ({ component: Component, ...rest }: any) => {
   const history = useHistory();
@@ -276,6 +277,9 @@ const Main = () => {
   );
   const imgDomain = useAppSelector((state) => state.user.imgDomain);
   const { chainId, metaMaskAccount } = useAppSelector((state) => state.network);
+  const internetConnection = useAppSelector(
+    (state) => state.configs.internetConnection
+  );
   const userData = useAppSelector((state) => state.user.userData);
   const somethingWrong = useAppSelector(
     (state) => state.configs.somethingWrong
@@ -288,6 +292,7 @@ const Main = () => {
   useEffect(() => {
     dispatch(getInitial?.());
   }, [dispatch]);
+  if (!internetConnection || !navigator.onLine) return <NoInternetPage />;
   if (unSupport) return <UnSupportPage />;
   if (somethingWrong) return <ErrorPage />;
   if (!imgDomain) {

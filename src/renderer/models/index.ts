@@ -229,6 +229,7 @@ export interface TaskData {
   due_date?: Date | string;
   isHighLight?: boolean;
   createdAt?: string;
+  updatedAt?: string;
   total_messages?: string;
   latest_reply_message_at?: string;
   latest_reply_senders?: Array<string>;

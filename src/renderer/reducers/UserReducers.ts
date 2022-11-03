@@ -741,25 +741,6 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     }
     case actionTypes.MARK_UN_SEEN_CHANNEL: {
       const { channelId, communityId } = payload;
-      const unSeenChannel =
-        channelMap[currentTeamId]?.find((el) => el.channel_id === channelId) ||
-        directChannel.find((el) => el.channel_id === channelId);
-      if (!unSeenChannel?.seen) {
-        return state;
-      }
-      const spaceId = unSeenChannel?.space_id;
-      if (!spaceId) {
-        return {
-          ...state,
-          directChannel: directChannel.map((el) => {
-            if (el.channel_id === channelId) {
-              el.seen = false;
-              return { ...el };
-            }
-            return el;
-          }),
-        };
-      }
       return {
         ...state,
         channelMap: {

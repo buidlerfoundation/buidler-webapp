@@ -81,9 +81,14 @@ function App() {
       },
     };
     const eventOffline = () => {
+      dispatch({
+        type: actionTypes.UPDATE_INTERNET_CONNECTION,
+        payload: false,
+      });
       SocketUtils.socket?.disconnect?.();
     };
     const eventOnline = () => {
+      dispatch({ type: actionTypes.UPDATE_INTERNET_CONNECTION, payload: true });
       if (!user.user_id) {
         initApp();
       } else {
