@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import toast from "react-hot-toast";
 import { useHistory } from "react-router-dom";
 import { deleteChannel, updateChannel } from "renderer/actions/UserActions";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
@@ -66,6 +67,10 @@ const SettingChannel = ({
   }, [currentChannel?.channel_name, isOpenEditName]);
   const handleSave = useCallback(async () => {
     if (!currentChannel?.channel_id) return;
+    if (!currentName) {
+      toast.error("Channel name cannot be empty");
+      return;
+    }
     const success = await dispatch(
       updateChannel(currentChannel.channel_id, {
         channel_name: currentName,

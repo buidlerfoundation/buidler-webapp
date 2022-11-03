@@ -56,10 +56,18 @@ export const uploadToIPFS =
             signature,
             sign_message: message,
           })
+          .then((res) => {
+            dispatch({
+              type: actionTypes.UPDATE_TASK_REQUEST,
+              payload: {
+                taskId: pinPostId,
+                data: { uploadingIPFS: false, cid: res.data?.cid },
+                channelId,
+              },
+            });
+          })
           .catch((error) => {
             toast.error(error.message);
-          })
-          .finally(() => {
             dispatch({
               type: actionTypes.UPDATE_TASK_REQUEST,
               payload: {

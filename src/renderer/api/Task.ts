@@ -3,7 +3,7 @@ import ApiCaller from "./ApiCaller";
 import Caller from "./Caller";
 
 export const uploadToIPFS = (taskId: string, body: any) =>
-  Caller.post(`task/${taskId}/ipfs`, body);
+  Caller.post<TaskData>(`task/${taskId}/ipfs`, body);
 
 export const createTask = (body: any) => ApiCaller.post("task", body);
 
