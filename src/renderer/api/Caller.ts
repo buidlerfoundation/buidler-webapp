@@ -177,7 +177,7 @@ async function requestAPI<T = any>(
       );
       const msg = err.message || err;
       if (!msg.includes("aborted")) {
-        return handleError(msg, { uri, fetchOptions });
+        handleError(msg, { uri, fetchOptions });
       }
       return {
         message: msg,

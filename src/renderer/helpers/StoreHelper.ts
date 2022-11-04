@@ -54,3 +54,9 @@ export const getCurrentChannel = () => {
   const channels = channelMap?.[communityId];
   return channels?.find((el) => el.channel_id === channelId) || defaultChannel;
 };
+
+export const sleep = (mls: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, mls);
+  });
+};

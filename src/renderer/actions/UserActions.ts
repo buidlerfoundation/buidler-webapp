@@ -15,6 +15,7 @@ import SocketUtils from "../utils/SocketUtils";
 import { Community, UserData, UserRoleType } from "renderer/models";
 import store from "renderer/store";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
+import { sleep } from "renderer/helpers/StoreHelper";
 
 export const getInitial: ActionCreator<any> =
   () => async (dispatch: Dispatch) => {
@@ -44,52 +45,59 @@ const removeDeviceCode = async () => {
   });
 };
 
-export const refreshToken = () => async (dispatch: Dispatch) => {
-  dispatch({ type: ActionTypes.REFRESH_TOKEN_REQUEST });
-  const refreshTokenExpire = await getCookie(AsyncKey.refreshTokenExpire);
-  const token = await getCookie(AsyncKey.refreshTokenKey);
-  try {
-    const refreshTokenRes = await api.refreshToken(token);
-    if (refreshTokenRes.success) {
-      dispatch({
-        type: ActionTypes.UPDATE_CURRENT_TOKEN,
-        payload: refreshTokenRes?.data?.token,
-      });
-      await setCookie(AsyncKey.accessTokenKey, refreshTokenRes?.data?.token);
-      await setCookie(
-        AsyncKey.refreshTokenKey,
-        refreshTokenRes?.data?.refresh_token
-      );
-      await setCookie(
-        AsyncKey.tokenExpire,
-        refreshTokenRes?.data?.token_expire_at
-      );
-      await setCookie(
-        AsyncKey.refreshTokenExpire,
-        refreshTokenRes?.data?.refresh_token_expire_at
-      );
-    } else {
+export const refreshToken =
+  (retryCount?: number) => async (dispatch: Dispatch) => {
+    let rCount = retryCount || 0;
+    dispatch({ type: ActionTypes.REFRESH_TOKEN_REQUEST });
+    const refreshTokenExpire = await getCookie(AsyncKey.refreshTokenExpire);
+    const token = await getCookie(AsyncKey.refreshTokenKey);
+    try {
+      const refreshTokenRes = await api.refreshToken(token);
+      if (refreshTokenRes.success) {
+        dispatch({
+          type: ActionTypes.UPDATE_CURRENT_TOKEN,
+          payload: refreshTokenRes?.data?.token,
+        });
+        await setCookie(AsyncKey.accessTokenKey, refreshTokenRes?.data?.token);
+        await setCookie(
+          AsyncKey.refreshTokenKey,
+          refreshTokenRes?.data?.refresh_token
+        );
+        await setCookie(
+          AsyncKey.tokenExpire,
+          refreshTokenRes?.data?.token_expire_at
+        );
+        await setCookie(
+          AsyncKey.refreshTokenExpire,
+          refreshTokenRes?.data?.refresh_token_expire_at
+        );
+      } else {
+        if (refreshTokenRes.message === "Failed to fetch" && rCount <= 5) {
+          rCount++;
+          await sleep(3000);
+          return refreshToken(rCount)(dispatch);
+        }
+        GoogleAnalytics.tracking("Refresh failed", {
+          refreshTokenExpire,
+          message: refreshTokenRes.message || "Some thing wrong",
+        });
+        dispatch({
+          type: ActionTypes.REFRESH_TOKEN_FAIL,
+          payload: refreshTokenRes,
+        });
+        await removeDeviceCode();
+      }
+      return refreshTokenRes.success;
+    } catch (error: any) {
       GoogleAnalytics.tracking("Refresh failed", {
         refreshTokenExpire,
-        message: refreshTokenRes.message || "Some thing wrong",
+        message: error.message || error,
       });
-      dispatch({
-        type: ActionTypes.REFRESH_TOKEN_FAIL,
-        payload: refreshTokenRes,
-      });
+      dispatch({ type: ActionTypes.REFRESH_TOKEN_FAIL, payload: error });
       await removeDeviceCode();
+      return false;
     }
-    return refreshTokenRes.success;
-  } catch (error: any) {
-    GoogleAnalytics.tracking("Refresh failed", {
-      refreshTokenExpire,
-      message: error.message || error,
-    });
-    dispatch({ type: ActionTypes.REFRESH_TOKEN_FAIL, payload: error });
-    await removeDeviceCode();
-    return false;
-  }
-};
+  };
 
 export const getMemberData =
   (teamId: string, role: UserRoleType, page: number) =>
