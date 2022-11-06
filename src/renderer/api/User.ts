@@ -6,6 +6,8 @@ import {
   Contract,
   InitialApiData,
   NFTCollectionDataApi,
+  NotificationData,
+  NotificationFilterType,
   Space,
   SpaceCollectionData,
   Token,
@@ -170,3 +172,31 @@ export const refreshToken = (token: string) => {
     "Refresh-Token": token,
   });
 };
+
+export const getNotification = (
+  filterType: NotificationFilterType,
+  before?: string
+) => {
+  let uri = "notifications?page[size]=20";
+  if (filterType === "Mention") {
+    uri +=
+      "&notification_types[]=channel_mention&notification_types[]=post_mention";
+  } else if (filterType === "Unread") {
+    uri += "&is_read=false";
+  }
+  if (before) {
+    uri += `&page[before]=${before}`;
+  }
+  return Caller.get<NotificationData[]>(uri);
+};
+
+export const readNotification = (notificationId: string) =>
+  Caller.put(`notifications/${notificationId}`);
+
+export const readAllNotification = () => Caller.put("notifications");
+
+export const deleteNotification = (notificationId: string) =>
+  Caller.delete(`notifications/${notificationId}`);
+
+export const configNotificationFromTask = (taskId: string) =>
+  Caller.post(`notifications/task/${taskId}`);

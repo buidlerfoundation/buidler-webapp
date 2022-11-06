@@ -78,6 +78,7 @@ export interface UserData {
   verified_avatar_asset_collection?: NFTCollection;
   verified_username_asset_collection?: NFTCollection;
   is_deleted?: boolean;
+  total_unread_notifications?: number;
 }
 
 export interface Channel {
@@ -440,4 +441,24 @@ export type PinPostData = {
   attachments?: Array<LocalAttachment>;
   channels?: Array<Channel>;
   id?: string;
+};
+
+export type NotificationFilterType = "All" | "Mention" | "Unread";
+
+export type NotificationData = {
+  channel?: Channel;
+  content: string;
+  createdAt: string;
+  entity_id: string;
+  from_user: UserData;
+  from_user_id: string;
+  is_deleted: boolean;
+  is_read: boolean;
+  message_id?: string;
+  notification_id: string;
+  post?: TaskData;
+  notification_type: "post_reply" | "channel_mention" | "post_mention";
+  team_id: string;
+  to_user_id: string;
+  updatedAt: string;
 };

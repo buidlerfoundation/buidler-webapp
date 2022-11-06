@@ -5,6 +5,7 @@ import * as MessageActions from "./MessageActions";
 import * as ActivityActions from "./ActivityActions";
 import * as TransactionActions from "./TransactionActions";
 import * as CollectibleActions from "./CollectibleActions";
+import * as NotificationActions from "./NotificationActions";
 import { ActionCreatorsMapObject } from "redux";
 
 const actions: ActionCreatorsMapObject<any> = {
@@ -15,6 +16,7 @@ const actions: ActionCreatorsMapObject<any> = {
   ...ActivityActions,
   ...TransactionActions,
   ...CollectibleActions,
+  ...NotificationActions,
 };
 
 export default actions;

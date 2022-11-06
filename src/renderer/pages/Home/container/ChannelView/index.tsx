@@ -76,6 +76,7 @@ type ChannelViewProps = {
   scrollData?: any;
   teamUserData: Array<UserData>;
   onEditPinPost?: (data: TaskData) => void;
+  hideScrollDown?: boolean;
 };
 
 const ChannelView = forwardRef(
@@ -94,6 +95,7 @@ const ChannelView = forwardRef(
       scrollData,
       teamUserData,
       onEditPinPost,
+      hideScrollDown,
     }: ChannelViewProps,
     ref
   ) => {
@@ -688,6 +690,7 @@ const ChannelView = forwardRef(
               <div className="message-bottom">
                 <div style={{ position: "relative" }}>
                   {scrollData?.showScrollDown &&
+                    !hideScrollDown &&
                     !location.pathname.includes("user") && (
                       <div className="message-scroll-down__wrapper">
                         {scrollData?.unreadCount > 0 && (

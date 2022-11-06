@@ -278,6 +278,7 @@ class SocketUtil {
         this.socket?.off("ON_USER_LEAVE_TEAM");
         this.socket?.off("ON_UPDATE_USER_PERMISSION");
         this.socket?.off("ON_ATTACHMENT_UPLOAD_SUCCESSFUL");
+        this.socket?.off("ON_NEW_NOTIFICATION");
         this.socket?.off("disconnect");
         if (reason === "io server disconnect") {
           this.socket?.connect();
@@ -341,6 +342,21 @@ class SocketUtil {
     });
   };
   listenSocket() {
+    this.socket?.on("ON_NEW_NOTIFICATION", (data) => {
+      const { userData } = store.getState().user;
+      store.dispatch({
+        type: actionTypes.RECEIVE_NOTIFICATION,
+        payload: data,
+      });
+      store.dispatch({
+        type: actionTypes.UPDATE_USER_SUCCESS,
+        payload: {
+          user_id: userData.user_id,
+          total_unread_notifications:
+            (userData.total_unread_notifications || 0) + 1,
+        },
+      });
+    });
     this.socket?.on("ON_ATTACHMENT_UPLOAD_SUCCESSFUL", (data) => {
       store.dispatch({
         type: actionTypes.UPLOAD_ATTACHMENT_SUCCESS,

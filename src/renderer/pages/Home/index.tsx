@@ -835,6 +835,7 @@ const Home = () => {
               scrollData={messageData?.[channelId]?.scrollData}
               teamUserData={teamUserData}
               onEditPinPost={onEditPost}
+              hideScrollDown={isOpenMembers}
             />
             {currentChannel.channel_id &&
               currentChannel.channel_type !== "Direct" && (

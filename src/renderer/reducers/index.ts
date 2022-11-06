@@ -13,6 +13,7 @@ import networkReducer from "./NetworkReducer";
 import transactionReducer from "./TransactionReducer";
 import toggleSidebarReducer from "./ToggleSidebarReducer";
 import collectibleReducer from "./CollectibleReducers";
+import notificationReducer from "./NotificationReducers";
 
 const appReducer = combineReducers({
   error: ErrorReducer,
@@ -29,6 +30,7 @@ const appReducer = combineReducers({
   transaction: transactionReducer,
   toggleSidebar: toggleSidebarReducer,
   collectible: collectibleReducer,
+  notification: notificationReducer,
 });
 
 const rootReducer = (state, action) => {
