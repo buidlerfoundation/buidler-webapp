@@ -240,6 +240,7 @@ export interface TaskData {
   message_sender_id: string;
   cid?: string;
   uploadingIPFS?: boolean;
+  notification_type?: "Alert" | "Muted";
 }
 
 export interface ConversationData {
@@ -449,16 +450,17 @@ export type NotificationData = {
   channel?: Channel;
   content: string;
   createdAt: string;
-  entity_id: string;
-  from_user: UserData;
-  from_user_id: string;
-  is_deleted: boolean;
-  is_read: boolean;
+  entity_id?: string;
+  from_user?: UserData;
+  from_user_id?: string;
+  is_deleted?: boolean;
+  is_read?: boolean;
   message_id?: string;
   notification_id: string;
   post?: TaskData;
-  notification_type: "post_reply" | "channel_mention" | "post_mention";
-  team_id: string;
-  to_user_id: string;
-  updatedAt: string;
+  notification_type?: "post_reply" | "channel_mention" | "post_mention";
+  team_id?: string;
+  to_user_id?: string;
+  updatedAt?: string;
+  itemType?: string;
 };
