@@ -19,6 +19,7 @@ export const getNotifications: ActionCreator<any> =
           before,
           data: res.data,
           metadata: res.metadata,
+          filterType,
         },
       });
     } else {
