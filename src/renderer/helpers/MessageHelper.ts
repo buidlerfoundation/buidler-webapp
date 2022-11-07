@@ -67,7 +67,6 @@ export const extractContentMessage = (s: string) => {
       /(<a href='\$mention_location\/)(.*?)(' class='mention-string'>)(.*?)(<\/a>)/gim,
       `<$4-$2>`
     )
-    .replace(/(<@)(.*?)(-)(.*?)(>)/gim, `@$2`)
     .replace(/<br>/gim, "\n");
   return span.textContent || span.innerText;
 };
