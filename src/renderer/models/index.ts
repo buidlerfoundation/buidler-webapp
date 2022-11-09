@@ -241,6 +241,7 @@ export interface TaskData {
   cid?: string;
   uploadingIPFS?: boolean;
   notification_type?: "Alert" | "Muted";
+  total_unread_notifications?: number;
 }
 
 export interface ConversationData {

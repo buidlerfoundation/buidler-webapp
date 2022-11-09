@@ -107,6 +107,9 @@ const notificationReducers: Reducer<NotificationReducerState, AnyAction> = (
         },
       };
     }
+    case actionTypes.LOGOUT: {
+      return initialState;
+    }
     default:
       return state;
   }

@@ -88,6 +88,9 @@ export const getPinPostMessages: ActionCreator<any> =
     const { ppApiController } = store.getState().message;
     ppApiController?.abort?.();
     const controller = new AbortController();
+    if (!before) {
+      SocketUtils.emitSeenPost(postId);
+    }
     if (before) {
       dispatch({ type: actionTypes.MESSAGE_PP_MORE, payload: { postId } });
     } else if (isFresh) {
