@@ -344,13 +344,21 @@ class SocketUtil {
   };
   listenSocket() {
     this.socket?.on("ON_READ_NOTIFICATION_IN_POST", (data) => {
+      const { userData } = store.getState().user;
       const currentChannel = getCurrentChannel();
       store.dispatch({
         type: actionTypes.UPDATE_TASK_REQUEST,
         payload: {
           taskId: data.task_id,
-          data: { total_unread_notifications: data.total_unread_notifications },
+          data: { total_unread_notifications: 0 },
           channelId: currentChannel.channel_id,
+        },
+      });
+      store.dispatch({
+        type: actionTypes.UPDATE_USER_SUCCESS,
+        payload: {
+          user_id: userData.user_id,
+          total_unread_notifications: data.total_unread_notifications,
         },
       });
     });
