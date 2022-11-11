@@ -664,7 +664,9 @@ const ChannelView = forwardRef(
             <div className="channel-view__body">
               <ol
                 ref={msgListRef}
-                className="channel-view-message-list hide-scroll-bar"
+                className={`channel-view-message-list hide-scroll-bar ${
+                  isScrolling ? "channel-view-scrolling" : ""
+                }`}
                 onScroll={onMessageScroll}
               >
                 {messagesGroup.map(renderMessage)}
