@@ -151,14 +151,8 @@ a {
 }
 
 .hide-scroll-bar {
-  &::-webkit-scrollbar-track {
-    display: none;
-  }
   &::-webkit-scrollbar {
-    display: none;
-  }
-  &::-webkit-scrollbar-thumb {
-    display: none;
+    width: 0px;
   }
 }
 

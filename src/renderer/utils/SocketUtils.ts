@@ -105,7 +105,7 @@ const getMessages = async (
   channelType: string,
   dispatch: Dispatch
 ) => {
-  const messageRes = await api.getMessages(channelId, 50);
+  const messageRes = await api.getMessages(channelId);
   if (messageRes?.statusCode === 200) {
     const isPrivate = channelType === "Private" || channelType === "Direct";
     const messageData = isPrivate

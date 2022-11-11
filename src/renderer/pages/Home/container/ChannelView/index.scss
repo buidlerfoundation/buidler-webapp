@@ -126,19 +126,11 @@
   }
   .channel-view__body {
     flex: 1;
-    flex-direction: column-reverse;
+    flex-direction: column;
     display: flex;
-    overflow-y: scroll;
+    justify-content: flex-end;
+    overflow-y: auto;
     position: relative;
-    &::-webkit-scrollbar-track {
-      display: none;
-    }
-    &::-webkit-scrollbar {
-      display: none;
-    }
-    &::-webkit-scrollbar-thumb {
-      display: none;
-    }
     .date-title {
       display: flex;
       align-items: center;
@@ -160,6 +152,8 @@
     flex-direction: column-reverse;
     flex: 1;
     position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
   .message-bottom {
     display: flex;

@@ -34,7 +34,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
   switch (type) {
     case actionTypes.UPLOAD_ATTACHMENT_SUCCESS: {
       const { file, file_url } = payload;
-      const newMessageData = state.messageData;
+      const newMessageData = { ...state.messageData };
       if (file.entity_id && newMessageData?.[file.entity_id]) {
         newMessageData[file.entity_id] = {
           ...newMessageData?.[file.entity_id],
@@ -70,7 +70,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
     }
     case actionTypes.UPDATE_TASK_REQUEST: {
       const { taskId, channelId, data } = payload;
-      const newMessageData = state.messageData;
+      const newMessageData = { ...state.messageData };
       if (newMessageData[channelId]) {
         newMessageData[channelId] = {
           ...newMessageData[channelId],
@@ -89,7 +89,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
     }
     case actionTypes.DELETE_TASK_REQUEST: {
       const { taskId, channelId } = payload;
-      const newMessageData = state.messageData;
+      const newMessageData = { ...state.messageData };
       if (newMessageData[channelId]) {
         newMessageData[channelId] = {
           ...newMessageData[channelId],
@@ -180,7 +180,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
     }
     case actionTypes.REMOVE_MESSAGE_ATTACHMENT: {
       const { messageId, fileId, channelId } = payload;
-      const newMessageData = state.messageData;
+      const newMessageData = { ...state.messageData };
       if (newMessageData[channelId]) {
         newMessageData[channelId] = {
           ...newMessageData[channelId],
@@ -218,7 +218,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
     }
     case actionTypes.DELETE_MESSAGE: {
       const { messageId, channelId, currentChannelId } = payload;
-      const newMessageData = state.messageData;
+      const newMessageData = { ...state.messageData };
       if (currentChannelId !== channelId && newMessageData[currentChannelId]) {
         const currentIdx = newMessageData[currentChannelId].data.findIndex(
           (el) => el.message_id === messageId
@@ -300,7 +300,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
         plain_text,
         updatedAt,
       } = data;
-      const newMessageData = state.messageData;
+      const newMessageData = { ...state.messageData };
       if (newMessageData[entity_id]) {
         newMessageData[entity_id] = {
           ...newMessageData[entity_id],
@@ -340,7 +340,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
       };
     }
     case actionTypes.EMIT_NEW_MESSAGE: {
-      const newMessageData = state.messageData;
+      const newMessageData = { ...state.messageData };
       if (newMessageData[payload.entity_id]?.data) {
         newMessageData[payload.entity_id] = {
           ...newMessageData[payload.entity_id],
@@ -364,7 +364,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
     }
     case actionTypes.RECEIVE_MESSAGE: {
       const { data, currentChannelId } = payload;
-      const newMessageData = state.messageData;
+      const newMessageData = { ...state.messageData };
       if (data.entity_type === "post") {
         if (newMessageData[currentChannelId]?.data) {
           newMessageData[currentChannelId] = {

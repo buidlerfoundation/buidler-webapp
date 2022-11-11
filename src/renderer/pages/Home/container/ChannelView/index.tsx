@@ -598,9 +598,7 @@ const ChannelView = forwardRef(
           <MessageItem
             key={msg.message_id}
             message={msg}
-            content={msg.content}
             reacts={reactData?.[msg.message_id]}
-            task={msg.task}
             onCreateTask={onCreateTaskFromMessage}
             onReplyPress={onReplyPress}
             onMenuSelected={onMenuMessage}
@@ -663,23 +661,20 @@ const ChannelView = forwardRef(
                 teamId={communityId}
               />
             )}
-            <div
-              ref={msgListRef}
-              className="channel-view__body"
-              onScroll={onMessageScroll}
-            >
-              <div style={{ marginTop: 15 }} />
+            <div className="channel-view__body">
+              <ol
+                ref={msgListRef}
+                className="channel-view-message-list hide-scroll-bar"
+                onScroll={onMessageScroll}
+              >
+                {messagesGroup.map(renderMessage)}
+              </ol>
               {loadMoreAfterMessage && (
                 <div className="message-load-more-after">
                   <CircularProgress size={30} color="inherit" />
                 </div>
               )}
-              <ol
-                className="channel-view-message-list"
-                style={{ pointerEvents: isScrolling ? "none" : "initial" }}
-              >
-                {messagesGroup.map(renderMessage)}
-              </ol>
+              <div style={{ marginTop: 15 }} />
             </div>
             {loadMoreMessage && (
               <div className="message-load-more">
