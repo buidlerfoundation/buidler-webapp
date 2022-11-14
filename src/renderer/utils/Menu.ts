@@ -70,6 +70,11 @@ export const channelMenu = [
     icon: images.icSettingChannelEdit,
   },
   {
+    label: "Notification",
+    value: "Notification",
+    icon: images.icSettingChannelNotification,
+  },
+  {
     label: "Delete channel",
     value: "Delete channel",
     icon: images.icSettingChannelDelete,

@@ -36,6 +36,7 @@ const ChannelHeader = forwardRef(
     const popupChannelIconRef = useRef<any>();
     const [isActiveMember, setActiveMember] = useState(false);
     const [isActiveName, setActiveName] = useState(false);
+    const [isActiveNotification, setActiveNotification] = useState(false);
     const settingButtonRef = useRef<any>();
     const settingRef = useRef<any>();
     const users = useMemo(() => {
@@ -56,12 +57,15 @@ const ChannelHeader = forwardRef(
     const isOwner = role === "Owner";
     useImperativeHandle(ref, () => {
       return {
-        showSetting(action: "edit-member" | "edit-name") {
+        showSetting(action: "edit-member" | "edit-name" | "edit-notification") {
           if (action === "edit-member") {
             setActiveMember(true);
           }
           if (action === "edit-name") {
             setActiveName(true);
+          }
+          if (action === "edit-notification") {
+            setActiveNotification(true);
           }
           settingButtonRef.current.click();
         },
@@ -187,6 +191,7 @@ const ChannelHeader = forwardRef(
     const onCloseChannelSetting = useCallback(() => {
       setActiveMember(false);
       setActiveName(false);
+      setActiveNotification(false);
     }, []);
     const handleCloseChannelSetting = useCallback(() => {
       settingRef.current?.hide?.();
@@ -292,6 +297,7 @@ const ChannelHeader = forwardRef(
                 teamUserData={teamUserData}
                 isActiveMember={isActiveMember}
                 isActiveName={isActiveName}
+                isActiveNotification={isActiveNotification}
                 onClose={handleCloseChannelSetting}
                 isOwner={isOwner}
               />

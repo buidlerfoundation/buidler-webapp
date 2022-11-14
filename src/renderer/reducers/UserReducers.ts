@@ -123,6 +123,23 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     defaultChannel;
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.UPDATE_NOTIFICATION_CONFIG: {
+      return {
+        ...state,
+        channelMap: {
+          ...channelMap,
+          [currentTeamId]: channelMap[currentTeamId]?.map((el) => {
+            if (
+              payload.entity_type === "channel" &&
+              el.channel_id === payload.entity_id
+            ) {
+              return { ...el, notification_type: payload.notification_type };
+            }
+            return el;
+          }),
+        },
+      };
+    }
     case actionTypes.UPDATE_USER_PERMISSION: {
       const { role, team_id, user_id } = payload;
       return {
@@ -302,6 +319,18 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
               payload,
             ],
             total: teamUserMap[currentTeamId]?.total + 1,
+          },
+        },
+        memberData: {
+          ...state.memberData,
+          member: {
+            ...state.memberData.member,
+            data: [
+              payload,
+              ...state.memberData.member.data.filter(
+                (el) => el.user_id !== payload.user_id
+              ),
+            ],
           },
         },
       };
@@ -933,6 +962,26 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
               return el;
             }),
             total: teamUserMap[payload.teamId]?.total - 1,
+          },
+        },
+        memberData: {
+          member: {
+            ...memberData.member,
+            data: memberData.member.data.filter(
+              (el) => el.user_id !== payload.userId
+            ),
+          },
+          admin: {
+            ...memberData.admin,
+            data: memberData.admin.data.filter(
+              (el) => el.user_id !== payload.userId
+            ),
+          },
+          owner: {
+            ...memberData.owner,
+            data: memberData.owner.data.filter(
+              (el) => el.user_id !== payload.userId
+            ),
           },
         },
       };

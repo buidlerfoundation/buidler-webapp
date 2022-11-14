@@ -225,11 +225,6 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       if (!data.channels) {
         data.channels = task?.channels || [];
       }
-      if (!task?.channels?.find((el) => el.channel_id === channelId)) {
-        return {
-          ...state,
-        };
-      }
       const taskStatus = data?.status || task?.status;
       if (taskStatus === "archived") {
         newTasks = newTasks.filter((t) => t.task_id !== taskId);

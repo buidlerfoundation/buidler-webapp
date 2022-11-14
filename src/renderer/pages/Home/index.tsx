@@ -320,6 +320,13 @@ const Home = () => {
     },
     [currentTeam?.team_id, history]
   );
+  const handleOpenChannelNotification = useCallback(
+    (channel) => {
+      history.replace(`/channels/${currentTeam.team_id}/${channel.channel_id}`);
+      channelViewRef.current.showSetting("edit-notification");
+    },
+    [currentTeam?.team_id, history]
+  );
   const handleCloseModalUserProfile = useCallback(async () => {
     dispatch({ type: actionTypes.UPDATE_CURRENT_USER_PROFILE_ID, payload: "" });
     if (history.location.pathname.includes("user")) {
@@ -815,6 +822,7 @@ const Home = () => {
             onRemoveTeamMember={handleRemoveTeamMember}
             onEditChannelMember={handleOpenEditChannelMember}
             onEditChannelName={handleOpenEditChannelName}
+            onUpdateNotification={handleOpenChannelNotification}
             onInviteMember={handleOpenInviteMember}
             onSpaceBadgeClick={handleSpaceBadgeClick}
             onViewMembers={toggleOpenMembers}

@@ -8,6 +8,7 @@ type ChannelSettingsProps = {
   teamUserData: Array<any>;
   isActiveMember: boolean;
   isActiveName: boolean;
+  isActiveNotification: boolean;
   onClose: () => void;
   isOwner?: boolean;
 };
@@ -19,6 +20,7 @@ const ChannelSettings = ({
   onClose,
   isActiveName,
   isOwner,
+  isActiveNotification,
 }: ChannelSettingsProps) => {
   const [page, setPage] = useState(1);
   const spaceMembers = useAppSelector((state) => state.user.spaceMembers);
@@ -27,10 +29,10 @@ const ChannelSettings = ({
     if (isActiveMember) {
       setPage(0);
     }
-    if (isActiveName) {
+    if (isActiveName || isActiveNotification) {
       setPage(1);
     }
-  }, [isActiveMember, isActiveName]);
+  }, [isActiveMember, isActiveName, isActiveNotification]);
   return (
     <div className="channel-setting__container">
       <div className="setting-header">
@@ -55,6 +57,7 @@ const ChannelSettings = ({
           onClose={onClose}
           isActiveName={isActiveName}
           isOwner={isOwner}
+          isActiveNotification={isActiveNotification}
         />
       )}
       {page === 0 && (

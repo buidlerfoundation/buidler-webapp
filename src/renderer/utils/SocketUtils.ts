@@ -280,6 +280,7 @@ class SocketUtil {
         this.socket?.off("ON_ATTACHMENT_UPLOAD_SUCCESSFUL");
         this.socket?.off("ON_NEW_NOTIFICATION");
         this.socket?.off("ON_READ_NOTIFICATION_IN_POST");
+        this.socket?.off("ON_UPDATE_NOTIFICATION_CONFIG");
         this.socket?.off("disconnect");
         if (reason === "io server disconnect") {
           this.socket?.connect();
@@ -343,6 +344,12 @@ class SocketUtil {
     });
   };
   listenSocket() {
+    this.socket?.on("ON_UPDATE_NOTIFICATION_CONFIG", (data) => {
+      store.dispatch({
+        type: actionTypes.UPDATE_NOTIFICATION_CONFIG,
+        payload: data,
+      });
+    });
     this.socket?.on("ON_READ_NOTIFICATION_IN_POST", (data) => {
       const { userData } = store.getState().user;
       const currentChannel = getCurrentChannel();

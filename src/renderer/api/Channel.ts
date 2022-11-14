@@ -1,4 +1,5 @@
 import { Channel, SpaceMember } from "renderer/models";
+import { ConfigNotificationRequestBody } from "renderer/models/request";
 import ApiCaller from "./ApiCaller";
 import Caller from "./Caller";
 
@@ -15,11 +16,9 @@ export const deleteChannel = (id: string) => ApiCaller.delete(`channel/${id}`);
 
 export const updateChannelNotification = (
   channelId: string,
-  notificationType: string
+  data: ConfigNotificationRequestBody
 ) => {
-  return ApiCaller.post(`channel/${channelId}/notification`, {
-    notification_type: notificationType,
-  });
+  return ApiCaller.post(`channel/${channelId}/notification`, data);
 };
 
 export const addUserToChannel = (channelId: string, userId: string) =>

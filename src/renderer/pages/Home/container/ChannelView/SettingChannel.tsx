@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import toast from "react-hot-toast";
 import { useHistory } from "react-router-dom";
 import { deleteChannel, updateChannel } from "renderer/actions/UserActions";
@@ -17,6 +23,7 @@ type SettingChannelProps = {
   currentChannel?: Channel;
   onClose: () => void;
   isActiveName: boolean;
+  isActiveNotification: boolean;
   isOwner?: boolean;
 };
 
@@ -24,8 +31,10 @@ const SettingChannel = ({
   currentChannel,
   onClose,
   isActiveName,
+  isActiveNotification,
   isOwner,
 }: SettingChannelProps) => {
+  const buttonNotificationRef = useRef<any>();
   const history = useHistory();
   const dispatch = useAppDispatch();
   const currentTeam = useCurrentCommunity();
@@ -58,6 +67,11 @@ const SettingChannel = ({
     []
   );
   useEffect(() => {
+    if (isActiveNotification) {
+      buttonNotificationRef.current?.show();
+    }
+  }, [isActiveNotification]);
+  useEffect(() => {
     if (isActiveName) {
       setOpenEditName(true);
     }
@@ -83,10 +97,10 @@ const SettingChannel = ({
   const handleSelectMenu = useCallback(
     async (item: PopoverItem) => {
       if (!currentChannel?.channel_id) return;
-      await api.updateChannelNotification(
-        currentChannel.channel_id,
-        item.value
-      );
+      const notification_type: any = item.value;
+      await api.updateChannelNotification(currentChannel.channel_id, {
+        notification_type,
+      });
       setNotificationType(item.value);
     },
     [currentChannel]
@@ -184,6 +198,7 @@ const SettingChannel = ({
           <img src={images.icSettingChannelNotification} alt="" />
           <span className="setting-label">Notification</span>
           <PopoverButton
+            ref={buttonNotificationRef}
             title={currentNotificationType}
             icon={images.icCollapse}
             data={[

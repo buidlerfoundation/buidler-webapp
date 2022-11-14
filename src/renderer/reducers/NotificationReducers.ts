@@ -29,6 +29,43 @@ const notificationReducers: Reducer<NotificationReducerState, AnyAction> = (
   const { type, payload } = action;
   const { currentFilter } = state;
   switch (type) {
+    case actionTypes.UPDATE_NOTIFICATION_CONFIG: {
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [currentFilter]: state.data[currentFilter].map((el) => {
+            if (
+              payload.entity_type === "post" &&
+              el?.post &&
+              payload.entity_id === el?.post?.task_id
+            ) {
+              return {
+                ...el,
+                post: {
+                  ...el.post,
+                  notification_type: payload.notification_type,
+                },
+              };
+            }
+            if (
+              payload.entity_type === "channel" &&
+              el?.channel &&
+              payload.entity_id === el?.channel?.channel_id
+            ) {
+              return {
+                ...el,
+                channel: {
+                  ...el.channel,
+                  notification_type: payload.notification_type,
+                },
+              };
+            }
+            return el;
+          }),
+        },
+      };
+    }
     case actionTypes.UPDATE_ACTIVE_NOTIFICATION_FILTER: {
       return {
         ...state,
