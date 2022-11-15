@@ -11,6 +11,7 @@ type TaskReducerState = {
       archivedTasks: Array<TaskData>;
       canMoreTask: boolean;
       canMoreArchivedTask: boolean;
+      taskCount: number;
     };
   };
   apiController?: AbortController | null;
@@ -127,7 +128,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       return initialState;
     }
     case actionTypes.ARCHIVED_TASK_SUCCESS: {
-      const { channelId, res, id } = payload;
+      const { channelId, res, id, total } = payload;
       return {
         ...state,
         taskData: {
@@ -138,6 +139,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
               ? res
               : [...(state.taskData[channelId]?.archivedTasks || []), ...res],
             canMoreArchivedTask: res.length === 10,
+            archivedCount: total,
           },
         },
       };
@@ -149,7 +151,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       };
     }
     case actionTypes.TASK_SUCCESS: {
-      const { channelId, tasks, id } = payload;
+      const { channelId, tasks, id, total } = payload;
       return {
         ...state,
         taskData: {
@@ -160,6 +162,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
               ? tasks
               : [...(state.taskData[channelId]?.tasks || []), ...tasks],
             canMoreTask: tasks.length === 10,
+            taskCount: total,
           },
         },
         apiController: null,

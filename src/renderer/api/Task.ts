@@ -34,7 +34,7 @@ export const getArchivedTasks = (
   if (id) {
     uri += `&pagination[before]=${id}`;
   }
-  return ApiCaller.get(uri);
+  return Caller.get<TaskData[]>(uri);
 };
 
 export const getArchivedTaskCount = (
