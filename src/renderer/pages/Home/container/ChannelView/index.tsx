@@ -568,8 +568,10 @@ const ChannelView = forwardRef(
             getAroundMessage(messageId, currentChannel.channel_id)
           );
           if (!!success) {
-            const element = document.getElementById(messageId);
-            element?.scrollIntoView({ behavior: "smooth", block: "center" });
+            setTimeout(() => {
+              const element = document.getElementById(messageId);
+              element?.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 500);
           }
         }
         setTimeout(() => {

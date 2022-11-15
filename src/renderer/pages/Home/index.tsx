@@ -687,14 +687,14 @@ const Home = () => {
   }, [channelId, dispatch, matchMessageId]);
   useEffect(() => {
     inputRef.current?.focus();
-    if (channelId && validateUUID(channelId)) {
-      if (privateKey) {
-        if (matchMessageId) {
-          handleMessagesById();
-        } else {
-          dispatch(getMessages(channelId, "Public", undefined));
-        }
-      }
+    if (channelId && validateUUID(channelId) && privateKey) {
+      dispatch(getMessages(channelId, "Public", undefined));
+    }
+  }, [channelId, dispatch, privateKey]);
+
+  useEffect(() => {
+    if (channelId && validateUUID(channelId) && privateKey && matchMessageId) {
+      handleMessagesById();
     }
   }, [channelId, dispatch, handleMessagesById, matchMessageId, privateKey]);
 
