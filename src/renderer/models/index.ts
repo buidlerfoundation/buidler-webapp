@@ -307,6 +307,10 @@ export interface InitialApiData {
   img_domain: string;
   version: string;
   img_config: ImageConfig;
+  imgproxy: {
+    bucket_name: string;
+    domain: string;
+  };
 }
 
 export interface Contract {

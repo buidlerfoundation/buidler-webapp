@@ -21,7 +21,10 @@ export const getInitial: ActionCreator<any> =
   () => async (dispatch: Dispatch) => {
     try {
       const { data } = (await api.getInitial()) || {};
-      ImageHelper.initial(data?.img_domain || "", data?.img_config || "");
+      ImageHelper.initial(
+        data?.imgproxy.domain || "",
+        data?.imgproxy?.bucket_name || ""
+      );
       if (data?.force_update && data?.version > GlobalVariable.version) {
         // Update Desktop App
       }
