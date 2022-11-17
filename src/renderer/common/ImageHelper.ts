@@ -28,7 +28,7 @@ class ImageHelper {
     options: imageOptions = {},
     noParams = false
   ) => {
-    const suffix = "plain/gs://buidler";
+    const suffix = `plain/gs://${this.imgBucket}`;
     if (!name && id?.substring(0, 2) === "0x") {
       return `${suffix}/${id}/ethereum_blockies.png`;
     }
