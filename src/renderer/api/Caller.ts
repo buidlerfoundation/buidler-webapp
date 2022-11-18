@@ -19,6 +19,12 @@ const METHOD_PUT = "put";
 const METHOD_DELETE = "delete";
 const METHOD_PATCH = "patch";
 
+const sleep = (timeout = 1000) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, timeout);
+  });
+};
+
 const handleError = (message: string, apiData: any) => {
   const { uri, fetchOptions } = apiData;
   const compareUri = `${fetchOptions.method}-${uri}`;
@@ -34,6 +40,77 @@ const handleError = (message: string, apiData: any) => {
   } else {
     toast.error(message);
   }
+};
+
+const getRequestBody = (data: any) => {
+  try {
+    const body = JSON.parse(data);
+    return body;
+  } catch (error) {
+    return {};
+  }
+};
+
+const fetchWithRetry = (
+  uri: string,
+  fetchOptions: any = {},
+  retries = 0,
+  serviceBaseUrl?: string
+) => {
+  let apiUrl = "";
+  if (serviceBaseUrl) {
+    apiUrl = serviceBaseUrl + uri;
+  } else {
+    apiUrl = AppConfig.apiBaseUrl + uri;
+  }
+  return fetch(apiUrl, fetchOptions)
+    .then((res) => {
+      return res
+        .json()
+        .then(async (data) => {
+          if (res.status !== 200) {
+            handleError(data.message || data, { uri, fetchOptions });
+            return { ...data, statusCode: res.status };
+          }
+          if (data.data) {
+            return { ...data, statusCode: res.status };
+          }
+          if (data.success || data.message) {
+            return {
+              data: data.data,
+              success: data.success,
+              message: data.message,
+              statusCode: res.status,
+            };
+          }
+          return { data, statusCode: res.status };
+        })
+        .catch((err) => {
+          return { message: err, statusCode: res.status };
+        });
+    })
+    .catch(async (err) => {
+      const msg = err.message || err || "";
+      if (msg === "Failed to fetch") {
+        if (retries > 0) {
+          await sleep();
+          return fetchWithRetry(uri, fetchOptions, retries - 1, serviceBaseUrl);
+        }
+      }
+      GoogleAnalytics.trackingError(
+        uri,
+        fetchOptions.method.toLowerCase(),
+        msg,
+        err.statusCode,
+        getRequestBody(fetchOptions.body)
+      );
+      if (!msg.includes("aborted")) {
+        handleError(msg, { uri, fetchOptions });
+      }
+      return {
+        message: msg,
+      };
+    });
 };
 
 async function requestAPI<T = any>(
@@ -81,14 +158,6 @@ async function requestAPI<T = any>(
     // headers = {};
   } else {
     headers["Content-Type"] = "application/json";
-  }
-
-  // Build API url
-  let apiUrl = "";
-  if (serviceBaseUrl) {
-    apiUrl = serviceBaseUrl + uri;
-  } else {
-    apiUrl = AppConfig.apiBaseUrl + uri;
   }
 
   // Get access token and attach it to API request's header
@@ -141,48 +210,19 @@ async function requestAPI<T = any>(
   if (!navigator.onLine) {
     return Promise.reject(Error("No internet connection"));
   }
-  return fetch(apiUrl, fetchOptions)
-    .then((res) => {
-      return res
-        .json()
-        .then((data) => {
-          if (res.status !== 200) {
-            handleError(data.message || data, { uri, fetchOptions });
-            return { ...data, statusCode: res.status };
-          }
-          if (data.data) {
-            return { ...data, statusCode: res.status };
-          }
-          if (data.success || data.message) {
-            return {
-              data: data.data,
-              success: data.success,
-              message: data.message,
-              statusCode: res.status,
-            };
-          }
-          return { data, statusCode: res.status };
-        })
-        .catch((err) => {
-          return { message: err, statusCode: res.status };
-        });
-    })
-    .catch((err) => {
-      GoogleAnalytics.trackingError(
-        uri,
-        method.toLowerCase(),
-        err.message || "",
-        err.statusCode,
-        body
-      );
-      const msg = err.message || err;
-      if (!msg.includes("aborted")) {
-        handleError(msg, { uri, fetchOptions });
-      }
-      return {
-        message: msg,
-      };
-    });
+  const compareUri = `${method}-${uri}`;
+  const importantApi = importantApis.find((el) => {
+    if (el.exact) {
+      return compareUri === el.uri;
+    }
+    return compareUri.includes(el.uri);
+  });
+  return fetchWithRetry(
+    uri,
+    fetchOptions,
+    importantApi ? 5 : 0,
+    serviceBaseUrl
+  );
 }
 
 const timeRequestMap: { [key: string]: any } = {};

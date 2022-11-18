@@ -841,7 +841,10 @@ class SocketUtil {
         this.emitSeenChannel(message_data.message_id, message_data.entity_id);
       }
       if (userData?.user_id !== notification_data?.sender_data?.user_id) {
-        if (notification_type !== "Muted") {
+        if (
+          notification_type !== "Muted" &&
+          message_data.entity_type === "channel"
+        ) {
           if (currentChannel.channel_id !== message_data.entity_id) {
             store.dispatch({
               type: actionTypes.MARK_UN_SEEN_CHANNEL,

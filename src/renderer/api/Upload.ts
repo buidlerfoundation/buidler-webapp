@@ -1,7 +1,6 @@
 import toast from "react-hot-toast";
 import AppConfig from "renderer/common/AppConfig";
 import { AttachmentData, BaseDataApi, FileApiData } from "renderer/models";
-import ApiCaller from "./ApiCaller";
 import Caller from "./Caller";
 
 export const uploadFile = (
@@ -33,7 +32,7 @@ export const uploadFile = (
 };
 
 export const removeFile = (fileId: string) =>
-  ApiCaller.delete(`file/${fileId}`);
+  Caller.delete(`file/${fileId}`);
 
 export const getSpaceFile = (spaceId: string) =>
   Caller.get<Array<AttachmentData>>(`file/space/${spaceId}`);

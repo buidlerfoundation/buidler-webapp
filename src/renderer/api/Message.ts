@@ -1,7 +1,6 @@
 import { getDeviceCode } from "renderer/common/Cookie";
 import { MessageData } from "renderer/models";
 import { getMentionData } from "../helpers/MessageHelper";
-import ApiCaller from "./ApiCaller";
 import Caller from "./Caller";
 
 export const getPinPostMessage = async (
@@ -20,7 +19,7 @@ export const getPinPostMessage = async (
 };
 
 export const deleteMessage = (messageId: string) =>
-  ApiCaller.delete(`message/${messageId}`);
+  Caller.delete(`message/${messageId}`);
 
 export const getMessages = async (
   channelId: string,
@@ -47,7 +46,7 @@ export const getConversation = (
   limit = 20,
   before = new Date().toISOString()
 ) => {
-  return ApiCaller.get(
+  return Caller.get(
     `messages/conversation/${parentId}?page[size]=${limit}&page[before]=${before}`
   );
 };
@@ -58,7 +57,7 @@ export const editMessage = (
   plain_text: string,
   file_ids?: Array<string>
 ) => {
-  return ApiCaller.put(`message/${id}`, {
+  return Caller.put(`message/${id}`, {
     content,
     mentions: getMentionData(content),
     plain_text,
