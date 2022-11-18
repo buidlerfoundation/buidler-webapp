@@ -463,7 +463,11 @@ export type NotificationData = {
   message_id?: string;
   notification_id: string;
   post?: TaskData;
-  notification_type?: "post_reply" | "channel_mention" | "post_mention";
+  notification_type?:
+    | "post_reply"
+    | "channel_mention"
+    | "post_mention"
+    | "channel_reply";
   team_id?: string;
   to_user_id?: string;
   updatedAt?: string;
