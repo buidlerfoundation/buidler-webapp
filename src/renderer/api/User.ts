@@ -4,6 +4,7 @@ import {
   CollectibleDataApi,
   Community,
   Contract,
+  ENSAsset,
   InitialApiData,
   NFTCollectionDataApi,
   NotificationData,
@@ -20,8 +21,7 @@ import {
 import { ConfigNotificationRequestBody } from "renderer/models/request";
 import Caller from "./Caller";
 
-export const loginWithGoogle = (code: string) =>
-  Caller.post("user", { code });
+export const loginWithGoogle = (code: string) => Caller.post("user", { code });
 
 export const findUser = async () => {
   return Caller.get<UserData>("user");
@@ -71,8 +71,7 @@ export const getCollectibles = (page = 1, limit = 10) => {
 
 export const updateUser = (data: any) => Caller.put("user", data);
 
-export const verifyOtp = (data: any) =>
-  Caller.post("user/device/verify", data);
+export const verifyOtp = (data: any) => Caller.post("user/device/verify", data);
 
 export const syncChannelKey = (data: any) =>
   Caller.post("user/device/sync", data);
@@ -80,8 +79,7 @@ export const syncChannelKey = (data: any) =>
 export const acceptInvitation = (invitationId: string) =>
   Caller.post<Community>(`team/invitation/${invitationId}/accept`);
 
-export const removeDevice = (body: any) =>
-  Caller.delete("user/device", body);
+export const removeDevice = (body: any) => Caller.delete("user/device", body);
 
 export const getNFTCollection = () =>
   Caller.get<Array<UserNFTCollection>>("user/nft-collection");
@@ -100,7 +98,9 @@ export const fetchTransaction = (params: { page?: number; limit?: number }) => {
 };
 
 export const fetchNFTCollection = () =>
-  Caller.get<Array<NFTCollectionDataApi>>("user/nft-collection/group");
+  Caller.get<{ nft_assets: NFTCollectionDataApi[]; ens_assets: ENSAsset[] }>(
+    "user/nft-collection/group"
+  );
 
 export const getUserDetail = (userId: string, teamId: string) =>
   Caller.get<UserData>(`user/${userId}/team/${teamId}`);

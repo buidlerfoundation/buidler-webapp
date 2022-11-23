@@ -402,7 +402,12 @@ export interface NFTAsset {
 }
 
 export interface ENSAsset {
-  name: string;
+  token_id: string;
+  value: string;
+  can_set_username: boolean;
+  can_set_team_namespace: boolean;
+  contract_address: string;
+  network: string;
 }
 
 export interface CollectibleDataApi {
