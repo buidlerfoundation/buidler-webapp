@@ -450,7 +450,7 @@ export const createTeam = (body: any) => async (dispatch: Dispatch) => {
   if (res.statusCode === 200) {
     dispatch({
       type: ActionTypes.CREATE_TEAM_SUCCESS,
-      payload: res,
+      payload: res.data,
     });
   } else {
     dispatch({
