@@ -425,7 +425,7 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           data: normalizeMessage([data]),
           canMore: true,
           scrollData: { showScrollDown: false, unreadCount: 0 },
-          canMoreAfter: true,
+          canMoreAfter: false,
         };
       }
       return {
