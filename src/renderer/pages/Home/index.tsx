@@ -22,8 +22,6 @@ import { uniqBy } from "lodash";
 import { CreateSpaceData, MessageData, Space, TaskData } from "renderer/models";
 import ModalSpaceSetting from "renderer/shared/ModalSpaceSetting";
 import ModalSpaceDetail from "renderer/shared/ModalSpaceDetail";
-import { getSpaceBackgroundColor } from "renderer/helpers/SpaceHelper";
-import ImageHelper from "renderer/common/ImageHelper";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import {
   clearLastChannel,
@@ -403,14 +401,6 @@ const Home = () => {
         space_emoji: spaceData.emoji,
         space_image_url: spaceData.url,
       };
-      if (spaceData.url) {
-        const url = ImageHelper.normalizeImage(
-          spaceData.url,
-          currentTeam.team_id
-        );
-        const colorAverage = await getSpaceBackgroundColor(url);
-        body.space_background_color = colorAverage;
-      }
       const conditionAmount =
         spaceData?.condition?.amount || spaceData?.condition?.amountInput || "";
       if (spaceData.spaceType === "Exclusive") {

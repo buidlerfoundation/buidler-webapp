@@ -1,6 +1,5 @@
 import { ActionCreator, Dispatch } from "redux";
 import GlobalVariable from "renderer/services/GlobalVariable";
-import { getSpaceBackgroundColor } from "renderer/helpers/SpaceHelper";
 import api from "../api";
 import ActionTypes from "./ActionTypes";
 import { AsyncKey, UserRole } from "../common/AppConfig";
@@ -397,15 +396,9 @@ export const uploadSpaceAvatar =
     });
     const fileRes = await api.uploadFile(teamId, spaceId, file);
     if (fileRes.statusCode === 200) {
-      const url = ImageHelper.normalizeImage(
-        fileRes.data?.file_url || "",
-        teamId
-      );
-      const colorAverage = await getSpaceBackgroundColor(url);
       await api.updateSpaceChannel(spaceId, {
         space_emoji: "",
         space_image_url: fileRes.data?.file_url,
-        space_background_color: colorAverage,
       });
     } else {
       dispatch({
