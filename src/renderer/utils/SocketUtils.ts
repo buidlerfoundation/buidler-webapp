@@ -44,6 +44,7 @@ import {
 import { getCollectibles } from "renderer/actions/CollectibleActions";
 import { getPinPostMessages } from "renderer/actions/MessageActions";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
+import { getDeviceToken } from "renderer/services/firebase";
 
 const getTasks = async (channelId: string, dispatch: Dispatch) => {
   dispatch({ type: actionTypes.TASK_REQUEST, payload: { channelId } });
@@ -199,12 +200,15 @@ class SocketUtil {
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     const deviceCode = await getDeviceCode();
     const generatedPrivateKey = await GeneratedPrivateKey();
+    const deviceToken = await getDeviceToken();
     const publicKey = utils.computePublicKey(generatedPrivateKey, true);
     this.socket = io(`${AppConfig.apiBaseUrl}`, {
       query: {
         token: accessToken,
         device_code: deviceCode,
         encrypt_message_key: publicKey,
+        device_token: deviceToken,
+        platform: window.navigator.platform,
       },
       transports: ["websocket"],
       upgrade: false,

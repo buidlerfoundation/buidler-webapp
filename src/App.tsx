@@ -3,6 +3,7 @@ import "./index.scss";
 import "./App.scss";
 import "../src/renderer/styles/spacing.scss";
 import "./emoji.scss";
+import "renderer/services/firebase";
 import { useHistory } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
 import { ThemeProvider } from "@material-ui/styles";
@@ -45,12 +46,39 @@ function App() {
       history.replace("/channels");
     }
   }, [imgDomain, dispatch, history]);
+  const initPush = useCallback(() => {
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker
+          .register("/firebase-messaging-sw.js")
+          .then((registration) => {
+            //Confirm user permission for notification
+            Notification.requestPermission().then((permission) => {
+              if (permission === "granted") {
+                //If notification is allowed
+                navigator.serviceWorker.ready.then((p) => {
+                  p.pushManager.getSubscription().then((subscription) => {
+                    if (subscription === null) {
+                      //If there is no notification subscription, register.
+                      let re = p.pushManager.subscribe({
+                        userVisibleOnly: true,
+                      });
+                    }
+                  });
+                });
+              }
+            });
+          });
+      });
+    }
+  }, []);
   useEffect(() => {
     GoogleAnalytics.init();
     getCookie(AsyncKey.accessTokenKey).then((res) => {
       dispatch({ type: actionTypes.UPDATE_CURRENT_TOKEN, payload: res });
     });
-  }, [dispatch]);
+    initPush();
+  }, [dispatch, initPush]);
   useEffect(() => {
     if (user.user_id) {
       GoogleAnalytics.identify(user);
