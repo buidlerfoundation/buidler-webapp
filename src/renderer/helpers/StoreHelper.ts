@@ -10,12 +10,12 @@ const defaultChannel: Channel = {
   seen: true,
 };
 
-const getPathNameWithoutPostOrMessage = () => {
+function getPathNameWithoutPostOrMessage() {
   const { pathname } = window.location;
   const idx = Math.max(pathname.indexOf("/post"), pathname.indexOf("/message"));
   if (idx > 0) return pathname.substring(0, idx);
   return pathname;
-};
+}
 
 export const getPostId = () => {
   const { pathname } = window.location;
@@ -30,11 +30,11 @@ export const getCommunityId = () => {
   return pathname.substring(index + 1, lastIndex);
 };
 
-export const getChannelId = () => {
+export function getChannelId() {
   const pathname = getPathNameWithoutPostOrMessage();
   const lastIndex = pathname.lastIndexOf("/");
   return pathname.substring(lastIndex + 1);
-};
+}
 
 export const getCurrentCommunity = () => {
   if (!store) return null;

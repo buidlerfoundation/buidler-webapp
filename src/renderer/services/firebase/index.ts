@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import toast from "react-hot-toast";
+import { getChannelId } from "renderer/helpers/StoreHelper";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -12,11 +13,33 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const messaging = getMessaging(firebaseApp);
 
+const getDestinationRoute = (json: any) => {
+  const { message_data, notification_data } = json;
+  if (message_data.entity_type === "channel") {
+    return `/channels/${notification_data.team_id}/${message_data.entity_id}/message/${message_data.message_id}`;
+  }
+  if (message_data.entity_type === "post") {
+    const currentChannelId = getChannelId();
+    return `/channels/${notification_data.team_id}/${currentChannelId}/post/${message_data.entity_id}`;
+  }
+};
+
 onMessage(messaging, (payload) => {
-  const { body, title } = payload.notification || {};
-  const props: any = {
-    onClick: () => {},
-  };
+  const { notification, data } = payload;
+  const { body, title } = notification || {};
+  let props: any = {};
+  const json = data?.data ? JSON.parse(data?.data) : null;
+  if (json) {
+    const destination = getDestinationRoute(json);
+    props = {
+      subtitle: json.notification_data?.subtitle,
+      onClick: () => {
+        if (destination) {
+          window.location.replace(destination);
+        }
+      },
+    };
+  }
   toast.custom(body || "", {
     className: title || "",
     ariaProps: props,
