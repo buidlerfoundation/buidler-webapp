@@ -208,7 +208,7 @@ class SocketUtil {
         device_code: deviceCode,
         encrypt_message_key: publicKey,
         device_token: deviceToken,
-        platform: window.navigator.platform,
+        platform: 'Web',
       },
       transports: ["websocket"],
       upgrade: false,
