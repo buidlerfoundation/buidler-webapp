@@ -32,6 +32,7 @@ export const AsyncKey = {
   socketConnectKey: `${Prefix}_socket_connect_key`,
   tokenExpire: `${Prefix}_token_expire_key`,
   refreshTokenExpire: `${Prefix}_refresh_token_expire_key`,
+  spaceToggleKey: `${Prefix}_space_toggle_key`,
 };
 
 export const ProgressStatus = [

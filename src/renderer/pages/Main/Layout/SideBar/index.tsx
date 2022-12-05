@@ -62,9 +62,7 @@ const SideBar = forwardRef(
     const currentTeam = useCurrentCommunity();
     const communityId = useMatchCommunityId();
     const spaceChannel = useSpaceChannel();
-    const spaceExpandMap = useAppSelector(
-      (state) => state.toggleSidebar.spaceExpandMap
-    );
+    const spaceToggle = useAppSelector((state) => state.sideBar.spaceToggle);
     const [isOpenConfirmRemoveMember, setOpenConfirmRemoveMember] =
       useState(false);
     const [selectedMenuChannel, setSelectedMenuChannel] = useState<any>(null);
@@ -214,7 +212,7 @@ const SideBar = forwardRef(
                   onSpaceBadgeClick={onSpaceBadgeClick}
                   onCreateChannelClick={onCreateChannel}
                   channel_ids={space.channel_ids}
-                  isCollapsed={!spaceExpandMap[space.space_id]}
+                  isCollapsed={!spaceToggle[space.space_id]}
                 />
               </div>
             )}
@@ -227,7 +225,7 @@ const SideBar = forwardRef(
         isOwner,
         onCreateChannel,
         onSpaceBadgeClick,
-        spaceExpandMap,
+        spaceToggle,
       ]
     );
     return (

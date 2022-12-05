@@ -208,7 +208,7 @@ class SocketUtil {
         device_code: deviceCode,
         encrypt_message_key: publicKey,
         device_token: deviceToken,
-        platform: 'Web',
+        platform: "Web",
       },
       transports: ["websocket"],
       upgrade: false,
@@ -246,47 +246,12 @@ class SocketUtil {
         this.reloadData();
       }
       this.firstLoad = false;
+      this.removeListenSocket();
       this.listenSocket();
       this.socket?.on("disconnect", (reason: string) => {
         this.connecting = false;
+        this.removeListenSocket();
         console.log(`socket disconnect: ${reason}`);
-        this.socket?.off("ON_NEW_MESSAGE");
-        this.socket?.off("ON_NEW_TASK");
-        this.socket?.off("ON_UPDATE_TASK");
-        this.socket?.off("ON_ERROR");
-        this.socket?.off("ON_EDIT_MESSAGE");
-        this.socket?.off("ON_USER_ONLINE");
-        this.socket?.off("ON_USER_OFFLINE");
-        this.socket?.off("ON_DELETE_TASK");
-        this.socket?.off("ON_DELETE_MESSAGE");
-        this.socket?.off("ON_REACTION_ADDED");
-        this.socket?.off("ON_REACTION_REMOVED");
-        this.socket?.off("ON_NEW_USER_JOIN_TEAM");
-        this.socket?.off("ON_CREATE_NEW_CHANNEL");
-        this.socket?.off("ON_CREATE_NEW_SPACE");
-        this.socket?.off("ON_ADD_NEW_MEMBER_TO_PRIVATE_CHANNEL");
-        this.socket?.off("ON_REMOVE_NEW_MEMBER_FROM_PRIVATE_CHANNEL");
-        this.socket?.off("ON_UPDATE_MEMBER_IN_PRIVATE_CHANNEL");
-        this.socket?.off("ON_CHANNEL_KEY_SEND");
-        this.socket?.off("ON_VERIFY_DEVICE_OTP_SEND");
-        this.socket?.off("ON_SYNC_DATA_SEND");
-        this.socket?.off("ON_UPDATE_CHANNEL");
-        this.socket?.off("ON_DELETE_CHANNEL");
-        this.socket?.off("ON_UPDATE_SPACE");
-        this.socket?.off("ON_DELETE_SPACE");
-        this.socket?.off("ON_USER_UPDATE_PROFILE");
-        this.socket?.off("ON_ADD_USER_TO_SPACE");
-        this.socket?.off("ON_REMOVE_USER_FROM_SPACE");
-        this.socket?.off("ON_NEW_TRANSACTION");
-        this.socket?.off("ON_REMOVE_USER_FROM_TEAM");
-        this.socket?.off("ON_VIEW_MESSAGE_IN_CHANNEL");
-        this.socket?.off("ON_USER_LEAVE_TEAM");
-        this.socket?.off("ON_UPDATE_USER_PERMISSION");
-        this.socket?.off("ON_ATTACHMENT_UPLOAD_SUCCESSFUL");
-        this.socket?.off("ON_NEW_NOTIFICATION");
-        this.socket?.off("ON_READ_NOTIFICATION_IN_POST");
-        this.socket?.off("ON_UPDATE_NOTIFICATION_CONFIG");
-        this.socket?.off("disconnect");
         if (reason === "io server disconnect") {
           this.socket?.connect();
         }
@@ -348,6 +313,45 @@ class SocketUtil {
       },
     });
   };
+  removeListenSocket() {
+    this.socket?.off("ON_NEW_MESSAGE");
+    this.socket?.off("ON_NEW_TASK");
+    this.socket?.off("ON_UPDATE_TASK");
+    this.socket?.off("ON_ERROR");
+    this.socket?.off("ON_EDIT_MESSAGE");
+    this.socket?.off("ON_USER_ONLINE");
+    this.socket?.off("ON_USER_OFFLINE");
+    this.socket?.off("ON_DELETE_TASK");
+    this.socket?.off("ON_DELETE_MESSAGE");
+    this.socket?.off("ON_REACTION_ADDED");
+    this.socket?.off("ON_REACTION_REMOVED");
+    this.socket?.off("ON_NEW_USER_JOIN_TEAM");
+    this.socket?.off("ON_CREATE_NEW_CHANNEL");
+    this.socket?.off("ON_CREATE_NEW_SPACE");
+    this.socket?.off("ON_ADD_NEW_MEMBER_TO_PRIVATE_CHANNEL");
+    this.socket?.off("ON_REMOVE_NEW_MEMBER_FROM_PRIVATE_CHANNEL");
+    this.socket?.off("ON_UPDATE_MEMBER_IN_PRIVATE_CHANNEL");
+    this.socket?.off("ON_CHANNEL_KEY_SEND");
+    this.socket?.off("ON_VERIFY_DEVICE_OTP_SEND");
+    this.socket?.off("ON_SYNC_DATA_SEND");
+    this.socket?.off("ON_UPDATE_CHANNEL");
+    this.socket?.off("ON_DELETE_CHANNEL");
+    this.socket?.off("ON_UPDATE_SPACE");
+    this.socket?.off("ON_DELETE_SPACE");
+    this.socket?.off("ON_USER_UPDATE_PROFILE");
+    this.socket?.off("ON_ADD_USER_TO_SPACE");
+    this.socket?.off("ON_REMOVE_USER_FROM_SPACE");
+    this.socket?.off("ON_NEW_TRANSACTION");
+    this.socket?.off("ON_REMOVE_USER_FROM_TEAM");
+    this.socket?.off("ON_VIEW_MESSAGE_IN_CHANNEL");
+    this.socket?.off("ON_USER_LEAVE_TEAM");
+    this.socket?.off("ON_UPDATE_USER_PERMISSION");
+    this.socket?.off("ON_ATTACHMENT_UPLOAD_SUCCESSFUL");
+    this.socket?.off("ON_NEW_NOTIFICATION");
+    this.socket?.off("ON_READ_NOTIFICATION_IN_POST");
+    this.socket?.off("ON_UPDATE_NOTIFICATION_CONFIG");
+    this.socket?.off("disconnect");
+  }
   listenSocket() {
     this.socket?.on("ON_UPDATE_NOTIFICATION_CONFIG", (data) => {
       store.dispatch({

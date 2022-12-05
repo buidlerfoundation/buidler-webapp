@@ -30,6 +30,7 @@ import ErrorBoundary from "renderer/shared/ErrorBoundary";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import { CustomEventName } from "renderer/services/events/WindowEvent";
 import ChainId from "renderer/services/connectors/ChainId";
+import { initialSpaceToggle } from "renderer/actions/SideBarActions";
 
 function App() {
   const history = useHistory();
@@ -72,6 +73,9 @@ function App() {
       });
     }
   }, []);
+  useEffect(() => {
+    dispatch(initialSpaceToggle());
+  }, [dispatch]);
   useEffect(() => {
     GoogleAnalytics.init();
     getCookie(AsyncKey.accessTokenKey).then((res) => {

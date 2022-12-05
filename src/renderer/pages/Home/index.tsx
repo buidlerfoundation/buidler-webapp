@@ -895,11 +895,13 @@ const Home = () => {
             handleClose={handleCloseModalConfirmDeleteSpace}
             onDelete={handleDeleteSpace}
           />
-          <ModalAllMembers
-            open={isOpenMembers}
-            handleClose={toggleOpenMembers}
-            onSettingClick={onSettingClick}
-          />
+          {isOpenMembers && (
+            <ModalAllMembers
+              open={isOpenMembers}
+              handleClose={toggleOpenMembers}
+              onSettingClick={onSettingClick}
+            />
+          )}
           <ModalUserProfile
             open={!!currentUserId}
             handleClose={handleCloseModalUserProfile}
