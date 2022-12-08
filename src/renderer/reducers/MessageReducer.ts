@@ -123,8 +123,16 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
     }
     case actionTypes.MESSAGE_PP_SUCCESS:
     case actionTypes.MESSAGE_SUCCESS: {
-      const { channelId, data, before, reloadSocket, messageId, after } =
-        payload;
+      const {
+        channelId,
+        data,
+        before,
+        reloadSocket,
+        messageId,
+        after,
+        canMoreAfter,
+        canMoreBefore,
+      } = payload;
       let msg = data || [];
       let scrollData = state.messageData?.[channelId]?.scrollData;
       const currentData = state.messageData[channelId]?.data || [];
@@ -160,16 +168,22 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           ...state.messageData,
           [channelId]: {
             data: normalizeMessage(msg),
-            canMore: !after
-              ? data.length !== 0
-              : state.messageData?.[channelId]?.canMore,
-            canMoreAfter: messageId
-              ? true
-              : after
-              ? data.length !== 0
-              : before
-              ? state.messageData?.[channelId]?.canMoreAfter
-              : false,
+            canMore:
+              canMoreBefore !== undefined
+                ? canMoreBefore
+                : !after
+                ? data.length !== 0
+                : state.messageData?.[channelId]?.canMore,
+            canMoreAfter:
+              canMoreAfter !== undefined
+                ? canMoreAfter
+                : messageId
+                ? true
+                : after
+                ? data.length !== 0
+                : before
+                ? state.messageData?.[channelId]?.canMoreAfter
+                : false,
             scrollData,
           },
         },

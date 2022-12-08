@@ -434,7 +434,12 @@ export interface BaseDataApi<T> {
   message?: string;
   total?: number;
   token?: string;
-  metadata?: { total?: number; encrypt_message_key?: string };
+  metadata?: {
+    total?: number;
+    encrypt_message_key?: string;
+    can_loadmore_message_after?: boolean;
+    can_loadmore_message_before?: boolean;
+  };
   refresh_token?: string;
   token_expire_at?: number;
   refresh_token_expire_at?: number;
