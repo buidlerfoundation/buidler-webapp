@@ -12,6 +12,7 @@ import useAppDispatch from "renderer/hooks/useAppDispatch";
 import useChannel from "renderer/hooks/useChannel";
 import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
 import { Channel } from "renderer/models";
+import SwitchButton from "renderer/shared/SwitchButton";
 import api from "../../../../api";
 import images from "../../../../common/images";
 import AppInput from "../../../../shared/AppInput";
@@ -39,10 +40,14 @@ const SettingChannel = ({
   const dispatch = useAppDispatch();
   const currentTeam = useCurrentCommunity();
   const channels = useChannel();
+  const [limitChat, setLimitChat] = useState(false);
   const [isOpenConfirm, setOpenConfirm] = useState(false);
   const [currentName, setCurrentName] = useState("");
   const [isOpenEditName, setOpenEditName] = useState(false);
   const [currentNotificationType, setNotificationType] = useState<string>();
+  useEffect(() => {
+    setLimitChat(!!currentChannel?.is_chat_deactivated);
+  }, [currentChannel?.is_chat_deactivated]);
   useEffect(() => {
     setNotificationType(currentChannel?.notification_type);
   }, [currentChannel?.notification_type]);
@@ -94,6 +99,18 @@ const SettingChannel = ({
       toggleEditName();
     }
   }, [currentChannel?.channel_id, currentName, toggleEditName, dispatch]);
+  const onLimitChatChange = useCallback(
+    (active) => {
+      if (!currentChannel?.channel_id) return;
+      dispatch(
+        updateChannel(currentChannel?.channel_id, {
+          is_chat_deactivated: active,
+        })
+      );
+      setLimitChat(active);
+    },
+    [currentChannel?.channel_id, dispatch]
+  );
   const handleSelectMenu = useCallback(
     async (item: PopoverItem) => {
       if (!currentChannel?.channel_id) return;
@@ -208,6 +225,18 @@ const SettingChannel = ({
             ]}
             onSelected={handleSelectMenu}
           />
+        </div>
+      )}
+      {isOwner && (
+        <div className="setting-item">
+          <img src={images.icSettingSecure} alt="" />
+          <div className="setting-label__wrap">
+            <span className="setting-label">Limited channel</span>
+            <span className="setting-description">
+              Only owners and admins can send messages to channel
+            </span>
+          </div>
+          <SwitchButton active={limitChat} onChange={onLimitChatChange} />
         </div>
       )}
       {isOwner && (

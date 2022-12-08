@@ -470,6 +470,7 @@ const Home = () => {
         channel_type: channelData.isPrivate ? "Private" : "Public",
         channel_emoji: channelData.emoji,
         channel_image_url: channelData.url,
+        is_chat_deactivated: channelData.isDeactivated,
       };
       if (channelData.channelId) {
         body.channel_id = channelData.channelId;

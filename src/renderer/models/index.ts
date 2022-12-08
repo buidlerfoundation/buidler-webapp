@@ -21,6 +21,7 @@ export type CreateChannelData = {
   attachment?: LocalAttachment | null;
   emoji?: string | null;
   url?: string | null;
+  isDeactivated?: boolean;
 };
 
 export type CreateSpaceData = {
@@ -95,6 +96,7 @@ export interface Channel {
   user?: UserData;
   group_channel_id?: string;
   attachment?: any;
+  is_chat_deactivated?: boolean;
 }
 
 export interface Space {

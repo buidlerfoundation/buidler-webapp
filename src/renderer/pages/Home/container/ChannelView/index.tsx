@@ -61,6 +61,7 @@ import useTotalTeamUserData from "renderer/hooks/useTotalMemberUser";
 import actionTypes from "renderer/actions/ActionTypes";
 import ModalConfirmPin from "renderer/shared/ModalConfirmPin";
 import ModalConfirmDelete from "renderer/shared/ModalConfirmDelete";
+import useUserRole from "renderer/hooks/useUserRole";
 
 type ChannelViewProps = {
   currentChannel: Channel;
@@ -104,6 +105,7 @@ const ChannelView = forwardRef(
     const totalTeamUser = useTotalTeamUserData();
     const communityId = useMatchCommunityId();
     const reactData = useAppSelector((state) => state.reactReducer.reactData);
+    const userRole = useUserRole();
     const messageHighLightId = useAppSelector(
       (state) => state.message.highlightMessageId
     );
@@ -645,6 +647,10 @@ const ChannelView = forwardRef(
       selectedMessage,
       toggleConfirmDeleteMessage,
     ]);
+    const canChat = useMemo(() => {
+      if (!currentChannel.is_chat_deactivated) return true;
+      return userRole === "Owner" || userRole === "Admin";
+    }, [currentChannel.is_chat_deactivated, userRole]);
     if (!currentChannel?.channel_id && !currentChannel?.user)
       return <div className="channel-view-container" />;
     return (
@@ -678,7 +684,7 @@ const ChannelView = forwardRef(
                   <CircularProgress size={30} color="inherit" />
                 </div>
               )}
-              <div style={{ marginTop: 15 }} />
+              {canChat && <div style={{ marginTop: 15 }} />}
             </div>
             {loadMoreMessage && (
               <div className="message-load-more">
@@ -706,25 +712,27 @@ const ChannelView = forwardRef(
                       </div>
                     )}
                 </div>
-                <MessageInput
-                  placeholder={`Message to ${
-                    currentChannel?.user?.user_name
-                      ? currentChannel?.user?.user_name
-                      : `# ${currentChannel?.channel_name}`
-                  }`}
-                  attachments={files}
-                  onRemoveFile={handleRemoveFile}
-                  inputRef={inputRef}
-                  onKeyDown={debounce(onKeyDown, 100)}
-                  onPaste={_onPaste}
-                  text={text}
-                  setText={setText}
-                  onCircleClick={onCircleClick}
-                  messageReply={messageReply}
-                  onRemoveReply={onRemoveReply}
-                  messageEdit={messageEdit}
-                  inputId="message-input-channel"
-                />
+                {canChat && (
+                  <MessageInput
+                    placeholder={`Message to ${
+                      currentChannel?.user?.user_name
+                        ? currentChannel?.user?.user_name
+                        : `# ${currentChannel?.channel_name}`
+                    }`}
+                    attachments={files}
+                    onRemoveFile={handleRemoveFile}
+                    inputRef={inputRef}
+                    onKeyDown={debounce(onKeyDown, 100)}
+                    onPaste={_onPaste}
+                    text={text}
+                    setText={setText}
+                    onCircleClick={onCircleClick}
+                    messageReply={messageReply}
+                    onRemoveReply={onRemoveReply}
+                    messageEdit={messageEdit}
+                    inputId="message-input-channel"
+                  />
+                )}
               </div>
             )}
             <input
