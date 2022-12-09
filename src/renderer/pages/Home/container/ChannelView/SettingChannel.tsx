@@ -12,6 +12,7 @@ import useAppDispatch from "renderer/hooks/useAppDispatch";
 import useChannel from "renderer/hooks/useChannel";
 import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
 import { Channel } from "renderer/models";
+import IconLimitChat from "renderer/shared/SVG/IconLimitChat";
 import SwitchButton from "renderer/shared/SwitchButton";
 import api from "../../../../api";
 import images from "../../../../common/images";
@@ -228,12 +229,12 @@ const SettingChannel = ({
         </div>
       )}
       {isOwner && (
-        <div className="setting-item">
-          <img src={images.icSettingSecure} alt="" />
+        <div className="setting-item" style={{ alignItems: "flex-start" }}>
+          <IconLimitChat />
           <div className="setting-label__wrap">
             <span className="setting-label">Limited channel</span>
             <span className="setting-description">
-              Only owners and admins can send messages to channel
+              Only owners and admins can send messages to this channel.
             </span>
           </div>
           <SwitchButton active={limitChat} onChange={onLimitChatChange} />

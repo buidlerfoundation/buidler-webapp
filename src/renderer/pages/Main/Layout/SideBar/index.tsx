@@ -30,6 +30,7 @@ import CommunityHeader from "renderer/shared/CommunityHeader";
 type SideBarProps = {
   onEditGroupChannel: (group: any) => void;
   onEditChannelName: (channel: any) => void;
+  onOpenChannelSetting: (channel: any) => void;
   onUpdateNotification: (channel: any) => void;
   onDeleteChannel: (channel: any) => void;
   onEditChannelMember: (channel: any) => void;
@@ -47,6 +48,7 @@ const SideBar = forwardRef(
       onCreateChannel,
       onCreateGroupChannel,
       onEditChannelName,
+      onOpenChannelSetting,
       onUpdateNotification,
       onDeleteChannel,
       onEditChannelMember,
@@ -153,6 +155,10 @@ const SideBar = forwardRef(
             onEditChannelName(selectedMenuChannel);
             break;
           }
+          case "Channel setting": {
+            onOpenChannelSetting(selectedMenuChannel);
+            break;
+          }
           case "Notification": {
             onUpdateNotification(selectedMenuChannel);
             break;
@@ -183,6 +189,7 @@ const SideBar = forwardRef(
         onEditChannelMember,
         onEditChannelName,
         onEditGroupChannel,
+        onOpenChannelSetting,
         onSpaceBadgeClick,
         onUpdateNotification,
         selectedMenuChannel,
