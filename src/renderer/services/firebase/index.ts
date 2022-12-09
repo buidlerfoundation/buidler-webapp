@@ -25,12 +25,15 @@ const getDestinationRoute = (json: any) => {
 };
 
 onMessage(messaging, (payload) => {
-  const { notification, data } = payload;
-  const { body, title } = notification || {};
+  const { data } = payload;
+  let body = "";
+  let title = "";
   let props: any = {};
   const json = data?.data ? JSON.parse(data?.data) : null;
   if (json) {
     const destination = getDestinationRoute(json);
+    title = json.notification_data?.title;
+    body = json.notification_data?.body;
     props = {
       subtitle: json.notification_data?.subtitle,
       onClick: () => {
