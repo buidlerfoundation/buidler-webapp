@@ -50,6 +50,11 @@ class ImageHelper {
     return /.{0,}(\.mp4|\.mov|\.avi|\.m4v|\.m4p)$/g.test(name);
   };
 
+  shouldUseOrigin = (name?: string) => {
+    if (!name) return false;
+    return !/.{0,}(\.jpeg|\.png|\.gif|\.jpg)$/g.test(name);
+  };
+
   normalizeImage = (
     name?: string,
     id?: string,
@@ -57,7 +62,7 @@ class ImageHelper {
     noParams = false
   ) => {
     if (!this.imgDomain || !this.imgBucket) return "";
-    if (this.isVideo(name)) {
+    if (this.shouldUseOrigin(name)) {
       return `https://storage.googleapis.com/${this.imgBucket}/${id}/${name}`;
     }
     const domain = this.imgDomain;
