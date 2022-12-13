@@ -36,9 +36,9 @@ onMessage(messaging, (payload) => {
     body = json.notification_data?.body;
     props = {
       subtitle: json.notification_data?.subtitle,
-      onClick: () => {
+      onNotificationClick: (history) => {
         if (destination) {
-          window.location.replace(destination);
+          history.replace(destination);
         }
       },
     };
