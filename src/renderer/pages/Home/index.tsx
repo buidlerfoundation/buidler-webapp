@@ -591,7 +591,7 @@ const Home = () => {
   ]);
   useEffect(() => {
     if (currentChannel.channel_name && currentTeam.team_display_name) {
-      document.title = `${currentTeam.team_display_name} • ${currentChannel.channel_name}`;
+      document.title = `${currentTeam.team_display_name} • #${currentChannel.channel_name} | Buidler`;
     }
   }, [currentChannel.channel_name, currentTeam.team_display_name]);
   useEffect(() => {
