@@ -12,6 +12,7 @@ const AppConfig = {
     process.env.REACT_APP_DEFAULT_CHAIN_ID === "4"
       ? "https://rinkeby.etherscan.io"
       : "https://etherscan.io",
+  buidlerCommunityId: "c9097f50-9f0b-4e0a-a042-ab7790aff3b0",
 };
 
 export default AppConfig;
