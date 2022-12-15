@@ -3,6 +3,7 @@ import numeral from "numeral";
 import { ethers, utils } from "ethers";
 import MinABI from "renderer/services/connectors/MinABI";
 import { TransactionRequest } from "@ethersproject/abstract-provider";
+import AppConfig from "renderer/common/AppConfig";
 
 export const round = (value: number, afterDot: number) => {
   const p = Math.pow(10, afterDot);
@@ -112,13 +113,13 @@ export const getTransactionData = (
       ).toLocaleString("fullwide", { useGrouping: false })}`
     );
     transferData = inf.encodeFunctionData("transfer", [
-      sendData.recipientAddress,
+      sendData.recipientAddress || AppConfig.estimateGasRecipientAddress,
       amount.toHexString(),
     ]);
   } else if (typeId === "2") {
     transferData = inf.encodeFunctionData("transferFrom", [
       from,
-      sendData.recipientAddress,
+      sendData.recipientAddress || AppConfig.estimateGasRecipientAddress,
       sendData.nft?.token_id,
     ]);
   }
@@ -137,7 +138,8 @@ export const getEstimateTransaction = (
   };
   if (typeId === "1") {
     if (sendData.asset?.contract.contract_address === "eth") {
-      res.to = sendData.recipientAddress;
+      res.to =
+        sendData.recipientAddress || AppConfig.estimateGasRecipientAddress;
       res.value = getTransactionAmount(sendData)
         .toHexString()
         .replace(/^(0x)0+/g, "$1");

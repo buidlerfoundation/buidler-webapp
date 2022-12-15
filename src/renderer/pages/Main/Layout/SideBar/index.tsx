@@ -9,7 +9,6 @@ import React, {
 } from "react";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import "./index.scss";
-import { Droppable, Draggable } from "react-beautiful-dnd";
 import ModalConfirmDelete from "renderer/shared/ModalConfirmDelete";
 import { Space } from "renderer/models";
 import PopoverButton from "renderer/shared/PopoverButton";
@@ -197,33 +196,19 @@ const SideBar = forwardRef(
       ]
     );
     const renderSpaceItem = useCallback(
-      (space: Space, idx: number) => {
+      (space: Space) => {
         return (
-          <Draggable
+          <SpaceItem
             key={space.space_id}
-            draggableId={space.space_id}
-            index={idx}
-            isDragDisabled
-          >
-            {(dragProvided) => (
-              <div
-                ref={dragProvided.innerRef}
-                {...dragProvided.draggableProps}
-                {...dragProvided.dragHandleProps}
-              >
-                <SpaceItem
-                  isOwner={isOwner}
-                  space={space}
-                  onContextSpaceChannel={handleContextMenuSpace}
-                  onContextChannel={handleContextMenuChannel}
-                  onSpaceBadgeClick={onSpaceBadgeClick}
-                  onCreateChannelClick={onCreateChannel}
-                  channel_ids={space.channel_ids}
-                  isCollapsed={!spaceToggle[space.space_id]}
-                />
-              </div>
-            )}
-          </Draggable>
+            isOwner={isOwner}
+            space={space}
+            onContextSpaceChannel={handleContextMenuSpace}
+            onContextChannel={handleContextMenuChannel}
+            onSpaceBadgeClick={onSpaceBadgeClick}
+            onCreateChannelClick={onCreateChannel}
+            channel_ids={space.channel_ids}
+            isCollapsed={!spaceToggle[space.space_id]}
+          />
         );
       },
       [
@@ -243,16 +228,7 @@ const SideBar = forwardRef(
               onInvitePress={onInviteMember}
               onViewAllMembers={onViewMembers}
             />
-            <Droppable droppableId="group-channel-container" isDropDisabled>
-              {(provided) => {
-                return (
-                  <div ref={provided.innerRef} {...provided.droppableProps}>
-                    {spaceChannel.map(renderSpaceItem)}
-                    {provided.placeholder}
-                  </div>
-                );
-              }}
-            </Droppable>
+            {spaceChannel.map(renderSpaceItem)}
             <div ref={bottomBodyRef} />
             {isOwner && (
               <div className="btn-create-space" onClick={onCreateGroupChannel}>

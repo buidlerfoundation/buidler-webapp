@@ -62,6 +62,7 @@ class ImageHelper {
     noParams = false
   ) => {
     if (!this.imgDomain || !this.imgBucket) return "";
+    if (name?.includes("https://")) return name;
     if (this.shouldUseOrigin(name)) {
       return `https://storage.googleapis.com/${this.imgBucket}/${id}/${name}`;
     }

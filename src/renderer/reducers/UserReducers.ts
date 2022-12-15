@@ -729,6 +729,19 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       if (!space) return state;
       return {
         ...state,
+        channelMap: {
+          ...channelMap,
+          [currentTeamId]: channelMap[currentTeamId]?.map((el) => {
+            if (el.channel_id === channelId) {
+              return {
+                ...el,
+                space_id: spaceId,
+                space,
+              };
+            }
+            return el;
+          }),
+        },
         spaceChannelMap: {
           ...spaceChannelMap,
           [currentTeamId]: spaceChannelMap[currentTeamId]?.map((el) => {

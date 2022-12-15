@@ -99,6 +99,10 @@ a {
   border-radius: 5px;
 }
 
+.display-none {
+  display: none !important;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -328,7 +332,7 @@ a {
   --color-medium: #fcb828;
   --color-urgent: #d8292f;
   --color-mention: #0584fe;
-  --color-blue: #1159D5;
+  --color-blue: #1159d5;
   --color-secondary-text: #727272;
   --color-primary-text: #e8e8e8;
   --color-dark-text: #222222;

@@ -13,6 +13,7 @@ const AppConfig = {
       ? "https://rinkeby.etherscan.io"
       : "https://etherscan.io",
   buidlerCommunityId: "c9097f50-9f0b-4e0a-a042-ab7790aff3b0",
+  estimateGasRecipientAddress: "0x1908bf9Dae06BB1F6E4C7eE0f7B5D4c82D1Ba6ad",
 };
 
 export default AppConfig;

@@ -200,10 +200,10 @@ const Home = () => {
   const handleDragChannel = useCallback(
     (result: any) => {
       const { draggableId, source, destination } = result;
-      const groupId = destination.droppableId.split("group-channel-")[1];
-      const sourceGroupId = source.droppableId.split("group-channel-")[1];
-      if (groupId === sourceGroupId) return;
-      dispatch(dragChannel(draggableId, groupId));
+      const spaceId = destination.droppableId.split("group-channel-")[1];
+      const sourceSpaceId = source.droppableId.split("group-channel-")[1];
+      if (spaceId === sourceSpaceId) return;
+      dispatch(dragChannel(draggableId, spaceId));
     },
     [dispatch]
   );

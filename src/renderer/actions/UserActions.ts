@@ -164,14 +164,14 @@ export const findUser = () => async (dispatch: Dispatch) => {
 };
 
 export const dragChannel =
-  (channelId: string, groupId: string) => async (dispatch: Dispatch) => {
+  (channelId: string, spaceId: string) => async (dispatch: Dispatch) => {
     const res = await api.updateChannel(channelId, {
-      group_channel_id: groupId,
+      space_id: spaceId,
     });
     if (res.statusCode === 200) {
       dispatch({
         type: ActionTypes.UPDATE_GROUP_CHANNEL,
-        payload: { channelId, groupId },
+        payload: { channelId, spaceId },
       });
     }
   };
