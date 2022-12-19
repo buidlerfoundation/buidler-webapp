@@ -76,6 +76,7 @@ const Started = () => {
         }
       }
       MetamaskUtils.connected = true;
+      dispatch({ type: actionTypes.UPDATE_LOGIN_TYPE, payload: loginType });
       history.replace("/channels");
     },
     [dataFromUrl, dispatch, gaLoginSuccess, history]

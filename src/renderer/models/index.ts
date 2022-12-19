@@ -86,7 +86,7 @@ export interface Channel {
   channel_emoji?: string;
   channel_id: string;
   channel_image_url?: string;
-  channel_member: Array<string>;
+  channel_members: Array<string>;
   channel_name: string;
   channel_type: "Public" | "Private" | "Direct";
   notification_type?: string;
@@ -119,13 +119,14 @@ export interface Space {
 
 export interface Community {
   team_display_name: string;
-  team_icon: string;
+  team_icon?: string;
   team_id: string;
-  team_url: string;
-  role: string;
+  team_url?: string;
+  role?: string;
   team_description?: string;
   seen?: boolean;
   is_verified?: boolean;
+  direct?: boolean;
 }
 
 export interface NFTCollection {
@@ -484,4 +485,14 @@ export type NotificationData = {
   to_user_id?: string;
   updatedAt?: string;
   itemType?: string;
+};
+
+export type ChannelKeyApiData = {
+  channel_id: string;
+  channel_key_id: string;
+  createdAt: string;
+  key: string;
+  timestamp: number;
+  updatedAt: string;
+  user_id: string;
 };

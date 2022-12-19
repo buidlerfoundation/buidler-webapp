@@ -1,3 +1,4 @@
+import { DirectCommunity } from "renderer/common/AppConfig";
 import { UserData } from "renderer/models";
 import Caller from "./Caller";
 
@@ -9,8 +10,22 @@ import Caller from "./Caller";
 
 export const createTeam = (body: any) => Caller.post("team", body);
 
-export const getTeamUsers = (teamId: string, controller?: AbortController) =>
-  Caller.get<Array<UserData>>(`team/${teamId}/members`, undefined, controller);
+export const getDirectChannelUsers = (controller?: AbortController) =>
+  Caller.get<UserData[]>(
+    "direct-channel/members?channel_types[]=Direct&channel_types[]=Multiple Direct",
+    undefined,
+    controller
+  );
+
+export const getTeamUsers = (teamId: string, controller?: AbortController) => {
+  if (teamId === DirectCommunity.team_id)
+    return getDirectChannelUsers(controller);
+  return Caller.get<Array<UserData>>(
+    `team/${teamId}/members`,
+    undefined,
+    controller
+  );
+};
 
 export const invitation = (teamId: string) =>
   Caller.post<{ invitation_url: string }>(`team/invitation/${teamId}/members`);
@@ -18,5 +33,4 @@ export const invitation = (teamId: string) =>
 export const updateTeam = (teamId: string, body: any) =>
   Caller.put(`team/${teamId}`, body);
 
-export const removeTeam = (teamId: string) =>
-  Caller.delete(`team/${teamId}`);
+export const removeTeam = (teamId: string) => Caller.delete(`team/${teamId}`);

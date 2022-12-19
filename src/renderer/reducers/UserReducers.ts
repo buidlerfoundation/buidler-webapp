@@ -47,11 +47,12 @@ interface UserReducerState {
   apiTeamController?: AbortController | null;
   apiSpaceMemberController?: AbortController | null;
   currentUserProfileId?: string | null;
+  updateFromSocket?: boolean;
 }
 
 const defaultChannel: Channel = {
   channel_id: "",
-  channel_member: [],
+  channel_members: [],
   channel_name: "",
   channel_type: "Public",
   notification_type: "",
@@ -99,6 +100,7 @@ const initialState: UserReducerState = {
   },
   apiTeamController: null,
   currentUserProfileId: null,
+  updateFromSocket: false,
 };
 
 const userReducers: Reducer<UserReducerState, AnyAction> = (
@@ -126,6 +128,33 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     defaultChannel;
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.UPDATE_TEAM_FROM_SOCKET: {
+      return {
+        ...state,
+        updateFromSocket: payload,
+      };
+    }
+    case actionTypes.RECEIVE_MESSAGE: {
+      if (!payload.direct) {
+        return state;
+      }
+      const newChannels = channelMap?.[currentTeamId]?.map((el) => {
+        if (el.channel_id === payload.data.entity_id) {
+          return {
+            ...el,
+            updatedAt: new Date().toISOString(),
+          };
+        }
+        return el;
+      });
+      return {
+        ...state,
+        channelMap: {
+          ...state.channelMap,
+          [currentTeamId]: newChannels,
+        },
+      };
+    }
     case actionTypes.UPDATE_NOTIFICATION_CONFIG: {
       return {
         ...state,
@@ -339,79 +368,51 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
     }
     case actionTypes.NEW_CHANNEL: {
-      let newTeamUserData = teamUserMap[currentTeamId]?.data;
-      if (payload.channel_type === "Direct" && !!newTeamUserData) {
-        newTeamUserData = newTeamUserData.map((el) => {
-          if (
-            !!payload.channel_member.find((id) => id === el.user_id) &&
-            (el.user_id !== userData.user_id ||
-              payload.channel_member.length === 1)
-          ) {
-            el.direct_channel = payload.channel_id;
-          }
-          return el;
-        });
-        if (
-          !!payload.channel_member.find(
-            (el) => el === currentChannel.user?.user_id
-          )
-        ) {
-          currentChannel.channel_id = payload.channel_id;
-        }
-      }
+      const isDirect = payload?.channel_type === "Direct";
       const newChannels = channelMap[currentTeamId] || [];
-      if (payload.channel_type !== "Direct") {
+      if (payload.team_id === currentTeamId) {
         newChannels.push(payload);
       }
       return {
         ...state,
-        channelMap:
-          payload.channel_type === "Direct"
-            ? channelMap
-            : {
-                ...channelMap,
-                [currentTeamId]: uniqBy(newChannels, "channel_id"),
-              },
-        directChannel:
-          payload.channel_type === "Direct"
-            ? uniqBy([...directChannel, payload], "channel_id")
-            : directChannel,
-        teamUserMap: {
-          ...teamUserMap,
-          [currentTeamId]: {
-            ...teamUserMap[currentTeamId],
-            data: newTeamUserData,
-          },
+        channelMap: {
+          ...channelMap,
+          [currentTeamId]: newChannels,
         },
-        spaceChannelMap: {
-          ...spaceChannelMap,
-          [currentTeamId]: spaceChannelMap[currentTeamId].map((el) => {
-            if (el.space_id === payload.space_id) {
-              el.channel_ids = [...(el.channel_ids || []), payload.channel_id]
-                .sort((a1, a2) => {
-                  const name1 =
-                    newChannels.find((el) => el.channel_id === a1)
-                      ?.channel_name || "";
-                  const name2 =
-                    newChannels.find((el) => el.channel_id === a2)
-                      ?.channel_name || "";
-                  if (name1 > name2) return 1;
-                  return -1;
-                })
-                .sort((a1, a2) => {
-                  const type1 =
-                    newChannels.find((el) => el.channel_id === a1)
-                      ?.channel_type || "";
-                  const type2 =
-                    newChannels.find((el) => el.channel_id === a2)
-                      ?.channel_type || "";
-                  if (type1 > type2) return -1;
-                  return 1;
-                });
-            }
-            return el;
-          }),
-        },
+        spaceChannelMap: isDirect
+          ? spaceChannelMap
+          : {
+              ...spaceChannelMap,
+              [currentTeamId]: spaceChannelMap[currentTeamId].map((el) => {
+                if (el.space_id === payload.space_id) {
+                  el.channel_ids = [
+                    ...(el.channel_ids || []),
+                    payload.channel_id,
+                  ]
+                    .sort((a1, a2) => {
+                      const name1 =
+                        newChannels.find((el) => el.channel_id === a1)
+                          ?.channel_name || "";
+                      const name2 =
+                        newChannels.find((el) => el.channel_id === a2)
+                          ?.channel_name || "";
+                      if (name1 > name2) return 1;
+                      return -1;
+                    })
+                    .sort((a1, a2) => {
+                      const type1 =
+                        newChannels.find((el) => el.channel_id === a1)
+                          ?.channel_type || "";
+                      const type2 =
+                        newChannels.find((el) => el.channel_id === a2)
+                          ?.channel_type || "";
+                      if (type1 > type2) return -1;
+                      return 1;
+                    });
+                }
+                return el;
+              }),
+            },
       };
     }
     case actionTypes.DELETE_GROUP_CHANNEL_SUCCESS: {
@@ -545,9 +546,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             data: teamUserMap[currentTeamId]?.data?.map((el) => {
               if (el.user_id === user_id) {
                 el.status = "online";
-                return {
-                  ...el,
-                };
+                return { ...el };
               }
               return el;
             }),
@@ -587,8 +586,8 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       return {
         ...initialState,
         imgDomain,
-        imgBucket,
         imgConfig,
+        imgBucket,
       };
     }
     case actionTypes.GET_TEAM_USER: {
@@ -615,52 +614,23 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       return state;
     }
     case actionTypes.CURRENT_TEAM_SUCCESS: {
-      const {
-        lastChannelId,
-        resChannel,
-        directChannelUser,
-        teamUsersRes,
-        resSpace,
-      } = payload;
+      const { lastChannelId, resChannel, resSpace } = payload;
       let channel: Channel = defaultChannel;
-      if (directChannelUser && lastChannelId) {
-        const directChannelData = resChannel.data.find(
-          (c) => c?.channel_id === directChannelUser.direct_channel
-        );
-        channel = {
-          channel_id: lastChannelId,
-          channel_name: "",
-          channel_type: "Direct",
-          seen: true,
-          user: directChannelUser,
-          channel_member: directChannelData?.channel_member || [],
-          notification_type:
-            resChannel.data.find(
-              (c) => c?.channel_id === directChannelUser.direct_channel
-            )?.notification_type || "Alert",
-        };
-      } else if (resChannel?.data?.length > 0) {
+      if (resChannel?.data?.length > 0) {
         channel =
           resChannel.data.find((c) => c.channel_id === lastChannelId) ||
           resChannel.data.find(
             (c) =>
               c.channel_id === lastChannel?.[payload.team.team_id]?.channel_id
           ) ||
-          resChannel.data.filter((c) => c.channel_type !== "Direct")[0];
-        if (channel?.channel_type === "Direct") {
-          channel.user = teamUsersRes?.data?.find(
-            (u) => u.direct_channel === channel.channel_id
-          );
-        }
+          resChannel.data[0];
       }
       setCookie(AsyncKey.lastChannelId, channel?.channel_id);
       return {
         ...state,
         channelMap: {
           ...channelMap,
-          [payload.team.team_id]: resChannel.data.filter(
-            (el) => el.channel_type !== "Direct"
-          ),
+          [payload.team.team_id]: resChannel.data,
         },
         spaceChannelMap: {
           ...spaceChannelMap,
@@ -671,9 +641,6 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             return el;
           }),
         },
-        directChannel: resChannel.data.filter(
-          (el) => el.channel_type === "Direct"
-        ),
         currentTeamId: payload.team.team_id,
         currentChannelId: channel.channel_id,
         lastChannel: {
@@ -777,7 +744,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             return {
               ...el,
               seen:
-                channels.find(
+                channels?.find(
                   (c) => !c.seen && c.notification_type !== "Muted"
                 ) === undefined,
             };
@@ -788,6 +755,12 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     }
     case actionTypes.MARK_UN_SEEN_CHANNEL: {
       const { channelId, communityId } = payload;
+      const unSeenChannel = channelMap[currentTeamId]?.find(
+        (el) => el.channel_id === channelId
+      );
+      if (!unSeenChannel?.seen) {
+        return state;
+      }
       return {
         ...state,
         channelMap: {
@@ -914,16 +887,16 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       if (payload.channel_type === "Direct" && !!newTeamUserData) {
         newTeamUserData = newTeamUserData.map((el) => {
           if (
-            !!payload.channel_member.find((id) => id === el.user_id) &&
+            !!payload.channel_members.find((id) => id === el.user_id) &&
             (el.user_id !== userData.user_id ||
-              payload.channel_member.length === 1)
+              payload.channel_members.length === 1)
           ) {
             el.direct_channel = payload.channel_id;
           }
           return el;
         });
         if (
-          !!payload.channel_member.find(
+          !!payload.channel_members.find(
             (el) => el === currentChannel.user?.user_id
           )
         ) {

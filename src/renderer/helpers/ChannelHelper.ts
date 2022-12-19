@@ -6,6 +6,7 @@ import store from "renderer/store";
 import { uniqBy } from "lodash";
 import { decrypt } from "eciesjs";
 import CryptoJS from "crypto-js";
+import api from "renderer/api";
 
 export const encryptMessage = async (str: string, key: string) => {
   return CryptoJS.AES.encrypt(str, key).toString();
@@ -77,31 +78,40 @@ export const storePrivateChannel = async (
 };
 
 const decryptPrivateChannel = async (item: any, privateKey: string) => {
-  const key = await getChannelPrivateKey(item.key, privateKey);
+  const { channelId, key, timestamp } = item;
+  const decryptedKey = decrypt(privateKey, Buffer.from(key || "", "hex"));
   return {
-    key,
-    timestamp: item.timestamp,
-    channelId: item.channelId,
+    key: decryptedKey.toString(),
+    timestamp,
+    channelId,
   };
 };
 
 export const getPrivateChannel = async (privateKey: string) => {
+  const timestamp = Math.round(new Date().getTime() / 1000);
+  let lastSyncChannel = '0';
+  const lastSyncChannelKey = await getCookie(AsyncKey.lastSyncChannelKey);
+  if (typeof lastSyncChannelKey === "string") {
+    lastSyncChannel = lastSyncChannelKey;
+  }
+  const channelKeyRes = await api.getChannelKey(lastSyncChannel);
+  const syncChannelKey = channelKeyRes.data?.map((el) => ({
+    channelId: el.channel_id,
+    key: el.key,
+    timestamp: el.timestamp,
+  })) || [];
   const current = await getCookie(AsyncKey.channelPrivateKey);
-  // const current = JSON.stringify(testData);
-  let dataLocal: any = {};
+  let dataLocal: any = { data: [] };
   if (typeof current === "string") {
     dataLocal = JSON.parse(current);
-  } else {
-    return {};
   }
-  let req: Array<any> = [];
-  Object.keys(dataLocal).forEach((k) => {
-    req = [
-      ...req,
-      ...(dataLocal?.[k]?.map?.((el: any) => ({ channelId: k, ...el })) || []),
-    ];
-  });
-  req = req.map((el) => decryptPrivateChannel(el, privateKey));
+  dataLocal = uniqBy([...dataLocal.data, ...syncChannelKey], "key");
+  await setCookie(
+    AsyncKey.channelPrivateKey,
+    JSON.stringify({ data: dataLocal })
+  );
+  await setCookie(AsyncKey.lastSyncChannelKey, timestamp.toString());
+  const req = dataLocal.map((el) => decryptPrivateChannel(el, privateKey));
   const res = await Promise.all(req);
   return res.reduce((result, val) => {
     const { channelId, key, timestamp } = val;
@@ -135,22 +145,26 @@ export const normalizePublicMessageItem = (item: any, key: string) => {
 export const normalizeMessageItem = async (
   item: any,
   key: string,
-  channelId?: string
+  channelId: string
 ) => {
-  const content = await decryptMessage(item.content, key);
-  const plain_text = await decryptMessage(item.plain_text, key);
-  if ((!content || !plain_text) && !!item.content && !!item.plain_text) {
-    console.log("Encrypt Failed: ", content, plain_text, item, key, channelId);
+  const content = item.content
+    ? CryptoJS.AES.decrypt(item.content, key).toString(CryptoJS.enc.Utf8)
+    : "";
+  if (item?.conversation_data) {
+    item.conversation_data = await normalizeMessageItem(
+      item.conversation_data,
+      key,
+      channelId
+    );
   }
   return {
     ...item,
     content,
-    plain_text,
   };
 };
 
 export const normalizePublicMessageData = (
-  messages: Array<any>,
+  messages?: Array<any>,
   encryptMessageKey?: string
 ) => {
   const configs: any = store.getState()?.configs;
@@ -168,35 +182,34 @@ export const normalizePublicMessageData = (
   );
 };
 
-export const normalizeMessageData = async (
-  messages: Array<any>,
-  channelId: string
-) => {
-  const configs: any = store.getState()?.configs;
-  const { channelPrivateKey } = configs;
-  const keys = channelPrivateKey?.[channelId] || [];
-  if (keys?.length === 0) return [];
-  const req =
-    messages?.map?.((el) =>
-      normalizeMessageItem(
-        el,
-        findKey(keys, new Date(el.createdAt).getTime()).key,
-        channelId
-      )
-    ) || [];
-  const res = await Promise.all(req);
-  return res.filter(
-    (el) => !!el.content || el?.message_attachments?.length > 0
-  );
-};
-
-const findKey = (keys: Array<any>, created: number) => {
+export const findKey = (keys: Array<any>, created: number) => {
   return keys.find((el) => {
     if (el.expire) {
       return el.timestamp <= created && el.expire >= created;
     }
     return true;
   });
+};
+
+export const normalizeMessageData = async (
+  messages: Array<any>,
+  channelId: string
+) => {
+  const configs = store.getState()?.configs;
+  const { channelPrivateKey } = configs;
+  const keys = channelPrivateKey?.[channelId] || [];
+  if (keys.length === 0) return [];
+  const req = messages.map((el) =>
+    normalizeMessageItem(
+      el,
+      findKey(keys, Math.round(new Date(el.createdAt).getTime() / 1000)).key,
+      channelId
+    )
+  );
+  const res = await Promise.all(req);
+  return res.filter(
+    (el) => !!el.content || el?.message_attachments?.length > 0
+  );
 };
 
 export const uniqChannelPrivateKey = async () => {

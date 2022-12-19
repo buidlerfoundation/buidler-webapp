@@ -10,7 +10,7 @@ function useCurrentChannel() {
   return React.useMemo<Channel>(() => {
     const res = channels.find((el) => el.channel_id === channelId) || {
       channel_id: "",
-      channel_member: [],
+      channel_members: [],
       channel_name: "",
       channel_type: "Public",
       notification_type: "",

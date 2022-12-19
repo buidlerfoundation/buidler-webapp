@@ -62,6 +62,11 @@ import actionTypes from "renderer/actions/ActionTypes";
 import ModalConfirmPin from "renderer/shared/ModalConfirmPin";
 import ModalConfirmDelete from "renderer/shared/ModalConfirmDelete";
 import useUserRole from "renderer/hooks/useUserRole";
+import useChannel from "renderer/hooks/useChannel";
+import { DirectCommunity, LoginType } from "renderer/common/AppConfig";
+import useDirectChannelUser from "renderer/hooks/useDirectChannelUser";
+import DirectEmpty from "renderer/shared/DirectEmpty";
+import DirectNotSupport from "renderer/shared/DirectNotSupport";
 
 type ChannelViewProps = {
   currentChannel: Channel;
@@ -105,7 +110,14 @@ const ChannelView = forwardRef(
     const totalTeamUser = useTotalTeamUserData();
     const communityId = useMatchCommunityId();
     const reactData = useAppSelector((state) => state.reactReducer.reactData);
+    const channels = useChannel();
     const userRole = useUserRole();
+    const loginType = useAppSelector((state) => state.configs.loginType);
+    const isDirect = useMemo(
+      () => communityId === DirectCommunity.team_id,
+      [communityId]
+    );
+    const directUser = useDirectChannelUser();
     const messageHighLightId = useAppSelector(
       (state) => state.message.highlightMessageId
     );
@@ -651,8 +663,14 @@ const ChannelView = forwardRef(
       if (!currentChannel.is_chat_deactivated) return true;
       return userRole === "Owner" || userRole === "Admin";
     }, [currentChannel.is_chat_deactivated, userRole]);
-    if (!currentChannel?.channel_id && !currentChannel?.user)
+    if (!currentChannel?.channel_id && !isDirect)
       return <div className="channel-view-container" />;
+    if (isDirect && channels.length === 0) {
+      return <DirectEmpty />;
+    }
+    if (isDirect && loginType !== LoginType.WalletImport) {
+      return <DirectNotSupport />;
+    }
     return (
       <Dropzone onDrop={onAddFiles}>
         {({ getRootProps, getInputProps }) => (
@@ -716,8 +734,8 @@ const ChannelView = forwardRef(
                   placeholder={
                     canChat
                       ? `Message to ${
-                          currentChannel?.user?.user_name
-                            ? currentChannel?.user?.user_name
+                          isDirect && directUser
+                            ? `@ ${directUser.user_name}`
                             : `# ${currentChannel?.channel_name}`
                         }`
                       : "You do not have permission to send messages in this channel."

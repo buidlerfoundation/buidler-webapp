@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { memo, useEffect, useMemo } from "react";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import { Switch, Route, useHistory, useRouteMatch } from "react-router-dom";
 import {
@@ -201,7 +201,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
   return <Route {...rest} render={(props) => <Component {...props} />} />;
 };
 
-const RedirectToHome = () => {
+const RedirectToHome = memo(() => {
   const [isEmpty, setEmpty] = useState(false);
   const match = useRouteMatch<{
     match_community_id?: string;
@@ -268,7 +268,7 @@ const RedirectToHome = () => {
     return <Home />;
   }
   return <AppTitleBar />;
-};
+});
 
 const Main = () => {
   const unSupport = useMemo(

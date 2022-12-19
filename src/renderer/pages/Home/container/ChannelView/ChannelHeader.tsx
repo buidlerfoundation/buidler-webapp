@@ -15,13 +15,14 @@ import {
 import ImageHelper from "renderer/common/ImageHelper";
 import EmojiAndAvatarPicker from "renderer/shared/EmojiAndAvatarPicker";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
-import useAppSelector from "renderer/hooks/useAppSelector";
 import images from "../../../../common/images";
 import AvatarView from "../../../../shared/AvatarView";
 import PopoverButton from "../../../../shared/PopoverButton";
 import ChannelSettings from "./ChannelSettings";
 import "./index.scss";
 import { Channel, UserData } from "renderer/models";
+import useUserRole from "renderer/hooks/useUserRole";
+import useDirectChannelUser from "renderer/hooks/useDirectChannelUser";
 
 type ChannelHeaderProps = {
   currentChannel?: Channel;
@@ -32,7 +33,6 @@ type ChannelHeaderProps = {
 const ChannelHeader = forwardRef(
   ({ currentChannel, teamUserData, teamId }: ChannelHeaderProps, ref) => {
     const dispatch = useAppDispatch();
-    const userData = useAppSelector((state) => state.user.userData);
     const popupChannelIconRef = useRef<any>();
     const [isActiveMember, setActiveMember] = useState(false);
     const [isActiveName, setActiveName] = useState(false);
@@ -41,19 +41,25 @@ const ChannelHeader = forwardRef(
     const settingRef = useRef<any>();
     const users = useMemo(() => {
       if (!currentChannel) return [];
-      const { channel_type, channel_member } = currentChannel;
+      const { channel_type, channel_members } = currentChannel;
       if (channel_type === "Public") {
         return teamUserData;
       }
-      if (!channel_member) return [];
-      return channel_member
+      if (!channel_members) return [];
+      return channel_members
         .filter((id: string) => !!teamUserData.find((el) => el.user_id === id))
         .map((id: any) => teamUserData.find((el) => el.user_id === id));
     }, [currentChannel, teamUserData]);
-    const isChannelPrivate = currentChannel?.channel_type === "Private";
-    const role = teamUserData?.find?.(
-      (el) => el.user_id === userData?.user_id
-    )?.role;
+    const isChannelPrivate = useMemo(
+      () => currentChannel?.channel_type === "Private",
+      [currentChannel?.channel_type]
+    );
+    const isDirect = useMemo(
+      () => currentChannel?.channel_type === "Direct",
+      [currentChannel?.channel_type]
+    );
+    const directUser = useDirectChannelUser();
+    const role = useUserRole();
     const isOwner = role === "Owner";
     useImperativeHandle(ref, () => {
       return {
@@ -75,15 +81,8 @@ const ChannelHeader = forwardRef(
       };
     });
     const renderChannelIcon = useCallback(() => {
-      if (currentChannel?.user) {
-        return (
-          <AvatarView
-            user={teamUserData.find(
-              (u) => u.user_id === currentChannel?.user?.user_id
-            )}
-            size={25}
-          />
-        );
+      if (isDirect && directUser) {
+        return <AvatarView user={directUser} size={25} />;
       }
       if (currentChannel?.attachment) {
         return (
@@ -123,9 +122,9 @@ const ChannelHeader = forwardRef(
       currentChannel?.attachment,
       currentChannel?.channel_emoji,
       currentChannel?.channel_image_url,
-      currentChannel?.user,
+      directUser,
+      isDirect,
       teamId,
-      teamUserData,
     ]);
     const handleEmojiClick = useCallback(
       (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => e.stopPropagation(),
@@ -223,7 +222,7 @@ const ChannelHeader = forwardRef(
               flex: 1,
             }}
           >
-            {isOwner && !currentChannel?.user ? (
+            {isOwner && !isDirect ? (
               <PopoverButton
                 ref={popupChannelIconRef}
                 componentButton={
@@ -254,8 +253,8 @@ const ChannelHeader = forwardRef(
               style={{ display: "flex", width: 0, flex: 1 }}
             >
               <span className="channel-view__title text-ellipsis">
-                {currentChannel?.user?.user_name
-                  ? currentChannel?.user?.user_name
+                {isDirect && directUser
+                  ? directUser?.user_name
                   : currentChannel?.channel_name}
               </span>
             </div>

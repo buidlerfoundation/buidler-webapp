@@ -2,7 +2,7 @@ import { ActionCreator, Dispatch } from "redux";
 import GlobalVariable from "renderer/services/GlobalVariable";
 import api from "../api";
 import ActionTypes from "./ActionTypes";
-import { AsyncKey, UserRole } from "../common/AppConfig";
+import { AsyncKey, DirectCommunity, UserRole } from "../common/AppConfig";
 import {
   getCookie,
   getDeviceCode,
@@ -188,6 +188,7 @@ export const findTeamAndChannel =
     }
     if (res.statusCode === 200) {
       const communities = res.data || [];
+      communities.unshift(DirectCommunity);
       if (communities.length > 0) {
         const currentTeam =
           communities.find((t: Community) => t.team_id === lastTeamId) ||
@@ -212,17 +213,23 @@ export const findTeamAndChannel =
         const directChannelUser = teamUsersRes?.data?.find(
           (u: UserData) => u.direct_channel === lastChannelId
         );
-        dispatch({
-          type: ActionTypes.CURRENT_TEAM_SUCCESS,
-          payload: {
-            team: currentTeam,
-            lastChannelId,
-            directChannelUser,
-            resChannel,
-            teamUsersRes,
-            resSpace,
-          },
-        });
+        if (
+          resSpace.statusCode === 200 &&
+          resChannel.statusCode === 200 &&
+          teamUsersRes.statusCode === 200
+        ) {
+          dispatch({
+            type: ActionTypes.CURRENT_TEAM_SUCCESS,
+            payload: {
+              team: currentTeam,
+              lastChannelId,
+              directChannelUser,
+              resChannel,
+              teamUsersRes,
+              resSpace,
+            },
+          });
+        }
       } else {
         SocketUtils.init();
       }
@@ -329,11 +336,13 @@ const actionSetCurrentTeam = async (
       });
     }
     SocketUtils.changeTeam(team.team_id);
-    dispatch({
-      type: ActionTypes.CURRENT_TEAM_SUCCESS,
-      payload: { team, resChannel, lastChannelId, teamUsersRes, resSpace },
-    });
-    setCookie(AsyncKey.lastTeamId, team.team_id);
+    if (resChannel.statusCode === 200 && teamUsersRes.statusCode === 200) {
+      dispatch({
+        type: ActionTypes.CURRENT_TEAM_SUCCESS,
+        payload: { team, resChannel, lastChannelId, teamUsersRes, resSpace },
+      });
+      setCookie(AsyncKey.lastTeamId, team.team_id);
+    }
   } catch (error) {
     dispatch({
       type: ActionTypes.CURRENT_TEAM_FAIL,

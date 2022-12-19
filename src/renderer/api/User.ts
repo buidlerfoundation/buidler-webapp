@@ -1,3 +1,4 @@
+import { DirectCommunity } from "renderer/common/AppConfig";
 import {
   BalanceApiData,
   Channel,
@@ -35,8 +36,23 @@ export const getGroupChannel = (teamId: string) =>
 export const getSpaceChannel = (teamId: string, controller?: AbortController) =>
   Caller.get<Array<Space>>(`space/${teamId}`, undefined, controller);
 
-export const findChannel = (teamId: string, controller?: AbortController) =>
-  Caller.get<Array<Channel>>(`channel/${teamId}`, undefined, controller);
+export const findDirectChannel = (
+  status?: "pending" | "blocked" | "accepted",
+  controller?: AbortController
+) => {
+  let uri =
+    "direct-channel?channel_types[]=Direct&channel_types[]=Multiple Direct&status=accepted";
+  // if (status) {
+  //   uri += `&status=${status}`;
+  // }
+  return Caller.get<Array<Channel>>(uri, undefined, controller);
+};
+
+export const findChannel = (teamId: string, controller?: AbortController) => {
+  if (teamId === DirectCommunity.team_id)
+    return findDirectChannel(undefined, controller);
+  return Caller.get<Array<Channel>>(`channel/${teamId}`, undefined, controller);
+};
 
 export const getInitial = () => Caller.get<InitialApiData>(`initial`);
 

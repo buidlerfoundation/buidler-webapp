@@ -1,6 +1,7 @@
 import toast from "react-hot-toast";
 import { Dispatch } from "redux";
 import {
+  findKey,
   getChannelPrivateKey,
   getPrivateChannel,
   getRawPrivateChannel,
@@ -102,20 +103,15 @@ const getTaskFromUser = async (
   }
 };
 
-const getMessages = async (
-  channelId: string,
-  channelType: string,
-  dispatch: Dispatch
-) => {
+const getMessages = async (channelId: string, dispatch: Dispatch) => {
   const messageRes = await api.getMessages(channelId);
-  if (messageRes?.statusCode === 200) {
-    const isPrivate = channelType === "Private" || channelType === "Direct";
-    const messageData = isPrivate
-      ? await normalizeMessageData(messageRes.data || [], channelId)
-      : normalizePublicMessageData(
-          messageRes?.data || [],
+  if (messageRes.statusCode === 200) {
+    const messageData = messageRes?.metadata?.encrypt_message_key
+      ? normalizePublicMessageData(
+          messageRes?.data,
           messageRes?.metadata?.encrypt_message_key
-        );
+        )
+      : await normalizeMessageData(messageRes.data || [], channelId);
     dispatch({
       type: actionTypes.MESSAGE_SUCCESS,
       payload: { data: messageData, channelId, reloadSocket: true },
@@ -128,29 +124,35 @@ const actionSetCurrentTeam = async (
   dispatch: Dispatch,
   channelId?: string
 ) => {
-  const teamUsersRes = await api.getTeamUsers(team.team_id);
   let lastChannelId: any = null;
+  dispatch({ type: actionTypes.UPDATE_TEAM_FROM_SOCKET, payload: true });
   if (channelId) {
     lastChannelId = channelId;
   } else {
     lastChannelId = await getCookie(AsyncKey.lastChannelId);
   }
-  const resSpace = await api.getSpaceChannel(team.team_id);
-  const resChannel = await api.findChannel(team.team_id);
+  const [resSpace, resChannel, teamUsersRes] = await Promise.all([
+    api.getSpaceChannel(team.team_id),
+    api.findChannel(team.team_id),
+    api.getTeamUsers(team.team_id),
+  ]);
   if (teamUsersRes.statusCode === 200) {
     dispatch({
       type: actionTypes.GET_TEAM_USER,
       payload: { teamUsers: teamUsersRes, teamId: team.team_id },
     });
   }
-  const directChannelUser = teamUsersRes?.data?.find(
-    (u: any) => u.direct_channel === lastChannelId
-  );
   dispatch({
     type: actionTypes.CURRENT_TEAM_SUCCESS,
-    payload: { team, resChannel, directChannelUser, lastChannelId, resSpace },
+    payload: {
+      team,
+      resChannel,
+      lastChannelId,
+      resSpace,
+    },
   });
   setCookie(AsyncKey.lastTeamId, team.team_id);
+  dispatch({ type: actionTypes.UPDATE_TEAM_FROM_SOCKET, payload: false });
 };
 
 const loadMessageIfNeeded = async () => {
@@ -274,11 +276,7 @@ class SocketUtil {
         store.dispatch(getPinPostMessages(postId));
       }
       // load message
-      getMessages(
-        currentChannel.channel_id,
-        currentChannel.channel_type,
-        store.dispatch
-      );
+      getMessages(currentChannel.channel_id, store.dispatch);
       // load task
       if (currentChannel?.user) {
         getTaskFromUser(
@@ -663,7 +661,7 @@ class SocketUtil {
           );
           if (
             isExistChannel &&
-            !channel.channel_member.find(
+            !channel.channel_members.find(
               (el: string) => el === user.userData.user_id
             )
           ) {
@@ -677,7 +675,7 @@ class SocketUtil {
               payload: data.channel,
             });
           } else if (
-            !!channel.channel_member.find(
+            !!channel.channel_members.find(
               (el: string) => el === user.userData.user_id
             )
           ) {
@@ -727,7 +725,7 @@ class SocketUtil {
             payload: data.channel,
           });
         } else if (
-          !!data.channel_member.find((el: string) => el === userData.user_id)
+          !!data.channel_members.find((el: string) => el === userData.user_id)
         ) {
           store.dispatch({
             type: actionTypes.NEW_CHANNEL,
@@ -748,7 +746,7 @@ class SocketUtil {
           );
           if (
             isExistChannel &&
-            !data.channel_member.find((el: string) => el === userData.user_id)
+            !data.channel_members.find((el: string) => el === userData.user_id)
           ) {
             store.dispatch({
               type: actionTypes.DELETE_CHANNEL_SUCCESS,
@@ -837,6 +835,7 @@ class SocketUtil {
       const { channelPrivateKey } = configs;
       const user = store.getState()?.user;
       const { userData, teamUserMap, channelMap, currentTeamId } = user;
+      const direct = notification_data?.channel_type === "Direct";
       const currentChannel = getCurrentChannel();
       if (!currentChannel) return;
       const channel = channelMap?.[currentTeamId] || [];
@@ -867,7 +866,7 @@ class SocketUtil {
           channelNotification.user = teamUserData.find(
             (u: any) =>
               u.user_id ===
-              channelNotification.channel_member.find(
+              channelNotification.channel_members.find(
                 (el: string) => el !== userData?.user_id
               )
           );
@@ -889,22 +888,14 @@ class SocketUtil {
         }
       }
       let res = message_data;
-      if (
-        message_data.entity_type !== "post" &&
-        (!channelNotification ||
-          channelNotification?.channel_type === "Private" ||
-          channelNotification?.channel_type === "Direct")
-      ) {
-        const keys = channelPrivateKey[message_data.entity_id];
-        if (keys?.length > 0) {
-          res = await normalizeMessageItem(
-            message_data,
-            keys[keys.length - 1].key,
-            message_data.entity_id
-          );
-        } else {
-          res = null;
-        }
+      if (direct) {
+        const keys = channelPrivateKey?.[res.entity_id] || [];
+        res = await normalizeMessageItem(
+          res,
+          findKey(keys, Math.round(new Date(res.createdAt).getTime() / 1000))
+            .key,
+          res.entity_id
+        );
       }
       if (res) {
         store.dispatch({

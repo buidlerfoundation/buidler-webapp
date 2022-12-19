@@ -3,7 +3,7 @@ import store from "renderer/store";
 
 const defaultChannel: Channel = {
   channel_id: "",
-  channel_member: [],
+  channel_members: [],
   channel_name: "",
   channel_type: "Public",
   notification_type: "",

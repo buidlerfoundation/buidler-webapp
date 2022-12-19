@@ -16,10 +16,12 @@ export const getAroundMessage =
     });
     try {
       const messageRes = await api.getAroundMessageById(messageId);
-      const messageData = normalizePublicMessageData(
-        messageRes.data || [],
-        messageRes.metadata?.encrypt_message_key
-      );
+      const messageData = messageRes.metadata?.encrypt_message_key
+        ? normalizePublicMessageData(
+            messageRes.data || [],
+            messageRes.metadata?.encrypt_message_key
+          )
+        : await normalizeMessageData(messageRes.data || [], channelId);
       if (messageRes.statusCode === 200) {
         dispatch({
           type: actionTypes.MESSAGE_SUCCESS,
@@ -146,13 +148,7 @@ export const getPinPostMessages: ActionCreator<any> =
   };
 
 export const getMessages: ActionCreator<any> =
-  (
-    channelId: string,
-    channelType: string,
-    before?: string,
-    after?: string,
-    isFresh = false
-  ) =>
+  (channelId: string, before?: string, after?: string, isFresh = false) =>
   async (dispatch: Dispatch) => {
     const { apiController, messageData } = store.getState().message;
     apiController?.abort?.();
@@ -188,18 +184,17 @@ export const getMessages: ActionCreator<any> =
           channelId
         );
       }
-      const isPrivate = channelType === "Private" || channelType === "Direct";
-      const messageData = isPrivate
-        ? await normalizeMessageData(messageRes.data || [], channelId)
-        : normalizePublicMessageData(
+      const data = messageRes.metadata?.encrypt_message_key
+        ? normalizePublicMessageData(
             messageRes.data || [],
             messageRes.metadata?.encrypt_message_key
-          );
+          )
+        : await normalizeMessageData(messageRes.data || [], channelId);
       if (messageRes.statusCode === 200) {
         dispatch({
           type: actionTypes.MESSAGE_SUCCESS,
           payload: {
-            data: messageData,
+            data,
             channelId,
             before,
             isFresh,

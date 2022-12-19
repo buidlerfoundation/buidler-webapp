@@ -237,6 +237,7 @@ function App() {
   useEffect(() => {
     getCookie(AsyncKey.loginType)
       .then((res) => {
+        dispatch({ type: actionTypes.UPDATE_LOGIN_TYPE, payload: res });
         if (res === LoginType.WalletConnect) {
           WalletConnectUtils.init(connectLogout);
           if (!WalletConnectUtils.connector?.connected) {
