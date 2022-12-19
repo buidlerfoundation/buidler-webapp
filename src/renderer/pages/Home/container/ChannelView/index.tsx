@@ -307,7 +307,7 @@ const ChannelView = forwardRef(
           case "Upload to IPFS":
             if (msg.task?.task_id) {
               dispatch(
-                uploadToIPFS(msg.task?.task_id, currentChannel.channel_id)
+                uploadToIPFS(msg.task?.task_id, currentChannel.channel_id, msg.task?.content)
               );
             }
             break;

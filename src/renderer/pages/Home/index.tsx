@@ -769,7 +769,7 @@ const Home = () => {
       setSelectedPost(post);
       switch (menu.value) {
         case "Upload to IPFS":
-          dispatch(uploadToIPFS(post.task_id, channelId));
+          dispatch(uploadToIPFS(post.task_id, channelId, post.content));
           break;
         case "Delete":
           toggleConfirmDeletePost();
