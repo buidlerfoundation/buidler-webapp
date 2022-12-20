@@ -28,7 +28,7 @@ export const findUser = async () => {
   return Caller.get<UserData>("user");
 };
 
-export const findTeam = () => Caller.get<Array<Community>>("user/team");
+export const findTeam = () => Caller.get<Community[]>("user/team?include_direct=1");
 
 export const getGroupChannel = (teamId: string) =>
   Caller.get(`group/${teamId}`);

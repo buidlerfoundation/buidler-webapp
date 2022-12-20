@@ -187,8 +187,14 @@ export const findTeamAndChannel =
       lastTeamId = await getCookie(AsyncKey.lastTeamId);
     }
     if (res.statusCode === 200) {
-      const communities = res.data || [];
-      communities.unshift(DirectCommunity);
+      const communitiesWithDM = res.data || [];
+      const communities = communitiesWithDM.filter(
+        (el) => el.team_id !== DirectCommunity.team_id
+      );
+      const DM = communitiesWithDM.find(
+        (el) => el.team_id === DirectCommunity.team_id
+      );
+      communities.unshift({ ...DirectCommunity, seen: DM?.seen });
       if (communities.length > 0) {
         const currentTeam =
           communities.find((t: Community) => t.team_id === lastTeamId) ||
