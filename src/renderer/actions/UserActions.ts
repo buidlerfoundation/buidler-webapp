@@ -239,7 +239,7 @@ export const findTeamAndChannel =
       } else {
         SocketUtils.init();
       }
-      dispatch({ type: ActionTypes.TEAM_SUCCESS, payload: { team: res.data } });
+      dispatch({ type: ActionTypes.TEAM_SUCCESS, payload: { team: communities } });
     } else {
       dispatch({ type: ActionTypes.TEAM_FAIL, payload: { message: res } });
       dispatch({

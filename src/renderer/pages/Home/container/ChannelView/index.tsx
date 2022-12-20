@@ -307,7 +307,11 @@ const ChannelView = forwardRef(
           case "Upload to IPFS":
             if (msg.task?.task_id) {
               dispatch(
-                uploadToIPFS(msg.task?.task_id, currentChannel.channel_id, msg.task?.content)
+                uploadToIPFS(
+                  msg.task?.task_id,
+                  currentChannel.channel_id,
+                  msg.task?.content
+                )
               );
             }
             break;
@@ -663,13 +667,13 @@ const ChannelView = forwardRef(
       if (!currentChannel.is_chat_deactivated) return true;
       return userRole === "Owner" || userRole === "Admin";
     }, [currentChannel.is_chat_deactivated, userRole]);
-    if (!currentChannel?.channel_id && !isDirect)
+    if (!currentChannel?.channel_id)
       return <div className="channel-view-container" />;
-    if (isDirect && channels.length === 0) {
-      return <DirectEmpty />;
-    }
     if (isDirect && loginType !== LoginType.WalletImport) {
       return <DirectNotSupport />;
+    }
+    if (isDirect && channels.length === 0) {
+      return <DirectEmpty />;
     }
     return (
       <Dropzone onDrop={onAddFiles}>
