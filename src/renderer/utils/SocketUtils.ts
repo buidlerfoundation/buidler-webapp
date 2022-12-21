@@ -15,7 +15,7 @@ import { uniqBy } from "lodash";
 import { TransactionApiData, UserData } from "renderer/models";
 import { utils } from "ethers";
 import actionTypes from "renderer/actions/ActionTypes";
-import AppConfig, { AsyncKey, LoginType } from "../common/AppConfig";
+import AppConfig, { AsyncKey, DirectCommunity, LoginType } from "../common/AppConfig";
 import {
   clearData,
   GeneratedPrivateKey,
@@ -298,16 +298,17 @@ class SocketUtil {
     const configs: any = store.getState()?.configs;
     const { channelPrivateKey, privateKey } = configs;
     const decrypted = await getChannelPrivateKey(key, privateKey);
-    storePrivateChannel(channel_id, key, timestamp);
-    this.emitReceivedKey(channel_id, timestamp);
     store.dispatch({
       type: actionTypes.SET_CHANNEL_PRIVATE_KEY,
       payload: {
         ...channelPrivateKey,
-        [channel_id]: [
-          ...(channelPrivateKey?.[channel_id] || []),
-          { key: decrypted, timestamp },
-        ],
+        [channel_id]: uniqBy(
+          [
+            ...(channelPrivateKey?.[channel_id] || []),
+            { key: decrypted, timestamp },
+          ],
+          "key"
+        ),
       },
     });
   };
@@ -698,18 +699,21 @@ class SocketUtil {
       }
     });
     this.socket?.on("ON_CREATE_NEW_CHANNEL", (data: any) => {
-      const { channel, key, timestamp } = data;
-      if (key && timestamp) {
-        this.handleChannelPrivateKey(channel.channel_id, key, timestamp);
-      }
-      const user = store.getState()?.user;
-      const { currentTeamId } = user;
-      if (currentTeamId === channel.team_id) {
+      const { currentTeamId } = store.getState()?.user;
+      const { channel, new_direct_users } = data;
+      if (
+        new_direct_users?.length > 0 &&
+        currentTeamId === DirectCommunity.team_id
+      ) {
         store.dispatch({
-          type: actionTypes.NEW_CHANNEL,
-          payload: channel,
+          type: actionTypes.NEW_DIRECT_USER,
+          payload: new_direct_users,
         });
       }
+      store.dispatch({
+        type: actionTypes.NEW_CHANNEL,
+        payload: channel,
+      });
     });
     this.socket?.on("ON_ADD_NEW_MEMBER_TO_PRIVATE_CHANNEL", (data: any) => {
       const user = store.getState()?.user;
@@ -834,17 +838,12 @@ class SocketUtil {
       const configs: any = store.getState()?.configs;
       const { channelPrivateKey } = configs;
       const user = store.getState()?.user;
-      const { userData, teamUserMap, channelMap, currentTeamId } = user;
+      const { userData } = user;
       const direct = notification_data?.channel_type === "Direct";
       const currentChannel = getCurrentChannel();
       if (!currentChannel) return;
-      const channel = channelMap?.[currentTeamId] || [];
-      const teamUserData = teamUserMap?.[currentTeamId]?.data || [];
       const messageData: any = store.getState()?.message.messageData;
-      const channelNotification = channel.find(
-        (c) => c.channel_id === message_data.entity_id
-      );
-      if (currentChannel.channel_id === message_data.entity_id) {
+      if (currentChannel.channel_id === message_data.entity_id && !direct) {
         this.emitSeenChannel(message_data.message_id, message_data.entity_id);
       }
       if (userData?.user_id !== notification_data?.sender_data?.user_id) {
@@ -861,15 +860,6 @@ class SocketUtil {
               },
             });
           }
-        }
-        if (channelNotification?.channel_type === "Direct") {
-          channelNotification.user = teamUserData.find(
-            (u: any) =>
-              u.user_id ===
-              channelNotification.channel_members.find(
-                (el: string) => el !== userData?.user_id
-              )
-          );
         }
         if (currentChannel.channel_id === message_data.entity_id) {
           const { scrollData } = messageData?.[currentChannel.channel_id] || {};
@@ -888,16 +878,7 @@ class SocketUtil {
         }
       }
       let res = message_data;
-      if (direct) {
-        const keys = channelPrivateKey?.[res.entity_id] || [];
-        res = await normalizeMessageItem(
-          res,
-          findKey(keys, Math.round(new Date(res.createdAt).getTime() / 1000))
-            .key,
-          res.entity_id
-        );
-      }
-      if (res) {
+      if (res && !direct) {
         store.dispatch({
           type: actionTypes.RECEIVE_MESSAGE,
           payload: { data: res, currentChannelId: currentChannel.channel_id },

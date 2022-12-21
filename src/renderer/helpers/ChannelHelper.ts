@@ -7,6 +7,7 @@ import { uniqBy } from "lodash";
 import { decrypt } from "eciesjs";
 import CryptoJS from "crypto-js";
 import api from "renderer/api";
+import { Channel } from "renderer/models";
 
 export const encryptMessage = async (str: string, key: string) => {
   return CryptoJS.AES.encrypt(str, key).toString();
@@ -44,10 +45,7 @@ export const getChannelPrivateKey = async (
   encrypted: string,
   privateKey: string
 ) => {
-  const res = await EthCrypto.decryptWithPrivateKey(
-    privateKey,
-    JSON.parse(encrypted)
-  );
+  const res = decrypt(privateKey, Buffer.from(encrypted, "hex")).toString();
   return res;
 };
 
@@ -89,17 +87,18 @@ const decryptPrivateChannel = async (item: any, privateKey: string) => {
 
 export const getPrivateChannel = async (privateKey: string) => {
   const timestamp = Math.round(new Date().getTime() / 1000);
-  let lastSyncChannel = '0';
+  let lastSyncChannel = "0";
   const lastSyncChannelKey = await getCookie(AsyncKey.lastSyncChannelKey);
   if (typeof lastSyncChannelKey === "string") {
     lastSyncChannel = lastSyncChannelKey;
   }
   const channelKeyRes = await api.getChannelKey(lastSyncChannel);
-  const syncChannelKey = channelKeyRes.data?.map((el) => ({
-    channelId: el.channel_id,
-    key: el.key,
-    timestamp: el.timestamp,
-  })) || [];
+  const syncChannelKey =
+    channelKeyRes.data?.map((el) => ({
+      channelId: el.channel_id,
+      key: el.key,
+      timestamp: el.timestamp,
+    })) || [];
   const current = await getCookie(AsyncKey.channelPrivateKey);
   let dataLocal: any = { data: [] };
   if (typeof current === "string") {
@@ -236,3 +235,9 @@ export const validateUUID = (id: string) =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     id
   );
+
+export const sortChannel = (v1: Channel, v2: Channel) => {
+  if ((v1.updatedAt || "") > (v2.updatedAt || "")) return -1;
+  if ((v1.updatedAt || "") < (v2.updatedAt || "")) return 1;
+  return 0;
+};

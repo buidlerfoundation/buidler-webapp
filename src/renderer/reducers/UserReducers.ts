@@ -338,6 +338,21 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         },
       };
     }
+    case actionTypes.NEW_DIRECT_USER: {
+      return {
+        ...state,
+        teamUserMap: {
+          ...teamUserMap,
+          [currentTeamId]: {
+            data: uniqBy(
+              [...(teamUserMap[currentTeamId]?.data || []), ...payload],
+              "user_id"
+            ),
+            total: teamUserMap[currentTeamId]?.total + payload.length,
+          },
+        },
+      };
+    }
     case actionTypes.NEW_USER: {
       return {
         ...state,
@@ -758,7 +773,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       const unSeenChannel = channelMap[currentTeamId]?.find(
         (el) => el.channel_id === channelId
       );
-      if (!unSeenChannel?.seen) {
+      if (!unSeenChannel?.seen && communityId === currentTeamId) {
         return state;
       }
       return {

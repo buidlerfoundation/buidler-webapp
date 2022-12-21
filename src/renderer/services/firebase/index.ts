@@ -15,10 +15,10 @@ const messaging = getMessaging(firebaseApp);
 
 const getDestinationRoute = (json: any) => {
   const { message_data, notification_data } = json;
-  if (message_data.entity_type === "channel") {
+  if (message_data?.entity_type === "channel") {
     return `/channels/${notification_data.team_id}/${message_data.entity_id}/message/${message_data.message_id}`;
   }
-  if (message_data.entity_type === "post") {
+  if (message_data?.entity_type === "post") {
     const currentChannelId = getChannelId();
     return `/channels/${notification_data.team_id}/${currentChannelId}/post/${message_data.entity_id}`;
   }

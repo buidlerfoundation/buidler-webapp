@@ -52,7 +52,6 @@ import { getUniqueId } from "../../../../helpers/GenerateUUID";
 import api from "../../../../api";
 import MessageInput from "../../../../shared/MessageInput";
 import ChannelHeader from "./ChannelHeader";
-import DirectDescription from "./DirectDescription";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import { useLocation } from "react-router-dom";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
@@ -685,12 +684,6 @@ const ChannelView = forwardRef(
               teamUserData={teamUserData}
               teamId={communityId}
             />
-            {!currentChannel.channel_id && (
-              <DirectDescription
-                currentChannel={currentChannel}
-                teamId={communityId}
-              />
-            )}
             <div className="channel-view__body">
               <ol
                 ref={msgListRef}

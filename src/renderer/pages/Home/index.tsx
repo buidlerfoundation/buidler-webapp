@@ -360,7 +360,7 @@ const Home = () => {
     async (message: MessageData) => {
       if (!message.createdAt) return;
       const messageId = await dispatch(
-        getMessages(channelId, "Public", undefined, message.createdAt)
+        getMessages(channelId, undefined, message.createdAt)
       );
       if (messageId) {
         const element = document.getElementById(messageId);
@@ -677,6 +677,7 @@ const Home = () => {
     }
   }, [channelId, dispatch, userData.user_id]);
   const handleMessagesById = useCallback(async () => {
+    if (direct) return;
     dispatch({
       type: actionTypes.UPDATE_HIGHLIGHT_MESSAGE,
       payload: matchMessageId,
@@ -696,13 +697,13 @@ const Home = () => {
         payload: null,
       });
     }, 2000);
-  }, [channelId, dispatch, matchMessageId]);
+  }, [channelId, direct, dispatch, matchMessageId]);
   useEffect(() => {
     inputRef.current?.focus();
-    if (channelId && validateUUID(channelId) && privateKey) {
+    if (channelId && validateUUID(channelId) && privateKey && !direct) {
       dispatch(getMessages(channelId, undefined));
     }
-  }, [channelId, dispatch, privateKey]);
+  }, [channelId, direct, dispatch, privateKey]);
 
   useEffect(() => {
     if (channelId && validateUUID(channelId) && privateKey && matchMessageId) {
