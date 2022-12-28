@@ -198,7 +198,7 @@ export const findTeamAndChannel =
       if (communities.length > 0) {
         const currentTeam =
           communities.find((t: Community) => t.team_id === lastTeamId) ||
-          communities[0];
+          communities[1];
         const teamId = currentTeam.team_id;
         const lastChannelId = await getCookie(AsyncKey.lastChannelId);
         const [resSpace, resChannel, teamUsersRes] = await Promise.all([

@@ -80,6 +80,7 @@ export interface UserData {
   verified_username_asset_collection?: NFTCollection;
   is_deleted?: boolean;
   total_unread_notifications?: number;
+  direct_channel_id?: string;
 }
 
 export interface Channel {
@@ -128,6 +129,7 @@ export interface Community {
   seen?: boolean;
   is_verified?: boolean;
   direct?: boolean;
+  team_background?: string;
 }
 
 export interface NFTCollection {

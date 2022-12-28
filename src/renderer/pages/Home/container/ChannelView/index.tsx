@@ -30,10 +30,7 @@ import {
   onRemoveAttachment,
   setScrollData,
 } from "renderer/actions/MessageActions";
-import {
-  createMemberChannelData,
-  encryptMessage,
-} from "renderer/helpers/ChannelHelper";
+import { encryptMessage } from "renderer/helpers/ChannelHelper";
 import toast from "react-hot-toast";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import { titleMessageFromNow } from "../../../../utils/DateUtils";
@@ -401,7 +398,11 @@ const ChannelView = forwardRef(
       if (extractContent(text).trim() !== "" || files.length > 0) {
         let content = extractContentMessage(text.trim());
         let plain_text = extractContent(text.trim());
-        if (currentChannel.channel_type === "Private") {
+        if (
+          currentChannel.channel_type === "Private" ||
+          (currentChannel.channel_type === "Direct" &&
+            currentChannel.channel_id)
+        ) {
           const { key } =
             channelPrivateKey[currentChannel.channel_id][
               channelPrivateKey[currentChannel.channel_id].length - 1
@@ -469,22 +470,6 @@ const ChannelView = forwardRef(
         }
         if (currentChannel.channel_id) {
           message.entity_id = currentChannel.channel_id;
-        } else if (currentChannel.user) {
-          message.other_user_id = currentChannel?.user?.user_id;
-          message.team_id = currentTeam.team_id;
-          const members = [{ user_id: message.other_user_id }];
-          if (message.other_user_id !== userData.user_id) {
-            members.push({ user_id: userData.user_id });
-          }
-          const { res, privateKey } = await createMemberChannelData(members);
-          const content = await encryptMessage(message.content, privateKey);
-          const plain_text = await encryptMessage(
-            message.plain_text,
-            privateKey
-          );
-          message.content = content;
-          message.plain_text = plain_text;
-          message.channel_member_data = res;
         }
         if (messageReply) {
           message.reply_message_id = messageReply.message_id;
@@ -529,14 +514,11 @@ const ChannelView = forwardRef(
       dispatch,
       currentChannel.channel_id,
       currentChannel.channel_type,
-      currentChannel.user,
       currentChannel?.space?.space_type,
       messageReply,
       totalTeamUser,
       scrollDown,
       channelPrivateKey,
-      currentTeam.team_id,
-      userData.user_id,
     ]);
     const handleRemoveFile = useCallback(
       (file) => {
@@ -666,14 +648,14 @@ const ChannelView = forwardRef(
       if (!currentChannel.is_chat_deactivated) return true;
       return userRole === "Owner" || userRole === "Admin";
     }, [currentChannel.is_chat_deactivated, userRole]);
-    if (!currentChannel?.channel_id)
-      return <div className="channel-view-container" />;
     if (isDirect && loginType !== LoginType.WalletImport) {
       return <DirectNotSupport />;
     }
     if (isDirect && channels.length === 0) {
       return <DirectEmpty />;
     }
+    if (!currentChannel?.channel_id)
+      return <div className="channel-view-container" />;
     return (
       <Dropzone onDrop={onAddFiles}>
         {({ getRootProps, getInputProps }) => (

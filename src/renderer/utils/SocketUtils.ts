@@ -15,7 +15,11 @@ import { uniqBy } from "lodash";
 import { TransactionApiData, UserData } from "renderer/models";
 import { utils } from "ethers";
 import actionTypes from "renderer/actions/ActionTypes";
-import AppConfig, { AsyncKey, DirectCommunity, LoginType } from "../common/AppConfig";
+import AppConfig, {
+  AsyncKey,
+  DirectCommunity,
+  LoginType,
+} from "../common/AppConfig";
 import {
   clearData,
   GeneratedPrivateKey,
@@ -906,7 +910,10 @@ class SocketUtil {
         (c: any) => c.channel_id === data.entity_id
       );
       let res = data;
-      if (channelNotification?.channel_type === "Private") {
+      if (
+        channelNotification?.channel_type === "Private" ||
+        channelNotification?.channel_type === "Direct"
+      ) {
         const keys = channelPrivateKey[data.entity_id];
         if (keys?.length > 0) {
           res = await normalizeMessageItem(

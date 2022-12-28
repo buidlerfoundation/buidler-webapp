@@ -1,13 +1,12 @@
-import { ethers } from "ethers";
-import EthCrypto from "eth-crypto";
 import { getCookie, setCookie } from "renderer/common/Cookie";
 import { AsyncKey } from "renderer/common/AppConfig";
 import store from "renderer/store";
 import { uniqBy } from "lodash";
-import { decrypt } from "eciesjs";
+import { decrypt, encrypt } from "eciesjs";
 import CryptoJS from "crypto-js";
 import api from "renderer/api";
-import { Channel } from "renderer/models";
+import { Channel, UserData } from "renderer/models";
+import { getUniqueId } from "./GenerateUUID";
 
 export const encryptMessage = async (str: string, key: string) => {
   return CryptoJS.AES.encrypt(str, key).toString();
@@ -17,28 +16,23 @@ export const decryptMessage = async (str: string, key: string) => {
   return CryptoJS.AES.decrypt(str, key).toString(CryptoJS.enc.Utf8);
 };
 
-const memberData = async (
-  member: any,
-  privateKey: string,
-  timestamp: number
-) => {
-  const key = await EthCrypto.encryptWithPublicKey(
-    member.user_id.slice(2),
-    privateKey
+const memberData = async (member: UserData, key: string, timestamp: number) => {
+  const encryptedKey = encrypt(member.user_id, Buffer.from(key)).toString(
+    "hex"
   );
   return {
-    key: JSON.stringify(key),
+    key: encryptedKey,
     timestamp,
     user_id: member.user_id,
   };
 };
 
 export const createMemberChannelData = async (members: Array<any>) => {
-  const { privateKey } = ethers.Wallet.createRandom();
-  const timestamp = new Date().getTime();
-  const req = members.map((el) => memberData(el, privateKey, timestamp));
+  const uuid = getUniqueId();
+  const timestamp = Math.round(new Date().getTime() / 1000);
+  const req = members.map((el) => memberData(el, uuid, timestamp));
   const res = await Promise.all(req);
-  return { res, privateKey };
+  return { res, uuid };
 };
 
 export const getChannelPrivateKey = async (
@@ -93,12 +87,11 @@ export const getPrivateChannel = async (privateKey: string) => {
     lastSyncChannel = lastSyncChannelKey;
   }
   const channelKeyRes = await api.getChannelKey(lastSyncChannel);
-  const syncChannelKey =
-    channelKeyRes.data?.map((el) => ({
-      channelId: el.channel_id,
-      key: el.key,
-      timestamp: el.timestamp,
-    })) || [];
+  const syncChannelKey = channelKeyRes.data?.map((el) => ({
+    channelId: el.channel_id,
+    key: el.key,
+    timestamp: el.timestamp,
+  })) || [];
   const current = await getCookie(AsyncKey.channelPrivateKey);
   let dataLocal: any = { data: [] };
   if (typeof current === "string") {

@@ -43,5 +43,12 @@ export const getSpaceMembers = (id: string, controller?: AbortController) =>
 export const getChannelFromSpace = (id: string) =>
   Caller.get<Array<Channel>>(`space/${id}/channel`);
 
+export const createDirectChannel = (
+  teamId: string,
+  requestBody: any
+) => {
+  return Caller.post<Channel>(`channel/${teamId}`, requestBody);
+};
+
 export const getChannelKey = (timestamp?: string) =>
   Caller.get<ChannelKeyApiData[]>(`channel-key?timestamp=${timestamp || 0}`);

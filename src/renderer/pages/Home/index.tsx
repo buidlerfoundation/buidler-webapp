@@ -639,7 +639,9 @@ const Home = () => {
               dispatch(setCurrentChannel?.(matchChannel, match_community_id));
             }
           } else {
-            dispatch(clearLastChannel(match_community_id));
+            if (match_community_id !== DirectCommunity.team_id) {
+              dispatch(clearLastChannel(match_community_id));
+            }
             history.replace(`/channels/${match_community_id}`);
           }
         }

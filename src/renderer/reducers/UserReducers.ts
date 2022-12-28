@@ -193,12 +193,9 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
     }
     case actionTypes.UPDATE_LAST_CHANNEL: {
-      const newLastChannel = channelMap?.[payload.communityId]?.find(
-        (el) => el.channel_id === payload.channelId
-      );
       state.lastChannel = {
         ...state.lastChannel,
-        [payload.communityId]: newLastChannel,
+        [payload.communityId]: { channel_id: payload.channelId },
       };
       return state;
     }
