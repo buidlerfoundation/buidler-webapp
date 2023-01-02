@@ -19,7 +19,7 @@ function useMatchChannelId() {
   return React.useMemo(
     () =>
       match_community_id === DirectCommunity.team_id
-        ? match_channel_id
+        ? match_channel_id || ""
         : match_channel_id || currentChannelId,
     [currentChannelId, match_channel_id, match_community_id]
   );
