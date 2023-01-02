@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useRouteMatch } from "react-router-dom";
+import { DirectCommunity } from "renderer/common/AppConfig";
 import useAppSelector from "./useAppSelector";
 
 function useMatchChannelId() {
@@ -17,8 +18,8 @@ function useMatchChannelId() {
 
   return React.useMemo(
     () =>
-      match_community_id === "user"
-        ? currentChannelId
+      match_community_id === DirectCommunity.team_id
+        ? match_channel_id
         : match_channel_id || currentChannelId,
     [currentChannelId, match_channel_id, match_community_id]
   );

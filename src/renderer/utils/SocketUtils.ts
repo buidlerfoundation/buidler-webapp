@@ -42,6 +42,7 @@ import { getTransactions } from "renderer/actions/TransactionActions";
 import { formatTokenValue } from "renderer/helpers/TokenHelper";
 import { normalizeUserName } from "renderer/helpers/MessageHelper";
 import {
+  getCommunityId,
   getCurrentChannel,
   getCurrentCommunity,
   getPostId,
@@ -962,6 +963,7 @@ class SocketUtil {
     this.socket?.emit?.("ON_VIEW_MESSAGE_IN_CHANNEL", {
       message_id: messageId,
       channel_id: channelId,
+      team_id: getCommunityId(),
     });
   }
   async emitOnline(teamId?: string) {

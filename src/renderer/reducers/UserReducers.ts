@@ -9,7 +9,7 @@ import {
   UserData,
 } from "renderer/models";
 import actionTypes from "../actions/ActionTypes";
-import { AsyncKey } from "../common/AppConfig";
+import { AsyncKey, DirectCommunity } from "../common/AppConfig";
 import { setCookie } from "../common/Cookie";
 
 interface MemberRoleData {
@@ -336,16 +336,17 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
     }
     case actionTypes.NEW_DIRECT_USER: {
+      const directChannelId = DirectCommunity.team_id;
       return {
         ...state,
         teamUserMap: {
           ...teamUserMap,
-          [currentTeamId]: {
+          [directChannelId]: {
             data: uniqBy(
-              [...(teamUserMap[currentTeamId]?.data || []), ...payload],
+              [...(teamUserMap[directChannelId]?.data || []), ...payload],
               "user_id"
             ),
-            total: teamUserMap[currentTeamId]?.total + payload.length,
+            total: teamUserMap[directChannelId]?.total + payload.length,
           },
         },
       };
@@ -382,14 +383,14 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     case actionTypes.NEW_CHANNEL: {
       const isDirect = payload?.channel_type === "Direct";
       const newChannels = channelMap[currentTeamId] || [];
-      if (payload.team_id === currentTeamId) {
-        newChannels.push(payload);
-      }
       return {
         ...state,
         channelMap: {
           ...channelMap,
-          [currentTeamId]: newChannels,
+          [payload.team_id]: uniqBy(
+            [payload, ...(channelMap?.[payload.team_id] || [])],
+            "channel_id"
+          ),
         },
         spaceChannelMap: isDirect
           ? spaceChannelMap
@@ -735,8 +736,8 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
     }
     case actionTypes.MARK_SEEN_CHANNEL: {
-      const { channel_id } = payload;
-      const channels = channelMap[currentTeamId]?.map((el) => {
+      const { channel_id, team_id } = payload;
+      const channels = channelMap[team_id]?.map((el) => {
         if (el.channel_id === channel_id) {
           return {
             ...el,
@@ -749,15 +750,15 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         ...state,
         channelMap: {
           ...channelMap,
-          [currentTeamId]: channels,
+          [team_id]: channels,
         },
         team: state.team?.map((el) => {
-          if (el.team_id === currentTeamId) {
+          if (el.team_id === team_id) {
             return {
               ...el,
               seen:
                 channels?.find(
-                  (c) => !c.seen && c.notification_type !== "Muted"
+                  (c) => !c.seen && c.notification_type !== 'Muted'
                 ) === undefined,
             };
           }
