@@ -87,11 +87,12 @@ export const getPrivateChannel = async (privateKey: string) => {
     lastSyncChannel = lastSyncChannelKey;
   }
   const channelKeyRes = await api.getChannelKey(lastSyncChannel);
-  const syncChannelKey = channelKeyRes.data?.map((el) => ({
-    channelId: el.channel_id,
-    key: el.key,
-    timestamp: el.timestamp,
-  })) || [];
+  const syncChannelKey =
+    channelKeyRes.data?.map((el) => ({
+      channelId: el.channel_id,
+      key: el.key,
+      timestamp: el.timestamp,
+    })) || [];
   const current = await getCookie(AsyncKey.channelPrivateKey);
   let dataLocal: any = { data: [] };
   if (typeof current === "string") {
@@ -139,9 +140,14 @@ export const normalizeMessageItem = async (
   key: string,
   channelId: string
 ) => {
-  const content = item.content
-    ? CryptoJS.AES.decrypt(item.content, key).toString(CryptoJS.enc.Utf8)
-    : "";
+  let content = "";
+  try {
+    content = item.content
+      ? CryptoJS.AES.decrypt(item.content, key).toString(CryptoJS.enc.Utf8)
+      : "";
+  } catch (error) {
+    console.log(error);
+  }
   if (item?.conversation_data) {
     item.conversation_data = await normalizeMessageItem(
       item.conversation_data,
