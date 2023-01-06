@@ -385,7 +385,7 @@ const Home = () => {
   );
   const onDeleteTask = useCallback(async () => {
     if (!selectedPost?.task_id) return;
-    await dispatch(deleteTask(selectedPost?.task_id, channelId));
+    dispatch(deleteTask(selectedPost?.task_id, channelId));
     toggleConfirmDeletePost();
     setOpenCreatePinPost(false);
     const path = history.location.pathname;

@@ -409,8 +409,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
                       const name2 =
                         newChannels.find((el) => el.channel_id === a2)
                           ?.channel_name || "";
-                      if (name1 > name2) return 1;
-                      return -1;
+                      return name1.localeCompare(name2);
                     })
                     .sort((a1, a2) => {
                       const type1 =
@@ -419,8 +418,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
                       const type2 =
                         newChannels.find((el) => el.channel_id === a2)
                           ?.channel_type || "";
-                      if (type1 > type2) return -1;
-                      return 1;
+                      return type2.localeCompare(type1);
                     });
                 }
                 return el;
@@ -758,7 +756,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
               ...el,
               seen:
                 channels?.find(
-                  (c) => !c.seen && c.notification_type !== 'Muted'
+                  (c) => !c.seen && c.notification_type !== "Muted"
                 ) === undefined,
             };
           }

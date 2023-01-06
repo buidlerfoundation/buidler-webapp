@@ -176,7 +176,10 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       const newArchivedTasks = archivedTasks
         ? archivedTasks.filter((t) => t.task_id !== taskId)
         : [];
-
+      let newPinPostDetail = state.pinPostDetail;
+      if (newPinPostDetail?.task_id === taskId) {
+        newPinPostDetail = null;
+      }
       return {
         ...state,
         taskData: {
@@ -187,6 +190,7 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
             archivedTasks: newArchivedTasks,
           },
         },
+        pinPostDetail: newPinPostDetail,
       };
     }
     case actionTypes.CREATE_TASK_SUCCESS: {

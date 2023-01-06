@@ -173,10 +173,10 @@ export const getTasks =
             total: taskRes.metadata?.total,
           },
         });
-      } else {
+      } else if (!taskRes.message?.includes('aborted')) {
         dispatch({
           type: actionTypes.TASK_FAIL,
-          payload: { message: "Error", taskRes },
+          payload: taskRes,
         });
       }
     } catch (e) {
