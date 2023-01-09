@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import toast from "react-hot-toast";
-import { getChannelId } from "renderer/helpers/StoreHelper";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -19,8 +18,7 @@ const getDestinationRoute = (json: any) => {
     return `/channels/${notification_data.team_id}/${message_data.entity_id}/message/${message_data.message_id}`;
   }
   if (message_data?.entity_type === "post") {
-    const currentChannelId = getChannelId();
-    return `/channels/${notification_data.team_id}/${currentChannelId}/post/${message_data.entity_id}`;
+    return `/channels/${notification_data.team_id}/${notification_data.channel_id}/post/${message_data.entity_id}`;
   }
 };
 
