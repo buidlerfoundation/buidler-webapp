@@ -165,7 +165,7 @@ const Home = () => {
   const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
   const [channelDelete, setChannelDelete] = useState<any>(null);
   const [isOpenInvite, setOpenInvite] = useState(false);
-  const [isOpenMembers, setOpeMembers] = useState(false);
+  const [isOpenMembers, setOpenMembers] = useState(false);
   const [isOpenConfirmDeleteSpace, setOpenConfirmDeleteSpace] = useState(false);
   const [isOpenConfirmDeleteChannel, setOpenConfirmDeleteChannel] =
     useState(false);
@@ -200,7 +200,7 @@ const Home = () => {
     []
   );
   const toggleOpenMembers = useCallback(
-    () => setOpeMembers((current) => !current),
+    () => setOpenMembers((current) => !current),
     []
   );
   const onSettingClick = useCallback(() => {
@@ -613,7 +613,8 @@ const Home = () => {
     }
   }, [currentUserProfileId, handleCloseModalSpaceDetail]);
   useEffect(() => {
-    setOpeMembers(false);
+    setOpenMembers(false);
+    setOpenCreatePinPost(false);
     setCurrentUserId("");
     if (match_community_id === "user" && match_channel_id) {
       setCurrentUserId(match_channel_id);

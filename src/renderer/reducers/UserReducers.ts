@@ -465,16 +465,22 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         ...state,
         spaceChannelMap: {
           ...spaceChannelMap,
-          [currentTeamId]: spaceChannelMap[currentTeamId]?.map((el) => {
-            if (el.space_id === payload.space_id) {
-              return {
-                ...el,
-                ...payload,
-                attachment: null,
-              };
-            }
-            return el;
-          }),
+          [currentTeamId]: spaceChannelMap[currentTeamId]
+            ?.map((el) => {
+              if (el.space_id === payload.space_id) {
+                return {
+                  ...el,
+                  ...payload,
+                  attachment: null,
+                };
+              }
+              return el;
+            })
+            .sort((a1, a2) => {
+              const name1 = a1.space_name;
+              const name2 = a2.space_name;
+              return name1.localeCompare(name2);
+            }),
         },
       };
     }
@@ -724,9 +730,9 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
           ...spaceChannelMap,
           [currentTeamId]: spaceChannelMap[currentTeamId]?.map((el) => {
             if (el.space_id === spaceId) {
-              el.channel_ids = [...el.channel_ids, channelId];
+              el.channel_ids = [...(el.channel_ids || []), channelId];
             } else {
-              el.channel_ids = el.channel_ids.filter((id) => id !== channelId);
+              el.channel_ids = el.channel_ids?.filter((id) => id !== channelId);
             }
             return el;
           }),
