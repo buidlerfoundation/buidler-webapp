@@ -8,7 +8,7 @@ class Web3AuthUtils {
 
   async init() {
     this.web3auth = new Web3Auth({
-      clientId: "BOnQh1maOvlEshkixNgwmXGY6Kl-pN-7BuRTk_AChdhW7MuuoxDP4TzbB850zkjrr73gO6OhjM4LNXpNki1wWJ4",
+      clientId: process.env.REACT_APP_WEB3_AUTH_CLIENT_ID,
       chainConfig: {
         chainNamespace: "eip155",
         chainId: process.env.REACT_APP_DEFAULT_CHAIN_ID,
