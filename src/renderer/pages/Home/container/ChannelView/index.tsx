@@ -659,7 +659,15 @@ const ChannelView = forwardRef(
     return (
       <Dropzone onDrop={onAddFiles}>
         {({ getRootProps, getInputProps }) => (
-          <div className="channel-view-container" {...getRootProps()}>
+          <div
+            className="channel-view-container"
+            style={{
+              backgroundColor: isDirect
+                ? "var(--color-darkest-background)"
+                : "initial",
+            }}
+            {...getRootProps()}
+          >
             <ChannelHeader
               ref={headerRef}
               currentChannel={currentChannel}

@@ -23,6 +23,8 @@ import "./index.scss";
 import { Channel, UserData } from "renderer/models";
 import useUserRole from "renderer/hooks/useUserRole";
 import useDirectChannelUser from "renderer/hooks/useDirectChannelUser";
+import IconLock from "renderer/shared/SVG/IconLock";
+import DirectMessageTooltip from "renderer/shared/DirectMessageTooltip";
 
 type ChannelHeaderProps = {
   currentChannel?: Channel;
@@ -33,6 +35,7 @@ type ChannelHeaderProps = {
 const ChannelHeader = forwardRef(
   ({ currentChannel, teamUserData, teamId }: ChannelHeaderProps, ref) => {
     const dispatch = useAppDispatch();
+    const popupDMRef = useRef<any>();
     const popupChannelIconRef = useRef<any>();
     const [isActiveMember, setActiveMember] = useState(false);
     const [isActiveName, setActiveName] = useState(false);
@@ -168,14 +171,14 @@ const ChannelHeader = forwardRef(
     );
     const handleChannelClick = useCallback(
       (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        if (!currentChannel?.user) {
+        if (!isDirect) {
           settingRef.current?.show(e.currentTarget, {
             x: 570,
             y: 110,
           });
         }
       },
-      [currentChannel?.user]
+      [isDirect]
     );
     const handleMemberClick = useCallback(
       (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -212,6 +215,12 @@ const ChannelHeader = forwardRef(
       ),
       [users]
     );
+    const onMouseEnterDMTag = useCallback(
+      (e: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
+        popupDMRef.current.show(e.target),
+      []
+    );
+    const onMouseLeaveDMTag = useCallback(() => popupDMRef.current.hide(), []);
     return (
       <>
         <div className="channel-view__header">
@@ -250,21 +259,37 @@ const ChannelHeader = forwardRef(
             <div
               ref={settingButtonRef}
               onClick={handleChannelClick}
-              style={{ display: "flex", width: 0, flex: 1 }}
+              style={{
+                display: "flex",
+                width: 0,
+                flex: 1,
+                alignItems: "center",
+              }}
             >
               <span className="channel-view__title text-ellipsis">
                 {isDirect && directUser
-                  ? directUser?.user_name
+                  ? directUser.user_name
                   : currentChannel?.channel_name}
               </span>
+              {isDirect && (
+                <div
+                  style={{ width: 20, height: 20 }}
+                  onMouseEnter={onMouseEnterDMTag}
+                  onMouseLeave={onMouseLeaveDMTag}
+                >
+                  <IconLock style={{ marginLeft: 10 }} size={20} />
+                </div>
+              )}
+              {isDirect && (
+                <PopoverButton
+                  style={{ pointerEvents: "none" }}
+                  ref={popupDMRef}
+                  popupOnly
+                  componentPopup={<DirectMessageTooltip />}
+                  transformOrigin={{ vertical: "top", horizontal: "left" }}
+                />
+              )}
             </div>
-            {isChannelPrivate && (
-              <img
-                className="icon-private"
-                src={images.icPrivateWhite}
-                alt=""
-              />
-            )}
           </div>
           {isChannelPrivate && (
             <div className="channel-view__members-wrapper">
