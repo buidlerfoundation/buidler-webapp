@@ -411,7 +411,7 @@ const Home = () => {
     async (spaceData: CreateSpaceData) => {
       let error = "";
       let body: any = {
-        space_name: spaceData.name,
+        space_name: spaceData.name.toUpperCase(),
         space_type: spaceData.spaceType === "Exclusive" ? "Private" : "Public",
         space_id: spaceData.spaceId,
         space_emoji: spaceData.emoji,

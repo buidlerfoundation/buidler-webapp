@@ -18,7 +18,11 @@ export const isNotFormat = (number: string | number) => {
   );
 };
 
-export const formatNumber = (number: string | number, removeZero = true) => {
+export const formatNumber = (
+  number: string | number,
+  removeZero = true,
+  decimal = 5
+) => {
   if (!number) return "";
   const str = `${number}`.includes("e")
     ? number.toLocaleString("fullwide", { useGrouping: false })
@@ -27,7 +31,7 @@ export const formatNumber = (number: string | number, removeZero = true) => {
     const splitted = str.split(".");
     const res = `${numeral(splitted[0]).format("0,0")}.${splitted[1].substring(
       0,
-      5
+      decimal
     )}`;
     if (removeZero) {
       return res.replace(/0*$/g, "");
