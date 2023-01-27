@@ -16,6 +16,7 @@
     "@types/react-dom": "^18.0.0",
     "@walletconnect/client": "^1.7.8",
     "@walletconnect/qrcode-modal": "^1.7.8",
+    "@web3auth/modal": "^4.2.3",
     "core-js": "^3.22.6",
     "crypto": "^1.0.1",
     "crypto-js": "3.1.9-1",
@@ -70,14 +71,18 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "chrome >= 67",
+      "edge >= 79",
+      "firefox >= 68",
+      "opera >= 54",
+      "safari >= 14"
     ],
     "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      "chrome >= 67",
+      "edge >= 79",
+      "firefox >= 68",
+      "opera >= 54",
+      "safari >= 14"
     ]
   },
   "resolutions": {

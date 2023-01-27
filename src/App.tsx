@@ -31,6 +31,8 @@ import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import { CustomEventName } from "renderer/services/events/WindowEvent";
 import ChainId from "renderer/services/connectors/ChainId";
 import { initialSpaceToggle } from "renderer/actions/SideBarActions";
+import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
+import { ethers } from "ethers";
 
 function App() {
   const history = useHistory();
@@ -236,7 +238,7 @@ function App() {
   }, [dispatch]);
   useEffect(() => {
     getCookie(AsyncKey.loginType)
-      .then((res) => {
+      .then(async (res) => {
         dispatch({ type: actionTypes.UPDATE_LOGIN_TYPE, payload: res });
         if (res === LoginType.WalletConnect) {
           WalletConnectUtils.init(connectLogout);
@@ -250,6 +252,16 @@ function App() {
             metamaskUpdate,
             metamaskConnected
           );
+        } else if (res === LoginType.Web3Auth) {
+          Web3AuthUtils.init();
+          if (!Web3AuthUtils.web3auth) return;
+          const web3authProvider = await Web3AuthUtils.web3auth.connect();
+          if (!web3authProvider) return;
+          Web3AuthUtils.provider = new ethers.providers.Web3Provider(
+            web3authProvider
+          );
+          const signer = Web3AuthUtils.provider.getSigner();
+          console.log('XXX: ', signer)
         }
       })
       .catch((err) => {

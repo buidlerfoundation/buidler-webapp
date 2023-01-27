@@ -16,6 +16,7 @@ import { ethers, utils } from "ethers";
 import GlobalVariable from "renderer/services/GlobalVariable";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import ChainId from "renderer/services/connectors/ChainId";
+import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
 
 const Started = () => {
   useEffect(() => {
@@ -223,6 +224,32 @@ const Started = () => {
     gaLoginClick("WalletConnect");
     WalletConnectUtils.connect(onWCConnected, onDisconnected);
   }, [gaLoginClick, onWCConnected, onDisconnected]);
+  const handleSocialConnect = useCallback(async () => {
+    await Web3AuthUtils.init();
+    if (!Web3AuthUtils.web3auth) return;
+    const web3authProvider = await Web3AuthUtils.web3auth.connect();
+    if (!web3authProvider) return;
+    Web3AuthUtils.provider = new ethers.providers.Web3Provider(
+      web3authProvider
+    );
+    const signer = Web3AuthUtils.provider.getSigner();
+    const address = await signer.getAddress();
+    try {
+      const nonceRes = await api.requestNonceWithAddress(address);
+      const message = nonceRes.data?.message;
+      if (nonceRes.statusCode !== 200 || !message) {
+        return;
+      }
+      const signature = await signer.signMessage(message);
+      gaLoginSubmit("Web3Auth");
+      const res = await api.verifyNonce(message, signature);
+      if (res.statusCode === 200) {
+        await handleResponseVerify(res, LoginType.Web3Auth);
+      }
+    } catch (error: any) {
+      console.log(error);
+    }
+  }, [gaLoginSubmit, handleResponseVerify]);
   return (
     <div className="started-container">
       <div className="started-body">
@@ -253,6 +280,16 @@ const Started = () => {
           onClick={handleWalletConnect}
         >
           <span>WalletConnect</span>
+          <div className="wallet-icon">
+            <img src={images.icWalletConnect} alt="" />
+          </div>
+        </div>
+        <div
+          className="wallet-button normal-button"
+          onClick={handleSocialConnect}
+          style={{ display: "none" }}
+        >
+          <span>SocialConnect</span>
           <div className="wallet-icon">
             <img src={images.icWalletConnect} alt="" />
           </div>
