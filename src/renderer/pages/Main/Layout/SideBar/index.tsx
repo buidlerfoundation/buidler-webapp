@@ -76,10 +76,10 @@ const SideBar = forwardRef(
     const menuSpaceChannelRef = useRef<any>();
     const menuMemberRef = useRef<any>();
     const isOwner = useMemo(() => {
-      return (
-        (team?.find((el) => el.team_id === communityId)?.role ||
-          currentTeam.role) === "Owner"
-      );
+      const role =
+        team?.find((el) => el.team_id === communityId)?.role ||
+        currentTeam.role;
+      return role === "Owner" || role === "Admin";
     }, [communityId, currentTeam.role, team]);
     useImperativeHandle(ref, () => {
       return {
