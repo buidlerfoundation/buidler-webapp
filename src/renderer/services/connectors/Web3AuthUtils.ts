@@ -12,7 +12,7 @@ class Web3AuthUtils {
       clientId: process.env.REACT_APP_WEB3_AUTH_CLIENT_ID || "",
       chainConfig: {
         chainNamespace: "eip155",
-        chainId: process.env.REACT_APP_DEFAULT_CHAIN_ID,
+        chainId: `0x${process.env.REACT_APP_DEFAULT_CHAIN_ID}`,
       },
     });
     await this.web3auth?.initModal();

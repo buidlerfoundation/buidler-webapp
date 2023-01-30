@@ -146,12 +146,10 @@ export const getEstimateTransaction = (
     } else {
       res.data = transferData;
       res.to = sendData.asset?.contract?.contract_address;
-      res.value = "0x0";
     }
   } else if (typeId === "2") {
     res.data = transferData;
     res.to = sendData.nft?.contract_address;
-    res.value = "0x0";
   }
   return res;
 };
