@@ -268,6 +268,8 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
             ...state.taskData[channelId],
             tasks: newTasks.sort(sortPinPost),
             archivedTasks: newArchivedTasks.sort(sortPinPost),
+            taskCount: newTasks.length,
+            archivedCount: newArchivedTasks.length,
           },
         },
       };
