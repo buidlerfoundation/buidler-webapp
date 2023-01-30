@@ -253,15 +253,13 @@ function App() {
             metamaskConnected
           );
         } else if (res === LoginType.Web3Auth) {
-          Web3AuthUtils.init();
+          await Web3AuthUtils.init();
           if (!Web3AuthUtils.web3auth) return;
           const web3authProvider = await Web3AuthUtils.web3auth.connect();
           if (!web3authProvider) return;
           Web3AuthUtils.provider = new ethers.providers.Web3Provider(
             web3authProvider
           );
-          const signer = Web3AuthUtils.provider.getSigner();
-          console.log('XXX: ', signer)
         }
       })
       .catch((err) => {

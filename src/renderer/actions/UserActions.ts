@@ -2,7 +2,12 @@ import { ActionCreator, Dispatch } from "redux";
 import GlobalVariable from "renderer/services/GlobalVariable";
 import api from "../api";
 import ActionTypes from "./ActionTypes";
-import { AsyncKey, DirectCommunity, UserRole } from "../common/AppConfig";
+import {
+  AsyncKey,
+  DirectCommunity,
+  LoginType,
+  UserRole,
+} from "../common/AppConfig";
 import {
   getCookie,
   getDeviceCode,
@@ -12,9 +17,10 @@ import {
 import ImageHelper from "../common/ImageHelper";
 import SocketUtils from "../utils/SocketUtils";
 import { Community, UserData, UserRoleType } from "renderer/models";
-import store from "renderer/store";
+import store, { AppGetState } from "renderer/store";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import { sleep } from "renderer/helpers/StoreHelper";
+import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
 
 export const getInitial: ActionCreator<any> =
   () => async (dispatch: Dispatch) => {
@@ -35,10 +41,15 @@ export const getInitial: ActionCreator<any> =
     }
   };
 
-export const logout: ActionCreator<any> = () => (dispatch: Dispatch) => {
-  SocketUtils.disconnect();
-  dispatch({ type: ActionTypes.LOGOUT });
-};
+export const logout: ActionCreator<any> =
+  () => (dispatch: Dispatch, getState: AppGetState) => {
+    const loginType = getState().configs.loginType;
+    if (loginType === LoginType.Web3Auth) {
+      Web3AuthUtils.disconnect();
+    }
+    SocketUtils.disconnect();
+    dispatch({ type: ActionTypes.LOGOUT });
+  };
 
 const removeDeviceCode = async () => {
   const deviceCode = await getDeviceCode();
@@ -239,7 +250,10 @@ export const findTeamAndChannel =
       } else {
         SocketUtils.init();
       }
-      dispatch({ type: ActionTypes.TEAM_SUCCESS, payload: { team: communities } });
+      dispatch({
+        type: ActionTypes.TEAM_SUCCESS,
+        payload: { team: communities },
+      });
     } else {
       dispatch({ type: ActionTypes.TEAM_FAIL, payload: { message: res } });
       dispatch({

@@ -17,6 +17,7 @@ import GlobalVariable from "renderer/services/GlobalVariable";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import ChainId from "renderer/services/connectors/ChainId";
 import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
+import IconWeb3Auth from "renderer/shared/SVG/IconWeb3Auth";
 
 const Started = () => {
   useEffect(() => {
@@ -287,11 +288,10 @@ const Started = () => {
         <div
           className="wallet-button normal-button"
           onClick={handleSocialConnect}
-          style={{ display: "none" }}
         >
           <span>SocialConnect</span>
           <div className="wallet-icon">
-            <img src={images.icWalletConnect} alt="" />
+            <IconWeb3Auth />
           </div>
         </div>
       </div>
