@@ -252,15 +252,16 @@ function App() {
             metamaskUpdate,
             metamaskConnected
           );
-        } else if (res === LoginType.Web3Auth) {
-          await Web3AuthUtils.init();
-          if (!Web3AuthUtils.web3auth) return;
-          const web3authProvider = await Web3AuthUtils.web3auth.connect();
-          if (!web3authProvider) return;
-          Web3AuthUtils.provider = new ethers.providers.Web3Provider(
-            web3authProvider
-          );
         }
+        // else if (res === LoginType.Web3Auth) {
+        //   await Web3AuthUtils.init();
+        //   if (!Web3AuthUtils.web3auth) return;
+        //   const web3authProvider = await Web3AuthUtils.web3auth.connect();
+        //   if (!web3authProvider) return;
+        //   Web3AuthUtils.provider = new ethers.providers.Web3Provider(
+        //     web3authProvider
+        //   );
+        // }
       })
       .catch((err) => {
         console.log(err);

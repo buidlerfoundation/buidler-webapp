@@ -7,9 +7,11 @@ import { AsyncKey, LoginType } from "renderer/common/AppConfig";
 import { ethers, utils } from "ethers";
 import WalletConnectUtils from "renderer/services/connectors/WalletConnectUtils";
 import toast from "react-hot-toast";
+import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
 
 export const uploadToIPFS =
-  (pinPostId: string, channelId: string, content: string) => async (dispatch: Dispatch) => {
+  (pinPostId: string, channelId: string, content: string) =>
+  async (dispatch: Dispatch) => {
     dispatch({
       type: actionTypes.UPDATE_TASK_REQUEST,
       payload: {
@@ -44,6 +46,17 @@ export const uploadToIPFS =
         signature = await WalletConnectUtils.connector?.signPersonalMessage(
           params
         );
+      } else if (loginType === LoginType.Web3Auth) {
+        if (!Web3AuthUtils.provider || !Web3AuthUtils.web3auth) {
+          await Web3AuthUtils.init();
+          const web3authProvider = await Web3AuthUtils.web3auth?.connect();
+          if (!web3authProvider) return;
+          Web3AuthUtils.provider = new ethers.providers.Web3Provider(
+            web3authProvider
+          );
+          const signer = Web3AuthUtils.provider.getSigner();
+          signature = await signer.signMessage(message);
+        }
       }
       dispatch({
         type: actionTypes.TOGGLE_MODAL_CONFIRM_SIGN_MESSAGE,
@@ -173,7 +186,7 @@ export const getTasks =
             total: taskRes.metadata?.total,
           },
         });
-      } else if (!taskRes.message?.includes('aborted')) {
+      } else if (!taskRes.message?.includes("aborted")) {
         dispatch({
           type: actionTypes.TASK_FAIL,
           payload: taskRes,
