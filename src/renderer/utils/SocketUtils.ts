@@ -1,14 +1,12 @@
 import toast from "react-hot-toast";
 import { Dispatch } from "redux";
 import {
-  findKey,
   getChannelPrivateKey,
   getPrivateChannel,
   getRawPrivateChannel,
   normalizeMessageData,
   normalizeMessageItem,
   normalizePublicMessageData,
-  storePrivateChannel,
 } from "renderer/helpers/ChannelHelper";
 import { io, Socket } from "socket.io-client";
 import { uniqBy } from "lodash";
