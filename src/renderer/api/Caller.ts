@@ -8,6 +8,7 @@ import store from "renderer/store";
 import SocketUtils from "renderer/utils/SocketUtils";
 import AppConfig, {
   AsyncKey,
+  ignoreMessageErrorApis,
   importantApis,
   whiteListRefreshTokenApis,
 } from "../common/AppConfig";
@@ -37,7 +38,7 @@ const handleError = (message: string, apiData: any) => {
   if (importantApi) {
     store.dispatch({ type: actionTypes.SOMETHING_WRONG });
     throw new Error("Something wrong");
-  } else {
+  } else if (!ignoreMessageErrorApis.includes(compareUri)) {
     toast.error(message);
   }
 };

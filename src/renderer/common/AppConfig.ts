@@ -103,6 +103,8 @@ export const whiteListRefreshTokenApis = [
   "delete-user/device",
 ];
 
+export const ignoreMessageErrorApis = ["delete-user/device"];
+
 export const DeletedUser: UserData = {
   user_id: "",
   user_name: "Deleted User",

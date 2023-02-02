@@ -63,6 +63,7 @@ import { DirectCommunity, LoginType } from "renderer/common/AppConfig";
 import useDirectChannelUser from "renderer/hooks/useDirectChannelUser";
 import DirectEmpty from "renderer/shared/DirectEmpty";
 import DirectNotSupport from "renderer/shared/DirectNotSupport";
+import useMessageLoading from "renderer/hooks/useMessageLoading";
 
 type ChannelViewProps = {
   currentChannel: Channel;
@@ -105,6 +106,7 @@ const ChannelView = forwardRef(
     const dispatch = useAppDispatch();
     const totalTeamUser = useTotalTeamUserData();
     const communityId = useMatchCommunityId();
+    const loading = useMessageLoading();
     const reactData = useAppSelector((state) => state.reactReducer.reactData);
     const channels = useChannel();
     const userRole = useUserRole();
@@ -675,15 +677,22 @@ const ChannelView = forwardRef(
               teamId={communityId}
             />
             <div className="channel-view__body">
-              <ol
-                ref={msgListRef}
-                className={`channel-view-message-list hide-scroll-bar ${
-                  isScrolling ? "channel-view-scrolling" : ""
-                }`}
-                onScroll={onMessageScroll}
-              >
-                {messagesGroup.map(renderMessage)}
-              </ol>
+              {messagesGroup.length > 0 && (
+                <ol
+                  ref={msgListRef}
+                  className={`channel-view-message-list hide-scroll-bar ${
+                    isScrolling ? "channel-view-scrolling" : ""
+                  }`}
+                  onScroll={onMessageScroll}
+                >
+                  {messagesGroup.map(renderMessage)}
+                </ol>
+              )}
+              {!loading && messagesGroup.length === 0 && (
+                <span className="channel-view-message-empty">
+                  No messages here yet. Send your first message.
+                </span>
+              )}
               {loadMoreAfterMessage && (
                 <div className="message-load-more-after">
                   <CircularProgress size={30} color="inherit" />
