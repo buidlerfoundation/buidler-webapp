@@ -220,9 +220,9 @@ const SettingChannel = ({
             title={currentNotificationType}
             icon={images.icCollapse}
             data={[
-              { value: "Quiet", label: "Quiet" },
-              { value: "Alert", label: "Alert" },
-              { value: "Muted", label: "Muted" },
+              { value: "quiet", label: "Quiet" },
+              { value: "alert", label: "Alert" },
+              { value: "muted", label: "Muted" },
             ]}
             onSelected={handleSelectMenu}
           />

@@ -762,7 +762,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
               ...el,
               seen:
                 channels?.find(
-                  (c) => !c.seen && c.notification_type !== "Muted"
+                  (c) => !c.seen && c.notification_type !== "muted"
                 ) === undefined,
             };
           }

@@ -1,5 +1,5 @@
 export type ConfigNotificationRequestBody = {
-  notification_type: "Alert" | "Muted" | "Quite";
+  notification_type: "alert" | "muted" | "quite";
 };
 
 export type DirectChannelRequestBody = {

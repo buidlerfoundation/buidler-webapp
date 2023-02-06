@@ -834,12 +834,9 @@ class SocketUtil {
         });
       });
     });
-    this.socket?.on("ON_USER_OFFLINE", (data: any) => {});
     this.socket?.on("ON_NEW_MESSAGE", async (data: any) => {
       const { message_data, notification_data } = data;
       const { notification_type } = notification_data;
-      const configs: any = store.getState()?.configs;
-      const { channelPrivateKey } = configs;
       const user = store.getState()?.user;
       const { userData } = user;
       const direct = notification_data?.channel_type === "Direct";
@@ -851,7 +848,7 @@ class SocketUtil {
       }
       if (userData?.user_id !== notification_data?.sender_data?.user_id) {
         if (
-          notification_type !== "Muted" &&
+          notification_type !== "muted" &&
           message_data.entity_type === "channel"
         ) {
           if (currentChannel.channel_id !== message_data.entity_id) {

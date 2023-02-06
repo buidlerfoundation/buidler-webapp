@@ -16,7 +16,11 @@ export const updateChannelNotification = (
   channelId: string,
   data: ConfigNotificationRequestBody
 ) => {
-  return Caller.post(`channel/${channelId}/notification`, data);
+  return Caller.post(`notification-setting`, {
+    entity_type: "CHANNEL",
+    entity_id: channelId,
+    notification_type: data.notification_type,
+  });
 };
 
 export const addUserToChannel = (channelId: string, userId: string) =>
@@ -43,10 +47,7 @@ export const getSpaceMembers = (id: string, controller?: AbortController) =>
 export const getChannelFromSpace = (id: string) =>
   Caller.get<Array<Channel>>(`space/${id}/channel`);
 
-export const createDirectChannel = (
-  teamId: string,
-  requestBody: any
-) => {
+export const createDirectChannel = (teamId: string, requestBody: any) => {
   return Caller.post<Channel>(`channel/${teamId}`, requestBody);
 };
 

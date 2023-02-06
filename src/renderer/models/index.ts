@@ -246,7 +246,7 @@ export interface TaskData {
   message_sender_id: string;
   cid?: string;
   uploadingIPFS?: boolean;
-  notification_type?: "Alert" | "Muted";
+  notification_type?: "alert" | "muted";
   total_unread_notifications?: number;
 }
 
