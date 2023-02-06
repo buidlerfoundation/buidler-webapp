@@ -39,10 +39,12 @@ interface UserReducerState {
   lastChannel: { [key: string]: Channel };
   spaceMembers: Array<UserData>;
   walletBalance?: BalanceApiData | null;
-  memberData: {
-    admin: MemberRoleData;
-    owner: MemberRoleData;
-    member: MemberRoleData;
+  memberDataMap: {
+    [key: string]: {
+      admin: MemberRoleData;
+      owner: MemberRoleData;
+      member: MemberRoleData;
+    };
   };
   apiTeamController?: AbortController | null;
   apiSpaceMemberController?: AbortController | null;
@@ -78,29 +80,31 @@ const initialState: UserReducerState = {
   lastChannel: {},
   spaceMembers: [],
   walletBalance: null,
-  memberData: {
-    admin: {
-      data: [],
-      total: 0,
-      canMore: false,
-      currentPage: 1,
-    },
-    owner: {
-      data: [],
-      total: 0,
-      canMore: false,
-      currentPage: 1,
-    },
-    member: {
-      data: [],
-      total: 0,
-      canMore: false,
-      currentPage: 1,
-    },
-  },
+  memberDataMap: {},
   apiTeamController: null,
   currentUserProfileId: null,
   updateFromSocket: false,
+};
+
+export const defaultMemberData = {
+  admin: {
+    data: [],
+    total: 0,
+    canMore: false,
+    currentPage: 1,
+  },
+  owner: {
+    data: [],
+    total: 0,
+    canMore: false,
+    currentPage: 1,
+  },
+  member: {
+    data: [],
+    total: 0,
+    canMore: false,
+    currentPage: 1,
+  },
 };
 
 const userReducers: Reducer<UserReducerState, AnyAction> = (
@@ -112,7 +116,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     teamUserMap,
     spaceChannelMap,
     walletBalance,
-    memberData,
+    memberDataMap,
     channelMap,
     lastChannel,
     team,
@@ -199,8 +203,23 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
       return state;
     }
+    case actionTypes.MEMBER_DATA_REQUEST: {
+      const { teamId } = payload;
+      return {
+        ...state,
+        memberDataMap: {
+          ...memberDataMap,
+          [teamId]: {
+            admin: memberDataMap?.[teamId]?.admin || defaultMemberData.admin,
+            member: memberDataMap?.[teamId]?.member || defaultMemberData.member,
+            owner: memberDataMap?.[teamId]?.owner || defaultMemberData.owner,
+          },
+        },
+      };
+    }
     case actionTypes.MEMBER_DATA_SUCCESS: {
-      const { role, page, data, total } = payload;
+      const { role, page, data, total, teamId } = payload;
+      const memberData = memberDataMap?.[teamId] || defaultMemberData;
       memberData[role] = {
         data: page === 1 ? data : [...(memberData[role]?.data || []), ...data],
         total,
@@ -209,7 +228,10 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       };
       return {
         ...state,
-        memberData: { ...memberData },
+        memberDataMap: {
+          ...memberDataMap,
+          [teamId]: memberData,
+        },
       };
     }
     case actionTypes.ACCEPT_TEAM_SUCCESS: {
@@ -366,16 +388,19 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             total: teamUserMap[currentTeamId]?.total + 1,
           },
         },
-        memberData: {
-          ...state.memberData,
-          member: {
-            ...state.memberData.member,
-            data: [
-              payload,
-              ...state.memberData.member.data.filter(
-                (el) => el.user_id !== payload.user_id
-              ),
-            ],
+        memberDataMap: {
+          ...memberDataMap,
+          [currentTeamId]: {
+            ...(memberDataMap[currentTeamId] || defaultMemberData),
+            member: {
+              ...(memberDataMap[currentTeamId]?.member || {}),
+              data: [
+                payload,
+                ...(memberDataMap[currentTeamId]?.member?.data || []).filter(
+                  (el) => el.user_id !== payload.user_id
+                ),
+              ],
+            },
           },
         },
       };
@@ -663,26 +688,6 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         lastChannel: {
           ...lastChannel,
           [payload.team.team_id]: channel,
-        },
-        memberData: state.memberData || {
-          admin: {
-            data: [],
-            total: 0,
-            canMore: false,
-            currentPage: 1,
-          },
-          owner: {
-            data: [],
-            total: 0,
-            canMore: false,
-            currentPage: 1,
-          },
-          member: {
-            data: [],
-            total: 0,
-            canMore: false,
-            currentPage: 1,
-          },
         },
         apiTeamController: null,
       };
@@ -972,24 +977,27 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
             total: teamUserMap[payload.teamId]?.total - 1,
           },
         },
-        memberData: {
-          member: {
-            ...memberData.member,
-            data: memberData.member.data.filter(
-              (el) => el.user_id !== payload.userId
-            ),
-          },
-          admin: {
-            ...memberData.admin,
-            data: memberData.admin.data.filter(
-              (el) => el.user_id !== payload.userId
-            ),
-          },
-          owner: {
-            ...memberData.owner,
-            data: memberData.owner.data.filter(
-              (el) => el.user_id !== payload.userId
-            ),
+        memberDataMap: {
+          ...memberDataMap,
+          [payload.teamId]: {
+            member: {
+              ...(memberDataMap[payload.teamId].member || {}),
+              data: (memberDataMap[payload.teamId].member.data || []).filter(
+                (el) => el.user_id !== payload.userId
+              ),
+            },
+            admin: {
+              ...(memberDataMap[payload.teamId].admin || {}),
+              data: (memberDataMap[payload.teamId].admin.data || []).filter(
+                (el) => el.user_id !== payload.userId
+              ),
+            },
+            owner: {
+              ...(memberDataMap[payload.teamId].owner || {}),
+              data: (memberDataMap[payload.teamId].owner.data || []).filter(
+                (el) => el.user_id !== payload.userId
+              ),
+            },
           },
         },
       };

@@ -131,7 +131,13 @@ export const getMemberData =
     if (res.success) {
       dispatch({
         type: ActionTypes.MEMBER_DATA_SUCCESS,
-        payload: { role, page, data: res.data, total: res.metadata?.total },
+        payload: {
+          role,
+          page,
+          data: res.data,
+          total: res.metadata?.total,
+          teamId,
+        },
       });
     } else {
       dispatch({
