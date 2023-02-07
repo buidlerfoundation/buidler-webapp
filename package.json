@@ -17,6 +17,7 @@
     "@walletconnect/client": "^1.7.8",
     "@walletconnect/qrcode-modal": "^1.7.8",
     "@web3auth/modal": "^4.2.3",
+    "copy-image-clipboard": "^2.1.2",
     "core-js": "^3.22.6",
     "crypto": "^1.0.1",
     "crypto-js": "3.1.9-1",
