@@ -384,14 +384,19 @@ class SocketUtil {
       const { userData } = store.getState().user;
       if (data.post?.task_id) {
         const currentChannel = getCurrentChannel();
-        store.dispatch({
-          type: actionTypes.UPDATE_TASK_REQUEST,
-          payload: {
-            taskId: data.post?.task_id,
-            data: { total_unread_notifications: 1 },
-            channelId: currentChannel.channel_id,
-          },
-        });
+        const postId = getPostId();
+        if (postId === data.post?.task_id) {
+          this.emitSeenPost(postId);
+        } else {
+          store.dispatch({
+            type: actionTypes.UPDATE_TASK_REQUEST,
+            payload: {
+              taskId: data.post?.task_id,
+              data: { total_unread_notifications: 1 },
+              channelId: currentChannel.channel_id,
+            },
+          });
+        }
       }
       store.dispatch({
         type: actionTypes.RECEIVE_NOTIFICATION,
