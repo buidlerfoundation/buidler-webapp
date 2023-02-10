@@ -248,6 +248,9 @@
       background-color: var(--color-lighter-background);
       border: 1px solid var(--color-stroke);
     }
+    .title-button {
+      text-transform: capitalize;
+    }
   }
   .setting-label__wrap {
     display: flex;

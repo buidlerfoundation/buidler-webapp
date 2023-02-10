@@ -22,6 +22,7 @@ export type CreateChannelData = {
   emoji?: string | null;
   url?: string | null;
   isDeactivated?: boolean;
+  notificationType?: string;
 };
 
 export type CreateSpaceData = {

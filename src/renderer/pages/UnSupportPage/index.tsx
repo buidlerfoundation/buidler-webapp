@@ -1,10 +1,16 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import images from "renderer/common/images";
+import { BuidlerURL } from "renderer/helpers/LinkHelper";
 import "./index.scss";
 
 const UnSupportPage = () => {
+  useEffect(() => {
+    if (/iPhone/g.test(window.navigator.userAgent)) {
+      window.location.replace(`${BuidlerURL}/download/ios`);
+    }
+  }, []);
   const handleBackToHome = useCallback(() => {
-    window.location.replace("https://buidler.app/");
+    window.location.replace(BuidlerURL);
   }, []);
   return (
     <div className="un-support-page__container">
