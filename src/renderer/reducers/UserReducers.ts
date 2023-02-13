@@ -17,6 +17,7 @@ interface MemberRoleData {
   total: number;
   canMore: boolean;
   currentPage: number;
+  loadMore?: boolean;
 }
 
 interface UserReducerState {
@@ -217,6 +218,21 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         },
       };
     }
+    case actionTypes.MEMBER_DATA_MORE: {
+      const { role, teamId } = payload;
+      const memberData = memberDataMap?.[teamId] || defaultMemberData;
+      memberData[role] = {
+        ...memberData[role],
+        loadMore: true,
+      };
+      return {
+        ...state,
+        memberDataMap: {
+          ...memberDataMap,
+          [teamId]: memberData,
+        },
+      };
+    }
     case actionTypes.MEMBER_DATA_SUCCESS: {
       const { role, page, data, total, teamId } = payload;
       const memberData = memberDataMap?.[teamId] || defaultMemberData;
@@ -225,6 +241,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
         total,
         canMore: data.length === 50,
         currentPage: page,
+        loadMore: false,
       };
       return {
         ...state,

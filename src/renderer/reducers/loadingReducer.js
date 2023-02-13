@@ -15,7 +15,7 @@ const loadingReducers = (state = {}, action) => {
     // e.g. will be true when receiving *_REQUEST
     //      and false when receiving *_SUCCESS / *_FAIL
     [requestName]:
-      requestState === "REQUEST" || payload?.message?.includes("aborted"),
+      requestState === "REQUEST" || payload?.message?.includes?.("aborted"),
   };
 };
 
