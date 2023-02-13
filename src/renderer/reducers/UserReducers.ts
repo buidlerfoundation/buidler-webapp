@@ -981,8 +981,8 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
           ...memberDataMap,
           [payload.teamId]: {
             member: {
-              ...(memberDataMap[payload.teamId].member || {}),
-              data: (memberDataMap[payload.teamId].member.data || []).filter(
+              ...(memberDataMap[payload.teamId]?.member || {}),
+              data: (memberDataMap[payload.teamId]?.member.data || []).filter(
                 (el) => el.user_id !== payload.userId
               ),
             },
