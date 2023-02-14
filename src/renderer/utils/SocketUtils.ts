@@ -352,9 +352,19 @@ class SocketUtil {
     this.socket?.off("ON_NEW_NOTIFICATION");
     this.socket?.off("ON_READ_NOTIFICATION_IN_POST");
     this.socket?.off("ON_UPDATE_NOTIFICATION_CONFIG");
+    this.socket?.off("ON_UPDATE_NOTIFICATION_SETTING");
     this.socket?.off("disconnect");
   }
   listenSocket() {
+    this.socket?.on("ON_UPDATE_NOTIFICATION_SETTING", (data) => {
+      const { entity_id, entity_type, notification_type } = data;
+      if (entity_type === "channel") {
+        store.dispatch({
+          type: actionTypes.UPDATE_CHANNEL_SUCCESS,
+          payload: { channel_id: entity_id, notification_type },
+        });
+      }
+    });
     this.socket?.on("ON_UPDATE_NOTIFICATION_CONFIG", (data) => {
       store.dispatch({
         type: actionTypes.UPDATE_NOTIFICATION_CONFIG,

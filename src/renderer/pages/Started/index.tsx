@@ -53,10 +53,11 @@ const Started = () => {
       GlobalVariable.loginType = loginType;
       if (
         loginType === LoginType.Metamask ||
-        loginType === LoginType.WalletConnect
+        loginType === LoginType.WalletConnect ||
+        loginType === LoginType.Web3Auth
       ) {
         gaLoginSuccess(
-          loginType === LoginType.Metamask ? "MetaMask" : "WalletConnect"
+          loginType === LoginType.Metamask ? "MetaMask" : loginType
         );
       }
       dispatch({ type: actionTypes.UPDATE_CURRENT_TOKEN, payload: res?.token });
@@ -230,6 +231,9 @@ const Started = () => {
     if (!Web3AuthUtils.web3auth) return;
     const web3authProvider = await Web3AuthUtils.web3auth.connect();
     if (!web3authProvider) return;
+    // web3authProvider
+    //     ?.request({ method: "eth_private_key" })
+    //     .then((res) => console.log("XXX: ", res));
     Web3AuthUtils.provider = new ethers.providers.Web3Provider(
       web3authProvider
     );
