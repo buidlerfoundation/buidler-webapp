@@ -36,6 +36,7 @@ export const AsyncKey = {
   refreshTokenExpire: `${Prefix}_refresh_token_expire_key`,
   lastSyncChannelKey: `${Prefix}_last_sync_channel_key`,
   spaceToggleKey: `${Prefix}_space_toggle_key`,
+  isBackup: `${Prefix}_is_backup`,
 };
 
 export const ProgressStatus = [
