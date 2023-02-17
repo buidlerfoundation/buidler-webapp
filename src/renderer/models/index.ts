@@ -391,8 +391,11 @@ export interface NFTCollectionDataApi {
   external_url: string;
   symbol: string;
   network: string;
-  nft: Array<UserNFTCollection>;
+  nfts: Array<UserNFTCollection>;
   slug: string;
+  marketplaces: {
+    [key: string]: { marketplace: string; last_ingested_at: string };
+  };
 }
 
 export interface NFTAsset {
