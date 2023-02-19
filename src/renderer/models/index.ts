@@ -394,7 +394,13 @@ export interface NFTCollectionDataApi {
   nfts: Array<UserNFTCollection>;
   slug: string;
   marketplaces: {
-    [key: string]: { marketplace: string; last_ingested_at: string };
+    [key: string]: {
+      marketplace: string;
+      last_ingested_at: string;
+      name: string;
+      safelist_request_status: string;
+      slug: string;
+    };
   };
 }
 
