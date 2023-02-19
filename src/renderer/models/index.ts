@@ -383,7 +383,7 @@ export interface TransactionApiData {
 
 export interface NFTCollectionDataApi {
   name: string;
-  description: string;
+  description?: string;
   contract_address: string;
   token_type: string;
   image_url: string;
@@ -502,4 +502,25 @@ export type ChannelKeyApiData = {
   timestamp: number;
   updatedAt: string;
   user_id: string;
+};
+
+export type NFTDetailDataApi = {
+  _id: string;
+  contract_address: string;
+  token_id: string;
+  user_id: string;
+  name: string;
+  token_type: string;
+  image_url: string;
+  background_image_url: string;
+  network: string;
+  attributes: {
+    _id: string;
+    contract_address: string;
+    token_id: string;
+    trait_type: string;
+    value: string;
+    network: string;
+  }[];
+  collection: NFTCollectionDataApi;
 };

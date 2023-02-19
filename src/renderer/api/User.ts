@@ -8,6 +8,7 @@ import {
   ENSAsset,
   InitialApiData,
   NFTCollectionDataApi,
+  NFTDetailDataApi,
   NotificationData,
   NotificationFilterType,
   Space,
@@ -16,7 +17,6 @@ import {
   TokenPrice,
   TransactionApiData,
   UserData,
-  UserNFTCollection,
   UserRoleType,
 } from "renderer/models";
 import { ConfigNotificationRequestBody } from "renderer/models/request";
@@ -28,7 +28,8 @@ export const findUser = async () => {
   return Caller.get<UserData>("user");
 };
 
-export const findTeam = () => Caller.get<Community[]>("user/team?include_direct=1");
+export const findTeam = () =>
+  Caller.get<Community[]>("user/team?include_direct=1");
 
 export const getGroupChannel = (teamId: string) =>
   Caller.get(`group/${teamId}`);
@@ -98,7 +99,7 @@ export const acceptInvitation = (invitationId: string) =>
 export const removeDevice = (body: any) => Caller.delete("user/device", body);
 
 export const getNFTCollection = () =>
-  Caller.get<Array<UserNFTCollection>>("user/nft-collection");
+  Caller.get<Array<NFTCollectionDataApi>>("user/nft-collection");
 
 export const getSpaceCondition = (spaceId: string) =>
   Caller.get<Array<SpaceCollectionData>>(`space/${spaceId}/condition`);
@@ -218,3 +219,17 @@ export const configNotificationFromTask = (
   pinPostId: string,
   data: ConfigNotificationRequestBody
 ) => Caller.post(`notifications/task/${pinPostId}`, data);
+
+export const getNFTsDetails = (
+  contractAddresses: string[],
+  tokenIds: string[],
+  networks: string[]
+) => {
+  let uri = "user/nft?";
+  contractAddresses.forEach(
+    (address) => (uri += `contract_addresses[]=${address}&`)
+  );
+  tokenIds.forEach((id) => (uri += `token_ids[]=${id}&`));
+  networks.forEach((network) => (uri += `networks[]=${network}&`));
+  return Caller.get<NFTDetailDataApi[]>(uri);
+};
