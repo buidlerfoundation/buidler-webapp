@@ -158,7 +158,7 @@ export const getMembersByRole = (
   } = {}
 ) => {
   const { userName, page } = params;
-  let url = `team/${teamId}/role?page=${page || 1}&limit=50`;
+  let url = `team/${teamId}/role?page=${page || 1}&limit=80`;
   roles.forEach((el) => {
     url += `&roles[]=${el}`;
   });
