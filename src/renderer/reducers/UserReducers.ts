@@ -239,7 +239,7 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       memberData[role] = {
         data: page === 1 ? data : [...(memberData[role]?.data || []), ...data],
         total,
-        canMore: data.length === 80,
+        canMore: data.length === 100,
         currentPage: page,
         loadMore: false,
       };
