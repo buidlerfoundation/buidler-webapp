@@ -1,5 +1,27 @@
 import images from "../common/images";
 
+export const nftMenu = [
+  {
+    label: "Set as profile picture",
+    value: "Set as profile picture",
+  },
+  // {
+  //   label: "Save photo",
+  //   value: "Save photo",
+  // },
+];
+
+export const ensMenu = [
+  {
+    label: "Set as username",
+    value: "Set as username",
+  },
+  // {
+  //   label: "Save photo",
+  //   value: "Save photo",
+  // },
+];
+
 export const spaceChannelMenu = [
   {
     label: "Create channel",
