@@ -14,7 +14,7 @@ export const getCollectibles: ActionCreator<any> =
           data: res.data?.nft_assets?.map((el) => {
             return {
               ...el,
-              nft: el.nfts.map((nftItem) => ({
+              nfts: el.nfts.map((nftItem) => ({
                 ...nftItem,
                 nft_collection: {
                   ...(nftItem.nft_collection || {}),
