@@ -76,13 +76,13 @@ export const totalBalanceUSD = (userBalance?: BalanceApiData | null) => {
   let res = formatUSDValue({
     value: ETH.balance,
     decimal: ETH.contract.decimals,
-    price: ETH.price?.rate,
+    price: ETH.price?.current_price,
   });
   tokens.forEach((el) => {
     res += formatUSDValue({
       value: el.balance,
       decimal: el.contract.decimals,
-      price: el.price?.rate,
+      price: el.price?.current_price,
     });
   });
   return res;

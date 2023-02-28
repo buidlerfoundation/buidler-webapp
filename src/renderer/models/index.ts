@@ -329,21 +329,15 @@ export interface Contract {
   owner: string;
   is_potential: boolean;
   logo_url: string;
+  is_supported: boolean;
+  logo: string;
+  network: string;
 }
 
 export interface TokenPrice {
-  rate: number;
-  diff?: number;
-  diff1h?: number;
-  diff7d?: number;
-  diff30d?: number;
-  diff60d?: number;
-  diff90d?: number;
-  marketCapUsd?: number;
-  volume24h?: number;
-  availableSupply?: number;
-  ts?: string;
-  currency?: string;
+  current_price: number;
+  id: string;
+  image: string;
 }
 
 export interface Token {
