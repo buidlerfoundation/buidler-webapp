@@ -328,7 +328,6 @@ export interface Contract {
   totalSupply: string;
   owner: string;
   is_potential: boolean;
-  logo_url: string;
   is_supported: boolean;
   logo: string;
   network: string;
@@ -348,8 +347,8 @@ export interface Token {
 
 export interface BalanceApiData {
   address: string;
-  ETH: Token;
   tokens: Array<Token>;
+  coins: Array<Token>;
 }
 
 export interface TransactionApiData {
