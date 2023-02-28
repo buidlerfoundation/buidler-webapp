@@ -1,97 +1,52 @@
-import { ethers, utils } from 'ethers';
-import EthCrypto from 'eth-crypto';
-import { getCookie, setCookie } from 'renderer/common/Cookie';
-import { AsyncKey } from 'renderer/common/AppConfig';
-import store from 'renderer/store';
-import { uniqBy } from 'lodash';
-
-const testData = {
-  'cc388ba9-bdee-44af-849e-4cc1b670b2b2': [
-    {
-      key: '{"iv":"099cfdb2852b525920220b1880d0922c","ephemPublicKey":"04a13cbbc47af728862e6061a8c091f267194ae4eee7dae556322bbec25e183381c5360e3f94a28b9d83dd889a7c78dfe73614bb575e4f8e9bff327aaa6c3810b2","ciphertext":"03151cf3164ea30fbc79362511260c5d207c2ff199690044110750bd8061b0ee89d1bb258776dbbcc9f892e7242e9233ec4c420bfa29b4f63ad5a4804b50f46a44d40ec4e6f444461a25ff06732b133a","mac":"013584bd513e19604b5fcdd599e22eb79843152f7dca1ef48a8a2b6e0f413db1"}',
-      timestamp: 1649670068309,
-    },
-    {
-      key: '{"iv":"099cfdb2852b525920220b1880d0922c","ephemPublicKey":"04a13cbbc47af728862e6061a8c091f267194ae4eee7dae556322bbec25e183381c5360e3f94a28b9d83dd889a7c78dfe73614bb575e4f8e9bff327aaa6c3810b2","ciphertext":"03151cf3164ea30fbc79362511260c5d207c2ff199690044110750bd8061b0ee89d1bb258776dbbcc9f892e7242e9233ec4c420bfa29b4f63ad5a4804b50f46a44d40ec4e6f444461a25ff06732b133a","mac":"013584bd513e19604b5fcdd599e22eb79843152f7dca1ef48a8a2b6e0f413db1"}',
-      timestamp: 1649670068309,
-    },
-  ],
-  'aa3532a9-ab39-4dc5-b167-29ef3da2fdef': [
-    {
-      key: '{"iv":"099cfdb2852b525920220b1880d0922c","ephemPublicKey":"04a13cbbc47af728862e6061a8c091f267194ae4eee7dae556322bbec25e183381c5360e3f94a28b9d83dd889a7c78dfe73614bb575e4f8e9bff327aaa6c3810b2","ciphertext":"03151cf3164ea30fbc79362511260c5d207c2ff199690044110750bd8061b0ee89d1bb258776dbbcc9f892e7242e9233ec4c420bfa29b4f63ad5a4804b50f46a44d40ec4e6f444461a25ff06732b133a","mac":"013584bd513e19604b5fcdd599e22eb79843152f7dca1ef48a8a2b6e0f413db1"}',
-      timestamp: 1649670068309,
-    },
-    {
-      key: '{"iv":"099cfdb2852b525920220b1880d0922c","ephemPublicKey":"04a13cbbc47af728862e6061a8c091f267194ae4eee7dae556322bbec25e183381c5360e3f94a28b9d83dd889a7c78dfe73614bb575e4f8e9bff327aaa6c3810b2","ciphertext":"03151cf3164ea30fbc79362511260c5d207c2ff199690044110750bd8061b0ee89d1bb258776dbbcc9f892e7242e9233ec4c420bfa29b4f63ad5a4804b50f46a44d40ec4e6f444461a25ff06732b133a","mac":"013584bd513e19604b5fcdd599e22eb79843152f7dca1ef48a8a2b6e0f413db1"}',
-      timestamp: 1649670068309,
-    },
-  ],
-  'd1489ab6-08b5-4319-a728-b3b29a408de0': [
-    {
-      key: '{"iv":"099cfdb2852b525920220b1880d0922c","ephemPublicKey":"04a13cbbc47af728862e6061a8c091f267194ae4eee7dae556322bbec25e183381c5360e3f94a28b9d83dd889a7c78dfe73614bb575e4f8e9bff327aaa6c3810b2","ciphertext":"03151cf3164ea30fbc79362511260c5d207c2ff199690044110750bd8061b0ee89d1bb258776dbbcc9f892e7242e9233ec4c420bfa29b4f63ad5a4804b50f46a44d40ec4e6f444461a25ff06732b133a","mac":"013584bd513e19604b5fcdd599e22eb79843152f7dca1ef48a8a2b6e0f413db1"}',
-      timestamp: 1649670068309,
-    },
-    {
-      key: '{"iv":"099cfdb2852b525920220b1880d0922c","ephemPublicKey":"04a13cbbc47af728862e6061a8c091f267194ae4eee7dae556322bbec25e183381c5360e3f94a28b9d83dd889a7c78dfe73614bb575e4f8e9bff327aaa6c3810b2","ciphertext":"03151cf3164ea30fbc79362511260c5d207c2ff199690044110750bd8061b0ee89d1bb258776dbbcc9f892e7242e9233ec4c420bfa29b4f63ad5a4804b50f46a44d40ec4e6f444461a25ff06732b133a","mac":"013584bd513e19604b5fcdd599e22eb79843152f7dca1ef48a8a2b6e0f413db1"}',
-      timestamp: 1649670068309,
-    },
-  ],
-};
+import { getCookie, setCookie } from "renderer/common/Cookie";
+import { AsyncKey } from "renderer/common/AppConfig";
+import store from "renderer/store";
+import { uniqBy } from "lodash";
+import { decrypt, encrypt } from "eciesjs";
+import CryptoJS from "crypto-js";
+import api from "renderer/api";
+import { Channel, UserData } from "renderer/models";
+import { getUniqueId } from "./GenerateUUID";
 
 export const encryptMessage = async (str: string, key: string) => {
-  const pubKey = utils.computePublicKey(key, true);
-  const res = await EthCrypto.encryptWithPublicKey(pubKey.slice(2), str);
-  return JSON.stringify(res);
+  return CryptoJS.AES.encrypt(str, key).toString();
 };
 
 export const decryptMessage = async (str: string, key: string) => {
-  try {
-    const res = await EthCrypto.decryptWithPrivateKey(key, JSON.parse(str));
-    return res;
-  } catch (error) {
-    return null;
-  }
+  return CryptoJS.AES.decrypt(str, key).toString(CryptoJS.enc.Utf8);
 };
 
-const memberData = async (
-  member: any,
-  privateKey: string,
-  timestamp: number
-) => {
-  const key = await EthCrypto.encryptWithPublicKey(
-    member.user_id.slice(2),
-    privateKey
+const memberData = async (member: UserData, key: string, timestamp: number) => {
+  const encryptedKey = encrypt(member.user_id, Buffer.from(key)).toString(
+    "hex"
   );
   return {
-    key: JSON.stringify(key),
+    key: encryptedKey,
     timestamp,
     user_id: member.user_id,
   };
 };
 
 export const createMemberChannelData = async (members: Array<any>) => {
-  const { privateKey } = ethers.Wallet.createRandom();
-  const timestamp = new Date().getTime();
-  const req = members.map((el) => memberData(el, privateKey, timestamp));
+  const uuid = getUniqueId();
+  const timestamp = Math.round(new Date().getTime() / 1000);
+  const req = members.map((el) => memberData(el, uuid, timestamp));
   const res = await Promise.all(req);
-  return { res, privateKey };
+  return { res, uuid };
 };
 
 export const getChannelPrivateKey = async (
   encrypted: string,
   privateKey: string
 ) => {
-  const res = await EthCrypto.decryptWithPrivateKey(
-    privateKey,
-    JSON.parse(encrypted)
-  );
+  const res = decrypt(privateKey, Buffer.from(encrypted, "hex")).toString();
   return res;
 };
 
 export const getRawPrivateChannel = async () => {
   const current = await getCookie(AsyncKey.channelPrivateKey);
   let res: any = {};
-  if (typeof current === 'string') {
+  if (typeof current === "string") {
     res = JSON.parse(current);
   }
   return res;
@@ -104,42 +59,52 @@ export const storePrivateChannel = async (
 ) => {
   const current = await getCookie(AsyncKey.channelPrivateKey);
   let res: any = {};
-  if (typeof current === 'string') {
+  if (typeof current === "string") {
     res = JSON.parse(current);
   }
   res[channelId] = uniqBy(
     [...(res?.[channelId] || []), { key, timestamp }],
-    'key'
+    "key"
   );
   setCookie(AsyncKey.channelPrivateKey, JSON.stringify(res));
 };
 
 const decryptPrivateChannel = async (item: any, privateKey: string) => {
-  const key = await getChannelPrivateKey(item.key, privateKey);
+  const { channelId, key, timestamp } = item;
+  const decryptedKey = decrypt(privateKey, Buffer.from(key || "", "hex"));
   return {
-    key,
-    timestamp: item.timestamp,
-    channelId: item.channelId,
+    key: decryptedKey.toString(),
+    timestamp,
+    channelId,
   };
 };
 
 export const getPrivateChannel = async (privateKey: string) => {
-  const current = await getCookie(AsyncKey.channelPrivateKey);
-  // const current = JSON.stringify(testData);
-  let dataLocal: any = {};
-  if (typeof current === 'string') {
-    dataLocal = JSON.parse(current);
-  } else {
-    return {};
+  const timestamp = Math.round(new Date().getTime() / 1000);
+  let lastSyncChannel = "0";
+  const lastSyncChannelKey = await getCookie(AsyncKey.lastSyncChannelKey);
+  if (typeof lastSyncChannelKey === "string") {
+    lastSyncChannel = lastSyncChannelKey;
   }
-  let req: Array<any> = [];
-  Object.keys(dataLocal).forEach((k) => {
-    req = [
-      ...req,
-      ...(dataLocal?.[k]?.map?.((el: any) => ({ channelId: k, ...el })) || []),
-    ];
-  });
-  req = req.map((el) => decryptPrivateChannel(el, privateKey));
+  const channelKeyRes = await api.getChannelKey(lastSyncChannel);
+  const syncChannelKey =
+    channelKeyRes.data?.map((el) => ({
+      channelId: el.channel_id,
+      key: el.key,
+      timestamp: el.timestamp,
+    })) || [];
+  const current = await getCookie(AsyncKey.channelPrivateKey);
+  let dataLocal: any = { data: [] };
+  if (typeof current === "string") {
+    dataLocal = JSON.parse(current);
+  }
+  dataLocal = uniqBy([...dataLocal.data, ...syncChannelKey], "key");
+  await setCookie(
+    AsyncKey.channelPrivateKey,
+    JSON.stringify({ data: dataLocal })
+  );
+  await setCookie(AsyncKey.lastSyncChannelKey, timestamp.toString());
+  const req = dataLocal.map((el) => decryptPrivateChannel(el, privateKey));
   const res = await Promise.all(req);
   return res.reduce((result, val) => {
     const { channelId, key, timestamp } = val;
@@ -154,62 +119,68 @@ export const getPrivateChannel = async (privateKey: string) => {
   }, {});
 };
 
-export const normalizeMessageItem = async (
-  item: any,
-  key: string,
-  channelId?: string
-) => {
-  const content = await decryptMessage(item.content, key);
-  const plain_text = await decryptMessage(item.plain_text, key);
-  if (item?.conversation_data?.length > 0) {
-    if (channelId) {
-      item.conversation_data = await normalizeMessageData(
-        item.conversation_data,
-        channelId
-      );
-    } else {
-      item.conversation_data = await normalizePublicMessageData(
-        item.conversation_data
-      );
-    }
+export const normalizePublicMessageItem = (item: any, key: string) => {
+  const content = item.content
+    ? CryptoJS.AES.decrypt(item.content, key).toString(CryptoJS.enc.Utf8)
+    : "";
+  if (item?.conversation_data) {
+    item.conversation_data = normalizePublicMessageItem(
+      item.conversation_data,
+      key
+    );
   }
   return {
     ...item,
     content,
-    plain_text,
   };
 };
 
-export const normalizePublicMessageData = async (messages: Array<any>) => {
-  const configs: any = store.getState()?.configs;
-  const { privateKey } = configs;
-  const req =
-    messages?.map?.((el) => normalizeMessageItem(el, privateKey)) || [];
-  const res = await Promise.all(req);
-  return res.filter((el) => !!el.content || el?.message_attachment?.length > 0);
-};
-
-export const normalizeMessageData = async (
-  messages: Array<any>,
+export const normalizeMessageItem = async (
+  item: any,
+  key: string,
   channelId: string
 ) => {
-  const configs: any = store.getState()?.configs;
-  const { channelPrivateKey } = configs;
-  const keys = channelPrivateKey?.[channelId] || [];
-  if (keys?.length === 0) return [];
-  const req =
-    messages?.map?.((el) =>
-      normalizeMessageItem(
-        el,
-        findKey(keys, new Date(el.createdAt).getTime()).key,
-        channelId
-      )
-    ) || [];
-  const res = await Promise.all(req);
-  return res.filter((el) => !!el.content || el?.message_attachment?.length > 0);
+  let content = "";
+  try {
+    content = item.content
+      ? CryptoJS.AES.decrypt(item.content, key).toString(CryptoJS.enc.Utf8)
+      : "";
+  } catch (error) {
+    console.log(error);
+  }
+  if (item?.conversation_data) {
+    item.conversation_data = await normalizeMessageItem(
+      item.conversation_data,
+      key,
+      channelId
+    );
+  }
+  return {
+    ...item,
+    content,
+  };
 };
 
-const findKey = (keys: Array<any>, created: number) => {
+export const normalizePublicMessageData = (
+  messages?: Array<any>,
+  encryptMessageKey?: string
+) => {
+  const configs: any = store.getState()?.configs;
+  const { privateKey } = configs;
+  const decryptMessageKey = decrypt(
+    privateKey,
+    Buffer.from(encryptMessageKey || "", "hex")
+  );
+  const res =
+    messages?.map?.((el) =>
+      normalizePublicMessageItem(el, decryptMessageKey.toString())
+    ) || [];
+  return res.filter(
+    (el) => !!el.content || el?.message_attachments?.length > 0
+  );
+};
+
+export const findKey = (keys: Array<any>, created: number) => {
   return keys.find((el) => {
     if (el.expire) {
       return el.timestamp <= created && el.expire >= created;
@@ -218,22 +189,54 @@ const findKey = (keys: Array<any>, created: number) => {
   });
 };
 
+export const normalizeMessageData = async (
+  messages: Array<any>,
+  channelId: string
+) => {
+  const configs = store.getState()?.configs;
+  const { channelPrivateKey } = configs;
+  const keys = channelPrivateKey?.[channelId] || [];
+  if (keys.length === 0) return [];
+  const req = messages.map((el) =>
+    normalizeMessageItem(
+      el,
+      findKey(keys, Math.round(new Date(el.createdAt).getTime() / 1000)).key,
+      channelId
+    )
+  );
+  const res = await Promise.all(req);
+  return res.filter(
+    (el) => !!el.content || el?.message_attachments?.length > 0
+  );
+};
+
 export const uniqChannelPrivateKey = async () => {
   const current = await getCookie(AsyncKey.channelPrivateKey);
   let dataLocal: any = {};
-  if (typeof current === 'string') {
+  if (typeof current === "string") {
     dataLocal = JSON.parse(current);
     const newObj: any = {};
     Object.keys(dataLocal).forEach((k) => {
-      newObj[k] = uniqBy(dataLocal[k], 'key');
+      newObj[k] = uniqBy(dataLocal[k], "key");
     });
     setCookie(AsyncKey.channelPrivateKey, JSON.stringify(newObj));
   }
 };
 
 export const spaceNameToAvatar = (name: string) => {
-  if (!name.trim()) return 'B';
-  const split = name.trim().split(' ');
+  if (!name.trim()) return "B";
+  const split = name.trim().split(" ");
   if (split.length > 1) return `${split[0].charAt(0)}${split[1].charAt(0)}`;
   return `${split[0].charAt(0)}`;
+};
+
+export const validateUUID = (id: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    id
+  );
+
+export const sortChannel = (v1: Channel, v2: Channel) => {
+  if ((v1.updatedAt || "") > (v2.updatedAt || "")) return -1;
+  if ((v1.updatedAt || "") < (v2.updatedAt || "")) return 1;
+  return 0;
 };

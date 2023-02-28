@@ -1,16 +1,19 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
+import toast from "react-hot-toast";
 import { useHistory } from "react-router-dom";
-import {
-  deleteChannel,
-  setCurrentChannel,
-  updateChannel,
-} from "renderer/actions/UserActions";
+import { deleteChannel, updateChannel } from "renderer/actions/UserActions";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
-import useAppSelector from "renderer/hooks/useAppSelector";
 import useChannel from "renderer/hooks/useChannel";
+import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
 import { Channel } from "renderer/models";
-import { GAAction, GACategory } from "renderer/services/analytics/GAEventName";
-import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
+import IconLimitChat from "renderer/shared/SVG/IconLimitChat";
+import SwitchButton from "renderer/shared/SwitchButton";
 import api from "../../../../api";
 import images from "../../../../common/images";
 import AppInput from "../../../../shared/AppInput";
@@ -22,20 +25,33 @@ type SettingChannelProps = {
   currentChannel?: Channel;
   onClose: () => void;
   isActiveName: boolean;
+  isActiveNotification: boolean;
+  isOwner?: boolean;
 };
 
 const SettingChannel = ({
   currentChannel,
   onClose,
   isActiveName,
+  isActiveNotification,
+  isOwner,
 }: SettingChannelProps) => {
+  const buttonNotificationRef = useRef<any>();
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const currentTeam = useAppSelector((state) => state.user.currentTeam);
+  const currentTeam = useCurrentCommunity();
   const channels = useChannel();
+  const [limitChat, setLimitChat] = useState(false);
   const [isOpenConfirm, setOpenConfirm] = useState(false);
   const [currentName, setCurrentName] = useState("");
   const [isOpenEditName, setOpenEditName] = useState(false);
+  const [currentNotificationType, setNotificationType] = useState<string>();
+  useEffect(() => {
+    setLimitChat(!!currentChannel?.is_chat_deactivated);
+  }, [currentChannel?.is_chat_deactivated]);
+  useEffect(() => {
+    setNotificationType(currentChannel?.notification_type);
+  }, [currentChannel?.notification_type]);
   const handleSelectChannelType = useCallback(
     (item: PopoverItem) => {
       if (!currentChannel?.channel_id) return;
@@ -57,6 +73,11 @@ const SettingChannel = ({
     []
   );
   useEffect(() => {
+    if (isActiveNotification) {
+      buttonNotificationRef.current?.show();
+    }
+  }, [isActiveNotification]);
+  useEffect(() => {
     if (isActiveName) {
       setOpenEditName(true);
     }
@@ -66,34 +87,41 @@ const SettingChannel = ({
   }, [currentChannel?.channel_name, isOpenEditName]);
   const handleSave = useCallback(async () => {
     if (!currentChannel?.channel_id) return;
+    if (!currentName) {
+      toast.error("Channel name cannot be empty");
+      return;
+    }
     const success = await dispatch(
       updateChannel(currentChannel.channel_id, {
         channel_name: currentName,
       })
     );
     if (!!success) {
-      GoogleAnalytics.event({
-        category: GACategory.CHANNEL,
-        action: GAAction.EDIT_CHANNEL_NAME,
-      });
       toggleEditName();
     }
   }, [currentChannel?.channel_id, currentName, toggleEditName, dispatch]);
+  const onLimitChatChange = useCallback(
+    (active) => {
+      if (!currentChannel?.channel_id) return;
+      dispatch(
+        updateChannel(currentChannel?.channel_id, {
+          is_chat_deactivated: active,
+        })
+      );
+      setLimitChat(active);
+    },
+    [currentChannel?.channel_id, dispatch]
+  );
   const handleSelectMenu = useCallback(
     async (item: PopoverItem) => {
       if (!currentChannel?.channel_id) return;
-      await api.updateChannelNotification(
-        currentChannel.channel_id,
-        item.value
-      );
-      dispatch(
-        setCurrentChannel?.({
-          ...currentChannel,
-          notification_type: item.value,
-        })
-      );
+      const notification_type: any = item.value;
+      await api.updateChannelNotification(currentChannel.channel_id, {
+        notification_type,
+      });
+      setNotificationType(item.value);
     },
-    [currentChannel, dispatch]
+    [currentChannel]
   );
   const handleToggleModalDelete = useCallback(
     () => setOpenConfirm((current) => !current),
@@ -118,10 +146,6 @@ const SettingChannel = ({
       deleteChannel(currentChannel.channel_id, currentTeam.team_id)
     );
     if (!!success) {
-      GoogleAnalytics.event({
-        category: GACategory.CHANNEL,
-        action: GAAction.DELETE,
-      });
       history.replace(`/channels/${currentTeam.team_id}/${nextChannelId}`);
       setOpenConfirm(false);
       onClose();
@@ -163,14 +187,16 @@ const SettingChannel = ({
           />
         </div>
       )}
-      <div
-        className="setting-item normal-button"
-        style={{ marginTop: 12 }}
-        onClick={toggleEditName}
-      >
-        <img src={images.icSettingChannelEdit} alt="" />
-        <span className="setting-label">Edit channel name</span>
-      </div>
+      {isOwner && (
+        <div
+          className="setting-item normal-button"
+          style={{ marginTop: 12 }}
+          onClick={toggleEditName}
+        >
+          <img src={images.icSettingChannelEdit} alt="" />
+          <span className="setting-label">Edit channel name</span>
+        </div>
+      )}
       {isOpenEditName && (
         <div className="edit-name-input__wrapper">
           <AppInput
@@ -190,24 +216,39 @@ const SettingChannel = ({
           <img src={images.icSettingChannelNotification} alt="" />
           <span className="setting-label">Notification</span>
           <PopoverButton
-            title={currentChannel?.notification_type}
+            ref={buttonNotificationRef}
+            title={currentNotificationType}
             icon={images.icCollapse}
             data={[
-              { value: "Quiet", label: "Quiet" },
-              { value: "Alert", label: "Alert" },
-              { value: "Muted", label: "Muted" },
+              { value: "quiet", label: "Quiet" },
+              { value: "alert", label: "Alert" },
+              { value: "muted", label: "Muted" },
             ]}
             onSelected={handleSelectMenu}
           />
         </div>
       )}
-      <div
-        className="setting-item normal-button"
-        onClick={handleToggleModalDelete}
-      >
-        <img src={images.icSettingChannelDelete} alt="" />
-        <span className="setting-label">Delete channel</span>
-      </div>
+      {isOwner && (
+        <div className="setting-item" style={{ alignItems: "flex-start" }}>
+          <IconLimitChat />
+          <div className="setting-label__wrap">
+            <span className="setting-label">Limited channel</span>
+            <span className="setting-description">
+              Only owners and admins can send messages to this channel.
+            </span>
+          </div>
+          <SwitchButton active={limitChat} onChange={onLimitChatChange} />
+        </div>
+      )}
+      {isOwner && (
+        <div
+          className="setting-item normal-button"
+          onClick={handleToggleModalDelete}
+        >
+          <img src={images.icSettingChannelDelete} alt="" />
+          <span className="setting-label">Delete channel</span>
+        </div>
+      )}
       <ModalConfirmDeleteChannel
         open={isOpenConfirm}
         handleClose={handleToggleModalDelete}

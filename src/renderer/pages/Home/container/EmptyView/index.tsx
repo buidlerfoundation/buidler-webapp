@@ -2,6 +2,7 @@ import React, { useCallback, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { createTeam } from "renderer/actions/UserActions";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
+import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import ModalTeam from "../../../../shared/ModalTeam";
 import NormalButton from "../../../../shared/NormalButton";
 import "./index.scss";
@@ -25,6 +26,9 @@ const EmptyView = () => {
         })
       );
       if (res.statusCode === 200) {
+        GoogleAnalytics.tracking("Create Community Successful", {
+          category: "Add Community",
+        });
         history.replace(`/channels/${res.team_id}`);
         setOpenModalTeam(false);
       }

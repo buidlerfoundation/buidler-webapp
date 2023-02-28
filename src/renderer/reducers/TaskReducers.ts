@@ -1,8 +1,7 @@
-import moment from 'moment';
-import { AnyAction, Reducer } from 'redux';
-import { TaskData } from 'renderer/models';
-import actionTypes from '../actions/ActionTypes';
-import { isFilterStatus } from '../helpers/TaskHelper';
+import { AnyAction, Reducer } from "redux";
+import { TaskData } from "renderer/models";
+import actionTypes from "../actions/ActionTypes";
+import { sortPinPost } from "../helpers/TaskHelper";
 
 type TaskReducerState = {
   taskData: {
@@ -10,12 +9,19 @@ type TaskReducerState = {
       archivedCount: number;
       tasks: Array<TaskData>;
       archivedTasks: Array<TaskData>;
+      canMoreTask: boolean;
+      canMoreArchivedTask: boolean;
+      taskCount: number;
     };
   };
+  apiController?: AbortController | null;
+  pinPostDetail?: TaskData | null;
 };
 
 const initialState: TaskReducerState = {
   taskData: {},
+  apiController: null,
+  pinPostDetail: null,
 };
 
 const taskReducers: Reducer<TaskReducerState, AnyAction> = (
@@ -24,37 +30,142 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
-    case actionTypes.LOGOUT: {
+    case actionTypes.PP_DETAIL_SUCCESS: {
       return {
-        taskData: {},
+        ...state,
+        pinPostDetail: payload.data,
       };
     }
+    case actionTypes.DELETE_MESSAGE: {
+      const { entityType, channelId, currentChannelId } = payload;
+      let pinPostDetail = state.pinPostDetail;
+      const newTasks = state.taskData[currentChannelId]?.tasks;
+      if ((!newTasks && !pinPostDetail) || entityType !== "post") {
+        return {
+          ...state,
+        };
+      }
+      if (pinPostDetail && pinPostDetail?.task_id === channelId) {
+        pinPostDetail = {
+          ...pinPostDetail,
+          total_messages: `${
+            parseInt(pinPostDetail.total_messages || "0") - 1
+          }`,
+        };
+      }
+      return {
+        ...state,
+        taskData: {
+          ...state.taskData,
+          [currentChannelId]: {
+            ...state.taskData[currentChannelId],
+            tasks: newTasks?.map((el) => {
+              if (el.task_id === channelId) {
+                return {
+                  ...el,
+                  total_messages: `${parseInt(el.total_messages || "0") - 1}`,
+                };
+              }
+              return el;
+            }),
+          },
+        },
+        pinPostDetail,
+      };
+    }
+    case actionTypes.RECEIVE_MESSAGE: {
+      const { data, currentChannelId } = payload;
+      const newTasks = state.taskData[currentChannelId]?.tasks;
+      let pinPostDetail = state.pinPostDetail;
+      if ((!newTasks && !pinPostDetail) || data.entity_type !== "post") {
+        return {
+          ...state,
+        };
+      }
+      if (pinPostDetail && pinPostDetail?.task_id === data.entity_id) {
+        pinPostDetail = {
+          ...pinPostDetail,
+          total_messages: `${
+            parseInt(pinPostDetail.total_messages || "0") + 1
+          }`,
+          latest_reply_senders: [
+            data.sender_id,
+            ...(pinPostDetail.latest_reply_senders?.filter(
+              (uId) => uId !== data.sender_id
+            ) || []),
+          ],
+          latest_reply_message_at: data.createdAt,
+        };
+      }
+      return {
+        ...state,
+        taskData: {
+          ...state.taskData,
+          [currentChannelId]: {
+            ...state.taskData[currentChannelId],
+            tasks: newTasks?.map((el) => {
+              if (el.task_id === data.entity_id) {
+                return {
+                  ...el,
+                  total_messages: `${parseInt(el.total_messages || "0") + 1}`,
+                  latest_reply_senders: [
+                    data.sender_id,
+                    ...(el.latest_reply_senders?.filter(
+                      (uId) => uId !== data.sender_id
+                    ) || []),
+                  ],
+                  latest_reply_message_at: data.createdAt,
+                };
+              }
+              return el;
+            }),
+          },
+        },
+        pinPostDetail,
+      };
+    }
+    case actionTypes.LOGOUT: {
+      return initialState;
+    }
     case actionTypes.ARCHIVED_TASK_SUCCESS: {
-      const { channelId, res } = payload;
+      const { channelId, res, id, total } = payload;
       return {
         ...state,
         taskData: {
           ...state.taskData,
           [channelId]: {
             ...(state.taskData[channelId] || {}),
-            archivedTasks: res,
-            archivedCount: null,
+            archivedTasks: !id
+              ? res
+              : [...(state.taskData[channelId]?.archivedTasks || []), ...res],
+            canMoreArchivedTask: res.length === 10,
+            archivedCount: total,
           },
         },
+      };
+    }
+    case actionTypes.TASK_REQUEST: {
+      return {
+        ...state,
+        apiController: payload.controller,
       };
     }
     case actionTypes.TASK_SUCCESS: {
-      const { channelId, tasks, archivedCount } = payload;
+      const { channelId, tasks, id, total } = payload;
       return {
         ...state,
         taskData: {
           ...state.taskData,
           [channelId]: {
             ...(state.taskData[channelId] || {}),
-            tasks,
-            archivedCount,
+            tasks: !id
+              ? tasks
+              : [...(state.taskData[channelId]?.tasks || []), ...tasks],
+            canMoreTask: tasks.length === 10,
+            taskCount: total,
           },
         },
+        apiController: null,
       };
     }
     case actionTypes.DELETE_TASK_REQUEST: {
@@ -65,16 +176,21 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       const newArchivedTasks = archivedTasks
         ? archivedTasks.filter((t) => t.task_id !== taskId)
         : [];
-
+      let newPinPostDetail = state.pinPostDetail;
+      if (newPinPostDetail?.task_id === taskId) {
+        newPinPostDetail = null;
+      }
       return {
         ...state,
         taskData: {
           ...state.taskData,
           [channelId]: {
+            ...state.taskData[channelId],
             tasks: newTasks,
             archivedTasks: newArchivedTasks,
           },
         },
+        pinPostDetail: newPinPostDetail,
       };
     }
     case actionTypes.CREATE_TASK_SUCCESS: {
@@ -99,53 +215,28 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
       };
     }
     case actionTypes.UPDATE_TASK_REQUEST: {
-      const { taskId, data, channelId, direct_channel, channelUserId } =
-        payload;
+      const { taskId, data, channelId } = payload;
       if (!state.taskData[channelId]) return state;
-      const { tasks, archivedTasks, archivedCount } = state.taskData[channelId];
+      const { tasks, archivedTasks } = state.taskData[channelId];
       let newTasks = [...(tasks || [])];
       let newArchivedTasks = [...(archivedTasks || [])];
-      let newArchivedCount = archivedCount;
       const task =
         newTasks.find((t) => t.task_id === taskId) ||
         newArchivedTasks.find((t) => t.task_id === taskId);
+      if (data.task_id === state.pinPostDetail?.task_id) {
+        state.pinPostDetail = {
+          ...state.pinPostDetail,
+          ...data,
+        };
+      }
+      if (!data.channels) {
+        data.channels = task?.channels || [];
+      }
       const taskStatus = data?.status || task?.status;
-      const { channel } = data;
-      if (channelUserId && channelUserId === data.assignee_id) {
-        if (taskStatus === 'archived') {
-          if (newArchivedCount !== null) {
-            newArchivedCount += 1;
-          } else {
-            newArchivedTasks = newArchivedTasks.filter(
-              (t) => t.task_id !== taskId
-            );
-            newArchivedTasks.push({ ...task, ...data });
-          }
-        } else {
-          newTasks = newTasks.map((t) => {
-            if (t.task_id !== taskId) return t;
-            return { ...t, ...data };
-          });
-        }
-      } else if (
-        (!direct_channel &&
-          channel != null &&
-          !channel.find((c) => c.channel_id === channelId)) ||
-        (channelUserId && channelUserId !== data.assignee_id) ||
-        (direct_channel && (data.assignee_id || data.assignee_id === null))
-      ) {
+      if (taskStatus === "archived") {
         newTasks = newTasks.filter((t) => t.task_id !== taskId);
         newArchivedTasks = newArchivedTasks.filter((t) => t.task_id !== taskId);
-      } else if (taskStatus === 'archived') {
-        newTasks = newTasks.filter((t) => t.task_id !== taskId);
-        if (newArchivedCount !== null) {
-          newArchivedCount += 1;
-        } else {
-          newArchivedTasks = newArchivedTasks.filter(
-            (t) => t.task_id !== taskId
-          );
-          newArchivedTasks.push({ ...task, ...data });
-        }
+        newArchivedTasks.push({ ...task, ...data });
       } else {
         const archivedTask = newArchivedTasks.find((t) => t.task_id === taskId);
         if (archivedTask) {
@@ -163,93 +254,44 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
             return { ...t, ...data };
           });
         }
+        if (!data.channels.find((el) => el.channel_id === channelId)) {
+          newTasks = newTasks.filter((el) => el.task_id !== taskId);
+        } else if (!newTasks.find((el) => el.task_id === taskId)) {
+          newTasks.push(data);
+        }
       }
       return {
         ...state,
         taskData: {
           ...state.taskData,
           [channelId]: {
-            tasks: newTasks,
-            archivedCount: newArchivedCount,
-            archivedTasks: newArchivedTasks,
+            ...state.taskData[channelId],
+            tasks: newTasks.sort(sortPinPost),
+            archivedTasks: newArchivedTasks.sort(sortPinPost),
+            taskCount: newTasks.length,
+            archivedCount: newArchivedTasks.length,
           },
         },
       };
     }
     case actionTypes.DROP_TASK: {
       const { channelId, result, upVote } = payload;
-      const { source, destination, draggableId } = result;
-      const { tasks, archivedTasks, archivedCount } = state.taskData[channelId];
-      let newTasks = tasks;
-      let newArchivedTasks = archivedTasks;
-      let newArchivedCount = archivedCount;
-      if (!isFilterStatus(destination.droppableId)) {
-        const newDate = moment(destination.droppableId).format(
-          'YYYY-MM-DD HH:mm:ss.SSSZ'
-        );
-        if (source.droppableId === 'archived') {
-          const task: any = archivedTasks.find((t) => t.task_id === draggableId);
-          newArchivedTasks = archivedTasks.filter(
-            (t) => t.task_id !== draggableId
-          );
-          newTasks = [
-            { ...task, status: 'todo', due_date: newDate, up_votes: upVote },
-            ...tasks,
-          ];
-        } else {
-          newTasks = tasks.map((t) => {
-            if (t.task_id === draggableId) {
-              return {
-                ...t,
-                due_date: newDate,
-                up_votes: upVote,
-              };
-            }
-            return t;
-          });
-        }
-      } else {
-        const newStatus = destination.droppableId;
-        const oldStatus = source.droppableId;
-        if (newStatus === 'archived') {
-          const task: any = tasks.find((t) => t.task_id === draggableId);
-          newTasks = tasks.filter((t) => t.task_id !== draggableId);
-          if (archivedTasks != null) {
-            newArchivedTasks = [
-              { ...task, status: newStatus, up_votes: upVote },
-              ...archivedTasks,
-            ];
-          } else {
-            newArchivedCount = archivedCount + 1;
-          }
-        } else if (oldStatus === 'archived') {
-          const task: any = archivedTasks.find((t) => t.task_id === draggableId);
-          newArchivedTasks = archivedTasks.filter(
-            (t) => t.task_id !== draggableId
-          );
-          newTasks = [
-            { ...task, status: newStatus, up_votes: upVote },
-            ...tasks,
-          ];
-        } else {
-          newTasks = tasks.map((t) => {
-            if (t.task_id === draggableId) {
-              t.status = newStatus;
-              t.up_votes = upVote;
-            }
-            return t;
-          });
-        }
-      }
+      const { draggableId } = result;
+      const { tasks } = state.taskData[channelId];
       return {
         ...state,
         taskData: {
           ...state.taskData,
           [channelId]: {
             ...(state.taskData[channelId] || {}),
-            tasks: newTasks,
-            archivedTasks: newArchivedTasks,
-            archivedCount: newArchivedCount,
+            tasks: tasks
+              .map((el) => {
+                if (el.task_id === draggableId) {
+                  el.up_votes = upVote;
+                }
+                return el;
+              })
+              .sort(sortPinPost),
           },
         },
       };

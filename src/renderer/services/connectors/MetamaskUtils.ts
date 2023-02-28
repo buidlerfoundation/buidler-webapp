@@ -83,6 +83,34 @@ class MetamaskUtils {
       params: [transactionParameters],
     });
   };
+
+  sendERC721Transaction = async (sendData: SendData, from: string) => {
+    if (!window.ethereum?.selectedAddress) {
+      await window.ethereum?.request({
+        method: "eth_requestAccounts",
+      });
+    }
+    const inf = new utils.Interface(MinABI);
+    const transferData = inf.encodeFunctionData("transferFrom", [
+      from,
+      sendData.recipientAddress,
+      sendData.nft?.token_id,
+    ]);
+
+    const transactionParameters = {
+      gasPrice: sendData.gasPrice?.toHexString(),
+      gas: sendData.gasLimit.toHexString(),
+      to: sendData.nft?.contract_address,
+      from,
+      value: "0x00",
+      data: transferData,
+    };
+
+    return window.ethereum?.request({
+      method: "eth_sendTransaction",
+      params: [transactionParameters],
+    });
+  };
 }
 
 export default new MetamaskUtils();

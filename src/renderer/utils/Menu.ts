@@ -1,5 +1,27 @@
 import images from "../common/images";
 
+export const nftMenu = [
+  {
+    label: "Set as profile picture",
+    value: "Set as profile picture",
+  },
+  // {
+  //   label: "Save photo",
+  //   value: "Save photo",
+  // },
+];
+
+export const ensMenu = [
+  {
+    label: "Set as username",
+    value: "Set as username",
+  },
+  // {
+  //   label: "Save photo",
+  //   value: "Save photo",
+  // },
+];
+
 export const spaceChannelMenu = [
   {
     label: "Create channel",
@@ -68,6 +90,16 @@ export const channelMenu = [
     label: "Edit channel name",
     value: "Edit channel name",
     icon: images.icSettingChannelEdit,
+  },
+  {
+    label: "Channel setting",
+    value: "Channel setting",
+    icon: images.icCommunitySetting,
+  },
+  {
+    label: "Notification",
+    value: "Notification",
+    icon: images.icSettingChannelNotification,
   },
   {
     label: "Delete channel",

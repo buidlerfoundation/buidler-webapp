@@ -18,17 +18,25 @@ export const isNotFormat = (number: string | number) => {
   );
 };
 
-export const formatNumber = (number: string | number) => {
+export const formatNumber = (
+  number: string | number,
+  removeZero = true,
+  decimal = 5
+) => {
   if (!number) return "";
   const str = `${number}`.includes("e")
     ? number.toLocaleString("fullwide", { useGrouping: false })
     : `${number}`;
   if (str.includes(".")) {
     const splitted = str.split(".");
-    return `${numeral(splitted[0]).format("0,0")}.${splitted[1].substring(
+    const res = `${numeral(splitted[0]).format("0,0")}.${splitted[1].substring(
       0,
-      5
+      decimal
     )}`;
+    if (removeZero) {
+      return res.replace(/0*$/g, "");
+    }
+    return res;
   }
   return numeral(str).format("0,0");
 };

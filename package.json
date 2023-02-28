@@ -1,6 +1,6 @@
 {
   "name": "buidler-web",
-  "version": "1.8.1",
+  "version": "2.2.6",
   "private": true,
   "dependencies": {
     "@date-io/date-fns": "1.3.13",
@@ -16,16 +16,21 @@
     "@types/react-dom": "^18.0.0",
     "@walletconnect/client": "^1.7.8",
     "@walletconnect/qrcode-modal": "^1.7.8",
+    "@web3auth/modal": "^4.2.3",
+    "copy-image-clipboard": "^2.1.2",
     "core-js": "^3.22.6",
     "crypto": "^1.0.1",
     "crypto-js": "3.1.9-1",
     "date-fns": "^2.28.0",
     "dotenv": "^16.0.1",
+    "eciesjs": "^0.3.15",
     "emoji-mart": "3.0.1",
     "eth-crypto": "^2.3.0",
+    "ethereum-blockies-base64": "^1.0.2",
     "ethereum-blockies-png": "^0.1.3",
     "ethers": "^5.6.7",
     "fast-average-color": "^7.1.0",
+    "firebase": "^9.14.0",
     "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
     "mixpanel-browser": "^2.45.0",
@@ -33,7 +38,7 @@
     "numeral": "^2.0.6",
     "react": "^18.1.0",
     "react-app-polyfill": "^3.0.0",
-    "react-beautiful-dnd": "^13.1.0",
+    "react-beautiful-dnd": "^13.1.1",
     "react-contenteditable": "^3.3.6",
     "react-dom": "^18.1.0",
     "react-dropzone": "11.3.2",
@@ -47,7 +52,7 @@
     "redux": "^4.2.0",
     "redux-thunk": "^2.4.1",
     "sass": "^1.52.1",
-    "socket.io-client": "3.1.2",
+    "socket.io-client": "4.5.1",
     "stream": "^0.0.2",
     "typescript": "^4.4.2",
     "uuid": "^8.3.2",
@@ -67,14 +72,18 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "chrome >= 67",
+      "edge >= 79",
+      "firefox >= 68",
+      "opera >= 54",
+      "safari >= 14"
     ],
     "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      "chrome >= 67",
+      "edge >= 79",
+      "firefox >= 68",
+      "opera >= 54",
+      "safari >= 14"
     ]
   },
   "resolutions": {

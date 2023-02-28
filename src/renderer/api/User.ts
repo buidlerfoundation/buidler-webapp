@@ -1,57 +1,76 @@
+import { DirectCommunity } from "renderer/common/AppConfig";
 import {
   BalanceApiData,
   Channel,
   CollectibleDataApi,
   Community,
   Contract,
+  ENSAsset,
   InitialApiData,
   NFTCollectionDataApi,
+  NFTDetailDataApi,
+  NotificationData,
+  NotificationFilterType,
   Space,
   SpaceCollectionData,
   Token,
   TokenPrice,
   TransactionApiData,
   UserData,
-  UserNFTCollection,
   UserRoleType,
 } from "renderer/models";
-import ApiCaller from "./ApiCaller";
+import { ConfigNotificationRequestBody } from "renderer/models/request";
 import Caller from "./Caller";
 
-export const loginWithGoogle = (code: string) =>
-  ApiCaller.post("user", { code });
+export const loginWithGoogle = (code: string) => Caller.post("user", { code });
 
 export const findUser = async () => {
   return Caller.get<UserData>("user");
 };
 
-export const findTeam = () => Caller.get<Array<Community>>("user/team");
+export const findTeam = () =>
+  Caller.get<Community[]>("user/team?include_direct=1");
 
 export const getGroupChannel = (teamId: string) =>
-  ApiCaller.get(`group/${teamId}`);
+  Caller.get(`group/${teamId}`);
 
-export const getSpaceChannel = (teamId: string) =>
-  Caller.get<Array<Space>>(`space/${teamId}`);
+export const getSpaceChannel = (teamId: string, controller?: AbortController) =>
+  Caller.get<Array<Space>>(`space/${teamId}`, undefined, controller);
 
-export const findChannel = (teamId: string) =>
-  Caller.get<Array<Channel>>(`channel/${teamId}`);
+export const findDirectChannel = (
+  status?: "pending" | "blocked" | "accepted",
+  controller?: AbortController
+) => {
+  let uri =
+    "direct-channel?channel_types[]=Direct&channel_types[]=Multiple Direct&status=accepted";
+  // if (status) {
+  //   uri += `&status=${status}`;
+  // }
+  return Caller.get<Array<Channel>>(uri, undefined, controller);
+};
+
+export const findChannel = (teamId: string, controller?: AbortController) => {
+  if (teamId === DirectCommunity.team_id)
+    return findDirectChannel(undefined, controller);
+  return Caller.get<Array<Channel>>(`channel/${teamId}`, undefined, controller);
+};
 
 export const getInitial = () => Caller.get<InitialApiData>(`initial`);
 
 export const updateChannel = (id: string, data: any) =>
-  ApiCaller.put(`channel/${id}`, data);
+  Caller.put(`channel/${id}`, data);
 
 export const removeTeamMember = (teamId: string, userId: string) =>
-  ApiCaller.delete(`team/${teamId}/member`, { user_ids: [userId] });
+  Caller.delete(`team/${teamId}/member`, { user_ids: [userId] });
 
 export const leaveTeam = (teamId: string) =>
-  ApiCaller.delete(`team/${teamId}/leave`);
+  Caller.delete(`team/${teamId}/leave`);
 
 export const updateUserChannel = (channelIds: Array<string>) =>
-  ApiCaller.put(`user/channel`, { channel_ids: channelIds });
+  Caller.put(`user/channel`, { channel_ids: channelIds });
 
 export const requestNonce = (pubKey: string) =>
-  ApiCaller.post("user/nonce", { public_key: pubKey });
+  Caller.post("user/nonce", { public_key: pubKey });
 
 export const requestNonceWithAddress = (address: string) =>
   Caller.post<{ message: string }>("user/address", { address });
@@ -67,22 +86,20 @@ export const getCollectibles = (page = 1, limit = 10) => {
   return Caller.get<CollectibleDataApi>(`user/nft?page=${page}&limit=${limit}`);
 };
 
-export const updateUser = (data: any) => ApiCaller.put("user", data);
+export const updateUser = (data: any) => Caller.put("user", data);
 
-export const verifyOtp = (data: any) =>
-  ApiCaller.post("user/device/verify", data);
+export const verifyOtp = (data: any) => Caller.post("user/device/verify", data);
 
 export const syncChannelKey = (data: any) =>
-  ApiCaller.post("user/device/sync", data);
+  Caller.post("user/device/sync", data);
 
 export const acceptInvitation = (invitationId: string) =>
   Caller.post<Community>(`team/invitation/${invitationId}/accept`);
 
-export const removeDevice = (body: any) =>
-  ApiCaller.delete("user/device", body);
+export const removeDevice = (body: any) => Caller.delete("user/device", body);
 
 export const getNFTCollection = () =>
-  ApiCaller.get<Array<UserNFTCollection>>("user/nft-collection");
+  Caller.get<Array<NFTCollectionDataApi>>("user/nft-collection");
 
 export const getSpaceCondition = (spaceId: string) =>
   Caller.get<Array<SpaceCollectionData>>(`space/${spaceId}/condition`);
@@ -98,7 +115,9 @@ export const fetchTransaction = (params: { page?: number; limit?: number }) => {
 };
 
 export const fetchNFTCollection = () =>
-  Caller.get<Array<NFTCollectionDataApi>>("user/nft-collection/group");
+  Caller.get<{ nft_assets: NFTCollectionDataApi[]; ens_assets: ENSAsset[] }>(
+    "user/nft-collection/group"
+  );
 
 export const getUserDetail = (userId: string, teamId: string) =>
   Caller.get<UserData>(`user/${userId}/team/${teamId}`);
@@ -127,6 +146,9 @@ export const getTokenPrice = (contractAddress: string) =>
 
 export const getGasPrice = () => Caller.get<number>("price/gas");
 
+export const getGasLimit = (tx) =>
+  Caller.post<number>("price/estimate/gas", tx);
+
 export const getMembersByRole = (
   teamId: string,
   roles: Array<UserRoleType> = [],
@@ -136,7 +158,7 @@ export const getMembersByRole = (
   } = {}
 ) => {
   const { userName, page } = params;
-  let url = `team/${teamId}/role?page=${page || 1}&limit=50`;
+  let url = `team/${teamId}/role?page=${page || 1}&limit=100`;
   roles.forEach((el) => {
     url += `&roles[]=${el}`;
   });
@@ -156,3 +178,58 @@ export const modifyRole = (
 
 export const addPendingTx = (tx: TransactionApiData) =>
   Caller.post<TransactionApiData>("user/transaction", tx);
+
+export const refreshToken = (token: string) => {
+  return Caller.post<{
+    token: string;
+    token_expire_at: number;
+    refresh_token: string;
+    refresh_token_expire_at: number;
+  }>("user/refresh", undefined, undefined, undefined, {
+    "Refresh-Token": token,
+  });
+};
+
+export const getNotification = (
+  filterType: NotificationFilterType,
+  before?: string
+) => {
+  let uri = "notifications?page[size]=20";
+  if (filterType === "Mention") {
+    uri +=
+      "&notification_types[]=channel_mention&notification_types[]=post_mention";
+  } else if (filterType === "Unread") {
+    uri += "&is_read=false";
+  }
+  if (before) {
+    uri += `&page[before]=${before}`;
+  }
+  return Caller.get<NotificationData[]>(uri);
+};
+
+export const readNotification = (notificationId: string) =>
+  Caller.put(`notifications/${notificationId}`);
+
+export const readAllNotification = () => Caller.put("notifications");
+
+export const deleteNotification = (notificationId: string) =>
+  Caller.delete(`notifications/${notificationId}`);
+
+export const configNotificationFromTask = (
+  pinPostId: string,
+  data: ConfigNotificationRequestBody
+) => Caller.post(`notifications/task/${pinPostId}`, data);
+
+export const getNFTsDetails = (
+  contractAddresses: string[],
+  tokenIds: string[],
+  networks: string[]
+) => {
+  let uri = "user/nft?";
+  contractAddresses.forEach(
+    (address) => (uri += `contract_addresses[]=${address}&`)
+  );
+  tokenIds.forEach((id) => (uri += `token_ids[]=${id}&`));
+  networks.forEach((network) => (uri += `networks[]=${network}&`));
+  return Caller.get<NFTDetailDataApi[]>(uri);
+};

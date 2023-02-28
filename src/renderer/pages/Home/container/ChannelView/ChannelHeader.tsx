@@ -15,52 +15,66 @@ import {
 import ImageHelper from "renderer/common/ImageHelper";
 import EmojiAndAvatarPicker from "renderer/shared/EmojiAndAvatarPicker";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
-import useAppSelector from "renderer/hooks/useAppSelector";
 import images from "../../../../common/images";
 import AvatarView from "../../../../shared/AvatarView";
 import PopoverButton from "../../../../shared/PopoverButton";
 import ChannelSettings from "./ChannelSettings";
 import "./index.scss";
+import { Channel, UserData } from "renderer/models";
+import useUserRole from "renderer/hooks/useUserRole";
+import useDirectChannelUser from "renderer/hooks/useDirectChannelUser";
+import IconLock from "renderer/shared/SVG/IconLock";
+import DirectMessageTooltip from "renderer/shared/DirectMessageTooltip";
 
 type ChannelHeaderProps = {
-  currentChannel?: any;
-  teamUserData: Array<any>;
+  currentChannel?: Channel;
+  teamUserData: Array<UserData>;
   teamId: string;
 };
 
 const ChannelHeader = forwardRef(
   ({ currentChannel, teamUserData, teamId }: ChannelHeaderProps, ref) => {
     const dispatch = useAppDispatch();
-    const userData = useAppSelector((state) => state.user.userData);
+    const popupDMRef = useRef<any>();
     const popupChannelIconRef = useRef<any>();
     const [isActiveMember, setActiveMember] = useState(false);
     const [isActiveName, setActiveName] = useState(false);
+    const [isActiveNotification, setActiveNotification] = useState(false);
     const settingButtonRef = useRef<any>();
     const settingRef = useRef<any>();
     const users = useMemo(() => {
       if (!currentChannel) return [];
-      const { channel_type, channel_member } = currentChannel;
+      const { channel_type, channel_members } = currentChannel;
       if (channel_type === "Public") {
         return teamUserData;
       }
-      if (!channel_member) return [];
-      return channel_member
+      if (!channel_members) return [];
+      return channel_members
         .filter((id: string) => !!teamUserData.find((el) => el.user_id === id))
         .map((id: any) => teamUserData.find((el) => el.user_id === id));
     }, [currentChannel, teamUserData]);
-    const isChannelPrivate = currentChannel?.channel_type === "Private";
-    const role = teamUserData?.find?.(
-      (el) => el.user_id === userData?.user_id
-    )?.role;
+    const isChannelPrivate = useMemo(
+      () => currentChannel?.channel_type === "Private",
+      [currentChannel?.channel_type]
+    );
+    const isDirect = useMemo(
+      () => currentChannel?.channel_type === "Direct",
+      [currentChannel?.channel_type]
+    );
+    const directUser = useDirectChannelUser();
+    const role = useUserRole();
     const isOwner = role === "Owner";
     useImperativeHandle(ref, () => {
       return {
-        showSetting(action: "edit-member" | "edit-name") {
+        showSetting(action: "edit-member" | "edit-name" | "edit-notification") {
           if (action === "edit-member") {
             setActiveMember(true);
           }
           if (action === "edit-name") {
             setActiveName(true);
+          }
+          if (action === "edit-notification") {
+            setActiveNotification(true);
           }
           settingButtonRef.current.click();
         },
@@ -70,15 +84,8 @@ const ChannelHeader = forwardRef(
       };
     });
     const renderChannelIcon = useCallback(() => {
-      if (currentChannel?.user) {
-        return (
-          <AvatarView
-            user={teamUserData.find(
-              (u) => u.user_id === currentChannel?.user?.user_id
-            )}
-            size={25}
-          />
-        );
+      if (isDirect && directUser) {
+        return <AvatarView user={directUser} size={25} />;
       }
       if (currentChannel?.attachment) {
         return (
@@ -118,9 +125,9 @@ const ChannelHeader = forwardRef(
       currentChannel?.attachment,
       currentChannel?.channel_emoji,
       currentChannel?.channel_image_url,
-      currentChannel?.user,
+      directUser,
+      isDirect,
       teamId,
-      teamUserData,
     ]);
     const handleEmojiClick = useCallback(
       (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => e.stopPropagation(),
@@ -128,15 +135,17 @@ const ChannelHeader = forwardRef(
     );
     const onAddFiles = useCallback(
       async (fs) => {
-        if (fs == null || fs.length === 0) return;
+        if (fs == null || fs.length === 0 || !currentChannel?.channel_id)
+          return;
         const file = [...fs][0];
-        dispatch(uploadChannelAvatar(teamId, currentChannel.channel_id, file));
+        dispatch(uploadChannelAvatar(teamId, currentChannel?.channel_id, file));
         popupChannelIconRef.current?.hide();
       },
       [currentChannel?.channel_id, dispatch, teamId]
     );
     const onSelectRecentFile = useCallback(
       async (file) => {
+        if (!currentChannel?.channel_id) return;
         await dispatch(
           updateChannel(currentChannel.channel_id, {
             channel_emoji: "",
@@ -149,6 +158,7 @@ const ChannelHeader = forwardRef(
     );
     const onAddEmoji = useCallback(
       async (emoji) => {
+        if (!currentChannel?.channel_id) return;
         await dispatch(
           updateChannel(currentChannel.channel_id, {
             channel_emoji: emoji.id,
@@ -161,14 +171,14 @@ const ChannelHeader = forwardRef(
     );
     const handleChannelClick = useCallback(
       (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        if (!currentChannel?.user) {
+        if (!isDirect) {
           settingRef.current?.show(e.currentTarget, {
             x: 570,
             y: 110,
           });
         }
       },
-      [currentChannel?.user]
+      [isDirect]
     );
     const handleMemberClick = useCallback(
       (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -183,6 +193,7 @@ const ChannelHeader = forwardRef(
     const onCloseChannelSetting = useCallback(() => {
       setActiveMember(false);
       setActiveName(false);
+      setActiveNotification(false);
     }, []);
     const handleCloseChannelSetting = useCallback(() => {
       settingRef.current?.hide?.();
@@ -204,6 +215,12 @@ const ChannelHeader = forwardRef(
       ),
       [users]
     );
+    const onMouseEnterDMTag = useCallback(
+      (e: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
+        popupDMRef.current.show(e.target),
+      []
+    );
+    const onMouseLeaveDMTag = useCallback(() => popupDMRef.current.hide(), []);
     return (
       <>
         <div className="channel-view__header">
@@ -214,7 +231,7 @@ const ChannelHeader = forwardRef(
               flex: 1,
             }}
           >
-            {isOwner && !currentChannel?.user ? (
+            {isOwner && !isDirect ? (
               <PopoverButton
                 ref={popupChannelIconRef}
                 componentButton={
@@ -231,7 +248,7 @@ const ChannelHeader = forwardRef(
                       onAddFiles={onAddFiles}
                       onAddEmoji={onAddEmoji}
                       onSelectRecentFile={onSelectRecentFile}
-                      channelId={currentChannel.channel_id}
+                      channelId={currentChannel?.channel_id}
                     />
                   </div>
                 }
@@ -242,21 +259,37 @@ const ChannelHeader = forwardRef(
             <div
               ref={settingButtonRef}
               onClick={handleChannelClick}
-              style={{ display: "flex", width: 0, flex: 1 }}
+              style={{
+                display: "flex",
+                width: 0,
+                flex: 1,
+                alignItems: "center",
+              }}
             >
               <span className="channel-view__title text-ellipsis">
-                {currentChannel?.user?.user_name
-                  ? currentChannel?.user?.user_name
+                {isDirect && directUser
+                  ? directUser.user_name
                   : currentChannel?.channel_name}
               </span>
+              {isDirect && (
+                <div
+                  style={{ width: 20, height: 20 }}
+                  onMouseEnter={onMouseEnterDMTag}
+                  onMouseLeave={onMouseLeaveDMTag}
+                >
+                  <IconLock style={{ marginLeft: 10 }} size={20} />
+                </div>
+              )}
+              {isDirect && (
+                <PopoverButton
+                  style={{ pointerEvents: "none" }}
+                  ref={popupDMRef}
+                  popupOnly
+                  componentPopup={<DirectMessageTooltip />}
+                  transformOrigin={{ vertical: "top", horizontal: "left" }}
+                />
+              )}
             </div>
-            {isChannelPrivate && (
-              <img
-                className="icon-private"
-                src={images.icPrivateWhite}
-                alt=""
-              />
-            )}
           </div>
           {isChannelPrivate && (
             <div className="channel-view__members-wrapper">
@@ -288,7 +321,9 @@ const ChannelHeader = forwardRef(
                 teamUserData={teamUserData}
                 isActiveMember={isActiveMember}
                 isActiveName={isActiveName}
+                isActiveNotification={isActiveNotification}
                 onClose={handleCloseChannelSetting}
+                isOwner={isOwner}
               />
             }
           />

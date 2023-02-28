@@ -4,13 +4,13 @@
   flex: 1;
   position: relative;
   width: 50%;
+  margin-right: 1px;
 
   .channel-view__header {
     height: 60px;
     width: 100%;
     display: flex;
     align-items: center;
-    background-color: var(--color-lighter-background);
     justify-content: space-between;
     .normal-button {
       &:hover {
@@ -24,7 +24,7 @@
       margin-left: 15px;
     }
     .channel-icon__wrapper {
-      margin: 0 10px 0 15px;
+      margin: 0 15px;
       position: relative;
       width: 25px;
       height: 25px;
@@ -105,6 +105,15 @@
       }
     }
   }
+  .message-load-more-after {
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background-color: var(--color-lighter-background);
+    color: var(--color-secondary-text);
+  }
   .message-load-more {
     position: absolute;
     top: 60px;
@@ -117,19 +126,11 @@
   }
   .channel-view__body {
     flex: 1;
-    flex-direction: column-reverse;
+    flex-direction: column;
     display: flex;
-    overflow-y: scroll;
+    justify-content: flex-end;
+    overflow-y: auto;
     position: relative;
-    &::-webkit-scrollbar-track {
-      display: none;
-    }
-    &::-webkit-scrollbar {
-      display: none;
-    }
-    &::-webkit-scrollbar-thumb {
-      display: none;
-    }
     .date-title {
       display: flex;
       align-items: center;
@@ -151,6 +152,26 @@
     flex-direction: column-reverse;
     flex: 1;
     position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .channel-view-message-empty {
+    align-self: center;
+    padding: 0 50px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 22px;
+    color: var(--color-secondary-text);
+    position: absolute;
+    top: 250px;
+  }
+  .channel-view-scrolling {
+    .message-item__root {
+      .message-item__menu {
+        opacity: 0;
+      }
+    }
   }
   .message-bottom {
     display: flex;
@@ -223,6 +244,18 @@
     align-items: center;
     padding: 10px 15px;
     margin-bottom: 5px;
+    .main-button {
+      background-color: var(--color-lighter-background);
+      border: 1px solid var(--color-stroke);
+    }
+    .title-button {
+      text-transform: capitalize;
+    }
+  }
+  .setting-label__wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
   }
   .setting-label {
     flex: 1;
@@ -231,6 +264,14 @@
     font-weight: 600;
     font-size: 16px;
     line-height: 19px;
+  }
+  .setting-description {
+    margin-top: 5px;
+    font-weight: 500;
+    font-size: 14px;
+    margin-left: 15px;
+    margin-right: 15px;
+    color: var(--color-secondary-text);
   }
   .edit-name-input__wrapper {
     display: flex;

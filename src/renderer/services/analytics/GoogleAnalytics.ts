@@ -1,4 +1,9 @@
 import mixpanel from "mixpanel-browser";
+import {
+  getCategoryByApi,
+  getEventNameByApi,
+} from "renderer/helpers/AnalyticHelper";
+import { UserData } from "renderer/models";
 
 class GoogleAnalytics {
   init() {
@@ -7,28 +12,28 @@ class GoogleAnalytics {
     });
   }
 
-  pageView(path: string) {
-    mixpanel.track("page_view", {
-      path,
-    });
+  identify(user: UserData) {
+    mixpanel.identify(user.user_id);
+    mixpanel.people.set({ name: user.user_name });
   }
 
-  modalView(name: string) {
-    mixpanel.track("modal_view", {
-      name,
-    });
+  tracking(eventName: string, props: { [key: string]: string }) {
+    mixpanel.track(eventName, props);
   }
 
-  event(args: {
-    category: string;
-    action: string;
-    label?: string;
-    value?: number;
-  }) {
-    mixpanel.track(args.action, {
-      category: args.category,
-      label: args.label,
-      value: args.value,
+  trackingError(
+    apiUrl: string,
+    method: string,
+    errorMessage: string,
+    statusCode: number,
+    reqBody?: any
+  ) {
+    this.tracking(getEventNameByApi(apiUrl, method, reqBody), {
+      category: getCategoryByApi(apiUrl, method, reqBody),
+      request_time: `${new Date().getTime()}`,
+      url: apiUrl,
+      error_code: `${statusCode}`,
+      error_message: errorMessage,
     });
   }
 }

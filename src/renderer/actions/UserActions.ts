@@ -1,31 +1,116 @@
 import { ActionCreator, Dispatch } from "redux";
 import GlobalVariable from "renderer/services/GlobalVariable";
-import { getSpaceBackgroundColor } from "renderer/helpers/SpaceHelper";
 import api from "../api";
 import ActionTypes from "./ActionTypes";
-import { AsyncKey, UserRole } from "../common/AppConfig";
-import { getCookie, removeCookie, setCookie } from "../common/Cookie";
+import {
+  AsyncKey,
+  DirectCommunity,
+  LoginType,
+  UserRole,
+} from "../common/AppConfig";
+import {
+  getCookie,
+  getDeviceCode,
+  removeCookie,
+  setCookie,
+} from "../common/Cookie";
 import ImageHelper from "../common/ImageHelper";
 import SocketUtils from "../utils/SocketUtils";
-import { Channel, Community, UserData, UserRoleType } from "renderer/models";
-import store from "renderer/store";
+import { Community, UserData, UserRoleType } from "renderer/models";
+import store, { AppGetState } from "renderer/store";
+import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
+import { sleep } from "renderer/helpers/StoreHelper";
+import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
 
 export const getInitial: ActionCreator<any> =
   () => async (dispatch: Dispatch) => {
-    const { data } = await api.getInitial();
-    ImageHelper.initial(data?.img_domain || "", data?.img_config || "");
-    if (data?.force_update && data?.version > GlobalVariable.version) {
-      // Update Desktop App
-    }
-    if (data) {
-      dispatch({ type: ActionTypes.GET_INITIAL, payload: { data } });
+    try {
+      const { data } = (await api.getInitial()) || {};
+      ImageHelper.initial(
+        data?.imgproxy.domain || "",
+        data?.imgproxy?.bucket_name || ""
+      );
+      if (data?.force_update && data?.version > GlobalVariable.version) {
+        // Update Desktop App
+      }
+      if (data) {
+        dispatch({ type: ActionTypes.GET_INITIAL, payload: { data } });
+      }
+    } catch (error) {
+      dispatch({ type: ActionTypes.GET_INITIAL_FAILED, payload: error });
     }
   };
 
-export const logout: ActionCreator<any> = () => (dispatch: Dispatch) => {
-  SocketUtils.disconnect();
-  dispatch({ type: ActionTypes.LOGOUT });
+export const logout: ActionCreator<any> =
+  () => (dispatch: Dispatch, getState: AppGetState) => {
+    const loginType = getState().configs.loginType;
+    if (loginType === LoginType.Web3Auth) {
+      Web3AuthUtils.disconnect();
+    }
+    SocketUtils.disconnect();
+    dispatch({ type: ActionTypes.LOGOUT });
+  };
+
+const removeDeviceCode = async () => {
+  const deviceCode = await getDeviceCode();
+  await api.removeDevice({
+    device_code: deviceCode,
+  });
 };
+
+export const refreshToken =
+  (retryCount?: number) => async (dispatch: Dispatch) => {
+    let rCount = retryCount || 0;
+    dispatch({ type: ActionTypes.REFRESH_TOKEN_REQUEST });
+    const refreshTokenExpire = await getCookie(AsyncKey.refreshTokenExpire);
+    const token = await getCookie(AsyncKey.refreshTokenKey);
+    try {
+      const refreshTokenRes = await api.refreshToken(token);
+      if (refreshTokenRes.success) {
+        dispatch({
+          type: ActionTypes.UPDATE_CURRENT_TOKEN,
+          payload: refreshTokenRes?.data?.token,
+        });
+        await setCookie(AsyncKey.accessTokenKey, refreshTokenRes?.data?.token);
+        await setCookie(
+          AsyncKey.refreshTokenKey,
+          refreshTokenRes?.data?.refresh_token
+        );
+        await setCookie(
+          AsyncKey.tokenExpire,
+          refreshTokenRes?.data?.token_expire_at
+        );
+        await setCookie(
+          AsyncKey.refreshTokenExpire,
+          refreshTokenRes?.data?.refresh_token_expire_at
+        );
+      } else {
+        if (refreshTokenRes.message === "Failed to fetch" && rCount <= 5) {
+          rCount++;
+          await sleep(3000);
+          return refreshToken(rCount)(dispatch);
+        }
+        GoogleAnalytics.tracking("Refresh failed", {
+          refreshTokenExpire,
+          message: refreshTokenRes.message || "Some thing wrong",
+        });
+        dispatch({
+          type: ActionTypes.REFRESH_TOKEN_FAIL,
+          payload: refreshTokenRes,
+        });
+        await removeDeviceCode();
+      }
+      return refreshTokenRes.success;
+    } catch (error: any) {
+      GoogleAnalytics.tracking("Refresh failed", {
+        refreshTokenExpire,
+        message: error.message || error,
+      });
+      dispatch({ type: ActionTypes.REFRESH_TOKEN_FAIL, payload: error });
+      await removeDeviceCode();
+      return false;
+    }
+  };
 
 export const getMemberData =
   (teamId: string, role: UserRoleType, page: number) =>
@@ -46,7 +131,13 @@ export const getMemberData =
     if (res.success) {
       dispatch({
         type: ActionTypes.MEMBER_DATA_SUCCESS,
-        payload: { role, page, data: res.data, total: res.metadata?.total },
+        payload: {
+          role,
+          page,
+          data: res.data,
+          total: res.metadata?.total,
+          teamId,
+        },
       });
     } else {
       dispatch({
@@ -90,14 +181,14 @@ export const findUser = () => async (dispatch: Dispatch) => {
 };
 
 export const dragChannel =
-  (channelId: string, groupId: string) => async (dispatch: Dispatch) => {
+  (channelId: string, spaceId: string) => async (dispatch: Dispatch) => {
     const res = await api.updateChannel(channelId, {
-      group_channel_id: groupId,
+      space_id: spaceId,
     });
     if (res.statusCode === 200) {
       dispatch({
         type: ActionTypes.UPDATE_GROUP_CHANNEL,
-        payload: { channelId, groupId },
+        payload: { channelId, spaceId },
       });
     }
   };
@@ -113,44 +204,63 @@ export const findTeamAndChannel =
       lastTeamId = await getCookie(AsyncKey.lastTeamId);
     }
     if (res.statusCode === 200) {
-      const communities = res.data || [];
+      const communitiesWithDM = res.data || [];
+      const communities = communitiesWithDM.filter(
+        (el) => el.team_id !== DirectCommunity.team_id
+      );
+      const DM = communitiesWithDM.find(
+        (el) => el.team_id === DirectCommunity.team_id
+      );
+      communities.unshift({ ...DirectCommunity, seen: DM?.seen });
       if (communities.length > 0) {
+        SocketUtils.init();
         const currentTeam =
           communities.find((t: Community) => t.team_id === lastTeamId) ||
-          communities[0];
+          communities?.[1] ||
+          communities?.[0];
         const teamId = currentTeam.team_id;
-        const resSpace = await api.getSpaceChannel(teamId);
-        const resChannel = await api.findChannel(teamId);
         const lastChannelId = await getCookie(AsyncKey.lastChannelId);
-        const teamUsersRes = await api.getTeamUsers(currentTeam.team_id);
+        const [resSpace, resChannel, teamUsersRes] = await Promise.all([
+          api.getSpaceChannel(teamId),
+          api.findChannel(teamId),
+          api.getTeamUsers(teamId),
+        ]);
         if (teamUsersRes.statusCode === 200) {
           dispatch({
             type: ActionTypes.GET_TEAM_USER,
             payload: {
               teamUsers: teamUsersRes,
-              teamId: currentTeam.team_id,
+              teamId,
             },
           });
         }
-        SocketUtils.init(currentTeam.team_id);
         const directChannelUser = teamUsersRes?.data?.find(
           (u: UserData) => u.direct_channel === lastChannelId
         );
-        dispatch({
-          type: ActionTypes.SET_CURRENT_TEAM,
-          payload: {
-            team: currentTeam,
-            lastChannelId,
-            directChannelUser,
-            resChannel,
-            teamUsersRes,
-            resSpace,
-          },
-        });
+        if (
+          resSpace.statusCode === 200 &&
+          resChannel.statusCode === 200 &&
+          teamUsersRes.statusCode === 200
+        ) {
+          dispatch({
+            type: ActionTypes.CURRENT_TEAM_SUCCESS,
+            payload: {
+              team: currentTeam,
+              lastChannelId,
+              directChannelUser,
+              resChannel,
+              teamUsersRes,
+              resSpace,
+            },
+          });
+        }
       } else {
         SocketUtils.init();
       }
-      dispatch({ type: ActionTypes.TEAM_SUCCESS, payload: { team: res.data } });
+      dispatch({
+        type: ActionTypes.TEAM_SUCCESS,
+        payload: { team: communities },
+      });
     } else {
       dispatch({ type: ActionTypes.TEAM_FAIL, payload: { message: res } });
       dispatch({
@@ -203,6 +313,7 @@ export const createNewChannel =
         type: ActionTypes.CREATE_CHANNEL_SUCCESS,
         payload: {
           ...res.data,
+          seen: true,
           group_channel: {
             group_channel_name: groupName,
           },
@@ -222,35 +333,49 @@ const actionSetCurrentTeam = async (
   dispatch: Dispatch,
   channelId?: string
 ) => {
+  const lastController = store.getState().user?.apiTeamController;
+  lastController?.abort?.();
+  const controller = new AbortController();
   dispatch({
-    type: ActionTypes.CHANNEL_REQUEST,
+    type: ActionTypes.CURRENT_TEAM_REQUEST,
+    payload: { controller },
   });
-  const teamUsersRes = await api.getTeamUsers(team.team_id);
-  let lastChannelId: any = null;
-  const resSpace = await api.getSpaceChannel(team.team_id);
-  const resChannel = await api.findChannel(team.team_id);
-  const lastChannel = store.getState().user?.lastChannel?.[team.team_id];
-  if (channelId) {
-    lastChannelId = channelId;
-  } else if (lastChannel) {
-    lastChannelId = lastChannel.channel_id;
-  } else {
-    lastChannelId = resChannel.data?.[0]?.channel_id;
-  }
-  await setCookie(AsyncKey.lastChannelId, lastChannelId);
-  if (teamUsersRes.statusCode === 200) {
+  try {
+    const teamUsersRes = await api.getTeamUsers(team.team_id, controller);
+    let lastChannelId: any = null;
+    const resSpace = await api.getSpaceChannel(team.team_id, controller);
+    const resChannel = await api.findChannel(team.team_id, controller);
+    const lastChannel = store.getState().user?.lastChannel?.[team.team_id];
+    if (channelId) {
+      lastChannelId = channelId;
+    } else if (lastChannel) {
+      lastChannelId = lastChannel.channel_id;
+    } else {
+      lastChannelId = resChannel.data?.find(
+        (el) => el.channel_type !== "Direct"
+      )?.[0]?.channel_id;
+    }
+    await setCookie(AsyncKey.lastChannelId, lastChannelId);
+    if (teamUsersRes.statusCode === 200) {
+      dispatch({
+        type: ActionTypes.GET_TEAM_USER,
+        payload: { teamUsers: teamUsersRes, teamId: team.team_id },
+      });
+    }
+    SocketUtils.changeTeam(team.team_id);
+    if (resChannel.statusCode === 200 && teamUsersRes.statusCode === 200) {
+      dispatch({
+        type: ActionTypes.CURRENT_TEAM_SUCCESS,
+        payload: { team, resChannel, lastChannelId, teamUsersRes, resSpace },
+      });
+      setCookie(AsyncKey.lastTeamId, team.team_id);
+    }
+  } catch (error) {
     dispatch({
-      type: ActionTypes.GET_TEAM_USER,
-      payload: { teamUsers: teamUsersRes, teamId: team.team_id },
+      type: ActionTypes.CURRENT_TEAM_FAIL,
+      payload: { message: error },
     });
   }
-  SocketUtils.changeTeam(team.team_id);
-  dispatch({
-    type: ActionTypes.SET_CURRENT_TEAM,
-    payload: { team, resChannel, lastChannelId, teamUsersRes, resSpace },
-  });
-  setCookie(AsyncKey.lastTeamId, team.team_id);
-  return { lastChannelId };
 };
 
 export const setCurrentTeam =
@@ -264,6 +389,7 @@ export const deleteSpaceChannel =
       payload: { spaceId },
     });
     const res = await api.deleteSpaceChannel(spaceId);
+    return res.statusCode === 200;
   };
 
 export const uploadChannelAvatar =
@@ -306,15 +432,9 @@ export const uploadSpaceAvatar =
     });
     const fileRes = await api.uploadFile(teamId, spaceId, file);
     if (fileRes.statusCode === 200) {
-      const url = ImageHelper.normalizeImage(
-        fileRes.data?.file_url || "",
-        teamId
-      );
-      const colorAverage = await getSpaceBackgroundColor(url);
       await api.updateSpaceChannel(spaceId, {
         space_emoji: "",
         space_image_url: fileRes.data?.file_url,
-        space_background_color: colorAverage,
       });
     } else {
       dispatch({
@@ -359,7 +479,7 @@ export const createTeam = (body: any) => async (dispatch: Dispatch) => {
   if (res.statusCode === 200) {
     dispatch({
       type: ActionTypes.CREATE_TEAM_SUCCESS,
-      payload: res,
+      payload: res.data,
     });
   } else {
     dispatch({
@@ -392,12 +512,7 @@ export const leaveTeam = (teamId: string) => async (dispatch: Dispatch) => {
     payload: { teamId },
   });
   const res = await api.leaveTeam(teamId);
-  if (res.statusCode === 200) {
-    dispatch({
-      type: ActionTypes.LEAVE_TEAM_SUCCESS,
-      payload: { teamId },
-    });
-  } else {
+  if (res.statusCode !== 200) {
     dispatch({
       type: ActionTypes.LEAVE_TEAM_FAIL,
       payload: res,
@@ -474,7 +589,11 @@ export const updateUser = (userData: any) => async (dispatch: Dispatch) => {
   dispatch({ type: ActionTypes.UPDATE_USER_REQUEST, payload: userData });
   const dataUpdate: any = {};
   if (userData.isUpdateENS && userData?.ensAsset) {
-    dataUpdate.ens_asset = userData?.ensAsset;
+    dataUpdate.ens_asset = {
+      contract_address: userData?.ensAsset?.contract_address,
+      token_id: userData?.ensAsset?.token_id,
+      network: userData?.ensAsset?.network,
+    };
   }
   if (!userData?.ensAsset && userData?.userName) {
     dataUpdate.username = userData?.userName;
@@ -500,12 +619,22 @@ export const updateUser = (userData: any) => async (dispatch: Dispatch) => {
 
 export const getSpaceMembers =
   (spaceId: string) => async (dispatch: Dispatch) => {
-    dispatch({ type: ActionTypes.SPACE_MEMBER_REQUEST, payload: spaceId });
-    const res = await api.getSpaceMembers(spaceId);
-    if (res.statusCode === 200) {
-      dispatch({ type: ActionTypes.SPACE_MEMBER_SUCCESS, payload: res });
-    } else {
-      dispatch({ type: ActionTypes.SPACE_MEMBER_FAIL, payload: res });
+    const { apiSpaceMemberController } = store.getState().user;
+    apiSpaceMemberController?.abort?.();
+    const controller = new AbortController();
+    dispatch({
+      type: ActionTypes.SPACE_MEMBER_REQUEST,
+      payload: { spaceId, controller },
+    });
+    try {
+      const res = await api.getSpaceMembers(spaceId, controller);
+      if (res.statusCode === 200) {
+        dispatch({ type: ActionTypes.SPACE_MEMBER_SUCCESS, payload: res });
+      } else {
+        dispatch({ type: ActionTypes.SPACE_MEMBER_FAIL, payload: res });
+      }
+    } catch (error) {
+      dispatch({ type: ActionTypes.SPACE_MEMBER_FAIL, payload: error });
     }
   };
 

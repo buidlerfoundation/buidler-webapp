@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import "./index.scss";
 import "./App.scss";
 import "../src/renderer/styles/spacing.scss";
 import "./emoji.scss";
+import "renderer/services/firebase";
 import { useHistory } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
 import { ThemeProvider } from "@material-ui/styles";
@@ -28,6 +29,10 @@ import MetamaskUtils from "renderer/services/connectors/MetamaskUtils";
 import ErrorBoundary from "renderer/shared/ErrorBoundary";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import { CustomEventName } from "renderer/services/events/WindowEvent";
+import ChainId from "renderer/services/connectors/ChainId";
+import { initialSpaceToggle } from "renderer/actions/SideBarActions";
+import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
+import { ethers } from "ethers";
 
 function App() {
   const history = useHistory();
@@ -44,18 +49,54 @@ function App() {
       history.replace("/channels");
     }
   }, [imgDomain, dispatch, history]);
+  const initPush = useCallback(() => {
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker
+          .register("/firebase-messaging-sw.js")
+          .then((registration) => {
+            //Confirm user permission for notification
+            Notification.requestPermission().then((permission) => {
+              if (permission === "granted") {
+                //If notification is allowed
+                navigator.serviceWorker.ready.then((p) => {
+                  p.pushManager.getSubscription().then((subscription) => {
+                    if (subscription === null) {
+                      //If there is no notification subscription, register.
+                      let re = p.pushManager.subscribe({
+                        userVisibleOnly: true,
+                      });
+                    }
+                  });
+                });
+              }
+            });
+          });
+      });
+    }
+  }, []);
+  useEffect(() => {
+    dispatch(initialSpaceToggle());
+  }, [dispatch]);
   useEffect(() => {
     GoogleAnalytics.init();
     getCookie(AsyncKey.accessTokenKey).then((res) => {
       dispatch({ type: actionTypes.UPDATE_CURRENT_TOKEN, payload: res });
     });
-  }, [dispatch]);
+    initPush();
+  }, [dispatch, initPush]);
+  useEffect(() => {
+    if (user.user_id) {
+      GoogleAnalytics.identify(user);
+    }
+  }, [user]);
   useEffect(() => {
     const eventFocus = async (e) => {
       const token = await getCookie(AsyncKey.accessTokenKey);
       if (token !== currentToken) {
         window.location.reload();
       }
+      SocketUtils.reconnectIfNeeded();
       dispatch({ type: actionTypes.UPDATE_CURRENT_TOKEN, payload: token });
     };
     window.addEventListener("focus", eventFocus);
@@ -74,9 +115,14 @@ function App() {
       },
     };
     const eventOffline = () => {
+      dispatch({
+        type: actionTypes.UPDATE_INTERNET_CONNECTION,
+        payload: false,
+      });
       SocketUtils.socket?.disconnect?.();
     };
     const eventOnline = () => {
+      dispatch({ type: actionTypes.UPDATE_INTERNET_CONNECTION, payload: true });
       if (!user.user_id) {
         initApp();
       } else {
@@ -94,9 +140,18 @@ function App() {
       if (!process.env.REACT_APP_ENABLE_INSPECT) e.preventDefault();
     };
     const eventClick = (e: any) => {
-      const href = e?.target?.href;
-      if (href?.includes("channels/user")) {
-        history.replace(`/channels/user/${href.split("/channels/user/")[1]}`);
+      if (!e.target.download) {
+        const href = e?.target?.href || e?.target?.parentElement?.href;
+        if (href?.includes("channels/user")) {
+          dispatch({
+            type: actionTypes.UPDATE_CURRENT_USER_PROFILE_ID,
+            payload: href.split("/channels/user/")[1],
+          });
+        } else if (href?.includes(window.location.origin)) {
+          history.push(href.replace(window.location.origin, ""));
+        } else if (href) {
+          window.open(href, "_blank");
+        }
         e.preventDefault();
       }
     };
@@ -121,7 +176,7 @@ function App() {
         changeRouteListener
       );
     };
-  }, [user, initApp, history]);
+  }, [user, initApp, history, dispatch]);
   const initGeneratedPrivateKey = useCallback(async () => {
     const generatedPrivateKey = await GeneratedPrivateKey();
     dispatch({
@@ -130,7 +185,11 @@ function App() {
     });
   }, [dispatch]);
   useEffect(() => {
-    initGeneratedPrivateKey();
+    getCookie(AsyncKey.socketConnectKey).then((res) => {
+      if (res) {
+        initGeneratedPrivateKey();
+      }
+    });
   }, [initGeneratedPrivateKey]);
   const connectLogout = useCallback(async () => {
     const deviceCode = await getDeviceCode();
@@ -142,6 +201,7 @@ function App() {
       dispatch(logout?.());
     });
   }, [dispatch]);
+  const metamaskDisconnect = useCallback(() => {}, []);
   const metamaskUpdate = useCallback(
     (data) => {
       if (typeof data === "string") {
@@ -150,14 +210,28 @@ function App() {
           payload: parseInt(data),
         });
       } else if (data.length === 0) {
-        connectLogout();
+        metamaskDisconnect();
+      } else if (data.length > 0) {
+        dispatch({
+          type: actionTypes.SET_METAMASK_ACCOUNT,
+          payload: data[0],
+        });
       }
     },
-    [connectLogout, dispatch]
+    [metamaskDisconnect, dispatch]
   );
   const metamaskConnected = useCallback(() => {
     setTimeout(() => {
-      const chainId = window.ethereum?.chainId || "";
+      const chainId =
+        window.ethereum?.chainId ||
+        window.ethereum?.networkVersion ||
+        process.env.REACT_APP_DEFAULT_CHAIN_ID ||
+        `${ChainId.EthereumMainnet}`;
+      const account = window.ethereum?.selectedAddress;
+      dispatch({
+        type: actionTypes.SET_METAMASK_ACCOUNT,
+        payload: account,
+      });
       dispatch({
         type: actionTypes.SWITCH_NETWORK,
         payload: parseInt(chainId),
@@ -166,7 +240,8 @@ function App() {
   }, [dispatch]);
   useEffect(() => {
     getCookie(AsyncKey.loginType)
-      .then((res) => {
+      .then(async (res) => {
+        dispatch({ type: actionTypes.UPDATE_LOGIN_TYPE, payload: res });
         if (res === LoginType.WalletConnect) {
           WalletConnectUtils.init(connectLogout);
           if (!WalletConnectUtils.connector?.connected) {
@@ -174,13 +249,32 @@ function App() {
           }
         } else if (res === LoginType.Metamask) {
           MetamaskUtils.connected = true;
-          MetamaskUtils.init(connectLogout, metamaskUpdate, metamaskConnected);
+          MetamaskUtils.init(
+            metamaskDisconnect,
+            metamaskUpdate,
+            metamaskConnected
+          );
         }
+        // else if (res === LoginType.Web3Auth) {
+        //   await Web3AuthUtils.init();
+        //   if (!Web3AuthUtils.web3auth) return;
+        //   const web3authProvider = await Web3AuthUtils.web3auth.connect();
+        //   if (!web3authProvider) return;
+        //   Web3AuthUtils.provider = new ethers.providers.Web3Provider(
+        //     web3authProvider
+        //   );
+        // }
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [connectLogout, dispatch, metamaskConnected, metamaskUpdate]);
+  }, [
+    connectLogout,
+    dispatch,
+    metamaskConnected,
+    metamaskDisconnect,
+    metamaskUpdate,
+  ]);
   const overrides: any = {
     MuiPickersDay: {
       day: {

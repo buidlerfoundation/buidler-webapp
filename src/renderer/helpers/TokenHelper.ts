@@ -1,5 +1,9 @@
-import { BalanceApiData } from "renderer/models";
+import { BalanceApiData, SendData } from "renderer/models";
 import numeral from "numeral";
+import { ethers, utils } from "ethers";
+import MinABI from "renderer/services/connectors/MinABI";
+import { TransactionRequest } from "@ethersproject/abstract-provider";
+import AppConfig from "renderer/common/AppConfig";
 
 export const round = (value: number, afterDot: number) => {
   const p = Math.pow(10, afterDot);
@@ -72,14 +76,80 @@ export const totalBalanceUSD = (userBalance?: BalanceApiData | null) => {
   let res = formatUSDValue({
     value: ETH.balance,
     decimal: ETH.contract.decimals,
-    price: ETH.price?.rate,
+    price: ETH.price?.current_price,
   });
   tokens.forEach((el) => {
     res += formatUSDValue({
       value: el.balance,
       decimal: el.contract.decimals,
-      price: el.price?.rate,
+      price: el.price?.current_price,
     });
   });
+  return res;
+};
+
+export const getTransactionAmount = (sendData: SendData) => {
+  const amount = ethers.BigNumber.from(
+    `${Math.floor(
+      parseFloat(`${sendData.amount || 0}`) *
+        Math.pow(10, sendData.asset?.contract.decimals || 0)
+    ).toLocaleString("fullwide", { useGrouping: false })}`
+  );
+  return amount;
+};
+
+export const getTransactionData = (
+  sendData: SendData,
+  typeId: string,
+  from: string
+) => {
+  const inf = new utils.Interface(MinABI);
+  let transferData = "0x";
+  if (typeId === "1") {
+    const amount = ethers.BigNumber.from(
+      `${Math.floor(
+        parseFloat(`${sendData.amount || 0}`) *
+          Math.pow(10, sendData.asset?.contract.decimals || 0)
+      ).toLocaleString("fullwide", { useGrouping: false })}`
+    );
+    transferData = inf.encodeFunctionData("transfer", [
+      sendData.recipientAddress || AppConfig.estimateGasRecipientAddress,
+      amount.toHexString(),
+    ]);
+  } else if (typeId === "2") {
+    transferData = inf.encodeFunctionData("transferFrom", [
+      from,
+      sendData.recipientAddress || AppConfig.estimateGasRecipientAddress,
+      sendData.nft?.token_id,
+    ]);
+  }
+  return transferData;
+};
+
+export const getEstimateTransaction = (
+  sendData: SendData,
+  typeId: string,
+  from: string
+) => {
+  const transferData = getTransactionData(sendData, typeId, from);
+  const res: TransactionRequest = {
+    from,
+    gasPrice: sendData.gasPrice?.toHexString(),
+  };
+  if (typeId === "1") {
+    if (sendData.asset?.contract.contract_address === "eth") {
+      res.to =
+        sendData.recipientAddress || AppConfig.estimateGasRecipientAddress;
+      res.value = getTransactionAmount(sendData)
+        .toHexString()
+        .replace(/^(0x)0+/g, "$1");
+    } else {
+      res.data = transferData;
+      res.to = sendData.asset?.contract?.contract_address;
+    }
+  } else if (typeId === "2") {
+    res.data = transferData;
+    res.to = sendData.nft?.contract_address;
+  }
   return res;
 };

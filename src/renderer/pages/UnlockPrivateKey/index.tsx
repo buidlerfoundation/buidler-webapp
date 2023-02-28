@@ -20,7 +20,7 @@ import useAppSelector from "renderer/hooks/useAppSelector";
 import { decryptString, getIV } from "renderer/utils/DataCrypto";
 import "./index.scss";
 
-const UnlockPrivateKey = () => {
+const UnlockPrivateKey = (props: any) => {
   const userData = useAppSelector((state) => state.user.userData);
   const history = useHistory();
   const [pass, setPass] = useState("");

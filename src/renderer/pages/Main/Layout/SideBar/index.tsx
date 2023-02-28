@@ -9,9 +9,8 @@ import React, {
 } from "react";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import "./index.scss";
-import { Droppable, Draggable } from "react-beautiful-dnd";
 import ModalConfirmDelete from "renderer/shared/ModalConfirmDelete";
-import { Space, UserData } from "renderer/models";
+import { Space } from "renderer/models";
 import PopoverButton from "renderer/shared/PopoverButton";
 import {
   channelMenu,
@@ -21,14 +20,17 @@ import {
   spaceExclusiveChannelMenu,
 } from "renderer/utils/Menu";
 import SpaceItem from "renderer/shared/SpaceItem";
-import MemberSpace from "renderer/shared/MemberSpace";
 import images from "renderer/common/images";
 import useMatchCommunityId from "renderer/hooks/useMatchCommunityId";
 import useSpaceChannel from "renderer/hooks/useSpaceChannel";
+import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
+import CommunityHeader from "renderer/shared/CommunityHeader";
 
 type SideBarProps = {
   onEditGroupChannel: (group: any) => void;
   onEditChannelName: (channel: any) => void;
+  onOpenChannelSetting: (channel: any) => void;
+  onUpdateNotification: (channel: any) => void;
   onDeleteChannel: (channel: any) => void;
   onEditChannelMember: (channel: any) => void;
   onInviteMember: () => void;
@@ -45,6 +47,8 @@ const SideBar = forwardRef(
       onCreateChannel,
       onCreateGroupChannel,
       onEditChannelName,
+      onOpenChannelSetting,
+      onUpdateNotification,
       onDeleteChannel,
       onEditChannelMember,
       onInviteMember,
@@ -55,11 +59,11 @@ const SideBar = forwardRef(
     }: SideBarProps,
     ref
   ) => {
-    const { directChannel, currentChannel, team, currentTeam } = useAppSelector(
-      (state) => state.user
-    );
+    const { team } = useAppSelector((state) => state.user);
+    const currentTeam = useCurrentCommunity();
     const communityId = useMatchCommunityId();
     const spaceChannel = useSpaceChannel();
+    const spaceToggle = useAppSelector((state) => state.sideBar.spaceToggle);
     const [isOpenConfirmRemoveMember, setOpenConfirmRemoveMember] =
       useState(false);
     const [selectedMenuChannel, setSelectedMenuChannel] = useState<any>(null);
@@ -72,10 +76,10 @@ const SideBar = forwardRef(
     const menuSpaceChannelRef = useRef<any>();
     const menuMemberRef = useRef<any>();
     const isOwner = useMemo(() => {
-      return (
-        (team?.find((el) => el.team_id === communityId)?.role ||
-          currentTeam.role) === "Owner"
-      );
+      const role =
+        team?.find((el) => el.team_id === communityId)?.role ||
+        currentTeam.role;
+      return role === "Owner" || role === "Admin";
     }, [communityId, currentTeam.role, team]);
     useImperativeHandle(ref, () => {
       return {
@@ -127,16 +131,6 @@ const SideBar = forwardRef(
       },
       [isOwner]
     );
-    const handleContextMenuMemberSpace = useCallback(
-      (e: React.MouseEvent<HTMLDivElement, MouseEvent>, u: UserData) => {
-        setSelectedMenuMember(u);
-        menuMemberRef.current?.show(e.currentTarget, {
-          x: e.pageX,
-          y: e.pageY,
-        });
-      },
-      []
-    );
     const onSelectedMenu = useCallback(
       (menu: any) => {
         switch (menu.value) {
@@ -158,6 +152,14 @@ const SideBar = forwardRef(
           }
           case "Edit channel name": {
             onEditChannelName(selectedMenuChannel);
+            break;
+          }
+          case "Channel setting": {
+            onOpenChannelSetting(selectedMenuChannel);
+            break;
+          }
+          case "Notification": {
+            onUpdateNotification(selectedMenuChannel);
             break;
           }
           case "Delete channel": {
@@ -186,39 +188,27 @@ const SideBar = forwardRef(
         onEditChannelMember,
         onEditChannelName,
         onEditGroupChannel,
+        onOpenChannelSetting,
         onSpaceBadgeClick,
+        onUpdateNotification,
         selectedMenuChannel,
         selectedMenuSpaceChannel,
       ]
     );
     const renderSpaceItem = useCallback(
-      (space: Space, idx: number) => {
+      (space: Space) => {
         return (
-          <Draggable
+          <SpaceItem
             key={space.space_id}
-            draggableId={space.space_id}
-            index={idx}
-            isDragDisabled
-          >
-            {(dragProvided) => (
-              <div
-                ref={dragProvided.innerRef}
-                {...dragProvided.draggableProps}
-                {...dragProvided.dragHandleProps}
-              >
-                <SpaceItem
-                  isOwner={isOwner}
-                  space={space}
-                  onContextSpaceChannel={handleContextMenuSpace}
-                  onContextChannel={handleContextMenuChannel}
-                  onSpaceBadgeClick={onSpaceBadgeClick}
-                  onCreateChannelClick={onCreateChannel}
-                  channel_ids={space.channel_ids}
-                  isCollapsed={!space.is_expand}
-                />
-              </div>
-            )}
-          </Draggable>
+            isOwner={isOwner}
+            space={space}
+            onContextSpaceChannel={handleContextMenuSpace}
+            onContextChannel={handleContextMenuChannel}
+            onSpaceBadgeClick={onSpaceBadgeClick}
+            onCreateChannelClick={onCreateChannel}
+            channel_ids={space.channel_ids}
+            isCollapsed={!spaceToggle[space.space_id]}
+          />
         );
       },
       [
@@ -227,30 +217,19 @@ const SideBar = forwardRef(
         isOwner,
         onCreateChannel,
         onSpaceBadgeClick,
+        spaceToggle,
       ]
     );
     return (
       <div id="sidebar">
         {team && team?.length > 0 ? (
           <div className="sidebar-body">
-            <Droppable droppableId="group-channel-container" isDropDisabled>
-              {(provided) => {
-                return (
-                  <div ref={provided.innerRef} {...provided.droppableProps}>
-                    {spaceChannel.map(renderSpaceItem)}
-                    {provided.placeholder}
-                  </div>
-                );
-              }}
-            </Droppable>
-            <div ref={bottomBodyRef} />
-            <MemberSpace
-              directChannel={directChannel}
-              currentChannel={currentChannel}
-              onContextMenu={handleContextMenuMemberSpace}
-              onInviteMember={onInviteMember}
-              onViewMembers={onViewMembers}
+            <CommunityHeader
+              onInvitePress={onInviteMember}
+              onViewAllMembers={onViewMembers}
             />
+            {spaceChannel.map(renderSpaceItem)}
+            <div ref={bottomBodyRef} />
             {isOwner && (
               <div className="btn-create-space" onClick={onCreateGroupChannel}>
                 <img src={images.icPlus} alt="" className="ic-plus" />

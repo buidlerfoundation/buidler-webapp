@@ -1,5 +1,7 @@
 import React, { useCallback } from "react";
 import toast from "react-hot-toast";
+import { AsyncKey } from "renderer/common/AppConfig";
+import { removeCookie } from "renderer/common/Cookie";
 import NormalButton from "renderer/shared/NormalButton";
 import "./index.scss";
 
@@ -11,6 +13,7 @@ const UnSupportedNetwork = () => {
         params: [{ chainId: `0x${process.env.REACT_APP_DEFAULT_CHAIN_ID}` }],
       })
       .then(() => {
+        removeCookie(AsyncKey.socketConnectKey);
         window.location.reload();
       })
       .catch((err) => {

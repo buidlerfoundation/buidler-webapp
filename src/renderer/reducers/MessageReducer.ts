@@ -5,19 +5,25 @@ import actionTypes from "../actions/ActionTypes";
 import { differenceBy } from "lodash";
 
 type MessageReducerState = {
-  conversationData: { [key: string]: Array<MessageData> };
   messageData: {
     [key: string]: {
       canMore: boolean;
       data: Array<MessageData>;
       scrollData: { showScrollDown: boolean; unreadCount?: number };
+      canMoreAfter: boolean;
     };
   };
+  apiController?: AbortController | null;
+  ppApiController?: AbortController | null;
+  highlightMessageId?: string;
+  loadMoreAfterMessage?: boolean;
 };
 
 const initialState: MessageReducerState = {
   messageData: {},
-  conversationData: {},
+  apiController: null,
+  ppApiController: null,
+  loadMoreAfterMessage: false,
 };
 
 const messageReducers: Reducer<MessageReducerState, AnyAction> = (
@@ -26,29 +32,114 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
-    case actionTypes.CONVERSATION_SUCCESS: {
-      const { parentId, data, before } = payload;
-      let cvs = data;
-      if (before && state.conversationData?.[parentId]) {
-        cvs = [...state.conversationData[parentId], ...data];
+    case actionTypes.UPLOAD_ATTACHMENT_SUCCESS: {
+      const { file, file_url } = payload;
+      const newMessageData = { ...state.messageData };
+      if (file.entity_id && newMessageData?.[file.entity_id]) {
+        newMessageData[file.entity_id] = {
+          ...newMessageData?.[file.entity_id],
+          data: newMessageData?.[file.entity_id]?.data?.map((el) => {
+            if (el.message_id === file.attachment_id) {
+              return {
+                ...el,
+                message_attachments: el.message_attachments.map((att) => {
+                  if (att.file_id === file.file_id) {
+                    return {
+                      ...file,
+                      file_url,
+                    };
+                  }
+                  return att;
+                }),
+              };
+            }
+            return el;
+          }),
+        };
       }
       return {
         ...state,
-        conversationData: {
-          ...state.conversationData,
-          [parentId]: cvs,
-        },
+        messageData: { ...newMessageData },
       };
     }
+    case actionTypes.UPDATE_HIGHLIGHT_MESSAGE: {
+      return {
+        ...state,
+        highlightMessageId: payload,
+      };
+    }
+    case actionTypes.UPDATE_TASK_REQUEST: {
+      const { taskId, channelId, data } = payload;
+      const newMessageData = { ...state.messageData };
+      if (newMessageData[channelId]) {
+        newMessageData[channelId] = {
+          ...newMessageData[channelId],
+          data: newMessageData[channelId]?.data?.map?.((msg) => {
+            if (msg.message_id === taskId && msg.task) {
+              msg.task = { ...msg.task, ...data };
+            }
+            return msg;
+          }),
+        };
+      }
+      return {
+        ...state,
+        messageData: newMessageData,
+      };
+    }
+    case actionTypes.DELETE_TASK_REQUEST: {
+      const { taskId, channelId } = payload;
+      const newMessageData = { ...state.messageData };
+      if (newMessageData[channelId]) {
+        newMessageData[channelId] = {
+          ...newMessageData[channelId],
+          data: newMessageData[channelId]?.data?.map?.((msg) => {
+            if (msg.message_id === taskId) {
+              msg.task = undefined;
+            }
+            return msg;
+          }),
+        };
+      }
+      return {
+        ...state,
+        messageData: newMessageData,
+      };
+    }
+    case actionTypes.MESSAGE_PP_FRESH:
+    case actionTypes.MESSAGE_PP_REQUEST: {
+      return {
+        ...state,
+        ppApiController: payload.controller,
+      };
+    }
+    case actionTypes.MESSAGE_FRESH:
+    case actionTypes.MESSAGE_REQUEST: {
+      return {
+        ...state,
+        apiController: payload.controller,
+        loadMoreAfterMessage: !!payload.after,
+      };
+    }
+    case actionTypes.MESSAGE_PP_SUCCESS:
     case actionTypes.MESSAGE_SUCCESS: {
-      const { channelId, data, before, reloadSocket } = payload;
+      const {
+        channelId,
+        data,
+        before,
+        reloadSocket,
+        messageId,
+        after,
+        canMoreAfter,
+        canMoreBefore,
+      } = payload;
       let msg = data || [];
       let scrollData = state.messageData?.[channelId]?.scrollData;
       const currentData = state.messageData[channelId]?.data || [];
       if (reloadSocket) {
         const diff = differenceBy(
           currentData.filter(
-            (el) => el.createdAt >= data[data.length - 1].createdAt
+            (el) => el.createdAt >= data?.[data.length - 1]?.createdAt
           ),
           data,
           "message_id"
@@ -57,11 +148,15 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           showScrollDown: false,
         };
         msg = [...diff, ...msg];
-      } else if (
-        (before || data.length === 0) &&
-        state.messageData?.[channelId]?.data
-      ) {
-        msg = [...currentData, ...data];
+      } else if (state.messageData?.[channelId]?.data) {
+        if (!after && (before || data.length === 0)) {
+          msg = [...currentData, ...data];
+        } else if (after || data.length === 0) {
+          msg = [...data, ...currentData];
+          scrollData = {
+            showScrollDown: data.length > 0,
+          };
+        }
       } else {
         scrollData = {
           showScrollDown: false,
@@ -73,21 +168,39 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           ...state.messageData,
           [channelId]: {
             data: normalizeMessage(msg),
-            canMore: data.length !== 0,
+            canMore:
+              canMoreBefore !== undefined
+                ? canMoreBefore
+                : !after
+                ? data.length !== 0
+                : state.messageData?.[channelId]?.canMore,
+            canMoreAfter:
+              canMoreAfter !== undefined
+                ? canMoreAfter
+                : messageId
+                ? true
+                : after
+                ? data.length !== 0
+                : before
+                ? state.messageData?.[channelId]?.canMoreAfter
+                : false,
             scrollData,
           },
         },
+        apiController: null,
+        ppApiController: null,
+        loadMoreAfterMessage: false,
       };
     }
     case actionTypes.REMOVE_MESSAGE_ATTACHMENT: {
       const { messageId, fileId, channelId } = payload;
-      const newMessageData = state.messageData;
+      const newMessageData = { ...state.messageData };
       if (newMessageData[channelId]) {
         newMessageData[channelId] = {
           ...newMessageData[channelId],
           data: newMessageData[channelId].data.map((el) => {
             if (el.message_id === messageId) {
-              el.message_attachment = el.message_attachment.filter(
+              el.message_attachments = el.message_attachments.filter(
                 (item) => item.file_id !== fileId
               );
             }
@@ -118,8 +231,47 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
       };
     }
     case actionTypes.DELETE_MESSAGE: {
-      const { messageId, channelId, parentId } = payload;
-      const newMessageData = state.messageData;
+      const { messageId, channelId, currentChannelId } = payload;
+      const newMessageData = { ...state.messageData };
+      if (currentChannelId !== channelId && newMessageData[currentChannelId]) {
+        const currentIdx = newMessageData[currentChannelId].data.findIndex(
+          (el) => el.message_id === messageId
+        );
+        const currentMsg = newMessageData[currentChannelId].data?.[currentIdx];
+        newMessageData[currentChannelId] = {
+          ...newMessageData[currentChannelId],
+          data: newMessageData[currentChannelId].data
+            .filter((el) => el.message_id !== messageId)
+            .map((el, index) => {
+              if (el.reply_message_id === messageId) {
+                el.conversation_data = undefined;
+                return {
+                  ...el,
+                };
+              }
+              if (el.message_id === channelId && el.task) {
+                el.task = {
+                  ...el.task,
+                  total_messages: `${
+                    parseInt(el.task.total_messages || "0") - 1
+                  }`,
+                };
+                return {
+                  ...el,
+                };
+              }
+              if (currentIdx === index + 1) {
+                return {
+                  ...el,
+                  isHead: el.isHead || currentMsg?.isHead,
+                  isConversationHead:
+                    el.isConversationHead || currentMsg?.isConversationHead,
+                };
+              }
+              return el;
+            }),
+        };
+      }
       if (newMessageData[channelId]) {
         const currentIdx = newMessageData[channelId].data.findIndex(
           (el) => el.message_id === messageId
@@ -130,10 +282,11 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           data: newMessageData[channelId].data
             .filter((el) => el.message_id !== messageId)
             .map((el, index) => {
-              if (el.parent_id === parentId) {
-                el.conversation_data = el.conversation_data.filter(
-                  (c) => c.message_id !== messageId
-                );
+              if (el.reply_message_id === messageId) {
+                el.conversation_data = undefined;
+                return {
+                  ...el,
+                };
               }
               if (currentIdx === index + 1) {
                 return {
@@ -154,49 +307,43 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
     case actionTypes.EDIT_MESSAGE: {
       const { data } = payload;
       const {
-        channel_id,
+        entity_id,
         message_id,
         content,
         task,
-        parent_id,
-        message_attachment,
+        message_attachments,
         plain_text,
+        updatedAt,
       } = data;
-      const newMessageData = state.messageData;
-      const newConversationData = state.conversationData;
-      if (newConversationData[parent_id]) {
-        newConversationData[parent_id] = newConversationData[parent_id].map(
-          (el) => {
-            if (el.message_id === message_id) {
-              el.content = content;
-              el.plain_text = plain_text;
-              el.task = task;
-              el.message_attachment = message_attachment;
-            }
-            return el;
-          }
-        );
-      }
-      if (newMessageData[channel_id]) {
-        newMessageData[channel_id] = {
-          ...newMessageData[channel_id],
-          data: newMessageData[channel_id]?.data?.map?.((msg) => {
+      const newMessageData = { ...state.messageData };
+      if (newMessageData[entity_id]) {
+        newMessageData[entity_id] = {
+          ...newMessageData[entity_id],
+          data: newMessageData[entity_id]?.data?.map?.((msg) => {
             if (msg.message_id === message_id) {
               msg.content = content;
               msg.plain_text = plain_text;
-              msg.task = task;
-              msg.message_attachment = message_attachment;
+              msg.task =
+                msg.task || task
+                  ? {
+                      ...(msg.task || {}),
+                      ...task,
+                    }
+                  : null;
+              msg.message_attachments = message_attachments;
+              msg.updatedAt = updatedAt;
+              return { ...msg };
             }
-            if (msg.parent_id === parent_id) {
-              msg.conversation_data = msg.conversation_data.map((el) => {
-                if (el.message_id === message_id) {
-                  el.content = content;
-                  el.plain_text = plain_text;
-                  el.task = task;
-                  el.message_attachment = message_attachment;
-                }
-                return el;
-              });
+            if (msg.reply_message_id === message_id && msg.conversation_data) {
+              msg.conversation_data = {
+                ...msg.conversation_data,
+                content,
+                plain_text,
+                task,
+                message_attachments,
+                updatedAt,
+              };
+              return { ...msg };
             }
             return msg;
           }),
@@ -208,117 +355,101 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
       };
     }
     case actionTypes.EMIT_NEW_MESSAGE: {
-      const newMessageData = state.messageData;
-      if (newMessageData[payload.channel_id]?.data) {
-        newMessageData[payload.channel_id] = {
-          ...newMessageData[payload.channel_id],
+      const newMessageData = { ...state.messageData };
+      if (newMessageData[payload.entity_id]?.data) {
+        newMessageData[payload.entity_id] = {
+          ...newMessageData[payload.entity_id],
           data: normalizeMessage([
             payload,
-            ...newMessageData[payload.channel_id].data.map((msg) => {
-              if (
-                msg.parent_id === payload.parent_id ||
-                msg.message_id === payload.parent_id
-              ) {
-                msg.conversation_data = payload.conversation_data;
-              }
-              if (
-                msg.message_id === payload.parent_id ||
-                msg.parent_id === payload.parent_id
-              ) {
-                msg.parent_id = payload.parent_id;
-                if (msg.task) {
-                  msg.task.comment_count = msg.task.comment_count
-                    ? msg.task.comment_count + 1
-                    : msg.conversation_data.length - 1;
-                }
-              }
-              return msg;
-            }),
+            ...newMessageData[payload.entity_id].data,
           ]),
         };
       } else {
-        newMessageData[payload.channel_id] = {
+        newMessageData[payload.entity_id] = {
           data: normalizeMessage([payload]),
           canMore: true,
           scrollData: { showScrollDown: false, unreadCount: 0 },
-        };
-      }
-      return {
-        ...state,
-        newMessageData,
-      };
-    }
-    case actionTypes.RECEIVE_MESSAGE: {
-      const { data } = payload;
-      if (!data.conversation_data) {
-        data.conversation_data = [];
-      }
-      const newMessageData = state.messageData;
-      const newConversationData = state.conversationData;
-      if (newConversationData[data.parent_id]) {
-        newConversationData[data.parent_id] = data.conversation_data;
-      }
-      if (newMessageData[data.channel_id]?.data) {
-        const isExited = !!newMessageData[data.channel_id]?.data?.find?.(
-          (el) => el.message_id === data.message_id
-        );
-        if (isExited) {
-          newMessageData[data.channel_id] = {
-            ...newMessageData[data.channel_id],
-            data: normalizeMessage(
-              newMessageData[data.channel_id].data.map((msg) => {
-                if (msg.message_id === data.message_id) {
-                  return data;
-                }
-                return msg;
-              })
-            ),
-          };
-        } else {
-          newMessageData[data.channel_id] = {
-            ...newMessageData[data.channel_id],
-            data: normalizeMessage([
-              data,
-              ...newMessageData[data.channel_id].data.map((msg) => {
-                if (
-                  msg.parent_id === data.parent_id ||
-                  msg.message_id === data.parent_id
-                ) {
-                  msg.conversation_data = data.conversation_data;
-                }
-                if (
-                  msg.message_id === data.parent_id ||
-                  msg.parent_id === data.parent_id
-                ) {
-                  msg.parent_id = data.parent_id;
-                  if (msg.task) {
-                    msg.task.comment_count = msg.task.comment_count
-                      ? msg.task.comment_count + 1
-                      : msg.conversation_data.length - 1;
-                  }
-                }
-                return msg;
-              }),
-            ]),
-          };
-        }
-      } else {
-        newMessageData[data.channel_id] = {
-          data: normalizeMessage([data]),
-          canMore: true,
-          scrollData: { showScrollDown: false, unreadCount: 0 },
+          canMoreAfter: true,
         };
       }
       return {
         ...state,
         messageData: newMessageData,
-        conversationData: newConversationData,
+      };
+    }
+    case actionTypes.RECEIVE_MESSAGE: {
+      const { data, currentChannelId } = payload;
+      const newMessageData = { ...state.messageData };
+      if (data.entity_type === "post") {
+        if (newMessageData[currentChannelId]?.data) {
+          newMessageData[currentChannelId] = {
+            ...newMessageData[currentChannelId],
+            data: normalizeMessage(
+              newMessageData[currentChannelId].data.map((msg) => {
+                if (msg.message_id === data.entity_id && msg.task) {
+                  msg.task = {
+                    ...msg.task,
+                    latest_reply_senders: [
+                      data.sender_id,
+                      ...(msg.task.latest_reply_senders?.filter(
+                        (el) => el !== data.sender_id
+                      ) || []),
+                    ],
+                    latest_reply_message_at: data.createdAt,
+                    total_messages: `${
+                      parseInt(msg.task.total_messages || "0") + 1
+                    }`,
+                  };
+                }
+                return msg;
+              })
+            ),
+          };
+        }
+      }
+      if (newMessageData[data.entity_id]?.data) {
+        if (!newMessageData[data.entity_id]?.canMoreAfter) {
+          const isExited = !!newMessageData[data.entity_id]?.data?.find?.(
+            (el) => el.message_id === data.message_id
+          );
+          if (isExited) {
+            newMessageData[data.entity_id] = {
+              ...newMessageData[data.entity_id],
+              data: normalizeMessage(
+                newMessageData[data.entity_id].data.map((msg) => {
+                  if (msg.message_id === data.message_id) {
+                    return data;
+                  }
+                  return msg;
+                })
+              ),
+            };
+          } else {
+            newMessageData[data.entity_id] = {
+              ...newMessageData[data.entity_id],
+              data: normalizeMessage([
+                data,
+                ...newMessageData[data.entity_id].data,
+              ]),
+            };
+          }
+        }
+      } else {
+        newMessageData[data.entity_id] = {
+          data: normalizeMessage([data]),
+          canMore: true,
+          scrollData: { showScrollDown: false, unreadCount: 0 },
+          canMoreAfter: false,
+        };
+      }
+      return {
+        ...state,
+        messageData: newMessageData,
       };
     }
     case actionTypes.LOGOUT: {
       return {
         messageData: {},
-        conversationData: {},
       };
     }
     default:

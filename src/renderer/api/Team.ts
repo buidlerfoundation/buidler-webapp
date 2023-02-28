@@ -1,5 +1,5 @@
+import { DirectCommunity } from "renderer/common/AppConfig";
 import { UserData } from "renderer/models";
-import ApiCaller from "./ApiCaller";
 import Caller from "./Caller";
 
 // {
@@ -8,16 +8,29 @@ import Caller from "./Caller";
 //   "team_icon": "https://geographical.co.uk/media/k2/items/cache/8e4e30c8fc08507de1b0b5afc7d32a85_XL.jpg"
 // }
 
-export const createTeam = (body: any) => ApiCaller.post("team", body);
+export const createTeam = (body: any) => Caller.post("team", body);
 
-export const getTeamUsers = (teamId: string) =>
-  Caller.get<Array<UserData>>(`team/${teamId}/members`);
+export const getDirectChannelUsers = (controller?: AbortController) =>
+  Caller.get<UserData[]>(
+    "direct-channel/members?channel_types[]=Direct&channel_types[]=Multiple Direct",
+    undefined,
+    controller
+  );
+
+export const getTeamUsers = (teamId: string, controller?: AbortController) => {
+  if (teamId === DirectCommunity.team_id)
+    return getDirectChannelUsers(controller);
+  return Caller.get<Array<UserData>>(
+    `team/${teamId}/members`,
+    undefined,
+    controller
+  );
+};
 
 export const invitation = (teamId: string) =>
   Caller.post<{ invitation_url: string }>(`team/invitation/${teamId}/members`);
 
 export const updateTeam = (teamId: string, body: any) =>
-  ApiCaller.put(`team/${teamId}`, body);
+  Caller.put(`team/${teamId}`, body);
 
-export const removeTeam = (teamId: string) =>
-  ApiCaller.delete(`team/${teamId}`);
+export const removeTeam = (teamId: string) => Caller.delete(`team/${teamId}`);

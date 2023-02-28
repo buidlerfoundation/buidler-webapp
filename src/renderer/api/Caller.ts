@@ -1,8 +1,18 @@
 import toast from "react-hot-toast";
+import actionTypes from "renderer/actions/ActionTypes";
+import { refreshToken } from "renderer/actions/UserActions";
 import { BaseDataApi } from "renderer/models";
+import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
+import GlobalVariable from "renderer/services/GlobalVariable";
 import store from "renderer/store";
-import AppConfig, { AsyncKey } from "../common/AppConfig";
-import { getCookie } from "../common/Cookie";
+import SocketUtils from "renderer/utils/SocketUtils";
+import AppConfig, {
+  AsyncKey,
+  ignoreMessageErrorApis,
+  importantApis,
+  whiteListRefreshTokenApis,
+} from "../common/AppConfig";
+import { clearData, getCookie } from "../common/Cookie";
 
 const METHOD_GET = "get";
 const METHOD_POST = "post";
@@ -10,14 +20,137 @@ const METHOD_PUT = "put";
 const METHOD_DELETE = "delete";
 const METHOD_PATCH = "patch";
 
+const sleep = (timeout = 1000) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, timeout);
+  });
+};
+
+const handleError = (message: string, apiData: any) => {
+  const { uri, fetchOptions } = apiData;
+  const compareUri = `${fetchOptions.method}-${uri}`;
+  const importantApi = importantApis.find((el) => {
+    if (el.exact) {
+      return compareUri === el.uri;
+    }
+    return compareUri.includes(el.uri);
+  });
+  if (importantApi) {
+    store.dispatch({ type: actionTypes.SOMETHING_WRONG });
+    throw new Error("Something wrong");
+  } else if (!ignoreMessageErrorApis.includes(compareUri)) {
+    toast.error(message);
+  }
+};
+
+const getRequestBody = (data: any) => {
+  try {
+    const body = JSON.parse(data);
+    return body;
+  } catch (error) {
+    return {};
+  }
+};
+
+const fetchWithRetry = (
+  uri: string,
+  fetchOptions: any = {},
+  retries = 0,
+  serviceBaseUrl?: string
+) => {
+  let apiUrl = "";
+  if (serviceBaseUrl) {
+    apiUrl = serviceBaseUrl + uri;
+  } else {
+    apiUrl = AppConfig.apiBaseUrl + uri;
+  }
+  return fetch(apiUrl, fetchOptions)
+    .then((res) => {
+      return res
+        .json()
+        .then(async (data) => {
+          if (res.status !== 200) {
+            handleError(data.message || data, { uri, fetchOptions });
+            return { ...data, statusCode: res.status };
+          }
+          if (data.data) {
+            return { ...data, statusCode: res.status };
+          }
+          if (data.success || data.message) {
+            return {
+              data: data.data,
+              success: data.success,
+              message: data.message,
+              statusCode: res.status,
+            };
+          }
+          return { data, statusCode: res.status };
+        })
+        .catch((err) => {
+          return { message: err, statusCode: res.status };
+        });
+    })
+    .catch(async (err) => {
+      const msg = err.message || err || "";
+      if (msg === "Failed to fetch") {
+        if (retries > 0) {
+          await sleep();
+          return fetchWithRetry(uri, fetchOptions, retries - 1, serviceBaseUrl);
+        }
+      }
+      GoogleAnalytics.trackingError(
+        uri,
+        fetchOptions.method.toLowerCase(),
+        msg,
+        err.statusCode,
+        getRequestBody(fetchOptions.body)
+      );
+      if (!msg.includes("aborted")) {
+        handleError(msg, { uri, fetchOptions });
+      }
+      return {
+        message: msg,
+      };
+    });
+};
+
 async function requestAPI<T = any>(
   method: string,
   uri: string,
   body?: any,
-  serviceBaseUrl?: string
+  serviceBaseUrl?: string,
+  controller?: AbortController,
+  h?: any
 ): Promise<BaseDataApi<T>> {
+  if (GlobalVariable.sessionExpired) {
+    return {
+      success: false,
+      statusCode: 403,
+    };
+  }
+  if (!whiteListRefreshTokenApis.includes(`${method}-${uri}`)) {
+    const expireTokenTime = await getCookie(AsyncKey.tokenExpire);
+    if (!expireTokenTime || new Date().getTime() / 1000 > expireTokenTime) {
+      const success: any = await store.dispatch(refreshToken());
+      if (!success) {
+        if (!GlobalVariable.sessionExpired) {
+          GlobalVariable.sessionExpired = true;
+          toast.error("Session expired");
+          clearData(() => {
+            window.location.reload();
+          });
+        }
+        return {
+          success: false,
+          statusCode: 403,
+        };
+      } else {
+        SocketUtils.init();
+      }
+    }
+  }
   // Build API header
-  const headers: any = {
+  let headers: any = {
     Accept: "*/*",
     "Access-Control-Allow-Origin": "*",
   };
@@ -26,14 +159,6 @@ async function requestAPI<T = any>(
     // headers = {};
   } else {
     headers["Content-Type"] = "application/json";
-  }
-
-  // Build API url
-  let apiUrl = "";
-  if (serviceBaseUrl) {
-    apiUrl = serviceBaseUrl + uri;
-  } else {
-    apiUrl = AppConfig.apiBaseUrl + uri;
   }
 
   // Get access token and attach it to API request's header
@@ -54,6 +179,13 @@ async function requestAPI<T = any>(
     headers["Chain-Id"] = chainId;
   }
 
+  if (h) {
+    headers = {
+      ...headers,
+      ...h,
+    };
+  }
+
   // Build API body
   let contentBody: any = null;
   if (
@@ -71,62 +203,71 @@ async function requestAPI<T = any>(
     }
   }
   // Construct fetch options
-  const fetchOptions = { method, headers, body: contentBody };
+  const fetchOptions: RequestInit = { method, headers, body: contentBody };
+  if (!!controller) {
+    fetchOptions.signal = controller.signal;
+  }
   // Run the fetching
-  return fetch(apiUrl, fetchOptions)
-    .then((res) => {
-      return res
-        .json()
-        .then((data) => {
-          if (res.status !== 200) {
-            toast.error(data.message || data);
-          }
-          if (data.data) {
-            return { ...data, statusCode: res.status };
-          }
-          if (data.success || data.message) {
-            return {
-              data: data.data,
-              success: data.success,
-              message: data.message,
-              statusCode: res.status,
-            };
-          }
-          return { data, statusCode: res.status };
-        })
-        .catch((err) => {
-          return { message: err, statusCode: res.status };
-        });
-    })
-    .catch((err) => {
-      toast.error(err.message || err);
-      return {
-        message: err,
-      };
-    });
+  if (!navigator.onLine) {
+    return Promise.reject(Error("No internet connection"));
+  }
+  const compareUri = `${method}-${uri}`;
+  const importantApi = importantApis.find((el) => {
+    if (el.exact) {
+      return compareUri === el.uri;
+    }
+    return compareUri.includes(el.uri);
+  });
+  return fetchWithRetry(
+    uri,
+    fetchOptions,
+    importantApi ? 5 : 0,
+    serviceBaseUrl
+  );
 }
 
 const timeRequestMap: { [key: string]: any } = {};
 
 const Caller = {
-  get<T>(url: string, baseUrl?: string) {
-    return requestAPI<T>(METHOD_GET, url, undefined, baseUrl);
+  get<T>(url: string, baseUrl?: string, controller?: AbortController) {
+    return requestAPI<T>(METHOD_GET, url, undefined, baseUrl, controller);
   },
 
-  post<T>(url: string, data?: any, baseUrl?: string) {
-    return requestAPI<T>(METHOD_POST, url, data, baseUrl);
+  post<T>(
+    url: string,
+    data?: any,
+    baseUrl?: string,
+    controller?: AbortController,
+    h?: any
+  ) {
+    return requestAPI<T>(METHOD_POST, url, data, baseUrl, controller, h);
   },
 
-  patch<T>(url: string, data?: any, baseUrl?: string) {
-    return requestAPI<T>(METHOD_PATCH, url, data, baseUrl);
+  patch<T>(
+    url: string,
+    data?: any,
+    baseUrl?: string,
+    controller?: AbortController
+  ) {
+    return requestAPI<T>(METHOD_PATCH, url, data, baseUrl, controller);
   },
 
-  put<T>(url: string, data?: any, baseUrl?: string) {
-    return requestAPI<T>(METHOD_PUT, url, data, baseUrl);
+  put<T>(
+    url: string,
+    data?: any,
+    baseUrl?: string,
+    controller?: AbortController
+  ) {
+    return requestAPI<T>(METHOD_PUT, url, data, baseUrl, controller);
   },
 
-  delete<T>(url: string, data?: any, baseUrl?: string) {
-    return requestAPI<T>(METHOD_DELETE, url, data, baseUrl);
+  delete<T>(
+    url: string,
+    data?: any,
+    baseUrl?: string,
+    controller?: AbortController
+  ) {
+    return requestAPI<T>(METHOD_DELETE, url, data, baseUrl, controller);
   },
 
   getWithLatestResponse(url: string, baseUrl?: string): Promise<any> {

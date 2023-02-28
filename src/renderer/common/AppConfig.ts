@@ -1,4 +1,4 @@
-import { UserRoleType } from "renderer/models";
+import { Community, UserData, UserRoleType } from "renderer/models";
 import images from "./images";
 
 const Prefix = "Buidler";
@@ -12,12 +12,15 @@ const AppConfig = {
     process.env.REACT_APP_DEFAULT_CHAIN_ID === "4"
       ? "https://rinkeby.etherscan.io"
       : "https://etherscan.io",
+  buidlerCommunityId: "c9097f50-9f0b-4e0a-a042-ab7790aff3b0",
+  estimateGasRecipientAddress: "0x1908bf9Dae06BB1F6E4C7eE0f7B5D4c82D1Ba6ad",
 };
 
 export default AppConfig;
 
 export const AsyncKey = {
   accessTokenKey: `${Prefix}_access_token`,
+  refreshTokenKey: `${Prefix}_refresh_token`,
   lastChannelId: `${Prefix}_last_channel_id`,
   lastTeamId: `${Prefix}_last_team_id`,
   ivKey: `${Prefix}_iv_key`,
@@ -28,6 +31,12 @@ export const AsyncKey = {
   lastTimeFocus: `${Prefix}_last_time_focus`,
   generatedPrivateKey: `${Prefix}_generated_private_key`,
   loginType: `${Prefix}_login_key`,
+  socketConnectKey: `${Prefix}_socket_connect_key`,
+  tokenExpire: `${Prefix}_token_expire_key`,
+  refreshTokenExpire: `${Prefix}_refresh_token_expire_key`,
+  lastSyncChannelKey: `${Prefix}_last_sync_channel_key`,
+  spaceToggleKey: `${Prefix}_space_toggle_key`,
+  isBackup: `${Prefix}_is_backup`,
 };
 
 export const ProgressStatus = [
@@ -55,6 +64,7 @@ export const LoginType = {
   WalletConnect: "WalletConnect",
   WalletImport: "WalletImport",
   Metamask: "Metamask",
+  Web3Auth: "Web3Auth",
 };
 
 export const SpaceBadge = [
@@ -76,4 +86,35 @@ export const UserRole: {
   Owner: "owner",
   Admin: "admin",
   Member: "member",
+};
+
+export const importantApis = [
+  { uri: "get-space", exact: false },
+  { uri: "get-channel", exact: false },
+  { uri: "get-user/team", exact: true },
+  { uri: "get-user", exact: true },
+  { uri: "post-user/refresh", exact: true },
+];
+
+export const whiteListRefreshTokenApis = [
+  "get-initial",
+  "post-user/refresh",
+  "post-user/address",
+  "post-user",
+  "delete-user/device",
+];
+
+export const ignoreMessageErrorApis = ["delete-user/device"];
+
+export const DeletedUser: UserData = {
+  user_id: "",
+  user_name: "Deleted User",
+  avatar_url: "",
+};
+
+export const DirectCommunity: Community = {
+  team_id: "b796712f-eea4-4ba1-abc6-ca76e9af24bc",
+  team_display_name: "Direct Message",
+  direct: true,
+  seen: true,
 };

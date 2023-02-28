@@ -3,17 +3,56 @@ import {
   normalizeMessageData,
   normalizePublicMessageData,
 } from "renderer/helpers/ChannelHelper";
+import store from "renderer/store";
+import SocketUtils from "renderer/utils/SocketUtils";
 import api from "../api";
 import actionTypes from "./ActionTypes";
+
+export const getAroundMessage =
+  (messageId: string, channelId: string) => async (dispatch: Dispatch) => {
+    dispatch({
+      type: actionTypes.MESSAGE_REQUEST,
+      payload: { messageId, channelId },
+    });
+    try {
+      const messageRes = await api.getAroundMessageById(messageId);
+      const messageData = messageRes.metadata?.encrypt_message_key
+        ? normalizePublicMessageData(
+            messageRes.data || [],
+            messageRes.metadata?.encrypt_message_key
+          )
+        : await normalizeMessageData(messageRes.data || [], channelId);
+      if (messageRes.statusCode === 200) {
+        dispatch({
+          type: actionTypes.MESSAGE_SUCCESS,
+          payload: {
+            data: messageData,
+            channelId,
+            messageId,
+            canMoreAfter: messageRes.metadata?.can_loadmore_message_after,
+            canMoreBefore: messageRes.metadata?.can_loadmore_message_before,
+          },
+        });
+      } else {
+        dispatch({
+          type: actionTypes.MESSAGE_FAIL,
+          payload: messageRes,
+        });
+      }
+      return messageRes.statusCode === 200;
+    } catch (error) {
+      dispatch({
+        type: actionTypes.MESSAGE_FAIL,
+        payload: { message: error },
+      });
+      return false;
+    }
+  };
 
 export const deleteMessage: ActionCreator<any> =
   (messageId: string, parentId: string, channelId: string) =>
   async (dispatch: Dispatch) => {
     api.deleteMessage(messageId);
-    dispatch({
-      type: actionTypes.DELETE_MESSAGE,
-      payload: { messageId, parentId, channelId },
-    });
   };
 
 export const getConversations: ActionCreator<any> =
@@ -47,26 +86,135 @@ export const onRemoveAttachment: ActionCreator<any> =
     });
   };
 
-export const getMessages: ActionCreator<any> =
-  (channelId: string, channelType: string, before?: string, isFresh = false) =>
+export const getPinPostMessages: ActionCreator<any> =
+  (postId: string, before?: string, isFresh = false) =>
   async (dispatch: Dispatch) => {
+    const { ppApiController } = store.getState().message;
+    ppApiController?.abort?.();
+    const controller = new AbortController();
+    if (!before) {
+      SocketUtils.emitSeenPost(postId);
+    }
+    if (before) {
+      dispatch({ type: actionTypes.MESSAGE_PP_MORE, payload: { postId } });
+    } else if (isFresh) {
+      dispatch({
+        type: actionTypes.MESSAGE_PP_FRESH,
+        payload: { postId, controller },
+      });
+    } else {
+      dispatch({
+        type: actionTypes.MESSAGE_PP_REQUEST,
+        payload: { postId, controller },
+      });
+    }
+    try {
+      const messageRes = await api.getPinPostMessage(
+        postId,
+        20,
+        before,
+        undefined,
+        controller
+      );
+      const messageData = normalizePublicMessageData(
+        messageRes.data || [],
+        messageRes.metadata?.encrypt_message_key
+      );
+      if (messageRes.statusCode === 200) {
+        dispatch({
+          type: actionTypes.MESSAGE_PP_SUCCESS,
+          payload: {
+            data: messageData,
+            channelId: postId,
+            before,
+            isFresh,
+            reloadSocket: !before,
+            canMoreAfter: messageRes.metadata?.can_loadmore_message_after,
+            canMoreBefore: messageRes.metadata?.can_loadmore_message_before,
+          },
+        });
+      } else {
+        dispatch({
+          type: actionTypes.MESSAGE_PP_FAIL,
+          payload: messageRes,
+        });
+      }
+    } catch (error) {
+      dispatch({
+        type: actionTypes.MESSAGE_PP_FAIL,
+        payload: { message: error },
+      });
+    }
+  };
+
+export const getMessages: ActionCreator<any> =
+  (channelId: string, before?: string, after?: string, isFresh = false) =>
+  async (dispatch: Dispatch) => {
+    const { apiController, messageData } = store.getState().message;
+    apiController?.abort?.();
+    if (!before) {
+      const messages = messageData?.[channelId]?.data;
+      SocketUtils.emitSeenChannel(messages?.[0]?.message_id, channelId);
+    }
+    const controller = new AbortController();
     if (before) {
       dispatch({ type: actionTypes.MESSAGE_MORE, payload: { channelId } });
     } else if (isFresh) {
-      dispatch({ type: actionTypes.MESSAGE_FRESH, payload: { channelId } });
-    } else {
-      dispatch({ type: actionTypes.MESSAGE_REQUEST, payload: { channelId } });
-    }
-    const messageRes = await api.getMessages(channelId, 50, before);
-    const isPrivate = channelType === "Private" || channelType === "Direct";
-    const messageData = isPrivate
-      ? await normalizeMessageData(messageRes.data || [], channelId)
-      : await normalizePublicMessageData(messageRes.data || []);
-    if (messageRes.statusCode === 200) {
       dispatch({
-        type: actionTypes.MESSAGE_SUCCESS,
-        payload: { data: messageData, channelId, before, isFresh },
+        type: actionTypes.MESSAGE_FRESH,
+        payload: { channelId, controller },
       });
+    } else {
+      dispatch({
+        type: actionTypes.MESSAGE_REQUEST,
+        payload: { channelId, controller, after },
+      });
+    }
+    try {
+      const messageRes = await api.getMessages(
+        channelId,
+        undefined,
+        before,
+        after,
+        controller
+      );
+      if (!before) {
+        SocketUtils.emitSeenChannel(
+          messageRes.data?.[0]?.message_id,
+          channelId
+        );
+      }
+      const data = messageRes.metadata?.encrypt_message_key
+        ? normalizePublicMessageData(
+            messageRes.data || [],
+            messageRes.metadata?.encrypt_message_key
+          )
+        : await normalizeMessageData(messageRes.data || [], channelId);
+      if (messageRes.statusCode === 200) {
+        dispatch({
+          type: actionTypes.MESSAGE_SUCCESS,
+          payload: {
+            data,
+            channelId,
+            before,
+            isFresh,
+            after,
+            reloadSocket: !before && !after,
+          },
+        });
+      } else {
+        dispatch({
+          type: actionTypes.MESSAGE_FAIL,
+          payload: messageRes,
+        });
+      }
+      return messageRes.data?.[messageRes.data.length - 1]?.message_id;
+    } catch (error) {
+      dispatch({
+        type: actionTypes.MESSAGE_FAIL,
+        payload: { message: error },
+      });
+      return false;
     }
   };
 

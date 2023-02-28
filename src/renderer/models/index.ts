@@ -4,9 +4,26 @@ export type LocalAttachment = {
   file?: any;
   loading?: boolean;
   type?: string;
+  fileName?: string;
+  id?: string;
+  randomId?: string;
+  url?: string;
 };
 
 export type SpaceType = "Public" | "Exclusive";
+
+export type CreateChannelData = {
+  name: string;
+  space?: Space | null;
+  isPrivate?: boolean;
+  members?: Array<UserData>;
+  channelId?: string;
+  attachment?: LocalAttachment | null;
+  emoji?: string | null;
+  url?: string | null;
+  isDeactivated?: boolean;
+  notificationType?: string;
+};
 
 export type CreateSpaceData = {
   spaceId?: string;
@@ -40,6 +57,9 @@ export interface UserNFTCollection {
   symbol: string;
   network: string;
   token_id: string;
+  nft_collection?: NFTCollection;
+  can_set_username?: boolean;
+  can_set_avatar?: boolean;
 }
 
 export interface UserData {
@@ -56,22 +76,30 @@ export interface UserData {
   user_channels?: Array<string>;
   user_bio?: string;
   spaces?: Array<Space>;
+  address?: string;
+  verified_avatar_asset_collection?: UserNFTCollection;
+  verified_username_asset_collection?: UserNFTCollection;
+  is_deleted?: boolean;
+  total_unread_notifications?: number;
+  direct_channel_id?: string;
 }
 
 export interface Channel {
   channel_emoji?: string;
   channel_id: string;
   channel_image_url?: string;
-  channel_member: Array<string>;
+  channel_members: Array<string>;
   channel_name: string;
   channel_type: "Public" | "Private" | "Direct";
-  notification_type: string;
-  seen: boolean;
+  notification_type?: string;
+  seen?: boolean;
   space?: Space;
   space_id?: string;
   user?: UserData;
   group_channel_id?: string;
   attachment?: any;
+  is_chat_deactivated?: boolean;
+  updatedAt?: string;
 }
 
 export interface Space {
@@ -90,16 +118,19 @@ export interface Space {
   space_background_color?: string;
   channel_ids: Array<string>;
   is_space_member: boolean;
-  is_expand?: boolean;
 }
 
 export interface Community {
   team_display_name: string;
-  team_icon: string;
+  team_icon?: string;
   team_id: string;
-  team_url: string;
-  role: string;
+  team_url?: string;
+  role?: string;
   team_description?: string;
+  seen?: boolean;
+  is_verified?: boolean;
+  direct?: boolean;
+  team_background?: string;
 }
 
 export interface NFTCollection {
@@ -153,9 +184,10 @@ export interface ReactReducerData {
 
 export interface AttachmentData {
   file_id: string;
-  file_url: string;
-  mimetype: string;
-  original_name: string;
+  file_url?: string;
+  mimetype?: string;
+  original_name?: string;
+  is_uploaded?: boolean;
 }
 
 export interface FileApiData {
@@ -189,44 +221,63 @@ export interface ReactionData {
 }
 
 export interface TaskData {
-  channel?: Array<Channel>;
+  channels?: Array<Channel>;
   comment_count: number;
   creator: UserData;
   creator_id: string;
-  notes: string;
   reaction_data: Array<ReactionData>;
   status: "pinned" | "todo" | "doing" | "done" | "archived";
-  task_attachment: Array<AttachmentData>;
+  task_attachments?: Array<AttachmentData>;
   task_id: string;
-  task_tag: Array<TagData>;
-  title: string;
+  task_tags: Array<TagData>;
+  content: string;
   up_votes: number;
   user_reaction: Array<UserReaction>;
   assignee?: UserData;
   due_date?: Date | string;
   isHighLight?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  total_messages?: string;
+  latest_reply_message_at?: string;
+  latest_reply_senders?: Array<string>;
+  total_reply_sender?: string;
+  root_message_channel_id: string;
+  message_created_at: string;
+  message_sender_id: string;
+  cid?: string;
+  uploadingIPFS?: boolean;
+  notification_type?: "alert" | "muted";
+  total_unread_notifications?: number;
 }
 
 export interface ConversationData {
   content: string;
   createdAt: string;
-  message_attachment: Array<AttachmentData>;
+  message_attachments: Array<AttachmentData>;
   message_id: string;
   message_tag: Array<TagData>;
-  parent_id: string;
+  reply_message_id: string;
   plain_text: string;
   sender_id: string;
   updatedAt: string;
-  task: TaskData;
+  task?: TaskData;
   isHead: boolean;
   isSending?: boolean;
-  isConversationHead: boolean;
+  isConversationHead?: boolean;
   reaction_data: Array<ReactionData>;
   user_reaction: Array<UserReaction>;
+  entity_id: string;
+  entity_type: string;
+}
+
+export interface MessageDateData {
+  type: "date";
+  value: string;
 }
 
 export interface MessageData extends ConversationData {
-  conversation_data: Array<ConversationData>;
+  conversation_data?: ConversationData;
 }
 
 export interface ReactUserApiData {
@@ -263,6 +314,10 @@ export interface InitialApiData {
   img_domain: string;
   version: string;
   img_config: ImageConfig;
+  imgproxy: {
+    bucket_name: string;
+    domain: string;
+  };
 }
 
 export interface Contract {
@@ -274,21 +329,15 @@ export interface Contract {
   owner: string;
   is_potential: boolean;
   logo_url: string;
+  is_supported: boolean;
+  logo: string;
+  network: string;
 }
 
 export interface TokenPrice {
-  rate: number;
-  diff?: number;
-  diff1h?: number;
-  diff7d?: number;
-  diff30d?: number;
-  diff60d?: number;
-  diff90d?: number;
-  marketCapUsd?: number;
-  volume24h?: number;
-  availableSupply?: number;
-  ts?: string;
-  currency?: string;
+  current_price: number;
+  id: string;
+  image: string;
 }
 
 export interface Token {
@@ -328,7 +377,7 @@ export interface TransactionApiData {
 
 export interface NFTCollectionDataApi {
   name: string;
-  description: string;
+  description?: string;
   contract_address: string;
   token_type: string;
   image_url: string;
@@ -336,7 +385,17 @@ export interface NFTCollectionDataApi {
   external_url: string;
   symbol: string;
   network: string;
-  nft: Array<UserNFTCollection>;
+  nfts: Array<UserNFTCollection>;
+  slug: string;
+  marketplaces: {
+    [key: string]: {
+      marketplace: string;
+      last_ingested_at: string;
+      name: string;
+      safelist_request_status: string;
+      slug: string;
+    };
+  };
 }
 
 export interface NFTAsset {
@@ -353,7 +412,12 @@ export interface NFTAsset {
 }
 
 export interface ENSAsset {
-  name: string;
+  token_id: string;
+  value: string;
+  can_set_username: boolean;
+  can_set_team_namespace: boolean;
+  contract_address: string;
+  network: string;
 }
 
 export interface CollectibleDataApi {
@@ -364,6 +428,7 @@ export interface CollectibleDataApi {
 export type SendData = {
   recipientAddress?: string;
   asset?: Token | null;
+  nft?: UserNFTCollection | null;
   amount?: number | string;
   amountUSD?: number | string;
   gasPrice?: ethers.BigNumber;
@@ -379,7 +444,83 @@ export interface BaseDataApi<T> {
   message?: string;
   total?: number;
   token?: string;
-  metadata?: { total?: number };
+  metadata?: {
+    total?: number;
+    encrypt_message_key?: string;
+    can_loadmore_message_after?: boolean;
+    can_loadmore_message_before?: boolean;
+  };
+  refresh_token?: string;
+  token_expire_at?: number;
+  refresh_token_expire_at?: number;
 }
 
 export type UserRoleType = "owner" | "admin" | "member";
+
+export type AssetTypeItem = {
+  label: string;
+  id: string;
+};
+
+export type PinPostData = {
+  content: string;
+  attachments?: Array<LocalAttachment>;
+  channels?: Array<Channel>;
+  id?: string;
+};
+
+export type NotificationFilterType = "All" | "Mention" | "Unread";
+
+export type NotificationData = {
+  channel?: Channel;
+  content: string;
+  createdAt: string;
+  entity_id?: string;
+  from_user?: UserData;
+  from_user_id?: string;
+  is_deleted?: boolean;
+  is_read?: boolean;
+  message_id?: string;
+  notification_id: string;
+  post?: TaskData;
+  notification_type?:
+    | "post_reply"
+    | "channel_mention"
+    | "post_mention"
+    | "channel_reply";
+  team_id?: string;
+  to_user_id?: string;
+  updatedAt?: string;
+  itemType?: string;
+};
+
+export type ChannelKeyApiData = {
+  channel_id: string;
+  channel_key_id: string;
+  createdAt: string;
+  key: string;
+  timestamp: number;
+  updatedAt: string;
+  user_id: string;
+};
+
+export type NFTDetailDataApi = {
+  _id: string;
+  contract_address: string;
+  token_id: string;
+  user_id: string;
+  name: string;
+  token_type: string;
+  image_url: string;
+  background_image_url: string;
+  network: string;
+  attributes: {
+    _id: string;
+    contract_address: string;
+    token_id: string;
+    trait_type: string;
+    value: string;
+    network: string;
+  }[];
+  collection: NFTCollectionDataApi;
+};
