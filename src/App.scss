@@ -320,6 +320,15 @@ a {
   }
 }
 
+.iframe-full {
+  width: 100%;
+  height: 100vh;
+}
+
+iframe {
+  border: none;
+}
+
 :root {
   --color-accent: #092555;
   --color-darkest-background: #121212;

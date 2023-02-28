@@ -77,8 +77,8 @@ export interface UserData {
   user_bio?: string;
   spaces?: Array<Space>;
   address?: string;
-  verified_avatar_asset_collection?: NFTCollection;
-  verified_username_asset_collection?: NFTCollection;
+  verified_avatar_asset_collection?: UserNFTCollection;
+  verified_username_asset_collection?: UserNFTCollection;
   is_deleted?: boolean;
   total_unread_notifications?: number;
   direct_channel_id?: string;
