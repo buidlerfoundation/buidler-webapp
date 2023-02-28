@@ -14,7 +14,7 @@ services:
       - VIRTUAL_PORT=3000
       - LETSENCRYPT_HOST=community.buidler.app
       - LETSENCRYPT_EMAIL="test.tai.htm@gmail.com"
-networks: 
+networks:
   default:  
     name: nginx-proxy
     external: true

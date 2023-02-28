@@ -1,0 +1,84 @@
+name: Buidler CI/CD
+run-name: ${{ github.actor }} is trigger run GitHub Actions 🚀
+on:
+  push:
+    branches:
+      - 'develop'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.get-build-tags.outputs.tags }}
+    steps:
+      - name: Information
+        run: |
+          echo "The commit SHA is: $GITHUB_SHA"
+          echo "The run id is: $GITHUB_RUN_ID" 
+          echo "The GitHub Actor's username is: $GITHUB_ACTOR"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          submodules: true
+
+      - name: 'Create env file'
+        run: |
+          echo "${{ secrets.STG_ENV_FILE }}" > .env
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}-stg
+          tags: |
+            type=sha,format=long
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          # labels: ${{ steps.meta.outputs.labels }}
+      
+      - name: Get tags
+        id: get-build-tags
+        run: echo "tags=sha-$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Information
+        run: |
+          echo "The tags output value is: ${{needs.build.outputs.tags}}"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Auth deployment server
+        id: 'auth'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.STG_GCP_CREDENTIALS }}'
+
+      - name: Access deployment server
+        id: 'compute-ssh'
+        uses: 'google-github-actions/ssh-compute@v0'
+        with:
+          instance_name: ${{ secrets.STG_INSTANCE_NAME }}
+          zone: 'asia-southeast1-b'
+          ssh_private_key: '${{ secrets.STG_GCP_SSH_PRIVATE_KEY }}'
+          command: './${{ github.event.repository.name }}/deployment/stg.sh ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}-stg ${{needs.build.outputs.tags}} up -d'
+
+      - name: Access logs
+        id: 'logs'
+        run: |-
+          echo '${{ steps.compute-ssh.outputs.stdout }}'
+          echo '${{ steps.compute-ssh.outputs.stderr }}'
