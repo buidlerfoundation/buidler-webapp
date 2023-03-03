@@ -510,8 +510,6 @@ export type NFTDetailDataApi = {
   user_id: string;
   name: string;
   token_type: string;
-  image_url: string;
-  background_image_url: string;
   network: string;
   attributes: {
     _id: string;
@@ -522,4 +520,11 @@ export type NFTDetailDataApi = {
     network: string;
   }[];
   collection: NFTCollectionDataApi;
+  media: {
+    bytes: number;
+    format: string;
+    gateway: string;
+    raw: string;
+    thumbnail: string;
+  }[];
 };
