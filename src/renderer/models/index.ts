@@ -60,6 +60,13 @@ export interface UserNFTCollection {
   nft_collection?: NFTCollection;
   can_set_username?: boolean;
   can_set_avatar?: boolean;
+  media: {
+    bytes: number;
+    format: string;
+    gateway: string;
+    raw: string;
+    thumbnail: string;
+  }[];
 }
 
 export interface UserData {
@@ -77,8 +84,8 @@ export interface UserData {
   user_bio?: string;
   spaces?: Array<Space>;
   address?: string;
-  verified_avatar_asset_collection?: UserNFTCollection;
-  verified_username_asset_collection?: UserNFTCollection;
+  verified_avatar_asset_collection?: NFTCollectionDataApi;
+  verified_username_asset_collection?: NFTCollectionDataApi;
   is_deleted?: boolean;
   total_unread_notifications?: number;
   direct_channel_id?: string;
@@ -505,6 +512,7 @@ export type ChannelKeyApiData = {
 
 export type NFTDetailDataApi = {
   _id: string;
+  can_set_avatar?: boolean;
   contract_address: string;
   token_id: string;
   user_id: string;
