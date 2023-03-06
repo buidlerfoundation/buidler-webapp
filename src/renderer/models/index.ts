@@ -160,7 +160,7 @@ export interface SpaceCollectionData {
   token_type: string;
   network: string;
   amount: number;
-  nft_collection?: NFTCollection;
+  nft_collection?: NFTCollectionDataApi;
   token_contract?: Contract;
 }
 
