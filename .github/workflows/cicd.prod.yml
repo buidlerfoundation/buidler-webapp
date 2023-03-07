@@ -72,7 +72,7 @@ jobs:
         id: 'compute-ssh'
         uses: 'google-github-actions/ssh-compute@v0'
         with:
-          instance_name: ${{ secrets.STG_INSTANCE_NAME }}
+          instance_name: ${{ secrets.PROD_INSTANCE_NAME }}
           zone: 'asia-southeast1-b'
           ssh_private_key: '${{ secrets.PROD_GCP_SSH_PRIVATE_KEY }}'
           command: './${{ github.event.repository.name }}/deployment/prod.sh ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}-prod ${{needs.build.outputs.tags}} up -d'
