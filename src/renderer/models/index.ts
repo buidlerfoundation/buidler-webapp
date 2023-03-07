@@ -60,6 +60,13 @@ export interface UserNFTCollection {
   nft_collection?: NFTCollection;
   can_set_username?: boolean;
   can_set_avatar?: boolean;
+  media: {
+    bytes: number;
+    format: string;
+    gateway: string;
+    raw: string;
+    thumbnail: string;
+  }[];
 }
 
 export interface UserData {
@@ -77,8 +84,8 @@ export interface UserData {
   user_bio?: string;
   spaces?: Array<Space>;
   address?: string;
-  verified_avatar_asset_collection?: NFTCollection;
-  verified_username_asset_collection?: NFTCollection;
+  verified_avatar_asset_collection?: NFTCollectionDataApi;
+  verified_username_asset_collection?: NFTCollectionDataApi;
   is_deleted?: boolean;
   total_unread_notifications?: number;
   direct_channel_id?: string;
@@ -153,7 +160,7 @@ export interface SpaceCollectionData {
   token_type: string;
   network: string;
   amount: number;
-  nft_collection?: NFTCollection;
+  nft_collection?: NFTCollectionDataApi;
   token_contract?: Contract;
 }
 
@@ -328,22 +335,15 @@ export interface Contract {
   totalSupply: string;
   owner: string;
   is_potential: boolean;
-  logo_url: string;
+  is_supported: boolean;
+  logo: string;
+  network: string;
 }
 
 export interface TokenPrice {
-  rate: number;
-  diff?: number;
-  diff1h?: number;
-  diff7d?: number;
-  diff30d?: number;
-  diff60d?: number;
-  diff90d?: number;
-  marketCapUsd?: number;
-  volume24h?: number;
-  availableSupply?: number;
-  ts?: string;
-  currency?: string;
+  current_price: number;
+  id: string;
+  image: string;
 }
 
 export interface Token {
@@ -354,8 +354,8 @@ export interface Token {
 
 export interface BalanceApiData {
   address: string;
-  ETH: Token;
   tokens: Array<Token>;
+  coins: Array<Token>;
 }
 
 export interface TransactionApiData {
@@ -512,13 +512,12 @@ export type ChannelKeyApiData = {
 
 export type NFTDetailDataApi = {
   _id: string;
+  can_set_avatar?: boolean;
   contract_address: string;
   token_id: string;
   user_id: string;
   name: string;
   token_type: string;
-  image_url: string;
-  background_image_url: string;
   network: string;
   attributes: {
     _id: string;
@@ -529,4 +528,11 @@ export type NFTDetailDataApi = {
     network: string;
   }[];
   collection: NFTCollectionDataApi;
+  media: {
+    bytes: number;
+    format: string;
+    gateway: string;
+    raw: string;
+    thumbnail: string;
+  }[];
 };
