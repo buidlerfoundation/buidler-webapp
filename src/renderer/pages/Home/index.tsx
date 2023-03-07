@@ -868,10 +868,11 @@ const Home = () => {
               ref={channelViewRef}
               inputRef={inputRef}
               currentChannel={currentChannel}
-              messages={uniqBy(
-                messageData[channelId]?.data || [],
-                "message_id"
-              )}
+              messages={
+                messageData[channelId]?.data
+                  ? uniqBy(messageData[channelId]?.data, "message_id")
+                  : undefined
+              }
               currentTeam={currentTeam}
               onMoreMessage={onMoreMessage}
               onMoreAfterMessage={onMoreAfterMessage}

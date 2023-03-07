@@ -67,7 +67,7 @@ import useMessageLoading from "renderer/hooks/useMessageLoading";
 
 type ChannelViewProps = {
   currentChannel: Channel;
-  messages: Array<MessageData>;
+  messages?: Array<MessageData>;
   inputRef: any;
   currentTeam: Community;
   onMoreMessage: (lastCreatedAt: string) => void;
@@ -119,7 +119,10 @@ const ChannelView = forwardRef(
     const messageHighLightId = useAppSelector(
       (state) => state.message.highlightMessageId
     );
-    const messagesGroup = useMemo<Array<MessageData | MessageDateData>>(() => {
+    const messagesGroup = useMemo<Array<
+      MessageData | MessageDateData
+    > | null>(() => {
+      if (!messages) return null;
       return normalizeMessages(messages);
     }, [messages]);
     const userData = useAppSelector((state) => state.user.userData);
@@ -217,7 +220,12 @@ const ChannelView = forwardRef(
           return current;
         });
         const { scrollTop, scrollHeight, clientHeight } = e.target;
-        if (scrollTop === 0 && messageCanMoreAfter && !loadMoreAfterMessage) {
+        if (
+          scrollTop === 0 &&
+          messageCanMoreAfter &&
+          !loadMoreAfterMessage &&
+          messages?.[0]
+        ) {
           onMoreAfterMessage(messages?.[0]);
         } else {
           const showScrollDown = scrollTop < 0;
@@ -232,7 +240,8 @@ const ChannelView = forwardRef(
           const compare = Math.round(scrollTop + scrollHeight);
           if (
             (compare === clientHeight + 1 || compare === clientHeight) &&
-            messageCanMore
+            messageCanMore &&
+            messages
           ) {
             onMoreMessage(messages?.[messages?.length - 1].createdAt);
           }
@@ -559,7 +568,7 @@ const ChannelView = forwardRef(
           type: actionTypes.UPDATE_HIGHLIGHT_MESSAGE,
           payload: messageId,
         });
-        if (messages.find((el) => el.message_id === messageId)) {
+        if (messages?.find((el) => el.message_id === messageId)) {
           setTimeout(() => {
             const element = document.getElementById(messageId);
             element?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -677,7 +686,7 @@ const ChannelView = forwardRef(
               teamId={communityId}
             />
             <div className="channel-view__body">
-              {messagesGroup.length > 0 && (
+              {messagesGroup && messagesGroup?.length > 0 && (
                 <ol
                   ref={msgListRef}
                   className={`channel-view-message-list hide-scroll-bar ${
@@ -685,10 +694,10 @@ const ChannelView = forwardRef(
                   }`}
                   onScroll={onMessageScroll}
                 >
-                  {messagesGroup.map(renderMessage)}
+                  {messagesGroup?.map(renderMessage)}
                 </ol>
               )}
-              {!loading && messagesGroup.length === 0 && (
+              {!loading && messagesGroup?.length === 0 && (
                 <span className="channel-view-message-empty">
                   No messages here yet. Send your first message.
                 </span>
