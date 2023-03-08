@@ -126,7 +126,7 @@ export const importToken = (address: string) =>
   Caller.post<Token>(`user/balance/${address}`);
 
 export const searchToken = (address: string) =>
-  Caller.get<Contract>(`contract/${address}`);
+  Caller.get<Contract[]>(`contract/${address}`);
 
 export const findUserByAddress = (params: {
   address?: string;
