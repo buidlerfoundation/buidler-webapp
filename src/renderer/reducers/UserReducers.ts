@@ -136,7 +136,8 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     case actionTypes.UPDATE_TEAM_FROM_SOCKET: {
       return {
         ...state,
-        updateFromSocket: payload,
+        updateFromSocket: payload.updating,
+        apiTeamController: payload.controller,
       };
     }
     case actionTypes.RECEIVE_MESSAGE: {

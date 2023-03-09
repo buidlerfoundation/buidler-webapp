@@ -128,16 +128,22 @@ const actionSetCurrentTeam = async (
   channelId?: string
 ) => {
   let lastChannelId: any = null;
-  dispatch({ type: actionTypes.UPDATE_TEAM_FROM_SOCKET, payload: true });
+  const lastController = store?.getState?.().user?.apiTeamController;
+  lastController?.abort?.();
+  const controller = new AbortController();
+  dispatch({
+    type: actionTypes.UPDATE_TEAM_FROM_SOCKET,
+    payload: { updating: true, controller },
+  });
   if (channelId) {
     lastChannelId = channelId;
   } else {
     lastChannelId = await getCookie(AsyncKey.lastChannelId);
   }
   const [resSpace, resChannel, teamUsersRes] = await Promise.all([
-    api.getSpaceChannel(team.team_id),
-    api.findChannel(team.team_id),
-    api.getTeamUsers(team.team_id),
+    api.getSpaceChannel(team.team_id, controller),
+    api.findChannel(team.team_id, controller),
+    api.getTeamUsers(team.team_id, controller),
   ]);
   if (teamUsersRes.statusCode === 200) {
     dispatch({
@@ -145,17 +151,22 @@ const actionSetCurrentTeam = async (
       payload: { teamUsers: teamUsersRes, teamId: team.team_id },
     });
   }
+  if (resSpace.statusCode === 200 && resChannel.statusCode === 200) {
+    dispatch({
+      type: actionTypes.CURRENT_TEAM_SUCCESS,
+      payload: {
+        team,
+        resChannel,
+        lastChannelId,
+        resSpace,
+      },
+    });
+    setCookie(AsyncKey.lastTeamId, team.team_id);
+  }
   dispatch({
-    type: actionTypes.CURRENT_TEAM_SUCCESS,
-    payload: {
-      team,
-      resChannel,
-      lastChannelId,
-      resSpace,
-    },
+    type: actionTypes.UPDATE_TEAM_FROM_SOCKET,
+    payload: { updating: false },
   });
-  setCookie(AsyncKey.lastTeamId, team.team_id);
-  dispatch({ type: actionTypes.UPDATE_TEAM_FROM_SOCKET, payload: false });
 };
 
 const loadMessageIfNeeded = async () => {
