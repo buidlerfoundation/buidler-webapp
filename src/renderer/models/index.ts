@@ -107,6 +107,7 @@ export interface Channel {
   attachment?: any;
   is_chat_deactivated?: boolean;
   updatedAt?: string;
+  team_id?: string;
 }
 
 export interface Space {
