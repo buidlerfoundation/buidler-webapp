@@ -93,7 +93,6 @@ export const importantApis = [
   { uri: "get-channel", exact: false },
   { uri: "get-user/team", exact: true },
   { uri: "get-user", exact: true },
-  { uri: "post-user/refresh", exact: true },
 ];
 
 export const whiteListRefreshTokenApis = [
@@ -104,7 +103,7 @@ export const whiteListRefreshTokenApis = [
   "delete-user/device",
 ];
 
-export const ignoreMessageErrorApis = ["delete-user/device"];
+export const ignoreMessageErrorApis = ["delete-user/device", "post-user/refresh"];
 
 export const DeletedUser: UserData = {
   user_id: "",

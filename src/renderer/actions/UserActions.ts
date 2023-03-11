@@ -84,12 +84,9 @@ export const refreshToken =
           AsyncKey.refreshTokenExpire,
           refreshTokenRes?.data?.refresh_token_expire_at
         );
-      } else {
-        if (refreshTokenRes.message === "Failed to fetch" && rCount <= 5) {
-          rCount++;
-          await sleep(3000);
-          return refreshToken(rCount)(dispatch);
-        }
+      } else if (
+        refreshTokenRes.message === "Failed to authenticate refresh token"
+      ) {
         GoogleAnalytics.tracking("Refresh failed", {
           refreshTokenExpire,
           message: refreshTokenRes.message || "Some thing wrong",
@@ -99,16 +96,24 @@ export const refreshToken =
           payload: refreshTokenRes,
         });
         await removeDeviceCode();
+      } else if (rCount <= 5) {
+        rCount++;
+        await sleep(3000);
+        return refreshToken(rCount)(dispatch);
       }
-      return refreshTokenRes.success;
+      return refreshTokenRes;
     } catch (error: any) {
+      const errMessage = error.message || error;
       GoogleAnalytics.tracking("Refresh failed", {
         refreshTokenExpire,
-        message: error.message || error,
+        message: errMessage,
       });
       dispatch({ type: ActionTypes.REFRESH_TOKEN_FAIL, payload: error });
       await removeDeviceCode();
-      return false;
+      return {
+        success: false,
+        message: errMessage,
+      };
     }
   };
 

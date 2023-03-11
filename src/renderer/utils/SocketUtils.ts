@@ -235,13 +235,15 @@ class SocketUtil {
       GoogleAnalytics.tracking("Socket error: ", { message: `${message}` });
       if (message === "Authentication error") {
         const res: any = await store.dispatch(refreshToken());
-        if (!!res) {
+        if (!!res.success) {
           this.init(true);
-        } else {
+        } else if (res.message === "Failed to authenticate refresh token") {
           clearData(() => {
             window.location.reload();
             store.dispatch(logout?.());
           });
+        } else {
+          toast.error(res.message);
         }
       }
     });

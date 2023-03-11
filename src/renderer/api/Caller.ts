@@ -131,22 +131,25 @@ async function requestAPI<T = any>(
   if (!whiteListRefreshTokenApis.includes(`${method}-${uri}`)) {
     const expireTokenTime = await getCookie(AsyncKey.tokenExpire);
     if (!expireTokenTime || new Date().getTime() / 1000 > expireTokenTime) {
-      const success: any = await store.dispatch(refreshToken());
+      const {success, message}: any = await store.dispatch(refreshToken());
       if (!success) {
-        if (!GlobalVariable.sessionExpired) {
-          GlobalVariable.sessionExpired = true;
-          toast.error("Session expired");
-          clearData(() => {
-            window.location.reload();
-          });
+        if (message === 'Failed to authenticate refresh token') {
+          if (!GlobalVariable.sessionExpired) {
+            GlobalVariable.sessionExpired = true;
+            toast.error("Session expired");
+            clearData(() => {
+              window.location.reload();
+            });
+          }
+        } else {
+          toast.error(message);
         }
         return {
           success: false,
           statusCode: 403,
         };
-      } else {
-        SocketUtils.init();
       }
+      SocketUtils.init();
     }
   }
   // Build API header
