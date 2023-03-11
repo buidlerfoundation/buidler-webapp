@@ -621,6 +621,7 @@ const Home = () => {
     if (currentChannel.channel_id) channelViewRef.current?.clearText?.();
   }, [currentChannel.channel_id]);
   useEffect(() => {
+    console.log('XXX: 2')
     setCurrentUserId(currentUserProfileId);
     if (currentUserProfileId) {
       handleCloseModalSpaceDetail();
@@ -635,7 +636,6 @@ const Home = () => {
     }
   }, [match_community_id, match_channel_id, dispatch]);
   useEffect(() => {
-    handleCloseModalSpaceDetail();
     if (match_channel_id && !!community) {
       if (match_community_id !== "user") {
         const matchCommunity = community?.find(
