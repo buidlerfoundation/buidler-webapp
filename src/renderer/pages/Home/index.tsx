@@ -621,7 +621,6 @@ const Home = () => {
     if (currentChannel.channel_id) channelViewRef.current?.clearText?.();
   }, [currentChannel.channel_id]);
   useEffect(() => {
-    console.log('XXX: 2')
     setCurrentUserId(currentUserProfileId);
     if (currentUserProfileId) {
       handleCloseModalSpaceDetail();
