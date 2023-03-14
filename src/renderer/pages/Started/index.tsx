@@ -261,15 +261,11 @@ const Started = () => {
         <div className="started-info-view">
           <img className="started-logo" alt="" src={images.icLogoSquare} />
           <span className="started-title">
-            A new home
-            <br />
-            for your community
-            <br />
-            to buidl together
+            Release the on-chain superpower to buidl a trustless community
           </span>
           <span className="started-description">
-            Web3 application for your community, teams, and supporters to
-            connect, communicate and collaborate.
+            The web3 messaging platform offers wallet-to-wallet messaging,
+            token-based membership, and on-chain verification.
           </span>
         </div>
         {!hideMetaMask && (
