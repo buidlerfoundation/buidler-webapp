@@ -201,6 +201,7 @@ export const dragChannel =
 export const findTeamAndChannel =
   (initCommunityId?: string) => async (dispatch: Dispatch) => {
     dispatch({ type: ActionTypes.TEAM_REQUEST, payload: { initCommunityId } });
+    await SocketUtils.init();
     const res = await api.findTeam();
     let lastTeamId = "";
     if (initCommunityId && initCommunityId !== "user") {
@@ -218,7 +219,6 @@ export const findTeamAndChannel =
       );
       communities.unshift({ ...DirectCommunity, seen: DM?.seen });
       if (communities.length > 0) {
-        SocketUtils.init();
         const currentTeam =
           communities.find((t: Community) => t.team_id === lastTeamId) ||
           communities?.[1] ||
@@ -254,13 +254,10 @@ export const findTeamAndChannel =
               lastChannelId,
               directChannelUser,
               resChannel,
-              teamUsersRes,
               resSpace,
             },
           });
         }
-      } else {
-        SocketUtils.init();
       }
       dispatch({
         type: ActionTypes.TEAM_SUCCESS,
