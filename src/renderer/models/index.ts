@@ -139,6 +139,7 @@ export interface Community {
   is_verified?: boolean;
   direct?: boolean;
   team_background?: string;
+  ens?: string;
 }
 
 export interface NFTCollection {
