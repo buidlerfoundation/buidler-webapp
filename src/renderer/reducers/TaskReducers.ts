@@ -188,6 +188,8 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
             ...state.taskData[channelId],
             tasks: newTasks,
             archivedTasks: newArchivedTasks,
+            taskCount: newTasks.length,
+            archivedCount: newArchivedTasks.length,
           },
         },
         pinPostDetail: newPinPostDetail,
