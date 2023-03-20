@@ -295,6 +295,23 @@ const Started = () => {
           </div>
         </div>
       </div>
+      <div className="promise-container">
+        <span>
+          By connecting wallet, you agree to our{" "}
+          <a href="https://buidler.app/terms" target="_blank" rel="noreferrer">
+            Terms
+          </a>{" "}
+          and{" "}
+          <a
+            href="https://buidler.app/privacy"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Privacy Policy
+          </a>
+          .
+        </span>
+      </div>
     </div>
   );
 };

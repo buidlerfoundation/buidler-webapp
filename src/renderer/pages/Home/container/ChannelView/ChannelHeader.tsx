@@ -25,6 +25,7 @@ import useUserRole from "renderer/hooks/useUserRole";
 import useDirectChannelUser from "renderer/hooks/useDirectChannelUser";
 import IconLock from "renderer/shared/SVG/IconLock";
 import DirectMessageTooltip from "renderer/shared/DirectMessageTooltip";
+import actionTypes from "renderer/actions/ActionTypes";
 
 type ChannelHeaderProps = {
   currentChannel?: Channel;
@@ -180,6 +181,14 @@ const ChannelHeader = forwardRef(
       },
       [isDirect]
     );
+    const openUserProfile = useCallback(() => {
+      if (isDirect && directUser) {
+        dispatch({
+          type: actionTypes.UPDATE_CURRENT_USER_PROFILE_ID,
+          payload: directUser?.user_id,
+        });
+      }
+    }, [directUser, dispatch, isDirect]);
     const handleMemberClick = useCallback(
       (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         setActiveMember(true);
@@ -254,7 +263,12 @@ const ChannelHeader = forwardRef(
                 }
               />
             ) : (
-              <div className="channel-icon__wrapper">{renderChannelIcon()}</div>
+              <div
+                className="channel-icon__wrapper normal-button-clear"
+                onClick={openUserProfile}
+              >
+                {renderChannelIcon()}
+              </div>
             )}
             <div
               ref={settingButtonRef}
@@ -266,11 +280,18 @@ const ChannelHeader = forwardRef(
                 alignItems: "center",
               }}
             >
-              <span className="channel-view__title text-ellipsis">
-                {isDirect && directUser
-                  ? directUser.user_name
-                  : currentChannel?.channel_name}
-              </span>
+              {isDirect && directUser ? (
+                <div
+                  className="channel-view__title normal-button-clear text-ellipsis"
+                  onClick={openUserProfile}
+                >
+                  <span>{directUser.user_name}</span>
+                </div>
+              ) : (
+                <span className="channel-view__title text-ellipsis">
+                  {currentChannel?.channel_name}
+                </span>
+              )}
               {isDirect && (
                 <div
                   style={{ width: 20, height: 20 }}
