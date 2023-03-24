@@ -108,6 +108,7 @@ export interface Channel {
   is_chat_deactivated?: boolean;
   updatedAt?: string;
   team_id?: string;
+  dapp_integration_url?: string;
 }
 
 export interface Space {
