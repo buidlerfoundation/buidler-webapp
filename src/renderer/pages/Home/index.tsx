@@ -87,6 +87,7 @@ import ModalTransactionDetail from "renderer/shared/ModalTransactionDetail";
 import ModalLoadingConfirmTx from "renderer/shared/ModalLoadingConfirmTx";
 import SideBarDM from "renderer/shared/SideBarDM";
 import ModalNFTDetail from "renderer/shared/ModalNFTDetail";
+import ModalBrowser from "renderer/shared/ModalBrowser";
 
 const loadMoreMessageSelector = createLoadMoreSelector([
   actionTypes.MESSAGE_PREFIX,
@@ -131,8 +132,13 @@ const Home = () => {
   const [currentUserId, setCurrentUserId] = useState<string | undefined | null>(
     ""
   );
+  const [openBrowser, setOpenBrowser] = useState(true);
   const [openNFTDetail, setOpenNFTDetail] = useState(false);
   const [selectedNFT, setSelectedNFT] = useState();
+  const toggleBrowser = useCallback(
+    () => setOpenBrowser((current) => !current),
+    []
+  );
   const toggleNFTDetail = useCallback(
     () => setOpenNFTDetail((current) => !current),
     []
@@ -956,6 +962,7 @@ const Home = () => {
             onSpaceClick={handleSpaceBadgeClick}
             onOpenNFTDetail={handleOpenNFTDetail}
           />
+          <ModalBrowser open={openBrowser} handleClose={toggleBrowser} />
           {openNFTDetail && (
             <ModalNFTDetail
               open={openNFTDetail}
