@@ -207,7 +207,11 @@ const SideBar = forwardRef(
             onSpaceBadgeClick={onSpaceBadgeClick}
             onCreateChannelClick={onCreateChannel}
             channel_ids={space.channel_ids}
-            isCollapsed={!spaceToggle[space.space_id]}
+            isCollapsed={
+              spaceToggle[space.space_id] === undefined
+                ? false
+                : !spaceToggle[space.space_id]
+            }
           />
         );
       },
