@@ -10,3 +10,8 @@ export const buildLinkUniSwap = (params: {
   `https://app.uniswap.org/#/swap?exactField=output&exactAmount=${params.amount}&outputCurrency=${params.contract_address}&chain=mainnet`;
 
 export const BuidlerURL = "https://buidler.app";
+
+export const sameDAppURL = (url: string, dAppUrl?: string) => {
+  if (!dAppUrl) return false;
+  return url.includes(dAppUrl);
+};

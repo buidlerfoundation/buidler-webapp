@@ -33,6 +33,8 @@ import ChainId from "renderer/services/connectors/ChainId";
 import { initialSpaceToggle } from "renderer/actions/SideBarActions";
 import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
 import { ethers } from "ethers";
+import useCurrentChannel from "renderer/hooks/useCurrentChannel";
+import { sameDAppURL } from "renderer/helpers/LinkHelper";
 
 function App() {
   const history = useHistory();
@@ -40,6 +42,7 @@ function App() {
   const currentToken = useAppSelector((state) => state.configs.currentToken);
   const user = useAppSelector((state) => state.user.userData);
   const imgDomain = useAppSelector((state: any) => state.user.imgDomain);
+  const currentChannel = useCurrentChannel();
   const initApp = useCallback(async () => {
     if (!imgDomain) {
       await dispatch(getInitial?.());
@@ -105,6 +108,30 @@ function App() {
     };
   }, [currentToken, dispatch]);
   useEffect(() => {
+    const eventClick = (e: any) => {
+      if (!e.target.download) {
+        const href = e?.target?.href || e?.target?.parentElement?.href;
+        if (sameDAppURL(href, currentChannel?.dapp_integration_url)) {
+          e.preventDefault();
+        } else if (href?.includes("channels/user")) {
+          dispatch({
+            type: actionTypes.UPDATE_CURRENT_USER_PROFILE_ID,
+            payload: href.split("/channels/user/")[1],
+          });
+        } else if (href?.includes(window.location.origin)) {
+          history.push(href.replace(window.location.origin, ""));
+        } else if (href) {
+          window.open(href, "_blank");
+        }
+        e.preventDefault();
+      }
+    };
+    window.addEventListener("click", eventClick);
+    return () => {
+      window.removeEventListener("click", eventClick);
+    };
+  }, [currentChannel?.dapp_integration_url, dispatch, history]);
+  useEffect(() => {
     TextareaAutosize.defaultProps = {
       ...TextareaAutosize.defaultProps,
       onFocus: () => {
@@ -139,22 +166,6 @@ function App() {
     const eventContextMenu = (e: any) => {
       if (!process.env.REACT_APP_ENABLE_INSPECT) e.preventDefault();
     };
-    const eventClick = (e: any) => {
-      if (!e.target.download) {
-        const href = e?.target?.href || e?.target?.parentElement?.href;
-        if (href?.includes("channels/user")) {
-          dispatch({
-            type: actionTypes.UPDATE_CURRENT_USER_PROFILE_ID,
-            payload: href.split("/channels/user/")[1],
-          });
-        } else if (href?.includes(window.location.origin)) {
-          history.push(href.replace(window.location.origin, ""));
-        } else if (href) {
-          window.open(href, "_blank");
-        }
-        e.preventDefault();
-      }
-    };
     const changeRouteListener = (e) => {
       const { detail: path } = e;
       history.replace(path);
@@ -163,14 +174,12 @@ function App() {
     window.addEventListener("online", eventOnline);
     window.addEventListener("paste", eventPaste);
     window.addEventListener("contextmenu", eventContextMenu);
-    window.addEventListener("click", eventClick);
     window.addEventListener(CustomEventName.CHANGE_ROUTE, changeRouteListener);
     return () => {
       window.removeEventListener("offline", eventOffline);
       window.removeEventListener("online", eventOnline);
       window.removeEventListener("paste", eventPaste);
       window.removeEventListener("contextmenu", eventContextMenu);
-      window.removeEventListener("click", eventClick);
       window.removeEventListener(
         CustomEventName.CHANGE_ROUTE,
         changeRouteListener
