@@ -11,7 +11,7 @@ export const buildLinkUniSwap = (params: {
 
 export const BuidlerURL = "https://buidler.app";
 
-export const sameDAppURL = (url: string, dAppUrl?: string) => {
-  if (!dAppUrl) return false;
+export const sameDAppURL = (url?: string, dAppUrl?: string) => {
+  if (!dAppUrl || !url) return false;
   return url.includes(dAppUrl);
 };
