@@ -502,6 +502,9 @@ const Home = () => {
         channel_image_url: channelData.url,
         is_chat_deactivated: channelData.isDeactivated,
         notification_type: channelData.notificationType,
+        dapp_integration_url: channelData.isActiveDApp
+          ? channelData.dAppUrl
+          : undefined,
       };
       if (channelData.channelId) {
         body.channel_id = channelData.channelId;

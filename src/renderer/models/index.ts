@@ -23,6 +23,8 @@ export type CreateChannelData = {
   url?: string | null;
   isDeactivated?: boolean;
   notificationType?: string;
+  dAppUrl?: string;
+  isActiveDApp?: boolean;
 };
 
 export type CreateSpaceData = {

@@ -15,3 +15,13 @@ export const sameDAppURL = (url?: string, dAppUrl?: string) => {
   if (!dAppUrl || !url) return false;
   return url.includes(dAppUrl);
 };
+
+export function isUrlValid(string) {
+  let url;
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;
+  }
+  return url.protocol === "http:" || url.protocol === "https:";
+}
