@@ -1,5 +1,5 @@
 import { DirectCommunity } from "renderer/common/AppConfig";
-import { UserData } from "renderer/models";
+import { ProfileApiData, UserData } from "renderer/models";
 import Caller from "./Caller";
 
 // {
@@ -34,3 +34,6 @@ export const updateTeam = (teamId: string, body: any) =>
   Caller.put(`team/${teamId}`, body);
 
 export const removeTeam = (teamId: string) => Caller.delete(`team/${teamId}`);
+
+export const getProfile = (name: string) =>
+  Caller.get<ProfileApiData>(`profiles/${name}/extensions`);

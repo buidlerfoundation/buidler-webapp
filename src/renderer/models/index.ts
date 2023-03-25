@@ -541,3 +541,10 @@ export type NFTDetailDataApi = {
     thumbnail: string;
   }[];
 };
+
+export interface ProfileApiData {
+  profile: {
+    user_id?: string;
+    team_id?: string;
+  };
+}
