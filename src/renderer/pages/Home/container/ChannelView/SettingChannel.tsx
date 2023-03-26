@@ -8,11 +8,13 @@ import React, {
 import toast from "react-hot-toast";
 import { useHistory } from "react-router-dom";
 import { deleteChannel, updateChannel } from "renderer/actions/UserActions";
+import { isUrlValid } from "renderer/helpers/LinkHelper";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
 import useChannel from "renderer/hooks/useChannel";
 import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
 import { Channel } from "renderer/models";
 import IconLimitChat from "renderer/shared/SVG/IconLimitChat";
+import IconMenuUrl from "renderer/shared/SVG/IconMenuUrl";
 import SwitchButton from "renderer/shared/SwitchButton";
 import api from "../../../../api";
 import images from "../../../../common/images";
@@ -44,7 +46,9 @@ const SettingChannel = ({
   const [limitChat, setLimitChat] = useState(false);
   const [isOpenConfirm, setOpenConfirm] = useState(false);
   const [currentName, setCurrentName] = useState("");
+  const [currentDAppUrl, setCurrentDAppUrl] = useState("");
   const [isOpenEditName, setOpenEditName] = useState(false);
+  const [isOpenEditDApp, setOpenEditDApp] = useState(false);
   const [currentNotificationType, setNotificationType] = useState<string>();
   useEffect(() => {
     setLimitChat(!!currentChannel?.is_chat_deactivated);
@@ -63,6 +67,12 @@ const SettingChannel = ({
     },
     [currentChannel?.channel_id, dispatch]
   );
+  const handleChangeDApp = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setCurrentDAppUrl(e.target.value);
+    },
+    []
+  );
   const handleChangeName = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) =>
       setCurrentName(e.target.value.toLowerCase().replaceAll(" ", "-")),
@@ -70,6 +80,10 @@ const SettingChannel = ({
   );
   const toggleEditName = useCallback(
     () => setOpenEditName((current) => !current),
+    []
+  );
+  const toggleEditDApp = useCallback(
+    () => setOpenEditDApp((current) => !current),
     []
   );
   useEffect(() => {
@@ -85,6 +99,11 @@ const SettingChannel = ({
   useEffect(() => {
     setCurrentName(currentChannel?.channel_name || "");
   }, [currentChannel?.channel_name, isOpenEditName]);
+  useEffect(() => {
+    if (isOpenEditDApp) {
+      setCurrentDAppUrl(currentChannel?.dapp_integration_url || "");
+    }
+  }, [currentChannel?.dapp_integration_url, isOpenEditDApp]);
   const handleSave = useCallback(async () => {
     if (!currentChannel?.channel_id) return;
     if (!currentName) {
@@ -100,6 +119,21 @@ const SettingChannel = ({
       toggleEditName();
     }
   }, [currentChannel?.channel_id, currentName, toggleEditName, dispatch]);
+  const handleSaveDapp = useCallback(async () => {
+    if (!currentChannel?.channel_id) return;
+    if (currentDAppUrl && !isUrlValid(currentDAppUrl)) {
+      toast.error("Invalid Url");
+      return;
+    }
+    const success = await dispatch(
+      updateChannel(currentChannel.channel_id, {
+        dapp_integration_url: currentDAppUrl,
+      })
+    );
+    if (!!success) {
+      toggleEditDApp();
+    }
+  }, [currentChannel?.channel_id, currentDAppUrl, dispatch, toggleEditDApp]);
   const onLimitChatChange = useCallback(
     (active) => {
       if (!currentChannel?.channel_id) return;
@@ -209,6 +243,30 @@ const SettingChannel = ({
           <NormalButton title="Cancel" onPress={toggleEditName} type="normal" />
           <div style={{ width: 10 }} />
           <NormalButton title="Save" onPress={handleSave} type="main" />
+        </div>
+      )}
+      {isOwner && (
+        <div
+          className="setting-item normal-button"
+          style={{ marginTop: 12 }}
+          onClick={toggleEditDApp}
+        >
+          <IconMenuUrl />
+          <span className="setting-label">Edit DApp url</span>
+        </div>
+      )}
+      {isOpenEditDApp && (
+        <div className="edit-name-input__wrapper">
+          <AppInput
+            className="edit-name-input"
+            value={currentDAppUrl}
+            placeholder="DApp url"
+            onChange={handleChangeDApp}
+            autoFocus
+          />
+          <NormalButton title="Cancel" onPress={toggleEditDApp} type="normal" />
+          <div style={{ width: 10 }} />
+          <NormalButton title="Save" onPress={handleSaveDapp} type="main" />
         </div>
       )}
       {currentChannel?.notification_type && (
