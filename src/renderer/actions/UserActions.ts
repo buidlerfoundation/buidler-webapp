@@ -153,8 +153,8 @@ export const getMemberData =
   };
 
 export const acceptTeam =
-  (invitationId: string) => async (dispatch: Dispatch) => {
-    const res = await api.acceptInvitation(invitationId);
+  (invitationId: string, ref?: string | null) => async (dispatch: Dispatch) => {
+    const res = await api.acceptInvitation(invitationId, ref);
     if (res.statusCode === 200) {
       dispatch({
         type: ActionTypes.ACCEPT_TEAM_SUCCESS,

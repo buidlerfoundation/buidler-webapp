@@ -81,6 +81,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
     [rest?.computedMatch?.params?.match_channel_id]
   );
   const invitationId = useMemo(() => query.get("invitation"), [query]);
+  const invitationRef = useMemo(() => query.get("ref"), [query]);
   const userData = useAppSelector((state) => state.user.userData);
   const userError = useAppSelector((state) => errorUserSelector(state));
   const currentTeamLoading = useAppSelector((state) =>
@@ -102,7 +103,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
     if (!userData.user_id && !userError) {
       await dispatch(findUser());
       if (invitationId && !team) {
-        const res = await api.acceptInvitation(invitationId);
+        const res = await api.acceptInvitation(invitationId, invitationRef);
         if (res.statusCode === 200) {
           await dispatch(findTeamAndChannel(res.data?.team_id));
           toast.success("You have successfully joined new community.");
@@ -153,6 +154,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
     currentTeamLoading,
     currentTeamError,
     match_channel_id,
+    invitationRef,
   ]);
   useEffect(() => {
     if (window.location.pathname !== "/") {
@@ -169,7 +171,10 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
     if (invitationId) {
       dispatch({
         type: actionTypes.SET_DATA_FROM_URL,
-        payload: `invitation=${invitationId}`,
+        payload: {
+          invitationId,
+          invitationRef,
+        },
       });
     }
     getCookie(AsyncKey.accessTokenKey)
@@ -191,7 +196,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
         });
         dispatch(logout?.());
       });
-  }, [history, initApp, dispatch, invitationId]);
+  }, [history, initApp, dispatch, invitationId, invitationRef]);
   if (loading)
     return (
       <div className="main-load-page">

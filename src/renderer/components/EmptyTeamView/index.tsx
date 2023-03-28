@@ -14,9 +14,9 @@ const EmptyTeamView = () => {
   const dispatch = useAppDispatch();
   const { dataFromUrl } = useAppSelector((state) => state.configs);
   const handleDataFromUrl = useCallback(async () => {
-    if (dataFromUrl?.includes("invitation=")) {
-      const invitationId = dataFromUrl.split("=")[1];
-      const res = await api.acceptInvitation(invitationId);
+    if (dataFromUrl?.invitationId) {
+      const { invitationId, invitationRef } = dataFromUrl;
+      const res = await api.acceptInvitation(invitationId, invitationRef);
       if (res.statusCode === 200) {
         toast.success("You have successfully joined new community.");
         dispatch({ type: actionTypes.REMOVE_DATA_FROM_URL });

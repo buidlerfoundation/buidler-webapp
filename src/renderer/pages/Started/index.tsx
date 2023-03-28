@@ -69,9 +69,12 @@ const Started = () => {
         AsyncKey.refreshTokenExpire,
         res?.refresh_token_expire_at
       );
-      if (dataFromUrl?.includes?.("invitation")) {
-        const invitationId = dataFromUrl.split("=")[1];
-        const acceptRes = await api.acceptInvitation(invitationId);
+      if (dataFromUrl?.invitationId) {
+        const { invitationId, invitationRef } = dataFromUrl;
+        const acceptRes = await api.acceptInvitation(
+          invitationId,
+          invitationRef
+        );
         if (acceptRes.statusCode === 200) {
           toast.success("You have successfully joined new community.");
           dispatch({ type: actionTypes.REMOVE_DATA_FROM_URL });

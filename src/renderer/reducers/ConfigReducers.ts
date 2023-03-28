@@ -7,7 +7,10 @@ interface ConfigReducerState {
   channelPrivateKey: { [key: string]: any };
   openOTP: boolean;
   requestOtpCode: string;
-  dataFromUrl: string;
+  dataFromUrl: {
+    invitationId: string;
+    invitationRef?: string;
+  };
   isFullScreen: boolean;
   currentToken?: string;
   somethingWrong?: boolean | null;
@@ -22,13 +25,15 @@ const initialState: ConfigReducerState = {
   channelPrivateKey: {},
   openOTP: false,
   requestOtpCode: "",
-  dataFromUrl: "",
+  dataFromUrl: {
+    invitationId: "",
+  },
   isFullScreen: true,
   currentToken: undefined,
   somethingWrong: null,
   isOpenModalConfirmSignMessage: false,
   internetConnection: true,
-  loginType: ''
+  loginType: "",
 };
 
 const configReducers: Reducer<ConfigReducerState, AnyAction> = (
@@ -82,7 +87,9 @@ const configReducers: Reducer<ConfigReducerState, AnyAction> = (
     case actionTypes.REMOVE_DATA_FROM_URL: {
       return {
         ...state,
-        dataFromUrl: "",
+        dataFromUrl: {
+          invitationId: "",
+        },
       };
     }
     case actionTypes.TOGGLE_OTP: {
