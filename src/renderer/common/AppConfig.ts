@@ -14,6 +14,7 @@ const AppConfig = {
       : "https://etherscan.io",
   buidlerCommunityId: "c9097f50-9f0b-4e0a-a042-ab7790aff3b0",
   estimateGasRecipientAddress: "0x1908bf9Dae06BB1F6E4C7eE0f7B5D4c82D1Ba6ad",
+  buidlerExtensionId: "ldbjeldeabnbghmhakiijnpfggokmhib",
 };
 
 export default AppConfig;
@@ -103,7 +104,10 @@ export const whiteListRefreshTokenApis = [
   "delete-user/device",
 ];
 
-export const ignoreMessageErrorApis = ["delete-user/device", "post-user/refresh"];
+export const ignoreMessageErrorApis = [
+  "delete-user/device",
+  "post-user/refresh",
+];
 
 export const DeletedUser: UserData = {
   user_id: "",

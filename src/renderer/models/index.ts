@@ -111,6 +111,7 @@ export interface Channel {
   updatedAt?: string;
   team_id?: string;
   dapp_integration_url?: string;
+  is_dapp_extension_required?: boolean;
 }
 
 export interface Space {

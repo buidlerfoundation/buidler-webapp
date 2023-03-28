@@ -889,7 +889,10 @@ const Home = () => {
               hideScrollDown={isOpenMembers}
             />
             {currentChannel.dapp_integration_url ? (
-              <BrowserView url={currentChannel.dapp_integration_url} />
+              <BrowserView
+                url={currentChannel.dapp_integration_url}
+                extensionRequired={currentChannel.is_dapp_extension_required}
+              />
             ) : (
               currentChannel.channel_id &&
               currentChannel.channel_type !== "Direct" && (
