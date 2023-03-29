@@ -233,7 +233,7 @@ const SideBar = forwardRef(
               onViewAllMembers={onViewMembers}
             />
             {spaceChannel.map(renderSpaceItem)}
-            <div ref={bottomBodyRef} />
+            <div ref={bottomBodyRef} style={!isOwner ? { minHeight: 10 } : {}} />
             {isOwner && (
               <div className="btn-create-space" onClick={onCreateGroupChannel}>
                 <img src={images.icPlus} alt="" className="ic-plus" />
