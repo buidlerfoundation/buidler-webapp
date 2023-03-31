@@ -239,3 +239,5 @@ export const getNFTsDetails = (
   networks.forEach((network) => (uri += `networks[]=${network}&`));
   return Caller.get<NFTDetailDataApi[]>(uri);
 };
+
+export const requestOTT = () => Caller.get<string>("authentication/ott");
