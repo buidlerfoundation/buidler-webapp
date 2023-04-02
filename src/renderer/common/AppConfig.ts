@@ -102,6 +102,7 @@ export const whiteListRefreshTokenApis = [
   "post-user/address",
   "post-user",
   "delete-user/device",
+  "get-authentication/ott/"
 ];
 
 export const ignoreMessageErrorApis = [

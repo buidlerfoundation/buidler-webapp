@@ -10,7 +10,7 @@ import {
 } from "renderer/actions/UserActions";
 import MainWrapper from "./Layout";
 import Home from "../Home";
-import { AsyncKey } from "../../common/AppConfig";
+import { AsyncKey, LoginType } from "../../common/AppConfig";
 import { getCookie, removeCookie, setCookie } from "../../common/Cookie";
 import Started from "../Started";
 import useAppDispatch from "renderer/hooks/useAppDispatch";
@@ -82,6 +82,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
   );
   const invitationId = useMemo(() => query.get("invitation"), [query]);
   const invitationRef = useMemo(() => query.get("ref"), [query]);
+  const ott = useMemo(() => query.get("ott"), [query]);
   const userData = useAppSelector((state) => state.user.userData);
   const userError = useAppSelector((state) => errorUserSelector(state));
   const currentTeamLoading = useAppSelector((state) =>
@@ -167,7 +168,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
       });
     }
   }, []);
-  useEffect(() => {
+  const checkingAuth = useCallback(async () => {
     if (invitationId) {
       dispatch({
         type: actionTypes.SET_DATA_FROM_URL,
@@ -176,6 +177,21 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
           invitationRef,
         },
       });
+    }
+    if (ott) {
+      const res = await api.generateTokenFromOTT(ott);
+      if (res.success) {
+        await setCookie(AsyncKey.accessTokenKey, res.data?.token);
+        await setCookie(AsyncKey.loginType, LoginType.Metamask);
+        await setCookie(AsyncKey.refreshTokenKey, res.data?.refresh_token);
+        await setCookie(AsyncKey.tokenExpire, res.data?.token_expire_at);
+        await setCookie(
+          AsyncKey.refreshTokenExpire,
+          res.data?.refresh_token_expire_at
+        );
+        history.replace(window.location.pathname);
+        return;
+      }
     }
     getCookie(AsyncKey.accessTokenKey)
       .then((res: any) => {
@@ -196,7 +212,10 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
         });
         dispatch(logout?.());
       });
-  }, [history, initApp, dispatch, invitationId, invitationRef]);
+  }, [dispatch, history, initApp, invitationId, invitationRef, ott]);
+  useEffect(() => {
+    checkingAuth();
+  }, [checkingAuth]);
   if (loading)
     return (
       <div className="main-load-page">

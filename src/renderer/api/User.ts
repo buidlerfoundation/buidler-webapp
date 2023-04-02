@@ -241,3 +241,11 @@ export const getNFTsDetails = (
 };
 
 export const requestOTT = () => Caller.get<string>("authentication/ott");
+
+export const generateTokenFromOTT = (ott: string) =>
+  Caller.get<{
+    token: string;
+    token_expire_at: number;
+    refresh_token: string;
+    refresh_token_expire_at: number;
+  }>(`authentication/ott/${ott}`);
