@@ -1005,14 +1005,14 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
               ),
             },
             admin: {
-              ...(memberDataMap[payload.teamId].admin || {}),
-              data: (memberDataMap[payload.teamId].admin.data || []).filter(
+              ...(memberDataMap[payload.teamId]?.admin || {}),
+              data: (memberDataMap[payload.teamId]?.admin.data || []).filter(
                 (el) => el.user_id !== payload.userId
               ),
             },
             owner: {
-              ...(memberDataMap[payload.teamId].owner || {}),
-              data: (memberDataMap[payload.teamId].owner.data || []).filter(
+              ...(memberDataMap[payload.teamId]?.owner || {}),
+              data: (memberDataMap[payload.teamId]?.owner.data || []).filter(
                 (el) => el.user_id !== payload.userId
               ),
             },
