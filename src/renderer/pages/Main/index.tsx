@@ -36,6 +36,7 @@ import PageNotFound from "renderer/shared/PageNotFound";
 import ErrorPage from "renderer/shared/ErrorBoundary/ErrorPage";
 import UnSupportPage from "../UnSupportPage";
 import NoInternetPage from "renderer/shared/NoInternetPage";
+import { acceptTeam } from "renderer/actions/UserActions";
 
 const PublicRoute = ({ component: Component, ...rest }: any) => {
   const history = useHistory();
@@ -189,11 +190,16 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
           AsyncKey.refreshTokenExpire,
           res.data?.refresh_token_expire_at
         );
-        let path = window.location.pathname;
         if (invitationId) {
-          path += `?&invitationId=${invitationId}`;
+          const res: any = await dispatch(
+            acceptTeam(invitationId, invitationRef)
+          );
+          if (res.statusCode === 200 && !!res.data?.team_id) {
+            toast.success("You have successfully joined new community.");
+            await setCookie(AsyncKey.lastTeamId, res.data?.team_id);
+          }
         }
-        history.replace(path);
+        history.replace(window.location.pathname);
         return;
       }
     }
