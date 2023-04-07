@@ -189,7 +189,11 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
           AsyncKey.refreshTokenExpire,
           res.data?.refresh_token_expire_at
         );
-        history.replace(window.location.pathname);
+        let path = window.location.pathname;
+        if (invitationId) {
+          path += `?&invitationId=${invitationId}`;
+        }
+        history.replace(path);
         return;
       }
     }
