@@ -10,7 +10,13 @@ const UnSupportedNetwork = () => {
     window.ethereum
       ?.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: `0x${process.env.REACT_APP_DEFAULT_CHAIN_ID}` }],
+        params: [
+          {
+            chainId: `0x${parseInt(
+              process.env.REACT_APP_DEFAULT_CHAIN_ID || '0'
+            ).toString(16)}`,
+          },
+        ],
       })
       .then(() => {
         removeCookie(AsyncKey.socketConnectKey);
