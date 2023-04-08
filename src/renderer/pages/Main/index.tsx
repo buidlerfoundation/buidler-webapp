@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo } from "react";
+import React, { memo, useEffect, useMemo, useRef } from "react";
 import useAppSelector from "renderer/hooks/useAppSelector";
 import { Switch, Route, useHistory, useRouteMatch } from "react-router-dom";
 import {
@@ -97,6 +97,7 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const history = useHistory();
+  const ottCheck = useRef(true);
 
   const initApp = useCallback(async () => {
     if (rest.redirect) {
@@ -179,7 +180,8 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
         },
       });
     }
-    if (ott) {
+    if (ott && ottCheck.current) {
+      ottCheck.current = false;
       const res = await api.generateTokenFromOTT(ott);
       if (res.success) {
         await setCookie(AsyncKey.accessTokenKey, res.data?.token);
