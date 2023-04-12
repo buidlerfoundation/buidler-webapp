@@ -291,8 +291,9 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
               if (currentIdx === index + 1) {
                 return {
                   ...el,
-                  isHead: currentMsg?.isHead,
-                  isConversationHead: currentMsg?.isConversationHead,
+                  isHead: el.isHead || currentMsg?.isHead,
+                  isConversationHead:
+                    el.isConversationHead || currentMsg?.isConversationHead,
                 };
               }
               return el;
