@@ -114,6 +114,13 @@ const fetchWithRetry = (
     });
 };
 
+function isWhiteList(method: string, uri: string) {
+  return (
+    whiteListRefreshTokenApis.includes(`${method}-${uri}`) ||
+    /authentication\/ott\/.*/.test(`${method}-${uri}`)
+  );
+}
+
 async function requestAPI<T = any>(
   method: string,
   uri: string,
@@ -128,7 +135,7 @@ async function requestAPI<T = any>(
       statusCode: 403,
     };
   }
-  if (!whiteListRefreshTokenApis.includes(`${method}-${uri}`)) {
+  if (!isWhiteList(method, uri)) {
     const expireTokenTime = await getCookie(AsyncKey.tokenExpire);
     if (!expireTokenTime || new Date().getTime() / 1000 > expireTokenTime) {
       const {success, message}: any = await store.dispatch(refreshToken());
