@@ -38,6 +38,7 @@ import images from "../../../../common/images";
 import MessageItem from "../../../../shared/MessageItem";
 import {
   extractContent,
+  extractContentMessage,
   getMentionData,
   normalizeMessages,
   normalizeMessageText,
@@ -406,7 +407,7 @@ const ChannelView = forwardRef(
     const editMessage = useCallback(async () => {
       if (!messageEdit?.message_id) return;
       if (extractContent(text).trim() !== "" || files.length > 0) {
-        let content = text.trim();
+        let content = extractContentMessage(text.trim());
         let plain_text = extractContent(text.trim());
         if (
           currentChannel.channel_type === "Private" ||
@@ -448,7 +449,7 @@ const ChannelView = forwardRef(
       }
       if (extractContent(text).trim() !== "" || files.length > 0) {
         const message: any = {
-          content: text.trim(),
+          content: extractContentMessage(text.trim()),
           plain_text: extractContent(text),
           mentions: getMentionData(text.trim()),
           text,

@@ -56,8 +56,7 @@ export const extractContent = (s: string) => {
 };
 
 export const extractContentMessage = (s: string) => {
-  const span = document.createElement("span");
-  span.innerHTML = s
+  return s
     .replace(/<div>(.*?)<\/div>/gim, "<br>$1")
     .replace(
       /(<a href="\$mention_location\/)(.*?)(" class="mention-string">)(.*?)(<\/a>)/gim,
@@ -68,7 +67,6 @@ export const extractContentMessage = (s: string) => {
       `<$4-$2>`
     )
     .replace(/<br>/gim, "\n");
-  return span.textContent || span.innerText;
 };
 
 export const normalizeMessageTextPlain = (
