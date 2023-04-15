@@ -58,6 +58,7 @@ export const extractContent = (s: string) => {
 export const extractContentMessage = (s: string) => {
   return s
     .replace(/<div>(.*?)<\/div>/gim, "<br>$1")
+    .replace(/&nbsp;/gim, " ")
     .replace(
       /(<a href="\$mention_location\/)(.*?)(" class="mention-string">)(.*?)(<\/a>)/gim,
       `<$4-$2>`
