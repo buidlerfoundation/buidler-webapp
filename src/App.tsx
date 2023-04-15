@@ -31,10 +31,10 @@ import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
 import { CustomEventName } from "renderer/services/events/WindowEvent";
 import ChainId from "renderer/services/connectors/ChainId";
 import { initialSpaceToggle } from "renderer/actions/SideBarActions";
-import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
-import { ethers } from "ethers";
 import useCurrentChannel from "renderer/hooks/useCurrentChannel";
 import { sameDAppURL } from "renderer/helpers/LinkHelper";
+import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
+import { ethers } from "ethers";
 
 function App() {
   const history = useHistory();
