@@ -64,7 +64,7 @@ const ChannelHeader = forwardRef(
     );
     const directUser = useDirectChannelUser();
     const role = useUserRole();
-    const isOwner = role === "Owner";
+    const isOwner = useMemo(() => role === "Owner" || role === "Admin", [role]);
     useImperativeHandle(ref, () => {
       return {
         showSetting(action: "edit-member" | "edit-name" | "edit-notification") {
