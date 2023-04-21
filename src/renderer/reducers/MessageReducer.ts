@@ -238,38 +238,49 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           (el) => el.message_id === messageId
         );
         const currentMsg = newMessageData[currentChannelId].data?.[currentIdx];
+        const data = newMessageData[currentChannelId].data
+          .filter((el) => el.message_id !== messageId)
+          .map((el, index) => {
+            if (el.reply_message_id === messageId) {
+              el.conversation_data = undefined;
+              return {
+                ...el,
+              };
+            }
+            if (el.message_id === channelId && el.task) {
+              el.task = {
+                ...el.task,
+                total_messages: `${
+                  parseInt(el.task.total_messages || "0") - 1
+                }`,
+              };
+              return {
+                ...el,
+              };
+            }
+            if (currentIdx === index + 1) {
+              return {
+                ...el,
+                isHead: el.isHead || currentMsg?.isHead,
+                isConversationHead:
+                  el.isConversationHead || currentMsg?.isConversationHead,
+              };
+            }
+            return el;
+          });
         newMessageData[currentChannelId] = {
           ...newMessageData[currentChannelId],
-          data: newMessageData[currentChannelId].data
-            .filter((el) => el.message_id !== messageId)
-            .map((el, index) => {
-              if (el.reply_message_id === messageId) {
-                el.conversation_data = undefined;
-                return {
-                  ...el,
-                };
-              }
-              if (el.message_id === channelId && el.task) {
-                el.task = {
-                  ...el.task,
-                  total_messages: `${
-                    parseInt(el.task.total_messages || "0") - 1
-                  }`,
-                };
-                return {
-                  ...el,
-                };
-              }
-              if (currentIdx === index + 1) {
-                return {
-                  ...el,
-                  isHead: el.isHead || currentMsg?.isHead,
-                  isConversationHead:
-                    el.isConversationHead || currentMsg?.isConversationHead,
-                };
-              }
-              return el;
-            }),
+          data,
+          scrollData: {
+            unreadCount:
+              data.length > 0
+                ? newMessageData[currentChannelId]?.scrollData?.unreadCount || 0
+                : 0,
+            showScrollDown:
+              data.length > 0
+                ? newMessageData[currentChannelId]?.scrollData?.showScrollDown
+                : false,
+          },
         };
       }
       if (newMessageData[channelId]) {
@@ -277,27 +288,38 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           (el) => el.message_id === messageId
         );
         const currentMsg = newMessageData[channelId].data?.[currentIdx];
+        const data = newMessageData[channelId].data
+          .filter((el) => el.message_id !== messageId)
+          .map((el, index) => {
+            if (el.reply_message_id === messageId) {
+              el.conversation_data = undefined;
+              return {
+                ...el,
+              };
+            }
+            if (currentIdx === index + 1) {
+              return {
+                ...el,
+                isHead: el.isHead || currentMsg?.isHead,
+                isConversationHead:
+                  el.isConversationHead || currentMsg?.isConversationHead,
+              };
+            }
+            return el;
+          });
         newMessageData[channelId] = {
           ...newMessageData[channelId],
-          data: newMessageData[channelId].data
-            .filter((el) => el.message_id !== messageId)
-            .map((el, index) => {
-              if (el.reply_message_id === messageId) {
-                el.conversation_data = undefined;
-                return {
-                  ...el,
-                };
-              }
-              if (currentIdx === index + 1) {
-                return {
-                  ...el,
-                  isHead: el.isHead || currentMsg?.isHead,
-                  isConversationHead:
-                    el.isConversationHead || currentMsg?.isConversationHead,
-                };
-              }
-              return el;
-            }),
+          data,
+          scrollData: {
+            unreadCount:
+              data.length > 0
+                ? newMessageData[channelId]?.scrollData?.unreadCount || 0
+                : 0,
+            showScrollDown:
+              data.length > 0
+                ? newMessageData[channelId]?.scrollData?.showScrollDown
+                : false,
+          },
         };
       }
       return {
