@@ -508,6 +508,33 @@ export const removeTeamMember =
     return res.statusCode === 200;
   };
 
+export const getUserDetail =
+  (userId: string, teamId: string) => async (dispatch: Dispatch) => {
+    try {
+      dispatch({
+        type: ActionTypes.FETCH_USER_REQUEST,
+        payload: { userId, teamId },
+      });
+      const res = await api.getUserDetail(userId, teamId, true);
+      if (res.success) {
+        dispatch({
+          type: ActionTypes.FETCH_USER_SUCCESS,
+          payload: { user: res.data, teamId },
+        });
+      } else {
+        dispatch({
+          type: ActionTypes.FETCH_USER_FAIL,
+          payload: { userId, teamId },
+        });
+      }
+    } catch (error) {
+      dispatch({
+        type: ActionTypes.FETCH_USER_FAIL,
+        payload: { userId, teamId },
+      });
+    }
+  };
+
 export const leaveTeam = (teamId: string) => async (dispatch: Dispatch) => {
   dispatch({
     type: ActionTypes.LEAVE_TEAM_REQUEST,

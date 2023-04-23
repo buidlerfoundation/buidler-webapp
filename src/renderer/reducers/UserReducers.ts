@@ -133,6 +133,58 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     defaultChannel;
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.FETCH_USER_REQUEST: {
+      const { userId, teamId } = payload;
+      return {
+        ...state,
+        teamUserMap: {
+          ...state.teamUserMap,
+          [teamId]: {
+            data: [
+              ...(state.teamUserMap?.[teamId]?.data || []),
+              { user_id: userId, fetching: true },
+            ],
+            total: state.teamUserMap?.[teamId]?.total || 0,
+          },
+        },
+      };
+    }
+    case actionTypes.FETCH_USER_FAIL: {
+      const { userId, teamId } = payload;
+      return {
+        ...state,
+        teamUserMap: {
+          ...state.teamUserMap,
+          [teamId]: {
+            data: (state.teamUserMap?.[teamId]?.data || []).map((el) => {
+              if (el.user_id === userId) {
+                return { user_id: userId, fetching: true };
+              }
+              return el;
+            }),
+            total: state.teamUserMap?.[teamId]?.total || 0,
+          },
+        },
+      };
+    }
+    case actionTypes.FETCH_USER_SUCCESS: {
+      const { user, teamId } = payload;
+      return {
+        ...state,
+        teamUserMap: {
+          ...state.teamUserMap,
+          [teamId]: {
+            data: (state.teamUserMap?.[teamId]?.data || []).map((el) => {
+              if (el.user_id === user.user_id) {
+                return user;
+              }
+              return el;
+            }),
+            total: (state.teamUserMap?.[teamId]?.total || 0) + 1,
+          },
+        },
+      };
+    }
     case actionTypes.UPDATE_TEAM_FROM_SOCKET: {
       return {
         ...state,

@@ -91,6 +91,7 @@ export interface UserData {
   is_deleted?: boolean;
   total_unread_notifications?: number;
   direct_channel_id?: string;
+  fetching?: boolean;
 }
 
 export interface Channel {
