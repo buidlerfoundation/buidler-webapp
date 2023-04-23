@@ -207,12 +207,26 @@ class SocketUtil {
   socket: Socket | null = null;
   firstLoad = true;
   connecting = false;
+  connectingTimeout: any = null;
+  connectionToastId: any = null;
+  hideToastConnecting() {
+    if (this.connectionToastId) {
+      toast.dismiss(this.connectionToastId);
+      this.connectionToastId = null;
+    }
+  }
   async init(isRefresh = false) {
     if (!isRefresh) {
       this.firstLoad = true;
     }
     if (this.socket?.connected || this.connecting) return;
     this.connecting = true;
+    this.connectingTimeout = setTimeout(() => {
+      this.connectionToastId = toast.custom("Connecting...", {
+        className: "Internet Connection",
+        duration: Infinity,
+      });
+    }, 10000);
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     const deviceCode = await getDeviceCode();
     const generatedPrivateKey = await GeneratedPrivateKey();
@@ -231,6 +245,7 @@ class SocketUtil {
     });
     this.socket?.on("connect_error", async (err) => {
       this.connecting = false;
+      this.hideToastConnecting();
       const message = err.message || err;
       GoogleAnalytics.tracking("Socket error: ", { message: `${message}` });
       if (message === "Authentication error") {
@@ -249,6 +264,10 @@ class SocketUtil {
     });
     this.socket?.on("connect", async () => {
       this.connecting = false;
+      if (this.connectingTimeout) {
+        clearTimeout(this.connectingTimeout);
+      }
+      this.hideToastConnecting();
       console.log("socket connected");
       const socketConnectKey = await getCookie(AsyncKey.socketConnectKey);
       if (!socketConnectKey) {
@@ -269,6 +288,7 @@ class SocketUtil {
       this.socket?.on("disconnect", (reason: string) => {
         this.connecting = false;
         this.removeListenSocket();
+        this.hideToastConnecting();
         console.log(`socket disconnect: ${reason}`);
         if (reason === "io server disconnect") {
           this.socket?.connect();
