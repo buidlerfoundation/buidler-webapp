@@ -217,3 +217,14 @@ export const normalizeMemberUserName = (str: string, length = 5) => {
   }
   return str;
 };
+
+export const parseMessage = (message: string) => {
+  const links = message.match(
+    /((https?|ftps?):\/\/[^"<\s]+)(?![^<>]*>|[^"]*?<\/a)/gim
+  );
+  const addresses = message.match(/0x[a-f0-9A-F]{40}/gim);
+  return {
+    links,
+    addresses,
+  };
+};
