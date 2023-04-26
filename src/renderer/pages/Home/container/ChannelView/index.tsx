@@ -571,7 +571,7 @@ const ChannelView = forwardRef(
         if (messages?.find((el) => el.message_id === messageId)) {
           setTimeout(() => {
             const element = document.getElementById(messageId);
-            element?.scrollIntoView({ behavior: "smooth", block: "center" });
+            element?.scrollIntoView({ behavior: "smooth", block: "start" });
           }, 0);
         } else {
           const success = await dispatch(
@@ -580,7 +580,7 @@ const ChannelView = forwardRef(
           if (!!success) {
             setTimeout(() => {
               const element = document.getElementById(messageId);
-              element?.scrollIntoView({ behavior: "smooth", block: "center" });
+              element?.scrollIntoView({ behavior: "smooth", block: "start" });
             }, 500);
           }
         }

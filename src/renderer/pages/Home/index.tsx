@@ -706,7 +706,7 @@ const Home = () => {
     if (!!success) {
       setTimeout(() => {
         const element = document.getElementById(matchMessageId);
-        element?.scrollIntoView({ behavior: "smooth", block: "center" });
+        element?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 600);
     } else {
       dispatch(getMessages(channelId, undefined));

@@ -283,6 +283,16 @@ export interface ConversationData {
   user_reaction: Array<UserReaction>;
   entity_id: string;
   entity_type: string;
+  metadata?: {
+    type: "scam_alert" | "asset";
+    data: {
+      content: string;
+      content_type: string;
+      created_at: string;
+      id: string;
+      updated_at: string;
+    };
+  };
 }
 
 export interface MessageDateData {
