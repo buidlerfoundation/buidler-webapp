@@ -118,6 +118,16 @@ function App() {
             type: actionTypes.UPDATE_CURRENT_USER_PROFILE_ID,
             payload: href.split("/channels/user/")[1],
           });
+        } else if (href === window.location.href && href?.includes("message")) {
+          const messageId = href?.split("message/")?.[1];
+          if (messageId) {
+            const element = document.getElementById(messageId);
+            element?.scrollIntoView({ behavior: "smooth", block: "start" });
+            dispatch({
+              type: actionTypes.UPDATE_HIGHLIGHT_MESSAGE,
+              payload: messageId,
+            });
+          }
         } else if (href?.includes(window.location.origin)) {
           history.push(href.replace(window.location.origin, ""));
         } else if (href) {
