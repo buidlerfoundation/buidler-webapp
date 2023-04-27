@@ -113,6 +113,7 @@ export interface Channel {
   team_id?: string;
   dapp_integration_url?: string;
   is_dapp_extension_required?: boolean;
+  firstItem?: boolean;
 }
 
 export interface Space {
