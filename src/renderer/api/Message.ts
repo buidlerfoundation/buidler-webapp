@@ -71,3 +71,8 @@ export const getAroundMessageById = async (messageId: string, limit = 20) => {
     `messages/${messageId}/jump?device_code=${deviceCode}&limit=${limit}`
   );
 };
+
+export const upVoteScamMessage = (id) => Caller.post(`scam-alert/${id}/upvote`);
+
+export const downVoteScamMessage = (id) =>
+  Caller.post(`scam-alert/${id}/downvote`);
