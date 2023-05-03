@@ -219,9 +219,14 @@ export const normalizeMemberUserName = (str: string, length = 5) => {
 };
 
 export const parseMessage = (message: string) => {
-  const links = message.match(
-    /((https?|ftps?|http?):\/\/[^"<\s]+)(?![^<>]*>|[^"]*?<\/a)/gim
-  );
+  const normalizeMessage = message.replace(/\[(.*?)\]\((.*?)\)/gim, "$2");
+  const links = normalizeMessage
+    .split(/(\s)/g)
+    .filter((el) =>
+      el.match(
+        /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
+      )
+    );
   const addresses = message.match(/0x[a-f0-9A-F]{40}/gim);
   return {
     links,
