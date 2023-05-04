@@ -1,6 +1,6 @@
 {
   "name": "buidler-web",
-  "version": "2.4.4",
+  "version": "2.5.3",
   "private": true,
   "dependencies": {
     "@date-io/date-fns": "1.3.13",
