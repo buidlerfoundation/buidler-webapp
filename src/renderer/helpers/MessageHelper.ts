@@ -233,3 +233,8 @@ export const parseMessage = (message: string) => {
     addresses,
   };
 };
+
+export const getBlockIntoViewByElement = (element: HTMLElement | null) => {
+  if ((element?.textContent?.length || 0) <= 1000) return "center";
+  return "start";
+};

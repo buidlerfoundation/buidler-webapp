@@ -35,6 +35,7 @@ import useCurrentChannel from "renderer/hooks/useCurrentChannel";
 import { sameDAppURL } from "renderer/helpers/LinkHelper";
 import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
 import { ethers } from "ethers";
+import { getBlockIntoViewByElement } from "renderer/helpers/MessageHelper";
 
 function App() {
   const history = useHistory();
@@ -122,7 +123,10 @@ function App() {
           const messageId = href?.split("message/")?.[1];
           if (messageId) {
             const element = document.getElementById(messageId);
-            element?.scrollIntoView({ behavior: "smooth", block: "start" });
+            element?.scrollIntoView({
+              behavior: "smooth",
+              block: getBlockIntoViewByElement(element),
+            });
             dispatch({
               type: actionTypes.UPDATE_HIGHLIGHT_MESSAGE,
               payload: messageId,

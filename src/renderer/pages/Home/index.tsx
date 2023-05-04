@@ -88,6 +88,7 @@ import ModalLoadingConfirmTx from "renderer/shared/ModalLoadingConfirmTx";
 import SideBarDM from "renderer/shared/SideBarDM";
 import ModalNFTDetail from "renderer/shared/ModalNFTDetail";
 import BrowserView from "renderer/shared/BrowserView";
+import { getBlockIntoViewByElement } from "renderer/helpers/MessageHelper";
 
 const loadMoreMessageSelector = createLoadMoreSelector([
   actionTypes.MESSAGE_PREFIX,
@@ -706,7 +707,10 @@ const Home = () => {
     if (!!success) {
       setTimeout(() => {
         const element = document.getElementById(matchMessageId);
-        element?.scrollIntoView({ behavior: "smooth", block: "start" });
+        element?.scrollIntoView({
+          behavior: "smooth",
+          block: getBlockIntoViewByElement(element),
+        });
       }, 600);
     } else {
       dispatch(getMessages(channelId, undefined));
