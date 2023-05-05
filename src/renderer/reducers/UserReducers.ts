@@ -133,6 +133,27 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
     defaultChannel;
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.GET_TEAM_USER_ONLINE: {
+      const { teamId, onlineUsers } = payload;
+      return {
+        ...state,
+        teamUserMap: {
+          ...state.teamUserMap,
+          [teamId]: {
+            ...(state.teamUserMap?.[teamId] || {}),
+            data: state.teamUserMap?.[teamId]?.data?.map((el) => {
+              if (onlineUsers.includes(el.user_id)) {
+                return {
+                  ...el,
+                  status: "online",
+                };
+              }
+              return el;
+            }),
+          },
+        },
+      };
+    }
     case actionTypes.FETCH_USER_REQUEST: {
       const { userId, teamId } = payload;
       return {

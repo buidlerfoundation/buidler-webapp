@@ -173,6 +173,20 @@ export const clearLastChannel: ActionCreator<any> =
     });
   };
 
+export const fetchListUserOnline: ActionCreator<any> =
+  (teamId: string) => async (dispatch: Dispatch) => {
+    const onlineUsersRes = await api.getListUserOnline(teamId);
+    if (onlineUsersRes.statusCode === 200) {
+      dispatch({
+        type: ActionTypes.GET_TEAM_USER_ONLINE,
+        payload: {
+          onlineUsers: onlineUsersRes.data || [],
+          teamId,
+        },
+      });
+    }
+  };
+
 export const findUser = () => async (dispatch: Dispatch) => {
   dispatch({ type: ActionTypes.USER_REQUEST });
   const res = await api.findUser();
@@ -238,6 +252,7 @@ export const findTeamAndChannel =
               teamId,
             },
           });
+          dispatch(fetchListUserOnline(teamId));
         }
         const directChannelUser = teamUsersRes?.data?.find(
           (u: UserData) => u.direct_channel === lastChannelId
@@ -363,6 +378,7 @@ const actionSetCurrentTeam = async (
         type: ActionTypes.GET_TEAM_USER,
         payload: { teamUsers: teamUsersRes, teamId: team.team_id },
       });
+      dispatch(fetchListUserOnline(team.team_id));
     }
     SocketUtils.changeTeam(team.team_id);
     if (resChannel.statusCode === 200 && teamUsersRes.statusCode === 200) {

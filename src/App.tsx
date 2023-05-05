@@ -14,11 +14,13 @@ import {
   GeneratedPrivateKey,
   getCookie,
   getDeviceCode,
+  removeCookie,
+  setCookie,
 } from "renderer/common/Cookie";
 import { AsyncKey, LoginType } from "renderer/common/AppConfig";
 import actionTypes from "renderer/actions/ActionTypes";
 import api from "renderer/api";
-import { getInitial, logout } from "renderer/actions/UserActions";
+import { acceptTeam, getInitial, logout } from "renderer/actions/UserActions";
 import AppToastNotification from "renderer/shared/AppToastNotification";
 import Main from "renderer/pages/Main";
 import SocketUtils from "renderer/utils/SocketUtils";
@@ -36,6 +38,7 @@ import { sameDAppURL } from "renderer/helpers/LinkHelper";
 import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
 import { ethers } from "ethers";
 import { getBlockIntoViewByElement } from "renderer/helpers/MessageHelper";
+import { toast } from "react-hot-toast";
 
 function App() {
   const history = useHistory();
@@ -109,7 +112,7 @@ function App() {
     };
   }, [currentToken, dispatch]);
   useEffect(() => {
-    const eventClick = (e: any) => {
+    const eventClick = async (e: any) => {
       if (!e.target.download) {
         const href = e?.target?.href || e?.target?.parentElement?.href;
         if (sameDAppURL(href, currentChannel?.dapp_integration_url)) {
@@ -134,6 +137,39 @@ function App() {
           }
         } else if (href?.includes(window.location.origin)) {
           history.push(href.replace(window.location.origin, ""));
+        } else if (href?.includes("buidler.link")) {
+          e.preventDefault();
+          const url = new URL(href);
+          const communityUrl = url.pathname.substring(1);
+          const invitationRef = url.searchParams.get("ref");
+          const profileRes = await api.getProfile(communityUrl);
+          const teamId = profileRes?.data?.profile?.team_id;
+          const userId = profileRes?.data?.profile?.user_id;
+          if (userId) {
+            dispatch({
+              type: actionTypes.UPDATE_CURRENT_USER_PROFILE_ID,
+              payload: userId,
+            });
+          } else if (teamId) {
+            const invitationRes = await api.invitation(teamId);
+            const invitationUrl = invitationRes.data?.invitation_url;
+            const invitationId = invitationUrl?.substring(
+              invitationUrl?.lastIndexOf("/") + 1
+            );
+            if (!invitationId) {
+              toast.error("Invalid invitation link");
+              return;
+            }
+            const res: any = await dispatch(
+              acceptTeam(invitationId, invitationRef)
+            );
+            if (res.statusCode === 200 && !!res.data?.team_id) {
+              toast.success("You have successfully joined new community.");
+              removeCookie(AsyncKey.lastChannelId);
+              setCookie(AsyncKey.lastTeamId, teamId);
+              history.push(`/channels/${teamId}`);
+            }
+          }
         } else if (href) {
           window.open(href, "_blank");
         }

@@ -33,6 +33,7 @@ import GlobalVariable from "renderer/services/GlobalVariable";
 import { dispatchChangeRoute } from "renderer/services/events/WindowEvent";
 import {
   actionFetchWalletBalance,
+  fetchListUserOnline,
   logout,
   refreshToken,
 } from "renderer/actions/UserActions";
@@ -150,6 +151,7 @@ const actionSetCurrentTeam = async (
       type: actionTypes.GET_TEAM_USER,
       payload: { teamUsers: teamUsersRes, teamId: team.team_id },
     });
+    dispatch(fetchListUserOnline(team.team_id));
   }
   if (resSpace.statusCode === 200 && resChannel.statusCode === 200) {
     dispatch({
