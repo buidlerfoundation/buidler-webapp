@@ -112,6 +112,9 @@ const Home = () => {
     () => match.params,
     [match.params]
   );
+  const [dappStack, setDAppStack] = useState<
+    { url?: string; extensionRequired?: boolean }[]
+  >([]);
   const dispatch = useAppDispatch();
   const loadMoreMessage = useAppSelector((state) =>
     loadMoreMessageSelector(state)
@@ -618,6 +621,32 @@ const Home = () => {
     currentChannel?.space_id,
   ]);
   useEffect(() => {
+    if (match_community_id) {
+      setDAppStack([]);
+    }
+  }, [match_community_id]);
+  useEffect(() => {
+    if (currentChannel?.dapp_integration_url) {
+      setDAppStack((current) => {
+        if (
+          current.find((el) => el.url === currentChannel.dapp_integration_url)
+        ) {
+          return current;
+        }
+        return [
+          ...current,
+          {
+            url: currentChannel.dapp_integration_url,
+            extensionRequired: currentChannel.is_dapp_extension_required,
+          },
+        ];
+      });
+    }
+  }, [
+    currentChannel.dapp_integration_url,
+    currentChannel.is_dapp_extension_required,
+  ]);
+  useEffect(() => {
     if (currentChannel.channel_name && currentTeam.team_display_name) {
       document.title = `${currentTeam.team_display_name} • #${currentChannel.channel_name} | Buidler`;
     }
@@ -893,10 +922,16 @@ const Home = () => {
               hideScrollDown={isOpenMembers}
             />
             {currentChannel.dapp_integration_url ? (
-              <BrowserView
-                url={currentChannel.dapp_integration_url}
-                extensionRequired={currentChannel.is_dapp_extension_required}
-              />
+              <div className="dapp-browser__container">
+                {dappStack.map((el) => (
+                  <BrowserView
+                    url={el.url || ""}
+                    extensionRequired={el.extensionRequired}
+                    key={el.url}
+                    isActive={currentChannel.dapp_integration_url === el.url}
+                  />
+                ))}
+              </div>
             ) : (
               currentChannel.channel_id &&
               currentChannel.channel_type !== "Direct" && (
