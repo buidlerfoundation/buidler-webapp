@@ -410,11 +410,9 @@ const ChannelView = forwardRef(
       if (extractContent(text).trim() !== "" || files.length > 0) {
         let content = extractContentMessage(text.trim());
         let plain_text = extractContent(text.trim());
-        if (
-          currentChannel.channel_type === "Private" ||
-          (currentChannel.channel_type === "Direct" &&
-            currentChannel.channel_id)
-        ) {
+        const isDirect =
+          currentChannel.channel_type === "Direct" && currentChannel.channel_id;
+        if (currentChannel.channel_type === "Private" || isDirect) {
           const { key } =
             channelPrivateKey[currentChannel.channel_id][
               channelPrivateKey[currentChannel.channel_id].length - 1
@@ -429,7 +427,7 @@ const ChannelView = forwardRef(
           files.map((el) => el.id || "")
         );
         GoogleAnalytics.tracking("Message Edited", {
-          category: "Message",
+          category: isDirect ? "Direct Message" : "Channel Message",
         });
         setText("");
         setFiles([]);
@@ -459,11 +457,9 @@ const ChannelView = forwardRef(
         if (files.length > 0) {
           message.file_ids = files.map((el) => el.randomId);
         }
-        if (
-          currentChannel.channel_type === "Private" ||
-          (currentChannel.channel_type === "Direct" &&
-            currentChannel.channel_id)
-        ) {
+        const isDirect =
+          currentChannel.channel_type === "Direct" && currentChannel.channel_id;
+        if (currentChannel.channel_type === "Private" || isDirect) {
           const { key } =
             channelPrivateKey?.[currentChannel.channel_id]?.[
               channelPrivateKey?.[currentChannel.channel_id]?.length - 1
@@ -505,7 +501,7 @@ const ChannelView = forwardRef(
           gaLabel += ", file";
         }
         GoogleAnalytics.tracking("Message Sent", {
-          category: "Message",
+          category: isDirect ? "Direct Message" : "Channel Message",
           type: gaLabel,
           is_reply: `${!!messageReply}`,
           is_exclusive_space: `${
@@ -653,12 +649,13 @@ const ChannelView = forwardRef(
         )
       );
       GoogleAnalytics.tracking("Message Deleted", {
-        category: "Message",
+        category: isDirect ? "Direct Message" : "Channel Message",
       });
       toggleConfirmDeleteMessage();
     }, [
       currentChannel.channel_id,
       dispatch,
+      isDirect,
       selectedMessage,
       toggleConfirmDeleteMessage,
     ]);

@@ -182,6 +182,15 @@ function App() {
     };
   }, [currentChannel?.dapp_integration_url, dispatch, history]);
   useEffect(() => {
+    if (currentChannel.channel_id) {
+      const element = document.getElementById(currentChannel.channel_id);
+      element?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [currentChannel.channel_id]);
+  useEffect(() => {
     TextareaAutosize.defaultProps = {
       ...TextareaAutosize.defaultProps,
       onFocus: () => {
