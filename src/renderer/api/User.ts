@@ -259,5 +259,9 @@ export const generateTokenFromOTT = (ott: string) =>
     refresh_token_expire_at: number;
   }>(`authentication/ott/${ott}`);
 
-export const getListUserOnline = (communityId) =>
-  Caller.get<String[]>(`user/online?team_id=${communityId}`);
+export const getListUserOnline = (communityId, controller?: AbortController) =>
+  Caller.get<String[]>(
+    `user/online?team_id=${communityId}`,
+    undefined,
+    controller
+  );

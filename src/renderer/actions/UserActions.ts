@@ -359,6 +359,10 @@ const actionSetCurrentTeam = async (
   });
   try {
     const teamUsersRes = await api.getTeamUsers(team.team_id, controller);
+    const onlineUsersRes = await api.getListUserOnline(
+      team.team_id,
+      controller
+    );
     let lastChannelId: any = null;
     const resSpace = await api.getSpaceChannel(team.team_id, controller);
     const resChannel = await api.findChannel(team.team_id, controller);
@@ -374,11 +378,22 @@ const actionSetCurrentTeam = async (
     }
     await setCookie(AsyncKey.lastChannelId, lastChannelId);
     if (teamUsersRes.statusCode === 200) {
+      if (teamUsersRes.data) {
+        const onlineUsers = onlineUsersRes?.data || [];
+        teamUsersRes.data = teamUsersRes.data.map((el) => {
+          if (onlineUsers.includes(el.user_id)) {
+            return {
+              ...el,
+              status: "online",
+            };
+          }
+          return el;
+        });
+      }
       dispatch({
         type: ActionTypes.GET_TEAM_USER,
         payload: { teamUsers: teamUsersRes, teamId: team.team_id },
       });
-      dispatch(fetchListUserOnline(team.team_id));
     }
     SocketUtils.changeTeam(team.team_id);
     if (resChannel.statusCode === 200 && teamUsersRes.statusCode === 200) {

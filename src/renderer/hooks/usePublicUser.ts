@@ -8,7 +8,7 @@ function usePublicUser(userId?: string, defaultValue?: UserData) {
 
   return React.useMemo(
     () =>
-      teamUserData.find((el) => el.user_id === userId) ||
+      teamUserData.find((el) => !el.is_deleted && el.user_id === userId) ||
       defaultValue ||
       DeletedUser,
     [defaultValue, teamUserData, userId]

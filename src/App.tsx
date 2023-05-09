@@ -169,6 +169,8 @@ function App() {
               setCookie(AsyncKey.lastTeamId, teamId);
               history.push(`/channels/${teamId}`);
             }
+          } else {
+            window.open(href, "_blank");
           }
         } else if (href) {
           window.open(href, "_blank");
@@ -181,15 +183,6 @@ function App() {
       window.removeEventListener("click", eventClick);
     };
   }, [currentChannel?.dapp_integration_url, dispatch, history]);
-  useEffect(() => {
-    if (currentChannel.channel_id) {
-      const element = document.getElementById(currentChannel.channel_id);
-      element?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
-  }, [currentChannel.channel_id]);
   useEffect(() => {
     TextareaAutosize.defaultProps = {
       ...TextareaAutosize.defaultProps,

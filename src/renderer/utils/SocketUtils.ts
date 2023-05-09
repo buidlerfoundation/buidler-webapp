@@ -146,7 +146,7 @@ const actionSetCurrentTeam = async (
       api.getSpaceChannel(team.team_id, controller),
       api.findChannel(team.team_id, controller),
       api.getTeamUsers(team.team_id, controller),
-      api.getListUserOnline(team.team_id),
+      api.getListUserOnline(team.team_id, controller),
     ]);
   if (teamUsersRes.statusCode === 200) {
     if (teamUsersRes.data) {
