@@ -38,6 +38,7 @@ export const AsyncKey = {
   lastSyncChannelKey: `${Prefix}_last_sync_channel_key`,
   spaceToggleKey: `${Prefix}_space_toggle_key`,
   isBackup: `${Prefix}_is_backup`,
+  draftMessageKey: `${Prefix}_draft_message`,
 };
 
 export const ProgressStatus = [

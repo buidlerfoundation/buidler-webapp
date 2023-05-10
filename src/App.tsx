@@ -39,6 +39,7 @@ import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
 import { ethers } from "ethers";
 import { getBlockIntoViewByElement } from "renderer/helpers/MessageHelper";
 import { toast } from "react-hot-toast";
+import { initialDraft } from "renderer/actions/DraftActions";
 
 function App() {
   const history = useHistory();
@@ -84,6 +85,7 @@ function App() {
   }, []);
   useEffect(() => {
     dispatch(initialSpaceToggle());
+    dispatch(initialDraft());
   }, [dispatch]);
   useEffect(() => {
     GoogleAnalytics.init();

@@ -15,6 +15,7 @@ import toggleSidebarReducer from "./ToggleSidebarReducer";
 import collectibleReducer from "./CollectibleReducers";
 import notificationReducer from "./NotificationReducers";
 import sideBarReducers from "./SideBarReducers";
+import draftReducers from "./DraftReducers";
 
 const appReducer = combineReducers({
   error: ErrorReducer,
@@ -33,6 +34,7 @@ const appReducer = combineReducers({
   collectible: collectibleReducer,
   notification: notificationReducer,
   sideBar: sideBarReducers,
+  draft: draftReducers,
 });
 
 const rootReducer = (state, action) => {

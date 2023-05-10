@@ -109,6 +109,9 @@ const ChannelView = forwardRef(
     const communityId = useMatchCommunityId();
     const loading = useMessageLoading();
     const reactData = useAppSelector((state) => state.reactReducer.reactData);
+    const textFromDraft = useAppSelector(
+      (state) => state.draft.data?.[currentChannel.channel_id]?.text || ""
+    );
     const channels = useChannel();
     const userRole = useUserRole();
     const loginType = useAppSelector((state) => state.configs.loginType);
@@ -363,12 +366,12 @@ const ChannelView = forwardRef(
     }, [currentChannel.channel_id, dispatch, messageCanMoreAfter, scrollDown]);
     const onClearText = useCallback(() => {
       inputRef.current?.blur();
-      setText("");
+      setText(textFromDraft);
       setMessageReply(null);
       setMessageEdit(null);
       setFiles([]);
       generateId.current = "";
-    }, [inputRef]);
+    }, [inputRef, textFromDraft]);
     const onRemoveReply = useCallback(() => {
       if (messageReply || messageEdit) {
         setText("");
@@ -762,6 +765,7 @@ const ChannelView = forwardRef(
                   messageEdit={messageEdit}
                   inputId="message-input-channel"
                   disabled={!canChat}
+                  entityId={currentChannel.channel_id}
                 />
               </div>
             )}
