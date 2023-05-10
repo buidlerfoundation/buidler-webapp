@@ -30,6 +30,36 @@ const taskReducers: Reducer<TaskReducerState, AnyAction> = (
 ) => {
   const { type, payload } = action;
   switch (type) {
+    case actionTypes.UPLOAD_ATTACHMENT_SUCCESS: {
+      const { file, file_url } = payload;
+      const newTaskData = { ...state.taskData };
+      if (file.entity_id && newTaskData?.[file.entity_id]) {
+        newTaskData[file.entity_id] = {
+          ...newTaskData?.[file.entity_id],
+          tasks: newTaskData?.[file.entity_id]?.tasks?.map((el) => {
+            if (el.task_id === file.attachment_id) {
+              return {
+                ...el,
+                task_attachments: el?.task_attachments?.map((att) => {
+                  if (att.file_id === file.file_id) {
+                    return {
+                      ...file,
+                      file_url,
+                    };
+                  }
+                  return att;
+                }),
+              };
+            }
+            return el;
+          }),
+        };
+      }
+      return {
+        ...state,
+        taskData: { ...newTaskData },
+      };
+    }
     case actionTypes.PP_DETAIL_SUCCESS: {
       return {
         ...state,

@@ -40,6 +40,19 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
           ...newMessageData?.[file.entity_id],
           data: newMessageData?.[file.entity_id]?.data?.map((el) => {
             if (el.message_id === file.attachment_id) {
+              if (el.task && el.task.task_attachments) {
+                el.task.task_attachments = el.task.task_attachments?.map(
+                  (att) => {
+                    if (att.file_id === file.file_id) {
+                      return {
+                        ...file,
+                        file_url,
+                      };
+                    }
+                    return att;
+                  }
+                );
+              }
               return {
                 ...el,
                 message_attachments: el.message_attachments.map((att) => {
