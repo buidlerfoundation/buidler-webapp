@@ -8,6 +8,7 @@ export type LocalAttachment = {
   id?: string;
   randomId?: string;
   url?: string;
+  attachmentId?: string;
 };
 
 export type SpaceType = "Public" | "Exclusive";

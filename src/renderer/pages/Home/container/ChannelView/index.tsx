@@ -65,6 +65,7 @@ import useDirectChannelUser from "renderer/hooks/useDirectChannelUser";
 import DirectEmpty from "renderer/shared/DirectEmpty";
 import DirectNotSupport from "renderer/shared/DirectNotSupport";
 import useMessageLoading from "renderer/hooks/useMessageLoading";
+import { updateAttachmentDraft } from "renderer/actions/DraftActions";
 
 type ChannelViewProps = {
   currentChannel: Channel;
@@ -111,6 +112,11 @@ const ChannelView = forwardRef(
     const reactData = useAppSelector((state) => state.reactReducer.reactData);
     const textFromDraft = useAppSelector(
       (state) => state.draft.data?.[currentChannel.channel_id]?.text || ""
+    );
+    const attachmentsFromDraft = useAppSelector(
+      (state) =>
+        state.draft.attachmentData?.[currentChannel.channel_id]?.attachments ||
+        []
     );
     const channels = useChannel();
     const userRole = useUserRole();
@@ -172,6 +178,7 @@ const ChannelView = forwardRef(
             loading: true,
             type: f.type || "application",
             fileName: f.name,
+            attachmentId: generateId.current,
           };
           setFiles((current) => [...current, attachment]);
           api
@@ -355,6 +362,15 @@ const ChannelView = forwardRef(
     }, []);
     useEffect(() => {
       if (currentChannel.channel_id) {
+        dispatch(
+          updateAttachmentDraft(currentChannel.channel_id, {
+            attachments: files,
+          })
+        );
+      }
+    }, [currentChannel.channel_id, dispatch, files]);
+    useEffect(() => {
+      if (currentChannel.channel_id) {
         scrollDown();
       }
     }, [currentChannel.channel_id, scrollDown]);
@@ -369,9 +385,9 @@ const ChannelView = forwardRef(
       setText(textFromDraft);
       setMessageReply(null);
       setMessageEdit(null);
-      setFiles([]);
-      generateId.current = "";
-    }, [inputRef, textFromDraft]);
+      setFiles(attachmentsFromDraft || []);
+      generateId.current = attachmentsFromDraft?.[0]?.attachmentId || "";
+    }, [attachmentsFromDraft, inputRef, textFromDraft]);
     const onRemoveReply = useCallback(() => {
       if (messageReply || messageEdit) {
         setText("");
@@ -752,7 +768,7 @@ const ChannelView = forwardRef(
                         }`
                       : "You do not have permission to send messages in this channel."
                   }
-                  attachments={files}
+                  attachments={attachmentsFromDraft}
                   onRemoveFile={handleRemoveFile}
                   inputRef={inputRef}
                   onKeyDown={debounce(onKeyDown, 100)}

@@ -3,6 +3,7 @@ import { AsyncKey } from "renderer/common/AppConfig";
 import { getCookie, setCookie } from "renderer/common/Cookie";
 import actionTypes from "./ActionTypes";
 import { AppGetState } from "renderer/store";
+import { LocalAttachment } from "renderer/models";
 
 export const initialDraft = () => async (dispatch: Dispatch) => {
   const dataLocal = await getCookie(AsyncKey.draftMessageKey);
@@ -24,5 +25,14 @@ export const updateDraft =
     dispatch({
       type: actionTypes.UPDATE_DRAFT,
       payload: { entityId, text: data?.text },
+    });
+  };
+
+export const updateAttachmentDraft =
+  (entityId: string, data?: { attachments?: LocalAttachment[] }) =>
+  (dispatch: Dispatch) => {
+    dispatch({
+      type: actionTypes.UPDATE_ATTACHMENT_DRAFT,
+      payload: { entityId, attachments: data?.attachments || [] },
     });
   };
