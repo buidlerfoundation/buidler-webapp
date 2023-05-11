@@ -113,6 +113,19 @@ export const normalizeMessageTextPlain = (
   }</div>`;
 };
 
+export const convertLinkToHTML = (text: string) => {
+  const splitted = text.split(" ");
+  const regex = /((https?|ftps?):\/\/[^"'<\s)]+)(?![^<>]|[^"]*?<\/a)/;
+  return splitted
+    .map((el) => {
+      if (regex.test(el)) {
+        return el.replace(regex, "<a href='$1'>$1</a>");
+      }
+      return el;
+    })
+    .join(" ");
+};
+
 export const normalizeMessageText = (
   text: string,
   wrapParagraph?: boolean,
@@ -128,7 +141,7 @@ export const normalizeMessageText = (
       )
       .replace(/href=".*?\/channels\/user/g, `href="$mention_location`);
   }
-  let res = text
+  let res = convertLinkToHTML(text)
     .replace(/<br>/gim, "\n")
     .replace(/\n- (.*)/gim, "\n  • $1")
     .replace(/^#### (.*$)(\n)/gim, "<h4>$1</h4>")
@@ -148,10 +161,6 @@ export const normalizeMessageText = (
     )
     .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>")
     .replace(/\n$/gim, "<br />")
-    .replace(
-      /((https?|ftps?):\/\/[^"<\s)]+)(?![^<>]*>|[^"]*?<\/a)/gim,
-      "<a href='$1'>$1</a>"
-    )
     .replace(/\$mention_location/g, `${window.location.origin}/channels/user`)
     .replace(
       /(<@)(.*?)(-)(.*?)(>)/gim,
