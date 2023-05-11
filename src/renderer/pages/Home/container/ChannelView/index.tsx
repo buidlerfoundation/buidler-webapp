@@ -385,7 +385,14 @@ const ChannelView = forwardRef(
       setText(textFromDraft);
       setMessageReply(null);
       setMessageEdit(null);
-      setFiles(attachmentsFromDraft || []);
+      setFiles(
+        attachmentsFromDraft?.map?.((el) => {
+          return {
+            ...el,
+            loading: false,
+          };
+        }) || []
+      );
       generateId.current = attachmentsFromDraft?.[0]?.attachmentId || "";
     }, [attachmentsFromDraft, inputRef, textFromDraft]);
     const onRemoveReply = useCallback(() => {
