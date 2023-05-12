@@ -136,8 +136,13 @@ const Home = () => {
   const [currentUserId, setCurrentUserId] = useState<string | undefined | null>(
     ""
   );
+  const [fullScreenIFrame, setFullScreenIFrame] = useState(false);
   const [openNFTDetail, setOpenNFTDetail] = useState(false);
   const [selectedNFT, setSelectedNFT] = useState();
+  const toggleFullScreenIFrame = useCallback(
+    () => setFullScreenIFrame((current) => !current),
+    []
+  );
   const toggleNFTDetail = useCallback(
     () => setOpenNFTDetail((current) => !current),
     []
@@ -773,6 +778,7 @@ const Home = () => {
   useEffect(() => {
     const keyDownListener = (e: any) => {
       if (e.key === "Escape") {
+        setFullScreenIFrame(false);
         setOpenCreateChannel(false);
       } else {
         const taskElement = document.getElementById("task-list");
@@ -929,6 +935,8 @@ const Home = () => {
                     extensionRequired={el.extensionRequired}
                     key={el.url}
                     isActive={currentChannel.dapp_integration_url === el.url}
+                    fullScreen={fullScreenIFrame}
+                    toggleFullScreen={toggleFullScreenIFrame}
                   />
                 ))}
               </div>
