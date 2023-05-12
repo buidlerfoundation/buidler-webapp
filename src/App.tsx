@@ -14,13 +14,11 @@ import {
   GeneratedPrivateKey,
   getCookie,
   getDeviceCode,
-  removeCookie,
-  setCookie,
 } from "renderer/common/Cookie";
 import { AsyncKey, LoginType } from "renderer/common/AppConfig";
 import actionTypes from "renderer/actions/ActionTypes";
 import api from "renderer/api";
-import { acceptTeam, getInitial, logout } from "renderer/actions/UserActions";
+import { getInitial, logout } from "renderer/actions/UserActions";
 import AppToastNotification from "renderer/shared/AppToastNotification";
 import Main from "renderer/pages/Main";
 import SocketUtils from "renderer/utils/SocketUtils";
@@ -38,7 +36,6 @@ import { sameDAppURL } from "renderer/helpers/LinkHelper";
 import Web3AuthUtils from "renderer/services/connectors/Web3AuthUtils";
 import { ethers } from "ethers";
 import { getBlockIntoViewByElement } from "renderer/helpers/MessageHelper";
-import { toast } from "react-hot-toast";
 import { initialDraft } from "renderer/actions/DraftActions";
 
 function App() {
