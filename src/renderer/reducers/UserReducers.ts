@@ -51,6 +51,7 @@ interface UserReducerState {
   apiSpaceMemberController?: AbortController | null;
   currentUserProfileId?: string | null;
   updateFromSocket?: boolean;
+  currentCommunityProfileId?: string | null;
 }
 
 const defaultChannel: Channel = {
@@ -85,6 +86,7 @@ const initialState: UserReducerState = {
   apiTeamController: null,
   currentUserProfileId: null,
   updateFromSocket: false,
+  currentCommunityProfileId: null,
 };
 
 export const defaultMemberData = {
@@ -269,6 +271,12 @@ const userReducers: Reducer<UserReducerState, AnyAction> = (
       return {
         ...state,
         currentUserProfileId: payload,
+      };
+    }
+    case actionTypes.UPDATE_CURRENT_COMMUNITY_PROFILE_ID: {
+      return {
+        ...state,
+        currentCommunityProfileId: payload,
       };
     }
     case actionTypes.UPDATE_LAST_CHANNEL: {

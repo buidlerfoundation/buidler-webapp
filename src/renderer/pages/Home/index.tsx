@@ -89,6 +89,7 @@ import SideBarDM from "renderer/shared/SideBarDM";
 import ModalNFTDetail from "renderer/shared/ModalNFTDetail";
 import BrowserView from "renderer/shared/BrowserView";
 import { getBlockIntoViewByElement } from "renderer/helpers/MessageHelper";
+import ModalCommunityProfile from "renderer/shared/ModalCommunityProfile";
 
 const loadMoreMessageSelector = createLoadMoreSelector([
   actionTypes.MESSAGE_PREFIX,
@@ -132,6 +133,9 @@ const Home = () => {
   );
   const currentUserProfileId = useAppSelector(
     (state) => state.user.currentUserProfileId
+  );
+  const currentCommunityProfileId = useAppSelector(
+    (state) => state.user.currentCommunityProfileId
   );
   const [currentUserId, setCurrentUserId] = useState<string | undefined | null>(
     ""
@@ -363,6 +367,12 @@ const Home = () => {
       history.goBack();
     }
   }, [dispatch, history]);
+  const handleCloseModalCommunityProfile = useCallback(() => {
+    dispatch({
+      type: actionTypes.UPDATE_CURRENT_COMMUNITY_PROFILE_ID,
+      payload: "",
+    });
+  }, [dispatch]);
   const handleOpenInviteMember = useCallback(() => setOpenInvite(true), []);
   const handleSpaceBadgeClick = useCallback(
     (s: Space) => {
@@ -780,6 +790,8 @@ const Home = () => {
       if (e.key === "Escape") {
         setFullScreenIFrame(false);
         setOpenCreateChannel(false);
+        handleCloseModalUserProfile();
+        handleCloseModalCommunityProfile();
       } else {
         const taskElement = document.getElementById("task-list");
         const taskHoverElement = taskElement?.querySelector(
@@ -817,11 +829,13 @@ const Home = () => {
     };
   }, [
     history,
-    currentTeam?.team_id,
+    currentTeam.team_id,
     currentChannel?.channel_id,
     dispatch,
     taskData,
     currentChannelId,
+    handleCloseModalUserProfile,
+    handleCloseModalCommunityProfile,
   ]);
 
   const onMenuPostSelected = useCallback(
@@ -1013,6 +1027,11 @@ const Home = () => {
             onViewTxDetail={onViewTxDetail}
             onSpaceClick={handleSpaceBadgeClick}
             onOpenNFTDetail={handleOpenNFTDetail}
+          />
+          <ModalCommunityProfile
+            open={!!currentCommunityProfileId}
+            handleClose={handleCloseModalCommunityProfile}
+            communityId={currentCommunityProfileId}
           />
           {openNFTDetail && (
             <ModalNFTDetail
