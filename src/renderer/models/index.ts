@@ -475,6 +475,7 @@ export interface BaseDataApi<T> {
     encrypt_message_key?: string;
     can_loadmore_message_after?: boolean;
     can_loadmore_message_before?: boolean;
+    is_new_team_member?: boolean;
   };
   refresh_token?: string;
   token_expire_at?: number;

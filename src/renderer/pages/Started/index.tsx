@@ -76,7 +76,9 @@ const Started = () => {
           invitationRef
         );
         if (acceptRes.statusCode === 200) {
-          toast.success("You have successfully joined new community.");
+          if (acceptRes.metadata?.is_new_team_member) {
+            toast.success("You have successfully joined new community.");
+          }
           dispatch({ type: actionTypes.REMOVE_DATA_FROM_URL });
           await setCookie(AsyncKey.lastTeamId, acceptRes.data?.team_id);
         }

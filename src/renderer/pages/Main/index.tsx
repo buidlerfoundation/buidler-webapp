@@ -109,7 +109,9 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
         const res = await api.acceptInvitation(invitationId, invitationRef);
         if (res.statusCode === 200) {
           await dispatch(findTeamAndChannel(res.data?.team_id));
-          toast.success("You have successfully joined new community.");
+          if (res.metadata?.is_new_team_member) {
+            toast.success("You have successfully joined new community.");
+          }
           dispatch({ type: actionTypes.REMOVE_DATA_FROM_URL });
           setCookie(AsyncKey.lastTeamId, res.data?.team_id);
           history.replace({
@@ -197,7 +199,9 @@ const PrivateRoute = ({ component: Component, ...rest }: any) => {
             acceptTeam(invitationId, invitationRef)
           );
           if (res.statusCode === 200 && !!res.data?.team_id) {
-            toast.success("You have successfully joined new community.");
+            if (res.metadata?.is_new_team_member) {
+              toast.success("You have successfully joined new community.");
+            }
             await setCookie(AsyncKey.lastTeamId, res.data?.team_id);
           }
         }

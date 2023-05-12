@@ -166,7 +166,9 @@ function App() {
               acceptTeam(invitationId, invitationRef)
             );
             if (res.statusCode === 200 && !!res.data?.team_id) {
-              toast.success("You have successfully joined new community.");
+              if (res.metadata?.is_new_team_member) {
+                toast.success("You have successfully joined new community.");
+              }
               removeCookie(AsyncKey.lastChannelId);
               setCookie(AsyncKey.lastTeamId, teamId);
               history.push(`/channels/${teamId}`);
