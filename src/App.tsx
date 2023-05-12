@@ -155,28 +155,10 @@ function App() {
           } else if (teamId) {
             dispatch({
               type: actionTypes.UPDATE_CURRENT_COMMUNITY_PROFILE_ID,
-              payload: communityUrl,
+              payload: `${communityUrl}?${
+                invitationRef ? `&ref=${invitationRef}` : ""
+              }`,
             });
-            // const invitationRes = await api.invitation(teamId);
-            // const invitationUrl = invitationRes.data?.invitation_url;
-            // const invitationId = invitationUrl?.substring(
-            //   invitationUrl?.lastIndexOf("/") + 1
-            // );
-            // if (!invitationId) {
-            //   toast.error("Invalid invitation link");
-            //   return;
-            // }
-            // const res: any = await dispatch(
-            //   acceptTeam(invitationId, invitationRef)
-            // );
-            // if (res.statusCode === 200 && !!res.data?.team_id) {
-            //   if (res.metadata?.is_new_team_member) {
-            //     toast.success("You have successfully joined new community.");
-            //   }
-            //   removeCookie(AsyncKey.lastChannelId);
-            //   setCookie(AsyncKey.lastTeamId, teamId);
-            //   history.push(`/channels/${teamId}`);
-            // }
           } else {
             window.open(href, "_blank");
           }
