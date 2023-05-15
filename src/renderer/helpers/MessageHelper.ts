@@ -99,7 +99,7 @@ export const normalizeMessageTextPlain = (
   } else {
     res = res
       .replace(
-        /((https?|ftps?):\/\/[^"<\s)]+)(?![^<>]*>|[^"]*?<\/a)/gim,
+        /((https?|ftps?):\/\/[^"<\s),]+)(?![^<>]*>|[^"]*?<\/a)/gim,
         "<a class='text-ellipsis' style='white-space: pre-line;' href='$1'>$1</a>"
       )
       .replace(/\$mention_location/g, `${window.location.origin}/channels/user`)
@@ -111,19 +111,6 @@ export const normalizeMessageTextPlain = (
   return `<div class='enable-user-select'>${res}${
     isEdited ? ' <span class="edited-string">edited</span>' : ""
   }</div>`;
-};
-
-export const convertLinkToHTML = (text: string) => {
-  const splitted = text.split(" ");
-  const regex = /((https?|ftps?):\/\/[^"'<\s)]+)(?![^<>]|[^"]*?<\/a)/;
-  return splitted
-    .map((el) => {
-      if (regex.test(el)) {
-        return el.replace(regex, "<a href='$1'>$1</a>");
-      }
-      return el;
-    })
-    .join(" ");
 };
 
 export const normalizeMessageText = (
@@ -160,8 +147,11 @@ export const normalizeMessageText = (
       "<p><img class='image-inline' alt='$1' src='$2' /></p>"
     )
     .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>")
-    .replace(/\n$/gim, "<br />");
-  res = convertLinkToHTML(res)
+    .replace(/\n$/gim, "<br />")
+    .replace(
+      /((https?|ftps?):\/\/[^"<\s),]+)(?![^<>]*>|[^"]*?<\/a)/gim,
+      "<a onclick='event.stopPropagation();' target='_blank' href='$1'>$1</a>"
+    )
     .replace(/\$mention_location/g, `${window.location.origin}/channels/user`)
     .replace(
       /(<@)(.*?)(-)(.*?)(>)/gim,
