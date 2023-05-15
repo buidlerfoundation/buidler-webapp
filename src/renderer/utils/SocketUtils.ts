@@ -10,7 +10,7 @@ import {
 } from "renderer/helpers/ChannelHelper";
 import { io, Socket } from "socket.io-client";
 import { uniqBy } from "lodash";
-import { TransactionApiData, UserData } from "renderer/models";
+import { LocalAttachment, TransactionApiData, UserData } from "renderer/models";
 import { utils } from "ethers";
 import actionTypes from "renderer/actions/ActionTypes";
 import AppConfig, {
@@ -1066,6 +1066,7 @@ class SocketUtil {
     text?: string;
     entity_type?: string;
     file_ids?: string[];
+    files?: LocalAttachment[];
   }) => {
     const user: any = store.getState()?.user;
     const messageData: any = store.getState()?.message?.messageData;

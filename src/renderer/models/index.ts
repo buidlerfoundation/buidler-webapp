@@ -204,6 +204,7 @@ export interface AttachmentData {
   mimetype?: string;
   original_name?: string;
   is_uploaded?: boolean;
+  localFile?: LocalAttachment;
 }
 
 export interface FileApiData {
@@ -296,6 +297,7 @@ export interface ConversationData {
     };
   };
   is_scam_detected?: boolean;
+  files?: any[];
 }
 
 export interface MessageDateData {

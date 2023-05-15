@@ -457,7 +457,19 @@ const messageReducers: Reducer<MessageReducerState, AnyAction> = (
               data: normalizeMessage(
                 newMessageData[data.entity_id].data.map((msg) => {
                   if (msg.message_id === data.message_id) {
-                    return data;
+                    const newMsg = data;
+                    if (msg.files && newMsg?.message_attachments?.length > 0) {
+                      newMsg.message_attachments =
+                        newMsg.message_attachments.map((attachment) => {
+                          if (attachment.is_uploaded === false) {
+                            attachment.localFile = msg.files?.find(
+                              (file) => file.randomId === attachment.file_id
+                            );
+                          }
+                          return attachment;
+                        });
+                    }
+                    return newMsg;
                   }
                   return msg;
                 })

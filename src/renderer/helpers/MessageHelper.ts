@@ -141,7 +141,7 @@ export const normalizeMessageText = (
       )
       .replace(/href=".*?\/channels\/user/g, `href="$mention_location`);
   }
-  let res = convertLinkToHTML(text)
+  let res = text
     .replace(/<br>/gim, "\n")
     .replace(/\n- (.*)/gim, "\n  • $1")
     .replace(/^#### (.*$)(\n)/gim, "<h4>$1</h4>")
@@ -160,7 +160,8 @@ export const normalizeMessageText = (
       "<p><img class='image-inline' alt='$1' src='$2' /></p>"
     )
     .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>")
-    .replace(/\n$/gim, "<br />")
+    .replace(/\n$/gim, "<br />");
+  res = convertLinkToHTML(res)
     .replace(/\$mention_location/g, `${window.location.origin}/channels/user`)
     .replace(
       /(<@)(.*?)(-)(.*?)(>)/gim,
