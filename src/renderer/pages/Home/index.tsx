@@ -792,6 +792,7 @@ const Home = () => {
         setOpenCreateChannel(false);
         handleCloseModalUserProfile();
         handleCloseModalCommunityProfile();
+        channelViewRef.current?.hideReply?.()
       } else {
         const taskElement = document.getElementById("task-list");
         const taskHoverElement = taskElement?.querySelector(
