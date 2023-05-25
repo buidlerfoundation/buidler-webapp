@@ -719,6 +719,7 @@ const ChannelView = forwardRef(
             <div className="channel-view__body">
               {messagesGroup && messagesGroup?.length > 0 && (
                 <ol
+                  id="channel__message-list"
                   ref={msgListRef}
                   className={`channel-view-message-list hide-scroll-bar ${
                     isScrolling ? "channel-view-scrolling" : ""

@@ -241,7 +241,7 @@ class SocketUtil {
         className: "Internet Connection",
         duration: Infinity,
       });
-    }, 10000);
+    }, 30000);
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     const deviceCode = await getDeviceCode();
     const generatedPrivateKey = await GeneratedPrivateKey();
@@ -937,6 +937,9 @@ class SocketUtil {
                 },
               },
             });
+          } else {
+            const element = document.getElementById("channel__message-list");
+            element?.scrollTo?.(0, 0);
           }
         }
       }
