@@ -85,7 +85,8 @@ export const refreshToken =
           refreshTokenRes?.data?.refresh_token_expire_at
         );
       } else if (
-        refreshTokenRes.message === "Failed to authenticate refresh token"
+        refreshTokenRes.message === "Failed to authenticate refresh token" ||
+        refreshTokenRes.message === "Failed to authenticate token"
       ) {
         GoogleAnalytics.tracking("Refresh failed", {
           refreshTokenExpire,

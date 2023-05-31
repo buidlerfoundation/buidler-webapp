@@ -29,7 +29,6 @@ import {
 } from "renderer/reducers/selectors";
 import AppTitleBar from "renderer/shared/AppTitleBar";
 import GoogleAnalytics from "renderer/services/analytics/GoogleAnalytics";
-import { utils } from "ethers";
 import SwitchAccountMetaMask from "renderer/components/SwitchAccountMetaMask";
 import useCurrentCommunity from "renderer/hooks/useCurrentCommunity";
 import PageNotFound from "renderer/shared/PageNotFound";
@@ -37,6 +36,7 @@ import ErrorPage from "renderer/shared/ErrorBoundary/ErrorPage";
 import UnSupportPage from "../UnSupportPage";
 import NoInternetPage from "renderer/shared/NoInternetPage";
 import { acceptTeam } from "renderer/actions/UserActions";
+import useUserAddress from "renderer/hooks/useUserAddress";
 
 const PublicRoute = ({ component: Component, ...rest }: any) => {
   const history = useHistory();
@@ -324,10 +324,7 @@ const Main = () => {
   const somethingWrong = useAppSelector(
     (state) => state.configs.somethingWrong
   );
-  const address = useMemo(() => {
-    if (!userData.user_id) return null;
-    return utils.computeAddress(userData?.user_id);
-  }, [userData.user_id]);
+  const address = useUserAddress();
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(getInitial?.());

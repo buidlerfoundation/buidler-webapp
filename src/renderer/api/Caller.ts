@@ -152,7 +152,10 @@ async function requestAPI<T = any>(
     if (!expireTokenTime || new Date().getTime() / 1000 > expireTokenTime) {
       const { success, message }: any = await store.dispatch(refreshToken());
       if (!success) {
-        if (message === "Failed to authenticate refresh token") {
+        if (
+          message === "Failed to authenticate refresh token" ||
+          message === "Failed to authenticate token"
+        ) {
           if (!GlobalVariable.sessionExpired) {
             GlobalVariable.sessionExpired = true;
             toast.error("Session expired");

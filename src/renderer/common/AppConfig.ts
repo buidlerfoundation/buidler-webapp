@@ -123,3 +123,40 @@ export const DirectCommunity: Community = {
   direct: true,
   seen: true,
 };
+
+export const signTypeData = {
+  domain: {
+    name: "test",
+    version: "1",
+  },
+  types: {
+    Wallet: [
+      {
+        name: "name",
+        type: "string",
+      },
+      {
+        name: "address",
+        type: "string",
+      },
+    ],
+    Transaction: [
+      {
+        name: "from",
+        type: "Wallet",
+      },
+      {
+        name: "to",
+        type: "Wallet",
+      },
+      {
+        name: "check",
+        type: "bool",
+      },
+      {
+        name: "address",
+        type: "string",
+      },
+    ],
+  },
+};

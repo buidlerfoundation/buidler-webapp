@@ -550,7 +550,9 @@ class SocketUtil {
     });
     this.socket?.on("ON_NEW_TRANSACTION", async (data: TransactionApiData) => {
       const userData = store.getState().user.userData;
-      const address = utils.computeAddress(userData.user_id);
+      const address = userData.public_key
+        ? utils.computeAddress(userData.public_key)
+        : "";
       const { hash, receipt_status, from, input, value, to } = data;
       const amount = formatTokenValue({ value: parseInt(value), decimal: 18 });
       const txType =

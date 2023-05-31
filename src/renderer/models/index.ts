@@ -93,6 +93,7 @@ export interface UserData {
   total_unread_notifications?: number;
   direct_channel_id?: string;
   fetching?: boolean;
+  public_key?: string;
 }
 
 export interface Channel {

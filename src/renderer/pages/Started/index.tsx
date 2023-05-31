@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from "react";
 import "./index.scss";
 import { useHistory } from "react-router-dom";
 import { clearData, getDeviceCode, setCookie } from "renderer/common/Cookie";
-import { AsyncKey, LoginType } from "renderer/common/AppConfig";
+import { AsyncKey, LoginType, signTypeData } from "renderer/common/AppConfig";
 import api from "renderer/api";
 import { logout } from "renderer/actions/UserActions";
 import actionTypes from "renderer/actions/ActionTypes";
@@ -92,17 +92,42 @@ const Started = () => {
   const doingMetamaskLogin = useCallback(
     async (address: string) => {
       try {
-        const nonceRes = await api.requestNonceWithAddress(address);
-        const message = nonceRes.data?.message;
-        if (nonceRes.statusCode !== 200 || !message) {
-          return false;
-        }
+        // const nonceRes = await api.requestNonceWithAddress(address);
+        // const message = nonceRes.data?.message;
+        // if (nonceRes.statusCode !== 200 || !message) {
+        //   return false;
+        // }
         const metamaskProvider: any = window.ethereum;
         const provider = new ethers.providers.Web3Provider(metamaskProvider);
         const signer = provider.getSigner();
-        const signature = await signer.signMessage(message);
+        const message = {
+          from: {
+            name: "",
+            address: "",
+          },
+          to: {
+            name: "",
+            address: "",
+          },
+          check: true,
+          address: address,
+        };
+        const signature = await signer._signTypedData(
+          signTypeData.domain,
+          signTypeData.types,
+          message
+        );
+        const verify = utils.verifyTypedData(signTypeData.domain, signTypeData.types, message, signature)
+        console.log('XXX: ', verify);
         gaLoginSubmit("MetaMask");
-        const res = await api.verifyNonce(message, signature);
+        const res = await api.verifyNonce(
+          {
+            domain: signTypeData.domain,
+            types: signTypeData.types,
+            value: message,
+          },
+          signature
+        );
         if (res.statusCode === 200) {
           await handleResponseVerify(res, LoginType.Metamask);
           return true;
@@ -123,20 +148,47 @@ const Started = () => {
     try {
       const { accounts } = WalletConnectUtils.connector;
       const address = accounts?.[0];
-      const nonceRes = await api.requestNonceWithAddress(address);
-      const message = nonceRes.data?.message;
-      if (nonceRes.statusCode !== 200 || !message) {
-        return;
-      }
+      // const nonceRes = await api.requestNonceWithAddress(address);
+      // const message = nonceRes.data?.message;
+      // if (nonceRes.statusCode !== 200 || !message) {
+      //   return;
+      // }
+      const message = {
+        from: {
+          name: address,
+          address: address,
+        },
+        to: {
+          name: address,
+          address: address,
+        },
+        check: "true",
+        address: address,
+      };
       const params = [
-        utils.hexlify(ethers.utils.toUtf8Bytes(message)),
         address,
+        {
+          domain: signTypeData.domain,
+          types: signTypeData.types,
+          message,
+        },
       ];
-      const signature = await WalletConnectUtils.connector.signPersonalMessage(
+      // const params = [
+      //   utils.hexlify(ethers.utils.toUtf8Bytes(message)),
+      //   address,
+      // ];
+      const signature = await WalletConnectUtils.connector.signTypedData(
         params
       );
       gaLoginSubmit("WalletConnect");
-      const res = await api.verifyNonce(message, signature);
+      const res = await api.verifyNonce(
+        {
+          domain: signTypeData.domain,
+          types: signTypeData.types,
+          value: message,
+        },
+        signature
+      );
       if (res.statusCode === 200) {
         await handleResponseVerify(res, LoginType.WalletConnect);
       } else {
