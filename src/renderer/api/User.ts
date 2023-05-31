@@ -21,6 +21,7 @@ import {
 } from "renderer/models";
 import { ConfigNotificationRequestBody } from "renderer/models/request";
 import Caller from "./Caller";
+import { removeDeviceToken } from "renderer/services/firebase";
 
 export const loginWithGoogle = (code: string) => Caller.post("user", { code });
 
@@ -102,7 +103,10 @@ export const acceptInvitation = (invitationId: string, ref?: string | null) =>
     ref ? { ref } : undefined
   );
 
-export const removeDevice = (body: any) => Caller.delete("user/device", body);
+export const removeDevice = (body: any) => {
+  removeDeviceToken();
+  return Caller.delete("user/device", body);
+};
 
 export const getNFTCollection = () =>
   Caller.get<Array<NFTCollectionDataApi>>("user/nft-collection");

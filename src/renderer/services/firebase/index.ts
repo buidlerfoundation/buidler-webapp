@@ -1,5 +1,10 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import {
+  getMessaging,
+  getToken,
+  onMessage,
+  deleteToken,
+} from "firebase/messaging";
 import toast from "react-hot-toast";
 
 const firebaseConfig = {
@@ -64,3 +69,5 @@ export const getDeviceToken = async () => {
       return null;
     });
 };
+
+export const removeDeviceToken = () => deleteToken(messaging);
