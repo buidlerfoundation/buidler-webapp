@@ -70,4 +70,10 @@ export const getDeviceToken = async () => {
     });
 };
 
-export const removeDeviceToken = () => deleteToken(messaging);
+export const removeDeviceToken = async () => {
+  try {
+    await deleteToken(messaging)
+  } catch (error) {
+    console.log("An error occurred while delete token. ", error);
+  }
+};

@@ -730,7 +730,7 @@ class SocketUtil {
           );
           if (
             isExistChannel &&
-            !channel.channel_members.find(
+            !channel.channel_members?.find(
               (el: string) => el === user.userData.user_id
             )
           ) {
@@ -744,7 +744,7 @@ class SocketUtil {
               payload: data.channel,
             });
           } else if (
-            !!channel.channel_members.find(
+            !!channel.channel_members?.find(
               (el: string) => el === user.userData.user_id
             )
           ) {
@@ -797,7 +797,7 @@ class SocketUtil {
             payload: data.channel,
           });
         } else if (
-          !!data.channel_members.find((el: string) => el === userData.user_id)
+          !!data.channel_members?.find((el: string) => el === userData.user_id)
         ) {
           store.dispatch({
             type: actionTypes.NEW_CHANNEL,
@@ -818,7 +818,7 @@ class SocketUtil {
           );
           if (
             isExistChannel &&
-            !data.channel_members.find((el: string) => el === userData.user_id)
+            !data.channel_members?.find((el: string) => el === userData.user_id)
           ) {
             store.dispatch({
               type: actionTypes.DELETE_CHANNEL_SUCCESS,

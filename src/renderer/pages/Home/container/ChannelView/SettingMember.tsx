@@ -19,7 +19,7 @@ const SettingMember = ({
   const user = useSelector((state: any) => state.user.userData);
   const [isOpenUser, setOpenUser] = useState(false);
   const toggleUser = useCallback(() => setOpenUser((current) => !current), []);
-  const [members, setMembers] = useState(currentChannel.channel_members);
+  const [members, setMembers] = useState(currentChannel?.channel_members);
   const users = useMemo(() => {
     if (!currentChannel) return [];
     const { channel_type, channel_members } = currentChannel;
