@@ -26,10 +26,11 @@ class ImageHelper {
     name?: string,
     id?: string,
     options: imageOptions = {},
-    noParams = false
+    noParams = false,
+    userAvatar?: boolean,
   ) => {
     const suffix = `plain/gs://${this.imgBucket}`;
-    if (!name && id?.substring(0, 2) === "0x") {
+    if (!name && (id?.substring(0, 2) === "0x" || userAvatar)) {
       return `${suffix}/${id}/ethereum_blockies.png`;
     }
     if (name?.includes?.(".gif") || noParams) {
@@ -59,7 +60,8 @@ class ImageHelper {
     name?: string,
     id?: string,
     options: imageOptions = {},
-    noParams = false
+    noParams = false,
+    userAvatar?: boolean,
   ) => {
     if (!this.imgDomain || !this.imgBucket) return "";
     if (name?.includes("https://")) return name;
@@ -67,7 +69,7 @@ class ImageHelper {
       return `https://storage.googleapis.com/${this.imgBucket}/${id}/${name}`;
     }
     const domain = this.imgDomain;
-    const path = this.buildImagePath(name, id, options, noParams);
+    const path = this.buildImagePath(name, id, options, noParams, userAvatar);
     const message = `${process.env.REACT_APP_IMAGE_SALT}/${path}`;
     const key = `${process.env.REACT_APP_IMAGE_KEY}`;
     const signature = CryptoJS.HmacSHA256(message, key)
