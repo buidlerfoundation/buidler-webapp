@@ -97,6 +97,97 @@ const messageSlice = createSlice({
             : false,
       };
     },
+    deleteMessage: (
+      state: MessageState,
+      action: PayloadAction<{ messageId: string; entityId: string }>
+    ) => {
+      const { messageId, entityId } = action.payload;
+      const newMessageData = { ...state.messageData };
+      if (newMessageData[entityId]) {
+        const currentIdx = newMessageData[entityId].data.findIndex(
+          (el) => el.message_id === messageId
+        );
+        const currentMsg = newMessageData[entityId].data?.[currentIdx];
+        const data = newMessageData[entityId].data
+          .filter((el) => el.message_id !== messageId)
+          .map((el, index) => {
+            if (el.reply_message_id === messageId) {
+              el.conversation_data = undefined;
+              return {
+                ...el,
+              };
+            }
+            if (currentIdx === index + 1) {
+              return {
+                ...el,
+                isHead: el.isHead || currentMsg?.isHead,
+                isConversationHead:
+                  el.isConversationHead || currentMsg?.isConversationHead,
+              };
+            }
+            return el;
+          });
+        newMessageData[entityId] = {
+          ...newMessageData[entityId],
+          data,
+        };
+      }
+      state.messageData = newMessageData;
+    },
+    editMessage: (state: MessageState, action: PayloadAction<MessageData>) => {
+      const {
+        entity_id,
+        message_id,
+        content,
+        task,
+        message_attachments,
+        plain_text,
+        updatedAt,
+        is_scam_detected,
+      } = action.payload;
+      const newMessageData = { ...state.messageData };
+      if (newMessageData[entity_id]) {
+        newMessageData[entity_id] = {
+          ...newMessageData[entity_id],
+          data: newMessageData[entity_id]?.data?.map?.((msg) => {
+            if (msg.message_id === message_id) {
+              msg.content = content;
+              msg.plain_text = plain_text;
+              if (msg.task || task) {
+                if (msg.task) {
+                  msg.task = {
+                    ...msg.task,
+                    ...task,
+                  };
+                } else {
+                  msg.task = task;
+                }
+              } else {
+                msg.task = undefined;
+              }
+              msg.message_attachments = message_attachments;
+              msg.updatedAt = updatedAt;
+              msg.is_scam_detected = is_scam_detected;
+              return { ...msg };
+            }
+            if (msg.reply_message_id === message_id && msg.conversation_data) {
+              msg.conversation_data = {
+                ...msg.conversation_data,
+                content,
+                plain_text,
+                task,
+                message_attachments,
+                updatedAt,
+                is_scam_detected,
+              };
+              return { ...msg };
+            }
+            return msg;
+          }),
+        };
+      }
+      state.messageData = newMessageData;
+    },
     emitMessage: (state: MessageState, action: PayloadAction<MessageData>) => {
       const message = action.payload;
       if (
@@ -149,7 +240,7 @@ const messageSlice = createSlice({
         }
       })
       .addCase(getMessages.rejected, (state, action) => {
-        if (action.error.name !== 'AbortError') {
+        if (action.error.name !== "AbortError") {
           state.loadMoreAfterMessage = false;
           state.loadingMessage = false;
           state.loadMoreAfterMessage = false;

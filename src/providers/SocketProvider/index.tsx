@@ -61,10 +61,15 @@ const SocketProvider = ({ children }: ISocketProps) => {
       dispatch(MESSAGE_ACTIONS.newMessage(data.message_data));
     });
     socket.current?.on("ON_DELETE_MESSAGE", async (data: any) => {
-      console.log("XXX: delete message", data);
+      dispatch(
+        MESSAGE_ACTIONS.deleteMessage({
+          entityId: data.entity_id,
+          messageId: data.message_id,
+        })
+      );
     });
     socket.current?.on("ON_EDIT_MESSAGE", async (data: any) => {
-      console.log("XXX: edit message", data);
+      dispatch(MESSAGE_ACTIONS.editMessage(data));
     });
     socket.current?.on("ON_REACTION_ADDED", (data: any) => {
       const { attachment_id, emoji_id, user_id } = data.reaction_data;

@@ -7,6 +7,7 @@ import ErrorBoundary from "shared/ErrorBoundary";
 import Main from "pages/Main";
 import { useNavigate } from "react-router-dom";
 import { CustomEventName } from "services/events/WindowEvent";
+import AppToastNotification from "shared/AppToastNotification";
 
 function App() {
   const navigate = useNavigate();
@@ -55,6 +56,7 @@ function App() {
   return (
     <ErrorBoundary>
       <Main />
+      <AppToastNotification />
     </ErrorBoundary>
   );
 }
