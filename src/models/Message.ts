@@ -122,3 +122,10 @@ export type PayloadMessageListAction = {
   canMoreBefore?: boolean;
   messageId?: string;
 }
+
+export interface ReactReducerData {
+  count: number;
+  isReacted: boolean;
+  reactName: string;
+  skin: number;
+}
