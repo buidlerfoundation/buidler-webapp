@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  .body {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 50px);
+    .content-side {
+      display: flex;
+      flex: 1,
+    }
+    .chat-box__container {
+      margin-right: 10px;
+      width: 390px;
+      height: calc(100% - 10px);
+      border-radius: 5px;
+      background-color: var(--color-lighter-background);
+      overflow: hidden;
+    }
+  }
+}

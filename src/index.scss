@@ -1,32 +1,32 @@
 @font-face {
   font-family: "Helvetica";
-  src: url("./renderer/assets/fonts/Helvetica.otf");
+  src: url("./assets/fonts/Helvetica.otf");
 }
 
 @font-face {
   font-family: "SF-UI-Text";
-  src: url("./renderer/assets/fonts/SFUIText-Regular.ttf");
+  src: url("./assets/fonts/SFUIText-Regular.ttf");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: "SF-UI-Text";
-  src: url("./renderer/assets/fonts/SFUIText-Medium.ttf");
+  src: url("./assets/fonts/SFUIText-Medium.ttf");
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
   font-family: "SF-UI-Text";
-  src: url("./renderer/assets/fonts/SFUIText-Semibold.ttf");
+  src: url("./assets/fonts/SFUIText-Semibold.ttf");
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
   font-family: "SF-UI-Text";
-  src: url("./renderer/assets/fonts/SFUIText-Bold.ttf");
+  src: url("./assets/fonts/SFUIText-Bold.ttf");
   font-weight: 700;
   font-style: normal;
 }
@@ -63,7 +63,7 @@ body {
     "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: var(--color-primary-text);
+  color: var(--color-primary-text) !important;
   font-weight: 500;
   background-color: var(--color-lighter-background);
   transform: rotate(0deg);
@@ -128,15 +128,6 @@ span {
   -ms-user-select: auto; /* IE10+ */
 }
 
-::-moz-selection {
-  /* Code for Firefox */
-  // background: var(--color-primary-text);
-}
-
-::selection {
-  // background: var(--color-primary-text);
-}
-
 input {
   background-color: transparent;
   color: var(--color-primary-text);
@@ -182,17 +173,15 @@ code {
   font-size: 16px;
   color: var(--color-primary-text);
   position: relative;
-  background-color: var(--color-lighter-background);
+  background-color: var(--color-darkest-background);
   overflow: hidden;
 }
 
 #title-bar {
-  height: 49px;
+  height: 50px;
   width: 100%;
-  background-color: var(--color-lighter-background);
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--color-stroke);
   -webkit-app-region: drag;
   &.hide {
     height: 50px;
@@ -205,7 +194,6 @@ code {
   height: calc(100vh - 50px);
   width: 275px;
   background-color: var(--color-darkest-background);
-  border-right: 1px solid var(--color-stroke);
 }
 
 .row__space-between {
@@ -223,6 +211,9 @@ code {
 }
 
 .normal-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }

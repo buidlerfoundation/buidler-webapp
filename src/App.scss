@@ -19,6 +19,12 @@
   white-space: nowrap;
 }
 
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 textarea {
   font-weight: 600;
 }
@@ -293,13 +299,13 @@ a {
     padding: 40px 25px 20px 25px;
     flex-direction: column;
     border-radius: 0 5px 5px 0;
-    max-width: 529px;
   }
   .modal-label {
     font-weight: 700;
     font-size: 20px;
     line-height: 24px;
     text-transform: capitalize;
+    color: var(--color-primary-text);
   }
   .bottom {
     display: flex;

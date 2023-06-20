@@ -1,0 +1,18 @@
+namespace NodeJS {
+  interface ProcessEnv {
+    REACT_APP_API_BASE_URL: string;
+    REACT_APP_DEFAULT_CHAIN_ID: string;
+    REACT_APP_MIXPANEL_TOKEN: string;
+    REACT_APP_ENABLE_INSPECT: string;
+    REACT_APP_IMAGE_KEY: string;
+    REACT_APP_IMAGE_SALT: string;
+    REACT_APP_FIREBASE_API_KEY: string;
+    REACT_APP_FIREBASE_AUTH_DOMAIN: string;
+    REACT_APP_FIREBASE_PROJECT_ID: string;
+    REACT_APP_FIREBASE_MESSAGING_SENDER_ID: string;
+    REACT_APP_FIREBASE_APP_ID: string;
+    REACT_APP_WEB3_AUTH_CLIENT_ID: string;
+    REACT_APP_PROFILE_URL: string;
+    REACT_APP_URL: string;
+  }
+}
