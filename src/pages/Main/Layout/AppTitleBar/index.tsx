@@ -8,7 +8,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import IconPlus from "shared/SVG/IconPlus";
 import styles from "./index.module.scss";
 import useCurrentCommunity from "hooks/useCurrentCommunity";
@@ -45,7 +45,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
   const notificationRef = useRef<any>();
   const communityId = useCommunityId();
   const currentCommunity = useCurrentCommunity();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [openTxDetail, setOpenTxDetail] = useState(false);
   const [selectedHash, setSelectedHash] = useState<string | null>(null);
   const [openTeamSetting, setOpenTeamSetting] = useState(false);
@@ -150,9 +150,9 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
   }, [communities]);
   const setTeam = useCallback(
     async (t?: Community) => {
-      history.replace(`/channels/${t?.team_id}`);
+      navigate(`/channels/${t?.team_id}`, {replace: true});
     },
-    [history]
+    [navigate]
   );
   const handleCloseTeamSetting = useCallback(() => {
     setSelectedMenuTeam(null);

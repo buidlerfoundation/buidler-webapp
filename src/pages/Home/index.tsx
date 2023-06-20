@@ -7,7 +7,7 @@ import useCommunities from "hooks/useCommunities";
 import { getCookie, getLastChannelIdByCommunityId } from "common/Cookie";
 import useAppDispatch from "hooks/useAppDispatch";
 import { setUserCommunityData } from "reducers/UserReducers";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AsyncKey } from "common/AppConfig";
 import useChannels from "hooks/useChannels";
 import { DragDropContext } from "react-beautiful-dnd";
@@ -21,7 +21,7 @@ const Home = () => {
   const socket = useSocket();
   const dispatch = useAppDispatch();
   const getMessageActionRef = useRef<any>();
-  const history = useHistory();
+  const navigate = useNavigate();
   const matchCommunityId = useCommunityId();
   const matchChannelId = useChannelId();
   const communities = useCommunities();
@@ -59,14 +59,14 @@ const Home = () => {
           "";
       }
       if (!matchCommunityId || !community || !matchChannelId) {
-        history.replace(`/channels/${initialCommunityId}/${initialChannelId}`);
+        navigate(`/channels/${initialCommunityId}/${initialChannelId}`, {replace: true});
       }
     }
   }, [
     channels,
     communities,
     dispatch,
-    history,
+    navigate,
     matchChannelId,
     matchCommunityId,
   ]);

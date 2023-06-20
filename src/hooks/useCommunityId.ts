@@ -1,13 +1,13 @@
 import React from "react";
-import { useRouteMatch } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 function useCommunityId() {
-  const match = useRouteMatch<{
+  const params = useParams<{
     community_id?: string;
   }>();
   return React.useMemo(
-    () => match.params?.community_id || "",
-    [match.params?.community_id]
+    () => params?.community_id || "",
+    [params?.community_id]
   );
 }
 

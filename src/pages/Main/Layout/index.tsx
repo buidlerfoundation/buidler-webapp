@@ -1,4 +1,5 @@
 import React from "react";
+import { Outlet } from "react-router-dom";
 
 const styles: { [name: string]: React.CSSProperties } = {
   row: {
@@ -14,8 +15,7 @@ const styles: { [name: string]: React.CSSProperties } = {
   },
 };
 
-const MainWrapper = (props: any) => {
-  const { children } = props;
+const MainWrapper = () => {
   return (
     <div
       style={{
@@ -32,7 +32,7 @@ const MainWrapper = (props: any) => {
               height: "100%",
             }}
           >
-            {children}
+            <Outlet />
           </main>
         </div>
       </div>

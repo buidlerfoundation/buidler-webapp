@@ -1,13 +1,13 @@
 import React, { useMemo } from "react";
-import { useRouteMatch } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 function useChannelId() {
-  const match = useRouteMatch<{
+  const params = useParams<{
     channel_id?: string;
   }>();
   const channel_id = useMemo(
-    () => match.params?.channel_id,
-    [match.params?.channel_id]
+    () => params?.channel_id,
+    [params?.channel_id]
   );
 
   return React.useMemo(() => channel_id || "", [channel_id]);

@@ -5,11 +5,11 @@ import "styles/spacing.scss";
 import "styles/emoji.scss";
 import ErrorBoundary from "shared/ErrorBoundary";
 import Main from "pages/Main";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CustomEventName } from "services/events/WindowEvent";
 
 function App() {
-  const history = useHistory();
+  const navigate = useNavigate();
   useEffect(() => {
     const eventOffline = () => {
       // update connection state
@@ -31,8 +31,10 @@ function App() {
       if (!process.env.REACT_APP_ENABLE_INSPECT) e.preventDefault();
     };
     const changeRouteListener = (e: any) => {
-      const { detail: path } = e;
-      history.replace(path);
+      const {
+        detail: { path, push },
+      } = e;
+      navigate(path, { replace: !push });
     };
     window.addEventListener("offline", eventOffline);
     window.addEventListener("online", eventOnline);
@@ -49,7 +51,7 @@ function App() {
         changeRouteListener
       );
     };
-  }, [history]);
+  }, [navigate]);
   return (
     <ErrorBoundary>
       <Main />

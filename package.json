@@ -36,7 +36,7 @@
     "react-hot-toast": "^2.4.1",
     "react-qr-code": "^2.0.11",
     "react-redux": "^8.0.7",
-    "react-router-dom": "5.2.0",
+    "react-router-dom": "^6.13.0",
     "react-scripts": "4.0.3",
     "sass": "^1.63.2",
     "socket.io-client": "^4.6.2",
@@ -84,7 +84,6 @@
     "@types/mixpanel-browser": "^2.38.1",
     "@types/numeral": "^2.0.2",
     "@types/react-beautiful-dnd": "^13.1.4",
-    "@types/react-router-dom": "^5.3.3",
     "@types/uuid": "^9.0.1",
     "redux-logger": "^3.0.6"
   },

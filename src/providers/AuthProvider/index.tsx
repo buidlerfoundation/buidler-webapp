@@ -16,7 +16,7 @@ import {
   useState,
 } from "react";
 import { toast } from "react-hot-toast";
-import { useHistory } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { CONFIG_ACTIONS } from "reducers/ConfigReducers";
 import { NETWORK_ACTIONS } from "reducers/NetworkReducers";
 import { acceptInvitation } from "reducers/UserReducers";
@@ -59,7 +59,8 @@ interface IAuthProps {
 const AuthProvider = ({ children }: IAuthProps) => {
   const socket = useSocket();
   const query = useQuery();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const currentToken = useAppSelector((state) => state.configs.currentToken);
   const [loading, setLoading] = useState(true);
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
@@ -94,16 +95,16 @@ const AuthProvider = ({ children }: IAuthProps) => {
       );
       dispatch(getWalletBalance());
       await dispatch(getUserCommunity());
-      if (history.location.pathname.includes(AppConfig.loginPath)) {
-        history.replace("/channels");
+      if (location.pathname.includes(AppConfig.loginPath)) {
+        navigate("/channels", { replace: true });
       }
       socket.initSocket(onSocketConnected);
     } else {
       dispatch(logoutAction());
-      history.replace(loginPath);
+      navigate(loginPath, { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, history, loginPath, onSocketConnected]);
+  }, [dispatch, location.pathname, onSocketConnected, navigate, loginPath]);
   const handleInvitation = useCallback(async () => {
     if (invitationId) {
       const acceptInvitationActionRes = await dispatch(
@@ -150,9 +151,9 @@ const AuthProvider = ({ children }: IAuthProps) => {
       }
     }
     if (!accessToken) {
-      if (history.location.pathname !== AppConfig.loginPath) {
+      if (location.pathname !== AppConfig.loginPath) {
         dispatch(logoutAction());
-        history.replace(loginPath);
+        navigate(loginPath, { replace: true });
       }
     } else {
       dispatch(CONFIG_ACTIONS.updateCurrentToken(accessToken));
@@ -161,14 +162,15 @@ const AuthProvider = ({ children }: IAuthProps) => {
     }
     setLoading(false);
   }, [
-    dispatch,
     getInitial,
-    handleInvitation,
-    handleResponseVerify,
-    history,
-    initialUserData,
-    loginPath,
     ott,
+    handleResponseVerify,
+    location.pathname,
+    dispatch,
+    navigate,
+    loginPath,
+    handleInvitation,
+    initialUserData,
   ]);
   useEffect(() => {
     GoogleAnalytics.init();
@@ -343,9 +345,9 @@ const AuthProvider = ({ children }: IAuthProps) => {
     socket.disconnect();
     clearData();
     dispatch(logoutAction());
-    history.replace(AppConfig.loginPath);
+    navigate(AppConfig.loginPath, {replace: true});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, history]);
+  }, [dispatch, navigate]);
   const loginWithWalletConnect = useCallback(async () => {
     WalletConnectUtils.connect(onWCConnected, onDisconnected);
   }, [onDisconnected, onWCConnected]);
