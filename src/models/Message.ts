@@ -125,7 +125,13 @@ export type PayloadMessageListAction = {
 
 export interface ReactReducerData {
   count: number;
-  isReacted: boolean;
+  isReacted?: boolean;
   reactName: string;
   skin: number;
+}
+
+export interface ReactUserApiData {
+  emoji_id: string;
+  skin: number;
+  user_id: string;
 }

@@ -10,11 +10,13 @@ import {
   ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
 import { toast } from "react-hot-toast";
 import { MESSAGE_ACTIONS } from "reducers/MessageReducers";
+import { REACT_ACTIONS } from "reducers/ReactReducers";
 import { Socket, io } from "socket.io-client";
 
 type SocketState = "connecting" | "connected" | "disconnected";
@@ -50,6 +52,8 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.off("ON_NEW_MESSAGE");
     socket.current?.off("ON_DELETE_MESSAGE");
     socket.current?.off("ON_EDIT_MESSAGE");
+    socket.current?.off("ON_REACTION_ADDED");
+    socket.current?.off("ON_REACTION_REMOVED");
     socket.current?.off("disconnect");
   }, []);
   const listener = useCallback(() => {
@@ -62,45 +66,66 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.on("ON_EDIT_MESSAGE", async (data: any) => {
       console.log("XXX: edit message", data);
     });
-  }, [dispatch]);
-  const initSocket = useCallback(
-    async (onConnected: () => void) => {
-      if (socket.current?.connected) return;
-      setSocketState("connecting");
-      const accessToken = await getCookie(AsyncKey.accessTokenKey);
-      const deviceCode = await getDeviceCode();
-      const generatedPrivateKey = await GeneratedPrivateKey();
-      const publicKey = utils.computePublicKey(generatedPrivateKey, true);
-      socket.current = io(`${AppConfig.apiBaseUrl}`, {
-        query: {
-          token: accessToken,
-          device_code: deviceCode,
-          encrypt_message_key: publicKey,
-          platform: "Web",
-        },
-        transports: ["websocket"],
-        upgrade: false,
-      });
-      socket.current?.on("connect_error", (err) => {
-        toast.error(err.message);
-        setSocketState("disconnected");
-      });
-      socket.current?.on("connect", () => {
-        console.log("socket connected");
-        removeListener();
-        listener();
-        onConnected?.();
-        setSocketState("connected");
-      });
-      socket.current?.on("disconnect", (reason: string) => {
-        setSocketState("disconnected");
-        if (reason === "io server disconnect") {
-          socket.current?.connect();
-        }
-      });
-    },
-    [listener, removeListener]
-  );
+    socket.current?.on("ON_REACTION_ADDED", (data: any) => {
+      const { attachment_id, emoji_id, user_id } = data.reaction_data;
+      dispatch(
+        REACT_ACTIONS.addReact({
+          id: attachment_id,
+          reactName: emoji_id,
+          mine: user.user_id === user_id,
+        })
+      );
+    });
+    socket.current?.on("ON_REACTION_REMOVED", (data: any) => {
+      const { attachment_id, emoji_id, user_id } = data.reaction_data;
+      dispatch(
+        REACT_ACTIONS.removeReact({
+          id: attachment_id,
+          reactName: emoji_id,
+          mine: user.user_id === user_id,
+        })
+      );
+    });
+  }, [dispatch, user.user_id]);
+  const initSocket = useCallback(async (onConnected: () => void) => {
+    if (socket.current?.connected) return;
+    setSocketState("connecting");
+    const accessToken = await getCookie(AsyncKey.accessTokenKey);
+    const deviceCode = await getDeviceCode();
+    const generatedPrivateKey = await GeneratedPrivateKey();
+    const publicKey = utils.computePublicKey(generatedPrivateKey, true);
+    socket.current = io(`${AppConfig.apiBaseUrl}`, {
+      query: {
+        token: accessToken,
+        device_code: deviceCode,
+        encrypt_message_key: publicKey,
+        platform: "Web",
+      },
+      transports: ["websocket"],
+      upgrade: false,
+    });
+    socket.current?.on("connect_error", (err) => {
+      toast.error(err.message);
+      setSocketState("disconnected");
+    });
+    socket.current?.on("connect", () => {
+      console.log("socket connected");
+      onConnected?.();
+      setSocketState("connected");
+    });
+    socket.current?.on("disconnect", (reason: string) => {
+      setSocketState("disconnected");
+      if (reason === "io server disconnect") {
+        socket.current?.connect();
+      }
+    });
+  }, []);
+  useEffect(() => {
+    if (socketState === "connected" && user.user_id) {
+      removeListener();
+      listener();
+    }
+  }, [listener, removeListener, socketState, user.user_id]);
   const emitMessage = useCallback(
     (payload: EmitMessageData) => {
       const message: any = {
