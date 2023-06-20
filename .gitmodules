@@ -1,3 +1,0 @@
-[submodule "src/shared"]
-	path = src/shared
-	url = https://github.com/buidlerfoundation/buidler-component.git
