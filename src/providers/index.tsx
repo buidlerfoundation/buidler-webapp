@@ -16,6 +16,7 @@ const Providers = ({ children }: ProvidersProps) => {
       createTheme({
         typography: {
           fontFamily: `SF-UI-Text, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif`,
+          fontWeightRegular: 500,
           fontWeightMedium: 600,
           fontWeightBold: "bold",
         },
