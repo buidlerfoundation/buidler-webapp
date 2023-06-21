@@ -59,21 +59,18 @@ export const extractContentMessage = (s: string) => {
   const span = document.createElement("span");
   span.innerHTML = s
     .replace(/<div>(.*?)<\/div>/gim, "<br>$1")
-    .replace(
-      /(<a href="\$mention_location\/)(.*?)(" class="mention-string">)(.*?)(<\/a>)/gim,
-      `<$4-$2>`
-    )
-    .replace(
-      /(<a href='\$mention_location\/)(.*?)(' class='mention-string'>)(.*?)(<\/a>)/gim,
-      `<$4-$2>`
-    )
     .replace(/(<a )(.*?)( class="mention-string">)(.*?)(<\/a>)/gim, `<$4-$2>`)
     .replace(/<br>/gim, "\n");
   const text = span.textContent || span.innerText;
-  return text.replace(
-    /(<#)(.*?)(-href=)(.*?)(>)/gim,
-    `<a href=$4 class="mention-string">#$2</a>`
-  );
+  return text
+    .replace(
+      /(<@)(.*?)(-href=)(.*?)(>)/gim,
+      `<a href=$4 class="mention-string">@$2</a>`
+    )
+    .replace(
+      /(<#)(.*?)(-href=)(.*?)(>)/gim,
+      `<a href=$4 class="mention-string">#$2</a>`
+    );
 };
 
 export const normalizeMessageTextPlain = (
@@ -168,11 +165,11 @@ export const normalizeMessageText = (
 
 export const getMentionData = (s: string) => {
   const mentionRegex =
-    /(<a href="\$mention_location\/\?*)(.*?)(" class="mention-string">)/g;
+    /(<a href=".*\/user\/\?*)(.*?)(" class="mention-string">)/g;
   const mentionMatches = s.replace(/'/g, '"').match(mentionRegex);
   return mentionMatches?.map((el) => {
     const match =
-      /(<a href="\$mention_location\/\?*)(.*?)(" class="mention-string">)/.exec(
+      /(<a href=".*\/user\/\?*)(.*?)(" class="mention-string">)/.exec(
         el
       );
     return {

@@ -126,6 +126,12 @@ span {
   -moz-user-select: auto; /* mozilla browsers */
   -khtml-user-select: auto; /* webkit (konqueror) browsers */
   -ms-user-select: auto; /* IE10+ */
+  .mention-string {
+    pointer-events: all;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 input {

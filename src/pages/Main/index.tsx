@@ -12,6 +12,10 @@ const Main = () => {
       <Routes>
         <Route element={<MainWrapper />}>
           <Route
+            path="/"
+            element={<Home />}
+          />
+          <Route
             path="/channels/:community_id?/:channel_id?/:entity_type?/:entity_id?"
             element={<Home />}
           />
