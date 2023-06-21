@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { ENSAsset, NFTCollectionDataApi } from "models/User";
-import { logoutAction } from "./UserReducers";
+import { logoutAction } from "./UserActions";
 
 type CollectibleReducerState = {
   data: NFTCollectionDataApi[];

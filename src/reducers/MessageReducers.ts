@@ -1,5 +1,5 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { logoutAction } from "./UserReducers";
+import { logoutAction } from "./UserActions";
 import { normalizeMessage } from "helpers/MessageHelper";
 import { GeneratedPrivateKey } from "common/Cookie";
 import api from "api";

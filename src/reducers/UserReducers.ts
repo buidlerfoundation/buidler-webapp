@@ -1,5 +1,4 @@
 import {
-  createAction,
   createAsyncThunk,
   createSlice,
   PayloadAction,
@@ -13,6 +12,7 @@ import {
 } from "common/Cookie";
 import { Channel, Community, Space } from "models/Community";
 import { BalanceApiData, InitialApiData, UserData } from "models/User";
+import { logoutAction } from "./UserActions";
 
 interface UserState {
   data: UserData;
@@ -46,8 +46,6 @@ const initialState: UserState = {
   loadingCommunityData: false,
   currentToken: "",
 };
-
-export const logoutAction = createAction("user/logout");
 
 export const getUserAction = createAsyncThunk("user/me", async () => {
   const res = await api.findUser();

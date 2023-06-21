@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { logoutAction } from "./UserReducers";
+import { logoutAction } from "./UserActions";
 
 interface ConfigState {
   privateKey: string;

@@ -19,11 +19,11 @@ import { toast } from "react-hot-toast";
 import { Location, useLocation, useNavigate } from "react-router-dom";
 import { CONFIG_ACTIONS } from "reducers/ConfigReducers";
 import { NETWORK_ACTIONS } from "reducers/NetworkReducers";
+import { logoutAction } from "reducers/UserActions";
 import { acceptInvitation } from "reducers/UserReducers";
 import {
   getUserCommunity,
   getWalletBalance,
-  logoutAction,
   USER_ACTIONS,
 } from "reducers/UserReducers";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";

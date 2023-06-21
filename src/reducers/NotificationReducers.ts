@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { logoutAction } from "./UserReducers";
+import { logoutAction } from "./UserActions";
 import { NotificationData, NotificationFilterType } from "models/Notification";
 
 interface NotificationState {
