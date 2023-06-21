@@ -2,8 +2,10 @@ import { initializeApp } from "firebase/app";
 import {
   getMessaging,
   getToken,
+  isSupported,
   onMessage,
   deleteToken,
+  Messaging,
 } from "firebase/messaging";
 import toast from "react-hot-toast";
 
@@ -15,7 +17,6 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 const firebaseApp = initializeApp(firebaseConfig);
-const messaging = getMessaging(firebaseApp);
 
 const getDestinationRoute = (json: any) => {
   const { message_data, notification_data } = json;
@@ -27,32 +28,39 @@ const getDestinationRoute = (json: any) => {
   }
 };
 
-onMessage(messaging, (payload) => {
-  const { data } = payload;
-  let body = "";
-  let title = "";
-  let props: any = {};
-  const json = data?.data ? JSON.parse(data?.data) : null;
-  if (json) {
-    const destination = getDestinationRoute(json);
-    title = json.notification_data?.title;
-    body = json.notification_data?.body;
-    props = {
-      subtitle: json.notification_data?.subtitle,
-      onNotificationClick: (navigate: any) => {
-        if (destination) {
-          navigate(destination, {replace: true});
-        }
-      },
-    };
+let messaging: Messaging | null = null;
+isSupported().then((res) => {
+  if (res) {
+    messaging = getMessaging(firebaseApp);
+    onMessage(messaging, (payload) => {
+      const { data } = payload;
+      let body = "";
+      let title = "";
+      let props: any = {};
+      const json = data?.data ? JSON.parse(data?.data) : null;
+      if (json) {
+        const destination = getDestinationRoute(json);
+        title = json.notification_data?.title;
+        body = json.notification_data?.body;
+        props = {
+          subtitle: json.notification_data?.subtitle,
+          onNotificationClick: (navigate: any) => {
+            if (destination) {
+              navigate(destination, { replace: true });
+            }
+          },
+        };
+      }
+      toast.custom(body || "", {
+        className: title || "",
+        ariaProps: props,
+      });
+    });
   }
-  toast.custom(body || "", {
-    className: title || "",
-    ariaProps: props,
-  });
 });
 
 export const getDeviceToken = async () => {
+  if (!messaging) return null;
   if (Notification.permission !== "granted") {
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
@@ -71,8 +79,9 @@ export const getDeviceToken = async () => {
 };
 
 export const removeDeviceToken = async () => {
+  if (!messaging) return;
   try {
-    await deleteToken(messaging)
+    await deleteToken(messaging);
   } catch (error) {
     console.log("An error occurred while delete token. ", error);
   }
