@@ -17,6 +17,7 @@ import {
 import { toast } from "react-hot-toast";
 import { MESSAGE_ACTIONS } from "reducers/MessageReducers";
 import { REACT_ACTIONS } from "reducers/ReactReducers";
+import { getDeviceToken } from "services/firebase";
 import { Socket, io } from "socket.io-client";
 
 type SocketState = "connecting" | "connected" | "disconnected";
@@ -97,6 +98,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     setSocketState("connecting");
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     const deviceCode = await getDeviceCode();
+    const deviceToken = await getDeviceToken();
     const generatedPrivateKey = await GeneratedPrivateKey();
     const publicKey = utils.computePublicKey(generatedPrivateKey, true);
     socket.current = io(`${AppConfig.apiBaseUrl}`, {
@@ -104,6 +106,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
         token: accessToken,
         device_code: deviceCode,
         encrypt_message_key: publicKey,
+        device_token: deviceToken,
         platform: "Web",
       },
       transports: ["websocket"],
