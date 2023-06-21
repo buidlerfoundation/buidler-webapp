@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo } from "react";
+import React, { memo, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import IconWeb3Auth from "shared/SVG/IconWeb3Auth";
@@ -14,8 +14,6 @@ const Started = () => {
     const userAgent = window.navigator.userAgent;
     return !/Chrome/.test(userAgent);
   }, []);
-  const handleWalletConnect = useCallback(() => {}, []);
-  const handleSocialConnect = useCallback(async () => {}, []);
   return (
     <div className={styles.container}>
       <div className={styles.body}>

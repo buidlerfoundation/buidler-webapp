@@ -4,6 +4,7 @@ import MessageReducers from "./MessageReducers";
 import NetworkReducers from "./NetworkReducers";
 import NotificationReducers from "./NotificationReducers";
 import ReactReducers from "./ReactReducers";
+import SessionReducers from "./SessionReducers";
 import TransactionReducers from "./TransactionReducers";
 import UserReducers from "./UserReducers";
 import { combineReducers } from "redux";
@@ -17,6 +18,7 @@ const reducers = combineReducers({
   notification: NotificationReducers,
   message: MessageReducers,
   react: ReactReducers,
+  session: SessionReducers,
 });
 
 export default reducers;

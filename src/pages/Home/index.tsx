@@ -7,7 +7,7 @@ const Home = () => {
     <>
       <div className={styles["content-side"]}></div>
       <div className={styles["chat-box__container"]}>
-        <MessageChatBox />
+        <MessageChatBox hideCommunity />
       </div>
     </>
   );

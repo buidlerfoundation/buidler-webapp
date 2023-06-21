@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import styles from "./index.module.scss";
 import AppTitleBar from "./AppTitleBar";
 import { DragDropContext } from "react-beautiful-dnd";
@@ -35,6 +35,7 @@ const MainWrapper = () => {
   const dispatch = useAppDispatch();
   const getMessageActionRef = useRef<any>();
   const navigate = useNavigate();
+  const location = useLocation();
   const matchCommunityId = useCommunityId();
   const matchChannelId = useChannelId();
   const communities = useCommunities();
@@ -134,28 +135,32 @@ const MainWrapper = () => {
               height: "100%",
             }}
           >
-            <div className={styles.container}>
-              <AppTitleBar />
-              <DragDropContext onDragEnd={onDragEnd}>
-                <div className={styles.body}>
-                  <SideBar
-                    onCreateChannel={handleOpenCreateChannel}
-                    onCreateGroupChannel={handleOpenCreateSpace}
-                    onEditGroupChannel={handleOpenEditSpace}
-                    onDeleteChannel={handleOpenDeleteChannel}
-                    onRemoveTeamMember={handleRemoveTeamMember}
-                    onEditChannelMember={handleOpenEditChannelMember}
-                    onEditChannelName={handleOpenEditChannelName}
-                    onUpdateNotification={handleOpenChannelNotification}
-                    onInviteMember={handleOpenInviteMember}
-                    onSpaceBadgeClick={handleSpaceBadgeClick}
-                    onViewMembers={toggleOpenMembers}
-                    onOpenChannelSetting={onOpenChannelSetting}
-                  />
-                  <Outlet />
-                </div>
-              </DragDropContext>
-            </div>
+            {location.pathname.includes("panel") ? (
+              <Outlet />
+            ) : (
+              <div className={styles.container}>
+                <AppTitleBar />
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <div className={styles.body}>
+                    <SideBar
+                      onCreateChannel={handleOpenCreateChannel}
+                      onCreateGroupChannel={handleOpenCreateSpace}
+                      onEditGroupChannel={handleOpenEditSpace}
+                      onDeleteChannel={handleOpenDeleteChannel}
+                      onRemoveTeamMember={handleRemoveTeamMember}
+                      onEditChannelMember={handleOpenEditChannelMember}
+                      onEditChannelName={handleOpenEditChannelName}
+                      onUpdateNotification={handleOpenChannelNotification}
+                      onInviteMember={handleOpenInviteMember}
+                      onSpaceBadgeClick={handleSpaceBadgeClick}
+                      onViewMembers={toggleOpenMembers}
+                      onOpenChannelSetting={onOpenChannelSetting}
+                    />
+                    <Outlet />
+                  </div>
+                </DragDropContext>
+              </div>
+            )}
           </main>
         </div>
       </div>

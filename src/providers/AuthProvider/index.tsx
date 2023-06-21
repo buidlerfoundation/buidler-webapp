@@ -16,7 +16,7 @@ import {
   useState,
 } from "react";
 import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Location, useLocation, useNavigate } from "react-router-dom";
 import { CONFIG_ACTIONS } from "reducers/ConfigReducers";
 import { NETWORK_ACTIONS } from "reducers/NetworkReducers";
 import { acceptInvitation } from "reducers/UserReducers";
@@ -60,6 +60,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const socket = useSocket();
   const query = useQuery();
   const navigate = useNavigate();
+  const location = useLocation();
   const currentToken = useAppSelector((state) => state.configs.currentToken);
   const [loading, setLoading] = useState(true);
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
@@ -84,26 +85,30 @@ const AuthProvider = ({ children }: IAuthProps) => {
     }
   }, [dispatch]);
   const onSocketConnected = useCallback(async () => {}, []);
-  const initialUserData = useCallback(async () => {
-    const userRes = await api.findUser();
-    if (userRes.statusCode === 200) {
-      dispatch(
-        USER_ACTIONS.updateCurrentUser({
-          user: userRes.data,
-        })
-      );
-      dispatch(getWalletBalance());
-      await dispatch(getUserCommunity());
-      if (window.location.pathname.includes(AppConfig.loginPath)) {
-        navigate("/channels", { replace: true });
+  const initialUserData = useCallback(
+    async (previousLocation?: Location) => {
+      const userRes = await api.findUser();
+      if (userRes.statusCode === 200) {
+        dispatch(
+          USER_ACTIONS.updateCurrentUser({
+            user: userRes.data,
+          })
+        );
+        dispatch(getWalletBalance());
+        await dispatch(getUserCommunity());
+        if (window.location.pathname.includes(AppConfig.loginPath)) {
+          const path = previousLocation?.state?.from?.pathname || "/";
+          navigate(path, { replace: true });
+        }
+        socket.initSocket(onSocketConnected);
+      } else {
+        dispatch(logoutAction());
+        navigate(loginPath, { replace: true });
       }
-      socket.initSocket(onSocketConnected);
-    } else {
-      dispatch(logoutAction());
-      navigate(loginPath, { replace: true });
-    }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, onSocketConnected, loginPath]);
+    [dispatch, onSocketConnected, loginPath]
+  );
   const handleInvitation = useCallback(async () => {
     if (invitationId) {
       const acceptInvitationActionRes = await dispatch(
@@ -121,7 +126,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     }
   }, [dispatch, invitationId, invitationRef]);
   const handleResponseVerify = useCallback(
-    async (res: any, loginType: string) => {
+    async (res: any, loginType: string, previousLocation?: Location) => {
       await setCookie(AsyncKey.accessTokenKey, res?.token);
       await setCookie(AsyncKey.loginType, loginType);
       await setCookie(AsyncKey.refreshTokenKey, res?.refresh_token);
@@ -133,7 +138,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
       dispatch(CONFIG_ACTIONS.updateCurrentToken(res?.token));
       dispatch(CONFIG_ACTIONS.updateLoginType(loginType));
       await handleInvitation();
-      await initialUserData();
+      await initialUserData(previousLocation);
     },
     [dispatch, handleInvitation, initialUserData]
   );
@@ -152,7 +157,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     if (!accessToken) {
       if (window.location.pathname !== AppConfig.loginPath) {
         dispatch(logoutAction());
-        navigate(loginPath, { replace: true });
+        navigate(loginPath, { replace: true, state: { from: location } });
       }
     } else {
       dispatch(CONFIG_ACTIONS.updateCurrentToken(accessToken));
@@ -222,7 +227,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
           signature
         );
         if (res.statusCode === 200) {
-          await handleResponseVerify(res, LoginType.Metamask);
+          await handleResponseVerify(res, LoginType.Metamask, location.state);
           return true;
         }
         return false;
@@ -230,7 +235,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
         return false;
       }
     },
-    [handleResponseVerify]
+    [handleResponseVerify, location.state]
   );
   const metamaskDisconnect = useCallback(() => {}, []);
   const onMetamaskUpdate = useCallback(
@@ -323,7 +328,11 @@ const AuthProvider = ({ children }: IAuthProps) => {
         signature
       );
       if (res.statusCode === 200) {
-        await handleResponseVerify(res, LoginType.WalletConnect);
+        await handleResponseVerify(
+          res,
+          LoginType.WalletConnect,
+          location.state
+        );
       } else {
         WalletConnectUtils.connector.killSession();
       }
@@ -331,7 +340,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
       console.log(err);
       WalletConnectUtils.connector.killSession();
     }
-  }, [handleResponseVerify]);
+  }, [handleResponseVerify, location.state]);
   const onWCConnected = useCallback(() => {
     setTimeout(doingWCLogin, 300);
   }, [doingWCLogin]);
@@ -394,13 +403,13 @@ const AuthProvider = ({ children }: IAuthProps) => {
         signature
       );
       if (res.statusCode === 200) {
-        await handleResponseVerify(res, LoginType.Web3Auth);
+        await handleResponseVerify(res, LoginType.Web3Auth, location.state);
       }
     } catch (error: any) {
       console.log(error);
     }
     setLoadingWeb3Auth(false);
-  }, [handleResponseVerify]);
+  }, [handleResponseVerify, location.state]);
   const logout = useCallback(async () => {
     const loginType = await getCookie(AsyncKey.loginType);
     if (loginType === LoginType.WalletConnect) {
