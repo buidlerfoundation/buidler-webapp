@@ -121,7 +121,6 @@ const MainWrapper = () => {
   const handleOpenEditChannelName = useCallback(() => {}, []);
   const handleOpenChannelNotification = useCallback(() => {}, []);
   const handleOpenInviteMember = useCallback(() => {}, []);
-  const handleSpaceBadgeClick = useCallback(() => {}, []);
   const toggleOpenMembers = useCallback(() => {}, []);
   const onOpenChannelSetting = useCallback(() => {}, []);
   if (hideLayoutElement) {
@@ -161,7 +160,6 @@ const MainWrapper = () => {
                     onEditChannelName={handleOpenEditChannelName}
                     onUpdateNotification={handleOpenChannelNotification}
                     onInviteMember={handleOpenInviteMember}
-                    onSpaceBadgeClick={handleSpaceBadgeClick}
                     onViewMembers={toggleOpenMembers}
                     onOpenChannelSetting={onOpenChannelSetting}
                   />
