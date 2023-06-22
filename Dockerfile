@@ -1,5 +1,5 @@
 # Stage 1 - build stage
-FROM node:16.15.1-alpine as build-stage
+FROM node:16.18.1-alpine as build-stage
 WORKDIR /usr/src/app
 COPY package.json yarn.lock ./
 RUN yarn
