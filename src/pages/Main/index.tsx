@@ -6,6 +6,7 @@ import PageNotFound from "shared/PageNotFound";
 import Started from "pages/Started";
 import Home from "pages/Home";
 import Panel from "pages/Panel";
+import Plugin from "pages/Plugin";
 
 const Main = () => {
   return (
@@ -21,6 +22,7 @@ const Main = () => {
             element={<Home />}
           />
           <Route path="/panel/:community_id/:channel_id" element={<Panel />} />
+          <Route path="/plugin/:community_id/:channel_id" element={<Plugin />} />
         </Route>
         <Route path="/started" element={<Started />} />
         <Route path="*" element={<PageNotFound />} />

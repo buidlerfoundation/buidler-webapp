@@ -20,6 +20,13 @@ const Providers = ({ children }: ProvidersProps) => {
           fontWeightMedium: 600,
           fontWeightBold: "bold",
         },
+        palette: {
+          background: {
+            default: window.location.pathname.includes("plugin")
+              ? "transparent"
+              : "var(--color-lighter-background)",
+          },
+        },
       }),
     []
   );

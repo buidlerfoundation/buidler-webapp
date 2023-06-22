@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import styles from "./index.module.scss";
 import AppTitleBar from "./AppTitleBar";
@@ -105,7 +105,12 @@ const MainWrapper = () => {
       );
     }
   }, [dispatch, matchChannelId, socket.socketState]);
-
+  const hideLayoutElement = useMemo(
+    () =>
+      location.pathname.includes("panel") ||
+      location.pathname.includes("plugin"),
+    [location.pathname]
+  );
   const onDragEnd = useCallback(() => {}, []);
   const handleOpenCreateChannel = useCallback(() => {}, []);
   const handleOpenCreateSpace = useCallback(() => {}, []);
@@ -119,6 +124,13 @@ const MainWrapper = () => {
   const handleSpaceBadgeClick = useCallback(() => {}, []);
   const toggleOpenMembers = useCallback(() => {}, []);
   const onOpenChannelSetting = useCallback(() => {}, []);
+  if (hideLayoutElement) {
+    return (
+      <main>
+        <Outlet />
+      </main>
+    );
+  }
   return (
     <div
       style={{
@@ -135,32 +147,28 @@ const MainWrapper = () => {
               height: "100%",
             }}
           >
-            {location.pathname.includes("panel") ? (
-              <Outlet />
-            ) : (
-              <div className={styles.container}>
-                <AppTitleBar />
-                <DragDropContext onDragEnd={onDragEnd}>
-                  <div className={styles.body}>
-                    <SideBar
-                      onCreateChannel={handleOpenCreateChannel}
-                      onCreateGroupChannel={handleOpenCreateSpace}
-                      onEditGroupChannel={handleOpenEditSpace}
-                      onDeleteChannel={handleOpenDeleteChannel}
-                      onRemoveTeamMember={handleRemoveTeamMember}
-                      onEditChannelMember={handleOpenEditChannelMember}
-                      onEditChannelName={handleOpenEditChannelName}
-                      onUpdateNotification={handleOpenChannelNotification}
-                      onInviteMember={handleOpenInviteMember}
-                      onSpaceBadgeClick={handleSpaceBadgeClick}
-                      onViewMembers={toggleOpenMembers}
-                      onOpenChannelSetting={onOpenChannelSetting}
-                    />
-                    <Outlet />
-                  </div>
-                </DragDropContext>
-              </div>
-            )}
+            <div className={styles.container}>
+              <AppTitleBar />
+              <DragDropContext onDragEnd={onDragEnd}>
+                <div className={styles.body}>
+                  <SideBar
+                    onCreateChannel={handleOpenCreateChannel}
+                    onCreateGroupChannel={handleOpenCreateSpace}
+                    onEditGroupChannel={handleOpenEditSpace}
+                    onDeleteChannel={handleOpenDeleteChannel}
+                    onRemoveTeamMember={handleRemoveTeamMember}
+                    onEditChannelMember={handleOpenEditChannelMember}
+                    onEditChannelName={handleOpenEditChannelName}
+                    onUpdateNotification={handleOpenChannelNotification}
+                    onInviteMember={handleOpenInviteMember}
+                    onSpaceBadgeClick={handleSpaceBadgeClick}
+                    onViewMembers={toggleOpenMembers}
+                    onOpenChannelSetting={onOpenChannelSetting}
+                  />
+                  <Outlet />
+                </div>
+              </DragDropContext>
+            </div>
           </main>
         </div>
       </div>

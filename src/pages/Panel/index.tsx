@@ -4,11 +4,9 @@ import MessageChatBox from "shared/MessageChatBox";
 
 const Panel = () => {
   return (
-    <main>
-      <div className={styles.container}>
-        <MessageChatBox />
-      </div>
-    </main>
+    <div className={styles.container}>
+      <MessageChatBox />
+    </div>
   );
 };
 
