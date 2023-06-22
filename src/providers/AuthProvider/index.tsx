@@ -93,7 +93,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   }, [dispatch]);
   const onSocketConnected = useCallback(async () => {}, []);
   const initialUserData = useCallback(
-    async (previousLocation?: Location) => {
+    async (previousLocation?: any) => {
       const userRes = await api.findUser();
       if (userRes.statusCode === 200) {
         dispatch(
@@ -103,7 +103,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
         );
         await dispatch(getUserCommunity());
         if (window.location.pathname.includes(AppConfig.loginPath)) {
-          const path = previousLocation?.state?.from?.pathname || "/";
+          const path = previousLocation?.from?.pathname || "/";
           navigate(path, { replace: true });
         }
         socket.initSocket(onSocketConnected);
@@ -135,7 +135,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     async (
       res?: LoginApiData,
       loginType?: string,
-      previousLocation?: Location
+      previousLocation?: any,
     ) => {
       if (!res) return;
       await setCookie(AsyncKey.accessTokenKey, res?.token);
