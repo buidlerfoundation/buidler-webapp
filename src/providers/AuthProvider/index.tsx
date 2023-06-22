@@ -353,10 +353,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     setTimeout(doingWCLogin, 300);
   }, [doingWCLogin]);
   const onDisconnected = useCallback(async () => {
-    const deviceCode = await getDeviceCode();
-    api.removeDevice({
-      device_code: deviceCode,
-    });
+    api.logout();
     socket.disconnect();
     clearData();
     dispatch(logoutAction());

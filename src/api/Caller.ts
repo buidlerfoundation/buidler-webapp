@@ -24,6 +24,16 @@ const sleep = (timeout = 1000) => {
 };
 
 const handleError = (message: string, apiData: any, withoutError?: boolean) => {
+  if (message === "Failed to authenticate token") {
+    if (!GlobalVariable.sessionExpired) {
+      GlobalVariable.sessionExpired = true;
+      toast.error("Session expired");
+      clearData(() => {
+        window.location.reload();
+      });
+    }
+    return;
+  }
   const { uri, fetchOptions } = apiData;
   const compareUri = `${fetchOptions.method}-${uri}`;
   const importantApi = importantApis.find((el) => {

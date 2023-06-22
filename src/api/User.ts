@@ -91,8 +91,8 @@ export const getGasLimit = (tx: any) =>
 
 export const updateUser = (data: any) => Caller.put("user", data);
 
-export const removeDevice = (body: any) => {
-  return Caller.delete("user/device", body);
+export const logout = () => {
+  return Caller.delete("user/logout");
 };
 
 export const getProfile = (name: string) =>
