@@ -1,0 +1,81 @@
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+    -webkit-transform-origin: bottom right;
+    transform-origin: bottom right;
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    -webkit-transform-origin: bottom right;
+    transform-origin: bottom right;
+  }
+}
+
+@keyframes bounce-out {
+  0% {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    -webkit-transform-origin: bottom right;
+    transform-origin: bottom right;
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+    -webkit-transform-origin: bottom right;
+    transform-origin: bottom right;
+  }
+}
+
+.b-root-chat {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  bottom: 0;
+  right: 0;
+  padding-right: 20px;
+  .b-bubble__wrap {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+.b-chat__wrapper {
+  width: 100%;
+  height: calc(100% - 110px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.b-chat-box__wrapper {
+  -webkit-animation-duration: 0.3s;
+  animation-duration: 0.3s;
+  transition-timing-function: ease-in;
+  .b-chat-box {
+    border-radius: 10px;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-lighter-background);
+    position: relative;
+    overflow: hidden;
+  }
+}
+
+.b-bounce-in {
+  -webkit-animation-name: bounce-in;
+  animation-name: bounce-in;
+}
+
+.b-bounce-out {
+  -webkit-animation-name: bounce-out;
+  animation-name: bounce-out;
+}
