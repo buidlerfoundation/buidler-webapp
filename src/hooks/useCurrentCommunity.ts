@@ -8,11 +8,11 @@ function useCurrentCommunity() {
   const communities = useCommunities();
 
   return React.useMemo<Community>(() => {
-    const res = communities?.find((el) => el.team_id === communityId) || {
-      team_display_name: "",
-      team_icon: "",
-      team_id: "",
-      team_url: "",
+    const res = communities?.find((el) => el.community_id === communityId) || {
+      community_name: "",
+      community_image: "",
+      community_id: "",
+      community_url: "",
       role: "",
     };
     return res;

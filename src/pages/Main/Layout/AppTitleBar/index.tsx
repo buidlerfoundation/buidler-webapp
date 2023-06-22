@@ -4,7 +4,6 @@ import React, {
   useCallback,
   memo,
   useMemo,
-  useEffect,
   forwardRef,
   useImperativeHandle,
 } from "react";
@@ -21,7 +20,6 @@ import TeamItem from "./TeamItem";
 import { Community } from "models/Community";
 import useAppDispatch from "hooks/useAppDispatch";
 import useCommunityId from "hooks/useCommunityId";
-import AppConfig, { DirectCommunity } from "common/AppConfig";
 import ModalUserSetting from "shared/ModalUserSetting";
 import { useAuth } from "providers/AuthProvider";
 import ModalTeam from "shared/ModalTeam";
@@ -31,6 +29,8 @@ import ModalConfirmDelete from "shared/ModalConfirmDelete";
 import ModalConfirmDeleteTeam from "shared/ModalConfirmDeleteTeam";
 import ModalTeamSetting from "shared/ModalTeamSetting";
 import ModalTransactionDetail from "shared/ModalTransactionDetail";
+import api from "api";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 type AppTitleBarProps = {
   onJumpToMessage?: (messageId: string) => void;
@@ -141,16 +141,11 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
     null
   );
   const highlightCreateCommunityButton = useMemo(() => {
-    return (
-      (communities?.length === 2 &&
-        communities?.[1]?.team_id === AppConfig.buidlerCommunityId) ||
-      (communities?.length === 1 &&
-        communities?.[0]?.team_id === DirectCommunity.team_id)
-    );
+    return !communities || communities?.length <= 1;
   }, [communities]);
   const setTeam = useCallback(
     async (t?: Community) => {
-      navigate(`/channels/${t?.team_id}`, {replace: true});
+      navigate(`/channels/${t?.community_id}`, { replace: true });
     },
     [navigate]
   );
@@ -187,7 +182,22 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
     setOpenModalUser(true);
   }, []);
   const handleCloseModalTeam = useCallback(() => setOpenModalTeam(false), []);
-  const handleCreateTeam = useCallback(async (body: any) => {}, []);
+  const handleCreateTeam = useCallback(
+    async (body: any) => {
+      const res = await api.createCommunity({
+        community_name: body.name,
+        community_description: body.description,
+      });
+      if (res.success) {
+        GoogleAnalytics.tracking("Create Community Successful", {
+          category: "Add Community",
+        });
+        setTeam(res.data);
+        setOpenModalTeam(false);
+      }
+    },
+    [setTeam]
+  );
   const handleAcceptTeam = useCallback(async (teamId: string) => {}, []);
   const handleCloseModalUserSetting = useCallback(
     () => setOpenModalUser(false),
@@ -220,8 +230,8 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
     (el: Community) => {
       return (
         <TeamItem
-          key={el.team_id}
-          isSelected={el.team_id === communityId}
+          key={el.community_id}
+          isSelected={el.community_id === communityId}
           t={el}
           onChangeTeam={setTeam}
           onContextMenu={handleCommunityContextMenu}
@@ -338,14 +348,14 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
           handleClose={handleCloseModalConfirmDelete}
           title="Leave community"
           description="Are you sure you want to leave?"
-          contentName={selectedMenuTeam?.team_display_name || ""}
+          contentName={selectedMenuTeam?.community_name || ""}
           contentDelete="Leave"
           onDelete={onLeaveTeam}
         />
         <ModalConfirmDeleteTeam
           open={isOpenConfirmDeleteTeam}
           handleClose={handleCloseDeleteTeam}
-          teamName={selectedMenuTeam?.team_display_name || ""}
+          teamName={selectedMenuTeam?.community_name || ""}
           onDelete={onDeleteTeam}
         />
         <ModalTeamSetting

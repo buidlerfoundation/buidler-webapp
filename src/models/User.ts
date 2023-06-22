@@ -204,9 +204,16 @@ export interface UserNFTCollection {
   }[];
 }
 
+export interface UserAddress {
+  user_id: string;
+  network: string;
+  address: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface UserData {
   avatar_url: string;
-  encrypt_message_key?: string;
   is_verified_avatar?: boolean;
   is_verified_username?: boolean;
   nonce?: string;
@@ -215,16 +222,18 @@ export interface UserData {
   role?: string;
   status?: string;
   direct_channel?: string;
-  user_channels?: Array<string>;
-  user_bio?: string;
-  address?: string;
   verified_avatar_asset_collection?: NFTCollectionDataApi;
   verified_username_asset_collection?: NFTCollectionDataApi;
   is_deleted?: boolean;
   total_unread_notifications?: number;
   direct_channel_id?: string;
   fetching?: boolean;
-  public_key?: string;
+  background_url?: string;
+  bio?: string;
+  is_ethereum_blockies_uploaded?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  user_addresses: UserAddress[];
 }
 
 export interface InitialApiData {
@@ -240,7 +249,7 @@ export interface InitialApiData {
 export interface ProfileApiData {
   profile: {
     user_id?: string;
-    team_id?: string;
+    community_id?: string;
   };
 }
 
@@ -252,7 +261,14 @@ export interface FileApiData {
     file_id: string;
     mimetype: string;
     original_name: string;
-    team_id: string;
+    community_id: string;
     updatedAt: string;
   };
+}
+
+export interface LoginApiData {
+  token: string;
+  token_expire_at: number;
+  refresh_token: string;
+  refresh_token_expire_at: number;
 }

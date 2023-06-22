@@ -1,9 +1,9 @@
 "use client";
 import AppConfig, { AsyncKey } from "common/AppConfig";
-import { GeneratedPrivateKey, getCookie, getDeviceCode } from "common/Cookie";
-import { utils } from "ethers";
+import { getCookie } from "common/Cookie";
 import useAppDispatch from "hooks/useAppDispatch";
 import useUser from "hooks/useUser";
+import { Community } from "models/Community";
 import { EmitMessageData } from "models/Message";
 import {
   createContext,
@@ -17,7 +17,7 @@ import {
 import { toast } from "react-hot-toast";
 import { MESSAGE_ACTIONS } from "reducers/MessageReducers";
 import { REACT_ACTIONS } from "reducers/ReactReducers";
-import { getDeviceToken } from "services/firebase";
+import { USER_ACTIONS } from "reducers/UserReducers";
 import { Socket, io } from "socket.io-client";
 
 type SocketState = "connecting" | "connected" | "disconnected";
@@ -55,11 +55,12 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.off("ON_EDIT_MESSAGE");
     socket.current?.off("ON_REACTION_ADDED");
     socket.current?.off("ON_REACTION_REMOVED");
+    socket.current?.off("ON_CREATE_NEW_COMMUNITY");
     socket.current?.off("disconnect");
   }, []);
   const listener = useCallback(() => {
     socket.current?.on("ON_NEW_MESSAGE", async (data: any) => {
-      dispatch(MESSAGE_ACTIONS.newMessage(data.message_data));
+      dispatch(MESSAGE_ACTIONS.newMessage(data));
     });
     socket.current?.on("ON_DELETE_MESSAGE", async (data: any) => {
       dispatch(
@@ -92,21 +93,17 @@ const SocketProvider = ({ children }: ISocketProps) => {
         })
       );
     });
+    socket.current?.on("ON_CREATE_NEW_COMMUNITY", (data: Community) => {
+      dispatch(USER_ACTIONS.createNewCommunity(data));
+    });
   }, [dispatch, user.user_id]);
   const initSocket = useCallback(async (onConnected: () => void) => {
     if (socket.current?.connected) return;
     setSocketState("connecting");
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
-    const deviceCode = await getDeviceCode();
-    const deviceToken = await getDeviceToken();
-    const generatedPrivateKey = await GeneratedPrivateKey();
-    const publicKey = utils.computePublicKey(generatedPrivateKey, true);
     socket.current = io(`${AppConfig.apiBaseUrl}`, {
       query: {
         token: accessToken,
-        device_code: deviceCode,
-        encrypt_message_key: publicKey,
-        device_token: deviceToken,
         platform: "Web",
       },
       transports: ["websocket"],
@@ -138,7 +135,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     (payload: EmitMessageData) => {
       const message: any = {
         ...payload,
-        createdAt: new Date().toISOString(),
+        created_at: new Date().toISOString(),
         sender_id: user.user_id,
         isSending: true,
         conversation_data: null,

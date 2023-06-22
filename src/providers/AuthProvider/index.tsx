@@ -1,10 +1,17 @@
 import api from "api";
 import AppConfig, { AsyncKey, LoginType, signTypeData } from "common/AppConfig";
-import { clearData, getCookie, getDeviceCode, setCookie } from "common/Cookie";
-import { ethers } from "ethers";
+import {
+  GeneratedPrivateKey,
+  clearData,
+  getCookie,
+  getDeviceCode,
+  setCookie,
+} from "common/Cookie";
+import { ethers, utils } from "ethers";
 import useAppDispatch from "hooks/useAppDispatch";
 import useAppSelector from "hooks/useAppSelector";
 import useQuery from "hooks/useQuery";
+import { LoginApiData } from "models/User";
 import { useSocket } from "providers/SocketProvider";
 import {
   createContext,
@@ -23,7 +30,6 @@ import { logoutAction } from "reducers/UserActions";
 import { acceptInvitation } from "reducers/UserReducers";
 import {
   getUserCommunity,
-  getWalletBalance,
   USER_ACTIONS,
 } from "reducers/UserReducers";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
@@ -31,6 +37,7 @@ import ChainId from "services/connectors/ChainId";
 import MetamaskUtils from "services/connectors/MetamaskUtils";
 import WalletConnectUtils from "services/connectors/WalletConnectUtils";
 import Web3AuthUtils from "services/connectors/Web3AuthUtils";
+import { getDeviceToken } from "services/firebase";
 
 export interface IAuthContext {
   loginWithMetaMask: () => Promise<void>;
@@ -94,7 +101,6 @@ const AuthProvider = ({ children }: IAuthProps) => {
             user: userRes.data,
           })
         );
-        dispatch(getWalletBalance());
         await dispatch(getUserCommunity());
         if (window.location.pathname.includes(AppConfig.loginPath)) {
           const path = previousLocation?.state?.from?.pathname || "/";
@@ -116,17 +122,22 @@ const AuthProvider = ({ children }: IAuthProps) => {
       ).unwrap();
       if (
         acceptInvitationActionRes.statusCode === 200 &&
-        !!acceptInvitationActionRes.data?.team_id
+        !!acceptInvitationActionRes.data?.community_id
       ) {
         if (acceptInvitationActionRes.metadata?.is_new_team_member) {
           toast.success("You have successfully joined new community.");
         }
-        setCookie(AsyncKey.lastTeamId, acceptInvitationActionRes.data?.team_id);
+        setCookie(AsyncKey.lastTeamId, acceptInvitationActionRes.data?.community_id);
       }
     }
   }, [dispatch, invitationId, invitationRef]);
   const handleResponseVerify = useCallback(
-    async (res: any, loginType: string, previousLocation?: Location) => {
+    async (
+      res?: LoginApiData,
+      loginType?: string,
+      previousLocation?: Location
+    ) => {
+      if (!res) return;
       await setCookie(AsyncKey.accessTokenKey, res?.token);
       await setCookie(AsyncKey.loginType, loginType);
       await setCookie(AsyncKey.refreshTokenKey, res?.refresh_token);
@@ -195,24 +206,28 @@ const AuthProvider = ({ children }: IAuthProps) => {
     };
   }, [currentToken, dispatch]);
 
+  const getMessageSignTypedData = useCallback(async (address: string) => {
+    const deviceCode = await getDeviceCode();
+    const deviceToken = await getDeviceToken();
+    const generatedPrivateKey = await GeneratedPrivateKey();
+    const publicKey = utils.computePublicKey(generatedPrivateKey, true);
+    return {
+      device: {
+        device_code: deviceCode,
+        device_token: deviceToken,
+        encrypt_message_key: publicKey,
+      },
+      address,
+    };
+  }, []);
+
   const doingMetamaskLogin = useCallback(
     async (address: string) => {
       try {
         const metamaskProvider: any = window.ethereum;
         const provider = new ethers.providers.Web3Provider(metamaskProvider);
         const signer = provider.getSigner();
-        const message = {
-          from: {
-            name: address,
-            address: address,
-          },
-          to: {
-            name: "Buidler",
-            address: "Buidler",
-          },
-          check: true,
-          address: address,
-        };
+        const message = await getMessageSignTypedData(address);
         const signature = await signer._signTypedData(
           signTypeData.domain,
           signTypeData.types,
@@ -227,7 +242,11 @@ const AuthProvider = ({ children }: IAuthProps) => {
           signature
         );
         if (res.statusCode === 200) {
-          await handleResponseVerify(res, LoginType.Metamask, location.state);
+          await handleResponseVerify(
+            res.data,
+            LoginType.Metamask,
+            location.state
+          );
           return true;
         }
         return false;
@@ -235,7 +254,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
         return false;
       }
     },
-    [handleResponseVerify, location.state]
+    [getMessageSignTypedData, handleResponseVerify, location.state]
   );
   const metamaskDisconnect = useCallback(() => {}, []);
   const onMetamaskUpdate = useCallback(
@@ -296,18 +315,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     try {
       const { accounts } = WalletConnectUtils.connector;
       const address = accounts?.[0];
-      const message = {
-        from: {
-          name: address,
-          address: address,
-        },
-        to: {
-          name: "Buidler",
-          address: "Buidler",
-        },
-        check: true,
-        address,
-      };
+      const message = await getMessageSignTypedData(address);
       const params = [
         address,
         {
@@ -329,7 +337,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
       );
       if (res.statusCode === 200) {
         await handleResponseVerify(
-          res,
+          res.data,
           LoginType.WalletConnect,
           location.state
         );
@@ -340,7 +348,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
       console.log(err);
       WalletConnectUtils.connector.killSession();
     }
-  }, [handleResponseVerify, location.state]);
+  }, [getMessageSignTypedData, handleResponseVerify, location.state]);
   const onWCConnected = useCallback(() => {
     setTimeout(doingWCLogin, 300);
   }, [doingWCLogin]);
@@ -370,18 +378,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
       );
       const signer = Web3AuthUtils.provider.getSigner();
       const address = await signer.getAddress();
-      const message = {
-        from: {
-          name: address,
-          address: address,
-        },
-        to: {
-          name: "Buidler",
-          address: "Buidler",
-        },
-        check: true,
-        address,
-      };
+      const message = await getMessageSignTypedData(address);
       const params = [
         address,
         {
@@ -403,13 +400,17 @@ const AuthProvider = ({ children }: IAuthProps) => {
         signature
       );
       if (res.statusCode === 200) {
-        await handleResponseVerify(res, LoginType.Web3Auth, location.state);
+        await handleResponseVerify(
+          res.data,
+          LoginType.Web3Auth,
+          location.state
+        );
       }
     } catch (error: any) {
       console.log(error);
     }
     setLoadingWeb3Auth(false);
-  }, [handleResponseVerify, location.state]);
+  }, [getMessageSignTypedData, handleResponseVerify, location.state]);
   const logout = useCallback(async () => {
     const loginType = await getCookie(AsyncKey.loginType);
     if (loginType === LoginType.WalletConnect) {

@@ -35,12 +35,12 @@ const TeamItem = ({
   );
   const renderCommunityIcon = useCallback(() => {
     if (t?.direct) return <IconCommunityDirect />;
-    if (t?.team_icon)
+    if (t?.community_image)
       return (
         <ImageView
           alt=""
           className="team-icon-mini"
-          src={imageHelper.normalizeImage(t?.team_icon, t?.team_id, {
+          src={imageHelper.normalizeImage(t?.community_image, t?.community_id, {
             w: 40,
             h: 40,
             radius: 5,
@@ -49,13 +49,13 @@ const TeamItem = ({
       );
     return (
       <DefaultSpaceIcon
-        name={t.team_display_name ? t.team_display_name.charAt(0) : ""}
+        name={t.community_name ? t.community_name.charAt(0) : ""}
         size={20}
         borderRadius={5}
         fontSize={12}
       />
     );
-  }, [imageHelper, t?.direct, t.team_display_name, t?.team_icon, t?.team_id]);
+  }, [imageHelper, t?.direct, t.community_name, t?.community_image, t?.community_id]);
   const isUnseen = useMemo(() => {
     return !t.seen;
   }, [t.seen]);
@@ -71,7 +71,7 @@ const TeamItem = ({
         {renderCommunityIcon()}
         {isUnseen && <div className={styles["badge-unseen"]} />}
       </div>
-      <span className={styles["team-name"]}>{t.team_display_name}</span>
+      <span className={styles["team-name"]}>{t.community_name}</span>
     </div>
   );
 };

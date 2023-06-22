@@ -27,7 +27,7 @@ const configSlice = createSlice({
   name: "config",
   initialState,
   reducers: {
-    updateLoginType: (state: ConfigState, action: PayloadAction<string>) => {
+    updateLoginType: (state: ConfigState, action: PayloadAction<string | undefined>) => {
       state.loginType = action.payload;
     },
     updateCurrentToken: (state: ConfigState, action: PayloadAction<string>) => {

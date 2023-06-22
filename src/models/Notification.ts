@@ -19,7 +19,7 @@ export type NotificationData = {
     | "channel_mention"
     | "post_mention"
     | "channel_reply";
-  team_id?: string;
+  community_id?: string;
   to_user_id?: string;
   updatedAt?: string;
   itemType?: string;

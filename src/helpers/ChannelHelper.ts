@@ -33,7 +33,7 @@ export const normalizePublicMessageData = (
       normalizePublicMessageItem(el, decryptMessageKey.toString())
     ) || [];
   return res.filter(
-    (el) => !!el.content || el?.message_attachments?.length > 0
+    (el) => !!el.content || el?.attachments?.length > 0
   );
 };
 

@@ -3,12 +3,9 @@ import useAppSelector from "./useAppSelector";
 import useCommunityId from "./useCommunityId";
 
 const useSpaces = () => {
-  const spaceChannelMap = useAppSelector((state) => state.user.spaceChannelMap);
+  const spaceMap = useAppSelector((state) => state.user.spaceMap);
   const communityId = useCommunityId();
-  return useMemo(
-    () => spaceChannelMap[communityId] || [],
-    [spaceChannelMap, communityId]
-  );
+  return useMemo(() => spaceMap[communityId] || [], [spaceMap, communityId]);
 };
 
 export default useSpaces;

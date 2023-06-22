@@ -119,11 +119,12 @@ export const DeletedUser: UserData = {
   user_id: "",
   user_name: "User no longer in community",
   avatar_url: "",
+  user_addresses: [],
 };
 
 export const DirectCommunity: Community = {
-  team_id: "b796712f-eea4-4ba1-abc6-ca76e9af24bc",
-  team_display_name: "Direct Message",
+  community_id: "b796712f-eea4-4ba1-abc6-ca76e9af24bc",
+  community_name: "Direct Message",
   direct: true,
   seen: true,
 };
@@ -134,28 +135,24 @@ export const signTypeData = {
     version: "1",
   },
   types: {
-    Wallet: [
+    Device: [
       {
-        name: "name",
+        name: "device_code",
         type: "string",
       },
       {
-        name: "address",
+        name: "device_token",
+        type: "string",
+      },
+      {
+        name: "encrypt_message_key",
         type: "string",
       },
     ],
-    Transaction: [
+    Data: [
       {
-        name: "from",
-        type: "Wallet",
-      },
-      {
-        name: "to",
-        type: "Wallet",
-      },
-      {
-        name: "check",
-        type: "bool",
+        name: "device",
+        type: "Device",
       },
       {
         name: "address",

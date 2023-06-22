@@ -29,9 +29,9 @@ export const normalizeMessages = (messages: Array<MessageData>) => {
       const previousVal: any = messages?.[idx - 1];
       const previousDate =
         previousVal && !previousVal.type
-          ? moment(new Date(previousVal.createdAt)).format("YYYY-MM-DD")
+          ? moment(new Date(previousVal.created_at)).format("YYYY-MM-DD")
           : null;
-      const date = moment(new Date(val.createdAt)).format("YYYY-MM-DD");
+      const date = moment(new Date(val.created_at)).format("YYYY-MM-DD");
       if (previousDate && previousDate !== date) {
         result.push({ type: "date", value: previousDate }, val);
       } else {

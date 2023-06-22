@@ -28,15 +28,14 @@ export const getMessages = async (
   after?: string,
   controller?: AbortController
 ) => {
-  const deviceCode = await getDeviceCode();
-  let uri = `messages/${channelId}?page[size]=${limit}&device_code=${deviceCode}`;
+  let uri = `message/${channelId}/channel?pagination[size]=${limit}`;
   if (after) {
     if (before) {
-      uri += `&page[before]=${before}`;
+      uri += `&pagination[before]=${before}`;
     }
-    uri += `&page[after]=${after}`;
+    uri += `&pagination[after]=${after}`;
   } else {
-    uri += `&page[before]=${before || new Date().toISOString()}`;
+    uri += `&pagination[before]=${before || new Date().toISOString()}`;
   }
   return Caller.get<Array<MessageData>>(uri, undefined, controller);
 };
@@ -72,7 +71,8 @@ export const getAroundMessageById = async (messageId: string, limit = 20) => {
   );
 };
 
-export const upVoteScamMessage = (id: string) => Caller.post(`scam-alert/${id}/upvote`);
+export const upVoteScamMessage = (id: string) =>
+  Caller.post(`scam-alert/${id}/upvote`);
 
 export const downVoteScamMessage = (id: string) =>
   Caller.post(`scam-alert/${id}/downvote`);

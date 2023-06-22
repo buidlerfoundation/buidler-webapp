@@ -74,15 +74,16 @@ export interface TaskData {
 
 export interface ConversationData {
   content: string;
-  createdAt: string;
-  message_attachments: Array<AttachmentData>;
+  created_at: string;
+  attachments: Array<AttachmentData>;
   message_id: string;
   message_tag: Array<TagData>;
   reply_message_id: string;
   plain_text: string;
   sender_id: string;
-  updatedAt: string;
+  updated_at: string;
   task?: TaskData;
+  is_deleted?: boolean;
   isHead: boolean;
   isSending?: boolean;
   isConversationHead?: boolean;
@@ -102,6 +103,7 @@ export interface ConversationData {
   };
   is_scam_detected?: boolean;
   files?: any[];
+  sender?: UserData,
 }
 
 export interface MessageDateData {

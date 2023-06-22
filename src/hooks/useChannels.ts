@@ -1,11 +1,14 @@
 import { useMemo } from "react";
-import useAppSelector from "./useAppSelector";
-import useCommunityId from "./useCommunityId";
+import useGlobalChannels from "./useGlobalChannels";
+import useSpaceChannels from "./useSpaceChannels";
 
 const useChannels = () => {
-  const channelMap = useAppSelector((state) => state.user.channelMap);
-  const communityId = useCommunityId();
-  return useMemo(() => channelMap[communityId], [channelMap, communityId]);
+  const globalChannels = useGlobalChannels();
+  const spaceChannels = useSpaceChannels();
+  return useMemo(
+    () => [...spaceChannels, ...globalChannels],
+    [globalChannels, spaceChannels]
+  );
 };
 
 export default useChannels;

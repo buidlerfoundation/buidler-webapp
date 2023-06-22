@@ -21,10 +21,10 @@ const firebaseApp = initializeApp(firebaseConfig);
 const getDestinationRoute = (json: any) => {
   const { message_data, notification_data } = json;
   if (message_data?.entity_type === "channel") {
-    return `/channels/${notification_data.team_id}/${message_data.entity_id}/message/${message_data.message_id}`;
+    return `/channels/${notification_data.community_id}/${message_data.entity_id}/message/${message_data.message_id}`;
   }
   if (message_data?.entity_type === "post") {
-    return `/channels/${notification_data.team_id}/${notification_data.channel_id}/post/${message_data.entity_id}`;
+    return `/channels/${notification_data.community_id}/${notification_data.channel_id}/post/${message_data.entity_id}`;
   }
 };
 

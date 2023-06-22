@@ -2,6 +2,7 @@ import {
   BalanceApiData,
   Contract,
   InitialApiData,
+  LoginApiData,
   ProfileApiData,
   Token,
   TokenPrice,
@@ -9,8 +10,7 @@ import {
   UserRoleType,
 } from "models/User";
 import Caller from "./Caller";
-import { Channel, Community, Space } from "models/Community";
-import { DirectCommunity } from "common/AppConfig";
+import { Channel, Community } from "models/Community";
 
 export const getInitial = () => Caller.get<InitialApiData>(`initial`);
 
@@ -22,10 +22,7 @@ export const fetchWalletBalance = () =>
   Caller.get<BalanceApiData>("user/balance");
 
 export const findTeam = () =>
-  Caller.get<Community[]>("user/team?include_direct=1");
-
-export const getSpaceChannel = (teamId: string, controller?: AbortController) =>
-  Caller.get<Space[]>(`space/${teamId}`, undefined, controller);
+  Caller.get<Community[]>("community?include_direct=1");
 
 export const findDirectChannel = (
   status?: "pending" | "blocked" | "accepted",
@@ -37,12 +34,6 @@ export const findDirectChannel = (
   //   uri += `&status=${status}`;
   // }
   return Caller.get<Channel[]>(uri, undefined, controller);
-};
-
-export const findChannel = (teamId: string, controller?: AbortController) => {
-  if (teamId === DirectCommunity.team_id)
-    return findDirectChannel(undefined, controller);
-  return Caller.get<Channel[]>(`channel/${teamId}`, undefined, controller);
 };
 
 export const refreshToken = (token: string) => {
@@ -57,19 +48,10 @@ export const refreshToken = (token: string) => {
 };
 
 export const generateTokenFromOTT = (ott: string) =>
-  Caller.get<{
-    token: string;
-    token_expire_at: number;
-    refresh_token: string;
-    refresh_token_expire_at: number;
-  }>(`authentication/ott/${ott}`);
+  Caller.get<LoginApiData>(`authentication/ott/${ott}`);
 
 export const verifyNonce = (data: any, signature: string) =>
-  Caller.post<{
-    avatar_url: string;
-    user_id: string;
-    user_name: string;
-  }>("user", { data, signature });
+  Caller.post<LoginApiData>("user", { data, signature });
 
 export const acceptInvitation = (invitationId: string, ref?: string | null) =>
   Caller.post<Community>(
@@ -79,23 +61,6 @@ export const acceptInvitation = (invitationId: string, ref?: string | null) =>
     undefined,
     ref ? { ref } : undefined
   );
-
-export const getDirectChannelUsers = (controller?: AbortController) =>
-  Caller.get<UserData[]>(
-    "direct-channel/members?channel_types[]=Direct&channel_types[]=Multiple Direct",
-    undefined,
-    controller
-  );
-
-export const getTeamUsers = (teamId: string, controller?: AbortController) => {
-  if (teamId === DirectCommunity.team_id)
-    return getDirectChannelUsers(controller);
-  return Caller.get<UserData[]>(
-    `team/${teamId}/members`,
-    undefined,
-    controller
-  );
-};
 
 export const importToken = (address: string) =>
   Caller.post<Token>(`user/balance/${address}`);

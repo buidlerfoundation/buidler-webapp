@@ -1,13 +1,11 @@
-import { utils } from "ethers";
 import { useMemo } from "react";
 import useUser from "./useUser";
 
 function useUserAddress() {
   const userData = useUser()
   return useMemo(() => {
-    if (!userData.public_key) return '';
-    return utils.computeAddress(userData?.public_key);
-  }, [userData.public_key]);
+    return userData?.user_addresses?.[0]?.address || ''
+  }, [userData?.user_addresses]);
 }
 
 export default useUserAddress;

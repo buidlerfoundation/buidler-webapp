@@ -17,7 +17,7 @@ export const uploadFile = (
   }
   const data = new FormData();
   if (teamId) {
-    data.append("team_id", teamId);
+    data.append("community_id", teamId);
   }
   if (attachmentId) {
     data.append("attachment_id", attachmentId);

@@ -42,20 +42,20 @@ const MainWrapper = () => {
   const channels = useChannels();
   const initialCommunityData = useCallback(async () => {
     const community = communities?.find(
-      (el) => el.team_id === matchCommunityId
+      (el) => el.community_id === matchCommunityId
     );
     const initialCommunityId =
-      community?.team_id ||
+      community?.community_id ||
       (await getCookie(AsyncKey.lastTeamId)) ||
-      communities?.[1]?.team_id ||
-      communities?.[0]?.team_id;
+      communities?.[1]?.community_id ||
+      communities?.[0]?.community_id;
     if (initialCommunityId) {
       let initialChannelId = "";
-      if (!channels) {
-        const { channelId, resChannel } = await dispatch(
+      if (!channels || channels.length === 0) {
+        const { channelId, channels } = await dispatch(
           setUserCommunityData(initialCommunityId)
         ).unwrap();
-        const channel = resChannel.data?.find(
+        const channel = channels?.find(
           (el) => el.channel_id === matchChannelId
         );
         initialChannelId = channel?.channel_id || channelId || "";

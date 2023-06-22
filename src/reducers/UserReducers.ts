@@ -1,10 +1,6 @@
-import {
-  createAsyncThunk,
-  createSlice,
-  PayloadAction,
-} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import api from "api";
-import { AsyncKey, DirectCommunity } from "common/AppConfig";
+import { AsyncKey } from "common/AppConfig";
 import {
   getCookie,
   getLastChannelIdByCommunityId,
@@ -20,8 +16,8 @@ interface UserState {
   imgBucket?: string;
   currentToken?: string;
   communities?: Community[];
-  channelMap: { [key: string]: Channel[] };
-  spaceChannelMap: { [key: string]: Space[] };
+  globalChannelMap?: { [key: string]: Channel[] };
+  spaceMap: { [key: string]: Space[] };
   teamUserMap: {
     [key: string]: {
       data: UserData[];
@@ -37,11 +33,12 @@ const initialState: UserState = {
     avatar_url: "",
     user_id: "",
     user_name: "",
+    user_addresses: [],
   },
   imgDomain: "",
   imgBucket: "",
-  channelMap: {},
-  spaceChannelMap: {},
+  globalChannelMap: {},
+  spaceMap: {},
   teamUserMap: {},
   loadingCommunityData: false,
   currentToken: "",
@@ -64,27 +61,38 @@ export const getWalletBalance = createAsyncThunk("user/balance", async () => {
 export const getUserCommunity = createAsyncThunk("user/community", async () => {
   const res = await api.findTeam();
   if (res.statusCode === 200) {
-    const communitiesWithDM = res.data || [];
-    const communities = communitiesWithDM.filter(
-      (el) => el.team_id !== DirectCommunity.team_id
-    );
-    const DM = communitiesWithDM.find(
-      (el) => el.team_id === DirectCommunity.team_id
-    );
-    communities.unshift({ ...DirectCommunity, seen: DM?.seen });
-    return communities;
+    // const communitiesWithDM = res.data || [];
+    // const communities = communitiesWithDM.filter(
+    //   (el) => el.community_id !== DirectCommunity.community_id
+    // );
+    // const DM = communitiesWithDM.find(
+    //   (el) => el.community_id === DirectCommunity.community_id
+    // );
+    // communities.unshift({ ...DirectCommunity, seen: DM?.seen });
+    return res.data || [];
   }
 });
 
 export const setUserCommunityData = createAsyncThunk(
   "user/setCommunity",
   async (communityId: string) => {
-    const [resSpace, resChannel, teamUsersRes] = await Promise.all([
-      api.getSpaceChannel(communityId),
-      api.findChannel(communityId),
+    const [resChannel, teamUsersRes] = await Promise.all([
+      api.getListChannel(communityId),
       api.getTeamUsers(communityId),
     ]);
-    let channelId = resChannel.data?.[0]?.channel_id;
+    const channels = resChannel.data?.global_channels || []
+    resChannel.data?.spaces?.forEach(space => {
+      if (space.channels && space.channels?.length > 0) {
+        channels.push(...space.channels)
+      }
+    })
+    const initialSpace = resChannel.data?.spaces?.find(
+      (el) => el.channels && el.channels?.length > 0
+    );
+    let channelId =
+      initialSpace?.channels?.[0]?.channel_id ||
+      resChannel.data?.global_channels?.[0]?.channel_id;
+    
     const lastChannelIdByCommunityId = await getLastChannelIdByCommunityId(
       communityId
     );
@@ -92,11 +100,11 @@ export const setUserCommunityData = createAsyncThunk(
       channelId = lastChannelIdByCommunityId;
     }
     return {
-      resSpace,
       resChannel,
       teamUsersRes,
       communityId,
       channelId,
+      channels,
     };
   }
 );
@@ -199,6 +207,14 @@ const userSlice = createSlice({
         state.data = action.payload.user;
       }
     },
+    createNewCommunity: (
+      state: UserState,
+      action: PayloadAction<Community>
+    ) => {
+      const communities = state.communities || [];
+      communities.push({ ...action.payload, seen: true });
+      state.communities = communities;
+    },
     // updateCommunity: (
     //   state: UserState,
     //   action: PayloadAction<Community | undefined>
@@ -237,30 +253,21 @@ const userSlice = createSlice({
         state.loadingCommunityData = true;
       })
       .addCase(setUserCommunityData.rejected, (state: UserState) => {
-        state.loadingCommunityData = true;
+        state.loadingCommunityData = false;
       })
       .addCase(setUserCommunityData.fulfilled, (state: UserState, action) => {
-        const { resChannel, resSpace, teamUsersRes, communityId } =
-          action.payload;
-        if (resChannel.statusCode === 200 && resChannel.data) {
-          state.channelMap = {
-            ...state.channelMap,
-            [communityId]: resChannel.data,
+        const { resChannel, teamUsersRes, communityId } = action.payload;
+        if (resChannel.success && resChannel.data) {
+          state.spaceMap = {
+            ...state.spaceMap,
+            [communityId]: resChannel.data?.spaces || [],
+          };
+          state.globalChannelMap = {
+            ...state.globalChannelMap,
+            [communityId]: resChannel.data?.global_channels || [],
           };
         }
-        if (resSpace.statusCode === 200 && resSpace.data) {
-          state.spaceChannelMap = {
-            ...state.spaceChannelMap,
-            [communityId]: resSpace?.data?.map((el) => {
-              el.channel_ids =
-                resChannel.data
-                  ?.filter((c) => c.space_id === el.space_id)
-                  .map((c) => c.channel_id) || [];
-              return el;
-            }),
-          };
-        }
-        if (teamUsersRes.statusCode === 200 && teamUsersRes.data) {
+        if (teamUsersRes.success && teamUsersRes.data) {
           state.teamUserMap = {
             ...state.teamUserMap,
             [communityId]: {

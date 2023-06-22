@@ -12,59 +12,66 @@ export type LocalAttachment = {
 };
 
 export interface Community {
-  team_display_name: string;
-  team_icon?: string;
-  team_id: string;
-  team_url?: string;
-  role?: string;
-  team_description?: string;
+  community_background?: string;
+  community_description?: string;
+  community_id: string;
+  community_image?: string;
+  community_name?: string;
+  community_url?: string;
+  created_at?: string;
+  default_channel_id?: string;
+  notification_type?: string;
+  updated_at?: string;
   seen?: boolean;
+  role?: string;
   is_verified?: boolean;
   direct?: boolean;
-  team_background?: string;
   ens?: string;
   total_members?: number;
   total_online_members?: number;
 }
 
-export interface Space {
-  is_hidden?: boolean;
-  order: number;
-  space_emoji?: string;
-  space_id: string;
-  space_image_url?: string;
-  space_name: string;
-  space_type: "Public" | "Private";
-  team_id?: string;
-  space_description?: string;
-  icon_color?: string;
-  icon_sub_color?: string;
-  attachment?: LocalAttachment;
-  space_background_color?: string;
-  channel_ids: Array<string>;
-  is_space_member: boolean;
-}
-
 export interface Channel {
+  channel_url?: string;
+  channel_description?: string;
+  created_at?: string;
+  updated_at?: string;
   channel_emoji?: string;
   channel_id: string;
   channel_image_url?: string;
   channel_members?: Array<string>;
   channel_name: string;
-  channel_type: "Public" | "Private" | "Direct";
+  channel_type: "public" | "private" | "direct" | "global";
   notification_type?: string;
   seen?: boolean;
-  space?: Space;
   space_id?: string;
-  user?: UserData;
-  group_channel_id?: string;
-  attachment?: any;
   is_chat_deactivated?: boolean;
-  updatedAt?: string;
-  team_id?: string;
+  community_id?: string;
   dapp_integration_url?: string;
   is_dapp_extension_required?: boolean;
+  attachment?: LocalAttachment;
   firstItem?: boolean;
+}
+
+export interface Space {
+  is_hidden?: boolean;
+  order?: number;
+  space_emoji?: string;
+  space_id: string;
+  space_name: string;
+  community_id?: string;
+  space_description?: string;
+  icon_color?: string;
+  icon_sub_color?: string;
+  attachment?: LocalAttachment;
+  is_space_member?: boolean;
+  space_url?: string;
+  space_image?: string;
+  space_background?: string;
+  notification_type?: string;
+  created_at?: string;
+  updated_at?: string;
+  channels?: Channel[];
 }
 
 export type CreateChannelData = {

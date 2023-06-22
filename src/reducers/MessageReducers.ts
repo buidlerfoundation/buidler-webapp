@@ -140,9 +140,9 @@ const messageSlice = createSlice({
         message_id,
         content,
         task,
-        message_attachments,
+        attachments,
         plain_text,
-        updatedAt,
+        updated_at,
         is_scam_detected,
       } = action.payload;
       const newMessageData = { ...state.messageData };
@@ -165,8 +165,8 @@ const messageSlice = createSlice({
               } else {
                 msg.task = undefined;
               }
-              msg.message_attachments = message_attachments;
-              msg.updatedAt = updatedAt;
+              msg.attachments = attachments;
+              msg.updated_at = updated_at;
               msg.is_scam_detected = is_scam_detected;
               return { ...msg };
             }
@@ -176,8 +176,8 @@ const messageSlice = createSlice({
                 content,
                 plain_text,
                 task,
-                message_attachments,
-                updatedAt,
+                attachments,
+                updated_at,
                 is_scam_detected,
               };
               return { ...msg };
@@ -247,6 +247,7 @@ const messageSlice = createSlice({
         }
       })
       .addCase(getMessages.fulfilled, (state: MessageState, action: any) => {
+        if (!action.payload) return;
         const {
           data,
           after,
