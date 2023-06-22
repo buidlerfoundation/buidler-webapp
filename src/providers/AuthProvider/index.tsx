@@ -214,7 +214,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     return {
       device: {
         device_code: deviceCode,
-        device_token: deviceToken,
+        device_token: deviceToken || "",
         encrypt_message_key: publicKey,
       },
       address,
