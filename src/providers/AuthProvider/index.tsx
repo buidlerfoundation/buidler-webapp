@@ -10,6 +10,8 @@ import {
 import { ethers, utils } from "ethers";
 import useAppDispatch from "hooks/useAppDispatch";
 import useAppSelector from "hooks/useAppSelector";
+import useChannels from "hooks/useChannels";
+import useCommunities from "hooks/useCommunities";
 import useQuery from "hooks/useQuery";
 import { LoginApiData } from "models/User";
 import { useSocket } from "providers/SocketProvider";
@@ -27,11 +29,11 @@ import { Location, useLocation, useNavigate } from "react-router-dom";
 import { CONFIG_ACTIONS } from "reducers/ConfigReducers";
 import { NETWORK_ACTIONS } from "reducers/NetworkReducers";
 import { logoutAction } from "reducers/UserActions";
-import { acceptInvitation } from "reducers/UserReducers";
 import {
-  getUserCommunity,
-  USER_ACTIONS,
+  acceptInvitation,
+  getDataFromExternalUrl,
 } from "reducers/UserReducers";
+import { getUserCommunity, USER_ACTIONS } from "reducers/UserReducers";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import ChainId from "services/connectors/ChainId";
 import MetamaskUtils from "services/connectors/MetamaskUtils";
@@ -68,10 +70,13 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const query = useQuery();
   const navigate = useNavigate();
   const location = useLocation();
+  const communities = useCommunities();
+  const channels = useChannels();
   const currentToken = useAppSelector((state) => state.configs.currentToken);
   const [loading, setLoading] = useState(true);
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
   const ott = useMemo(() => query.get("ott"), [query]);
+  const externalUrl = useMemo(() => query.get("external_url"), [query]);
   const invitationId = useMemo(() => query.get("invitation"), [query]);
   const invitationRef = useMemo(() => query.get("ref"), [query]);
   const loginPath = useMemo(() => {
@@ -84,7 +89,37 @@ const AuthProvider = ({ children }: IAuthProps) => {
     }
     return path;
   }, [invitationId, invitationRef]);
+  const canViewOnly = useMemo(() => {
+    const path = location.pathname;
+    const isPublicPage = path.includes("panel") || path.includes("plugin");
+    return (
+      (externalUrl && isPublicPage) ||
+      (communities &&
+        communities?.length > 0 &&
+        channels.length > 0 &&
+        isPublicPage)
+    );
+  }, [channels.length, communities, externalUrl, location.pathname]);
+  const isExternalUrl = useMemo(() => {
+    const path = window.location.pathname;
+    return externalUrl && (path === "/panel" || path === "/plugin");
+  }, [externalUrl]);
   const dispatch = useAppDispatch();
+  const handleDataFromExternalUrl = useCallback(async () => {
+    if (isExternalUrl) {
+      const res = await dispatch(
+        getDataFromExternalUrl({ url: externalUrl })
+      ).unwrap();
+      if (res) {
+        const { community, channel } = res;
+        const path = `${window.location.pathname}/${community.community_id}/${channel.channel_id}`;
+        navigate(path, { replace: true });
+      } else {
+        // handle retry or something
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, externalUrl, isExternalUrl]);
   const getInitial = useCallback(async () => {
     const res = await api.getInitial();
     if (res.statusCode === 200) {
@@ -101,10 +136,14 @@ const AuthProvider = ({ children }: IAuthProps) => {
             user: userRes.data,
           })
         );
-        await dispatch(getUserCommunity());
-        if (window.location.pathname.includes(AppConfig.loginPath)) {
-          const path = previousLocation?.from?.pathname || "/";
-          navigate(path, { replace: true });
+        if (isExternalUrl) {
+          await handleDataFromExternalUrl();
+        } else {
+          await dispatch(getUserCommunity());
+          if (window.location.pathname.includes(AppConfig.loginPath)) {
+            const path = previousLocation?.from?.pathname || "/";
+            navigate(path, { replace: true });
+          }
         }
         socket.initSocket(onSocketConnected);
       } else {
@@ -113,7 +152,13 @@ const AuthProvider = ({ children }: IAuthProps) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch, onSocketConnected, loginPath]
+    [
+      dispatch,
+      onSocketConnected,
+      handleDataFromExternalUrl,
+      isExternalUrl,
+      loginPath,
+    ]
   );
   const handleInvitation = useCallback(async () => {
     if (invitationId) {
@@ -127,16 +172,15 @@ const AuthProvider = ({ children }: IAuthProps) => {
         if (acceptInvitationActionRes.metadata?.is_new_team_member) {
           toast.success("You have successfully joined new community.");
         }
-        setCookie(AsyncKey.lastTeamId, acceptInvitationActionRes.data?.community_id);
+        setCookie(
+          AsyncKey.lastTeamId,
+          acceptInvitationActionRes.data?.community_id
+        );
       }
     }
   }, [dispatch, invitationId, invitationRef]);
   const handleResponseVerify = useCallback(
-    async (
-      res?: LoginApiData,
-      loginType?: string,
-      previousLocation?: any,
-    ) => {
+    async (res?: LoginApiData, loginType?: string, previousLocation?: any) => {
       if (!res) return;
       await setCookie(AsyncKey.accessTokenKey, res?.token);
       await setCookie(AsyncKey.loginType, loginType);
@@ -166,7 +210,9 @@ const AuthProvider = ({ children }: IAuthProps) => {
       }
     }
     if (!accessToken) {
-      if (window.location.pathname !== AppConfig.loginPath) {
+      if (canViewOnly) {
+        await handleDataFromExternalUrl();
+      } else if (window.location.pathname !== AppConfig.loginPath) {
         dispatch(logoutAction());
         navigate(loginPath, { replace: true, state: { from: location } });
       }
@@ -177,15 +223,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     }
     setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    getInitial,
-    ott,
-    handleResponseVerify,
-    dispatch,
-    loginPath,
-    handleInvitation,
-    initialUserData,
-  ]);
+  }, []);
   useEffect(() => {
     GoogleAnalytics.init();
   }, []);

@@ -80,19 +80,19 @@ export const setUserCommunityData = createAsyncThunk(
       api.getListChannel(communityId),
       api.getTeamUsers(communityId),
     ]);
-    const channels = resChannel.data?.global_channels || []
-    resChannel.data?.spaces?.forEach(space => {
+    const channels = resChannel.data?.global_channels || [];
+    resChannel.data?.spaces?.forEach((space) => {
       if (space.channels && space.channels?.length > 0) {
-        channels.push(...space.channels)
+        channels.push(...space.channels);
       }
-    })
+    });
     const initialSpace = resChannel.data?.spaces?.find(
       (el) => el.channels && el.channels?.length > 0
     );
     let channelId =
       initialSpace?.channels?.[0]?.channel_id ||
       resChannel.data?.global_channels?.[0]?.channel_id;
-    
+
     const lastChannelIdByCommunityId = await getLastChannelIdByCommunityId(
       communityId
     );
@@ -106,6 +106,17 @@ export const setUserCommunityData = createAsyncThunk(
       channelId,
       channels,
     };
+  }
+);
+
+export const getDataFromExternalUrl = createAsyncThunk(
+  "user/external_url",
+  async (payload: { url?: string | null }) => {
+    if (!payload.url) return null;
+    const res = await api.getCommunityDataFromUrl(payload.url);
+    if (res.success) {
+      return res.data;
+    }
   }
 );
 
@@ -280,6 +291,21 @@ const userSlice = createSlice({
       })
       .addCase(getWalletBalance.fulfilled, (state: UserState, action) => {
         state.walletBalance = action.payload;
+      })
+      .addCase(getDataFromExternalUrl.fulfilled, (state: UserState, action) => {
+        if (action.payload) {
+          const { channel, community } = action.payload;
+          state.communities = [community];
+          state.spaceMap = {
+            [community.community_id]: [
+              {
+                space_id: channel.space_id || "",
+                space_name: "",
+                channels: [channel],
+              },
+            ],
+          };
+        }
       });
   },
 });

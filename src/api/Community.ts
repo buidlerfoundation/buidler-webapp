@@ -20,3 +20,8 @@ export const getTeamUsers = (
     controller
   );
 };
+
+export const getCommunityDataFromUrl = (url: string) =>
+  Caller.get<{ community: Community; space: Space | null; channel: Channel }>(
+    `external?url=${url}`
+  );
