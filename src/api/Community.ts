@@ -6,7 +6,7 @@ export const createCommunity = (body: any) =>
   Caller.post<Community>("community", body);
 
 export const getListChannel = (communityId: string) =>
-  Caller.get<{ spaces: Space[]; global_channels: Channel[] }>(
+  Caller.get<Space[]>(
     `channel?community_id=${communityId}`
   );
 

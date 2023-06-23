@@ -16,7 +16,6 @@ interface UserState {
   imgBucket?: string;
   currentToken?: string;
   communities?: Community[];
-  globalChannelMap?: { [key: string]: Channel[] };
   spaceMap: { [key: string]: Space[] };
   teamUserMap: {
     [key: string]: {
@@ -37,7 +36,6 @@ const initialState: UserState = {
   },
   imgDomain: "",
   imgBucket: "",
-  globalChannelMap: {},
   spaceMap: {},
   teamUserMap: {},
   loadingCommunityData: false,
@@ -80,18 +78,16 @@ export const setUserCommunityData = createAsyncThunk(
       api.getListChannel(communityId),
       api.getTeamUsers(communityId),
     ]);
-    const channels = resChannel.data?.global_channels || [];
-    resChannel.data?.spaces?.forEach((space) => {
+    const channels: Channel[] = [];
+    resChannel.data?.forEach((space) => {
       if (space.channels && space.channels?.length > 0) {
         channels.push(...space.channels);
       }
     });
-    const initialSpace = resChannel.data?.spaces?.find(
+    const initialSpace = resChannel.data?.find(
       (el) => el.channels && el.channels?.length > 0
     );
-    let channelId =
-      initialSpace?.channels?.[0]?.channel_id ||
-      resChannel.data?.global_channels?.[0]?.channel_id;
+    let channelId = initialSpace?.channels?.[0]?.channel_id;
 
     const lastChannelIdByCommunityId = await getLastChannelIdByCommunityId(
       communityId
@@ -271,11 +267,7 @@ const userSlice = createSlice({
         if (resChannel.success && resChannel.data) {
           state.spaceMap = {
             ...state.spaceMap,
-            [communityId]: resChannel.data?.spaces || [],
-          };
-          state.globalChannelMap = {
-            ...state.globalChannelMap,
-            [communityId]: resChannel.data?.global_channels || [],
+            [communityId]: resChannel.data || [],
           };
         }
         if (teamUsersRes.success && teamUsersRes.data) {
