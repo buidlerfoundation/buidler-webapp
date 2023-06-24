@@ -1,11 +1,11 @@
 import moment from "moment";
 import { MessageData, MessageDateData } from "models/Message";
 
-export const normalizeMessage = (messages: Array<any>) => {
+export const normalizeMessage = (messages: MessageData[]) => {
   return messages.map((msg, index) => {
-    const date = moment(new Date(msg.createdAt)).format("YYYY-MM-DD");
+    const date = moment(new Date(msg.created_at)).format("YYYY-MM-DD");
     const dateCompare = messages?.[index + 1]
-      ? moment(new Date(messages?.[index + 1].createdAt)).format("YYYY-MM-DD")
+      ? moment(new Date(messages?.[index + 1].created_at)).format("YYYY-MM-DD")
       : null;
     if (
       msg.sender_id !== messages?.[index + 1]?.sender_id ||
