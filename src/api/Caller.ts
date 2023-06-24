@@ -135,7 +135,8 @@ const fetchWithRetry: any = (
 function isWhiteList(method: string, uri: string) {
   return (
     whiteListRefreshTokenApis.includes(`${method}-${uri}`) ||
-    /authentication\/ott\/.*/.test(`${method}-${uri}`)
+    /authentication\/ott\/.*/.test(`${method}-${uri}`) ||
+    /get-external\?url=.*/.test(`${method}-${uri}`)
   );
 }
 
@@ -156,7 +157,7 @@ async function requestAPI<T = any>(
   }
   if (!isWhiteList(method, uri)) {
     const expireTokenTime = await getCookie(AsyncKey.tokenExpire);
-    if (!expireTokenTime || new Date().getTime() / 1000 > expireTokenTime) {
+    if (expireTokenTime && new Date().getTime() / 1000 > expireTokenTime) {
       const { success, message } = await store
         .dispatch(refreshTokenAction())
         .unwrap();
