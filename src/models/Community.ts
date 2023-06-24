@@ -44,13 +44,14 @@ export interface Channel {
   channel_type: "public" | "private" | "direct" | "global";
   notification_type?: string;
   seen?: boolean;
-  space_id?: string;
+  space_id: string;
   is_chat_deactivated?: boolean;
   community_id?: string;
   dapp_integration_url?: string;
   is_dapp_extension_required?: boolean;
   attachment?: LocalAttachment;
   firstItem?: boolean;
+  is_channel_member?: boolean;
 }
 
 export interface Space {

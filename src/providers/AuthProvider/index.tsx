@@ -25,7 +25,7 @@ import {
   useState,
 } from "react";
 import { toast } from "react-hot-toast";
-import { Location, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { CONFIG_ACTIONS } from "reducers/ConfigReducers";
 import { NETWORK_ACTIONS } from "reducers/NetworkReducers";
 import { logoutAction } from "reducers/UserActions";
@@ -45,6 +45,7 @@ export interface IAuthContext {
   loginWithMetaMask: () => Promise<void>;
   loginWithWalletConnect: () => Promise<void>;
   loginWithWeb3Auth: () => Promise<void>;
+  quickLogin: () => Promise<void>;
   logout: () => Promise<void>;
   loadingWeb3Auth: boolean;
 }
@@ -53,6 +54,7 @@ export const AuthContext = createContext<IAuthContext>({
   loginWithMetaMask: async () => {},
   loginWithWalletConnect: async () => {},
   loginWithWeb3Auth: async () => {},
+  quickLogin: async () => {},
   logout: async () => {},
   loadingWeb3Auth: false,
 });
@@ -74,6 +76,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const channels = useChannels();
   const currentToken = useAppSelector((state) => state.configs.currentToken);
   const [loading, setLoading] = useState(true);
+  const [isQuickLogin, setQuickLogin] = useState(false);
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
   const ott = useMemo(() => query.get("ott"), [query]);
   const externalUrl = useMemo(() => query.get("external_url"), [query]);
@@ -136,13 +139,15 @@ const AuthProvider = ({ children }: IAuthProps) => {
             user: userRes.data,
           })
         );
-        if (isExternalUrl) {
-          await handleDataFromExternalUrl();
-        } else {
-          await dispatch(getUserCommunity());
-          if (window.location.pathname.includes(AppConfig.loginPath)) {
-            const path = previousLocation?.from?.pathname || "/";
-            navigate(path, { replace: true });
+        if (!isQuickLogin) {
+          if (isExternalUrl) {
+            await handleDataFromExternalUrl();
+          } else {
+            await dispatch(getUserCommunity());
+            if (window.location.pathname.includes(AppConfig.loginPath)) {
+              const path = previousLocation?.from?.pathname || "/";
+              navigate(path, { replace: true });
+            }
           }
         }
         socket.initSocket(onSocketConnected);
@@ -158,6 +163,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
       handleDataFromExternalUrl,
       isExternalUrl,
       loginPath,
+      isQuickLogin,
     ]
   );
   const handleInvitation = useCallback(async () => {
@@ -446,6 +452,15 @@ const AuthProvider = ({ children }: IAuthProps) => {
     }
     setLoadingWeb3Auth(false);
   }, [getMessageSignTypedData, handleResponseVerify, location.state]);
+  const quickLogin = useCallback(async () => {
+    setQuickLogin(true);
+    if (window.ethereum) {
+      await loginWithMetaMask();
+    } else {
+      await loginWithWalletConnect();
+    }
+    setQuickLogin(false);
+  }, [loginWithMetaMask, loginWithWalletConnect]);
   const logout = useCallback(async () => {
     const loginType = await getCookie(AsyncKey.loginType);
     if (loginType === LoginType.WalletConnect) {
@@ -491,6 +506,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
         loginWithMetaMask,
         loginWithWalletConnect,
         loginWithWeb3Auth,
+        quickLogin,
         logout,
         loadingWeb3Auth,
       }}

@@ -6,9 +6,7 @@ export const createCommunity = (body: any) =>
   Caller.post<Community>("community", body);
 
 export const getListChannel = (communityId: string) =>
-  Caller.get<Space[]>(
-    `channel?community_id=${communityId}`
-  );
+  Caller.get<Space[]>(`channel?community_id=${communityId}`);
 
 export const getTeamUsers = (
   communityId: string,
@@ -25,3 +23,6 @@ export const getCommunityDataFromUrl = (url: string) =>
   Caller.get<{ community: Community; space: Space | null; channel: Channel }>(
     `external?url=${url}`
   );
+
+export const joinChannel = (channelId: string) =>
+  Caller.post(`channel/${channelId}/members`);

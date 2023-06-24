@@ -30,7 +30,6 @@ export const getMessages = createAsyncThunk(
   "message/get",
   async (payload: { channelId: string; before?: string; after?: string }) => {
     const { channelId, before, after } = payload;
-    const privateKey = await GeneratedPrivateKey();
     const messageRes = await api.getMessages(
       channelId,
       undefined,
@@ -38,11 +37,15 @@ export const getMessages = createAsyncThunk(
       after
     );
     if (messageRes.statusCode === 200) {
-      const messageData = normalizePublicMessageData(
-        messageRes.data,
-        privateKey,
-        messageRes.metadata?.encrypt_message_key
-      );
+      let messageData = messageRes.data;
+      if (messageRes.metadata?.encrypt_message_key) {
+        const privateKey = await GeneratedPrivateKey();
+        messageData = normalizePublicMessageData(
+          messageRes.data,
+          privateKey,
+          messageRes.metadata?.encrypt_message_key
+        );
+      }
       return {
         channelId,
         data: messageData,

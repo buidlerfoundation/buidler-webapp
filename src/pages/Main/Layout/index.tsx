@@ -92,11 +92,7 @@ const MainWrapper = () => {
   }, [initialCommunityData]);
 
   useEffect(() => {
-    if (
-      matchChannelId &&
-      validateUUID(matchChannelId) &&
-      socket.socketState === "connected"
-    ) {
+    if (matchChannelId && validateUUID(matchChannelId)) {
       if (getMessageActionRef.current) {
         getMessageActionRef.current.abort();
       }
@@ -104,7 +100,7 @@ const MainWrapper = () => {
         getMessages({ channelId: matchChannelId })
       );
     }
-  }, [dispatch, matchChannelId, socket.socketState]);
+  }, [dispatch, matchChannelId]);
   const hideLayoutElement = useMemo(
     () =>
       location.pathname.includes("panel") ||

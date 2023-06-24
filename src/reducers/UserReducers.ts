@@ -222,6 +222,38 @@ const userSlice = createSlice({
       communities.push({ ...action.payload, seen: true });
       state.communities = communities;
     },
+    updateChannel: (
+      state: UserState,
+      action: PayloadAction<{
+        communityId: string;
+        channelId: string;
+        spaceId: string;
+        data: any;
+      }>
+    ) => {
+      const { communityId, channelId, spaceId, data } = action.payload;
+      const newSpaceMap = state.spaceMap;
+      if (newSpaceMap[communityId]) {
+        newSpaceMap[communityId] = newSpaceMap[communityId].map((space) => {
+          if (space.space_id === spaceId) {
+            return {
+              ...space,
+              channels: space.channels?.map((channel) => {
+                if (channel.channel_id === channelId) {
+                  return {
+                    ...channel,
+                    ...data,
+                  };
+                }
+                return channel;
+              }),
+            };
+          }
+          return space;
+        });
+      }
+      state.spaceMap = newSpaceMap;
+    },
     // updateCommunity: (
     //   state: UserState,
     //   action: PayloadAction<Community | undefined>
