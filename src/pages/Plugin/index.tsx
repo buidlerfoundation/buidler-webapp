@@ -34,6 +34,17 @@ const Plugin = () => {
   const onBubbleClick = useCallback(() => {
     toggle();
   }, [toggle]);
+  useEffect(() => {
+    const messageListener = (e: any) => {
+      if (e.data === "toggle-plugin") {
+        toggle();
+      }
+    };
+    window.addEventListener("message", messageListener);
+    return () => {
+      window.removeEventListener("message", messageListener);
+    };
+  }, [toggle]);
   return (
     <div className={styles["b-root-chat"]}>
       <div className={styles["b-chat__wrapper"]}>

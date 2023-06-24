@@ -515,7 +515,9 @@ const AuthProvider = ({ children }: IAuthProps) => {
         <div
           style={{
             height: "100vh",
-            backgroundColor: "var(--color-darkest-background)",
+            backgroundColor: window.location.pathname.includes("plugin")
+              ? "transparent"
+              : "var(--color-darkest-background)",
           }}
         />
       )}
