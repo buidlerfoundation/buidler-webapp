@@ -142,7 +142,7 @@ const messageSlice = createSlice({
         entity_id,
         message_id,
         content,
-        task,
+        post,
         attachments,
         plain_text,
         updated_at,
@@ -156,17 +156,17 @@ const messageSlice = createSlice({
             if (msg.message_id === message_id) {
               msg.content = content;
               msg.plain_text = plain_text;
-              if (msg.task || task) {
-                if (msg.task) {
-                  msg.task = {
-                    ...msg.task,
-                    ...task,
+              if (msg.post || post) {
+                if (msg.post) {
+                  msg.post = {
+                    ...msg.post,
+                    ...post,
                   };
                 } else {
-                  msg.task = task;
+                  msg.post = post;
                 }
               } else {
-                msg.task = undefined;
+                msg.post = undefined;
               }
               msg.attachments = attachments;
               msg.updated_at = updated_at;
@@ -178,7 +178,7 @@ const messageSlice = createSlice({
                 ...msg.conversation_data,
                 content,
                 plain_text,
-                task,
+                post,
                 attachments,
                 updated_at,
                 is_scam_detected,

@@ -1,12 +1,17 @@
 .content-side {
   display: flex;
-  flex: 1,
+  flex: 1;
+  margin-bottom: 10px;
+  .dapp-iframe-full {
+    width: 100%;
+    border-radius: 10px;
+  }
 }
 .chat-box__container {
-  margin-right: 10px;
+  margin: 0 10px;
   width: 390px;
   height: calc(100% - 10px);
-  border-radius: 5px;
+  border-radius: 10px;
   background-color: var(--color-lighter-background);
   overflow: hidden;
 }

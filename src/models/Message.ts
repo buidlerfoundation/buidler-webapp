@@ -1,6 +1,8 @@
 import { Channel, LocalAttachment } from "./Community";
 import { UserData } from "./User";
 
+export type ActiveTab = "chat" | "pin" | "review";
+
 export type EmitMessageData = {
   entity_id: string;
   content: string;
@@ -41,48 +43,34 @@ export interface TagData {
   tag_type: string;
 }
 
-export interface TaskData {
-  channels?: Array<Channel>;
-  comment_count: number;
-  creator: UserData;
+export interface PostData {
+  content?: string;
+  attachments?: AttachmentData[];
+  created_at: string;
   creator_id: string;
-  reaction_data: Array<ReactionData>;
-  status: "pinned" | "todo" | "doing" | "done" | "archived";
-  task_attachments?: Array<AttachmentData>;
-  task_id: string;
-  task_tags: Array<TagData>;
-  content: string;
-  up_votes: number;
-  user_reaction: Array<UserReaction>;
-  assignee?: UserData;
-  due_date?: Date | string;
-  isHighLight?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-  total_messages?: string;
-  latest_reply_message_at?: string;
-  latest_reply_senders?: Array<string>;
-  total_reply_sender?: string;
-  root_message_channel_id: string;
-  message_created_at: string;
-  message_sender_id: string;
-  cid?: string;
+  creator: UserData;
+  ipfs_uploaded_at?: string;
+  is_deleted?: boolean;
+  post_id: string;
+  root_message_created_at: string;
+  updated_at: string;
+  status: "pinned" | "archived";
   uploadingIPFS?: boolean;
-  notification_type?: "alert" | "muted";
-  total_unread_notifications?: number;
+  notification_type?: string;
+  post_channels?: { channel: Channel; channel_id: string; post_id: string }[];
 }
 
 export interface ConversationData {
   content: string;
   created_at: string;
-  attachments: Array<AttachmentData>;
+  attachments: AttachmentData[];
   message_id: string;
   message_tag: Array<TagData>;
   reply_message_id: string;
   plain_text: string;
   sender_id: string;
   updated_at: string;
-  task?: TaskData;
+  post?: PostData;
   is_deleted?: boolean;
   isHead: boolean;
   isSending?: boolean;
@@ -103,7 +91,7 @@ export interface ConversationData {
   };
   is_scam_detected?: boolean;
   files?: any[];
-  sender?: UserData,
+  sender?: UserData;
 }
 
 export interface MessageDateData {
@@ -123,7 +111,7 @@ export type PayloadMessageListAction = {
   canMoreAfter?: boolean;
   canMoreBefore?: boolean;
   messageId?: string;
-}
+};
 
 export interface ReactReducerData {
   count: number;

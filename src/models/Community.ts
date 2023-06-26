@@ -52,6 +52,8 @@ export interface Channel {
   attachment?: LocalAttachment;
   firstItem?: boolean;
   is_channel_member?: boolean;
+  total_channel_members?: number;
+  total_channel_messages?: number;
 }
 
 export interface Space {
@@ -89,3 +91,9 @@ export type CreateChannelData = {
   dAppUrl?: string;
   isActiveDApp?: boolean;
 };
+
+export interface CreatePostBody {
+  content?: string;
+  post_id?: string;
+  channel_ids?: string[];
+}

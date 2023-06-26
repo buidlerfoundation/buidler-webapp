@@ -28,7 +28,7 @@ export const getMessages = async (
   after?: string,
   controller?: AbortController
 ) => {
-  let uri = `message/${channelId}/channel?pagination[size]=${limit}`;
+  let uri = `channel/${channelId}/messages?pagination[size]=${limit}`;
   if (after) {
     if (before) {
       uri += `&pagination[before]=${before}`;

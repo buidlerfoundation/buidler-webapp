@@ -1,5 +1,5 @@
 import { Channel } from "./Community";
-import { TaskData } from "./Message";
+import { PostData } from "./Message";
 import { UserData } from "./User";
 
 export type NotificationData = {
@@ -13,7 +13,7 @@ export type NotificationData = {
   is_read?: boolean;
   message_id?: string;
   notification_id: string;
-  post?: TaskData;
+  post?: PostData;
   notification_type?:
     | "post_reply"
     | "channel_mention"

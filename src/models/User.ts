@@ -254,16 +254,17 @@ export interface ProfileApiData {
 }
 
 export interface FileApiData {
+  attachment_id: string;
+  community_id: string;
+  created_at: string;
+  file_id: string;
   file_url: string;
-  file: {
-    attachment_id: string;
-    createdAt: string;
-    file_id: string;
-    mimetype: string;
-    original_name: string;
-    community_id: string;
-    updatedAt: string;
-  };
+  height?: number;
+  is_deleted?: boolean;
+  mimetype: string;
+  original_name: string;
+  updated_at: string;
+  width?: number;
 }
 
 export interface LoginApiData {
