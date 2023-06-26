@@ -4,7 +4,6 @@ import styles from "./index.module.scss";
 import AppTitleBar from "./AppTitleBar";
 import { DragDropContext } from "react-beautiful-dnd";
 import SideBar from "shared/SideBar";
-import { useSocket } from "providers/SocketProvider";
 import useAppDispatch from "hooks/useAppDispatch";
 import useCommunityId from "hooks/useCommunityId";
 import useChannelId from "hooks/useChannelId";
@@ -15,6 +14,7 @@ import { validateUUID } from "helpers/ChannelHelper";
 import { getMessages } from "reducers/MessageReducers";
 import { AsyncKey } from "common/AppConfig";
 import { setUserCommunityData } from "reducers/UserReducers";
+import { getPinPosts } from "reducers/PinPostReducers";
 
 const rootStyles: { [name: string]: React.CSSProperties } = {
   row: {
@@ -31,9 +31,9 @@ const rootStyles: { [name: string]: React.CSSProperties } = {
 };
 
 const MainWrapper = () => {
-  const socket = useSocket();
   const dispatch = useAppDispatch();
   const getMessageActionRef = useRef<any>();
+  const getPostActionRef = useRef<any>();
   const navigate = useNavigate();
   const location = useLocation();
   const matchCommunityId = useCommunityId();
@@ -98,6 +98,16 @@ const MainWrapper = () => {
       }
       getMessageActionRef.current = dispatch(
         getMessages({ channelId: matchChannelId })
+      );
+    }
+  }, [dispatch, matchChannelId]);
+  useEffect(() => {
+    if (matchChannelId && validateUUID(matchChannelId)) {
+      if (getPostActionRef.current) {
+        getPostActionRef.current.abort();
+      }
+      getPostActionRef.current = dispatch(
+        getPinPosts({ channel_id: matchChannelId })
       );
     }
   }, [dispatch, matchChannelId]);

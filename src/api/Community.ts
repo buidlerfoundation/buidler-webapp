@@ -1,4 +1,10 @@
-import { Channel, Community, CreatePostBody, Space } from "models/Community";
+import {
+  Channel,
+  Community,
+  CreatePostBody,
+  RequestPostList,
+  Space,
+} from "models/Community";
 import Caller from "./Caller";
 import { UserData } from "models/User";
 import { PostData } from "models/Message";
@@ -34,5 +40,11 @@ export const getChannel = (channelId: string) =>
 export const createPinPost = (createPostBody: CreatePostBody) =>
   Caller.post<PostData>("post", createPostBody);
 
-export const getListPost = (channelId: string) =>
-  Caller.get<PostData[]>(`channel/${channelId}/posts`);
+export const getListPost = (reqPostList: RequestPostList) => {
+  const { channel_id, before_id, limit = 10 } = reqPostList;
+  let uri = `channel/${channel_id}/posts?pagination[size]=${limit}`;
+  if (before_id) {
+    uri += `&pagination[before]=${before_id}`;
+  }
+  return Caller.get<PostData[]>(uri);
+};

@@ -97,3 +97,9 @@ export interface CreatePostBody {
   post_id?: string;
   channel_ids?: string[];
 }
+
+export interface RequestPostList {
+  channel_id: string;
+  before_id?: string;
+  limit?: string;
+}
