@@ -58,7 +58,7 @@ const Plugin = () => {
             <MessageChatBox />
           </div>
         </div>
-        <CommunityFloat bubbleOpen={open} />
+        <CommunityFloat bubbleOpen={open} shadow />
       </div>
       <div
         className={`${styles["b-bubble__wrap"]} normal-button-clear`}

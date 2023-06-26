@@ -44,6 +44,10 @@
     position: absolute;
     bottom: 20px;
     right: 20px;
+    height: 70px;
+    width: 70px;
+    border-radius: 35px;
+    box-shadow: 8px 8px 20px 0 #00000040;
   }
 }
 
@@ -67,6 +71,7 @@
     background-color: var(--color-lighter-background);
     position: relative;
     overflow: hidden;
+    box-shadow: 8px 8px 20px 0 #00000040;
   }
 }
 
