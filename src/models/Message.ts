@@ -58,6 +58,11 @@ export interface PostData {
   uploadingIPFS?: boolean;
   notification_type?: string;
   post_channels?: { channel: Channel; channel_id: string; post_id: string }[];
+  total_messages?: string;
+  total_unread_notifications?: number;
+  latest_reply_senders?: string[];
+  total_reply_sender?: string;
+  latest_reply_message_at?: string;
 }
 
 export interface ConversationData {
