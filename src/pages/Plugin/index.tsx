@@ -5,20 +5,29 @@ import React, {
   CSSProperties,
   memo,
 } from "react";
-import IconBubble from "shared/SVG/IconBubble";
 import MessageChatBox from "shared/MessageChatBox";
 import CommunityFloat from "shared/CommunityFloat";
 import styles from "./index.module.scss";
+import useOutsideUrlType from "hooks/useOutsideUrlType";
+import ChatBoxChannel from "shared/ChatBoxChannel";
+import usePluginOpen from "hooks/usePluginOpen";
+import useAppDispatch from "hooks/useAppDispatch";
+import { OUTSIDE_ACTIONS } from "reducers/OutsideReducers";
 
 const Plugin = () => {
-  const [open, setOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const outsideUrlType = useOutsideUrlType();
+  const pluginOpen = usePluginOpen();
   const [style, setStyle] = useState<CSSProperties>({
     width: "100%",
     height: 0,
   });
-  const toggle = useCallback(() => setOpen((current) => !current), []);
+  const toggle = useCallback(
+    () => dispatch(OUTSIDE_ACTIONS.toggle()),
+    [dispatch]
+  );
   useEffect(() => {
-    if (open) {
+    if (pluginOpen) {
       setStyle({
         width: "100%",
         height: "100%",
@@ -30,7 +39,7 @@ const Plugin = () => {
         window.parent.postMessage("close-plugin", "*");
       }, 290);
     }
-  }, [open]);
+  }, [pluginOpen]);
   const onBubbleClick = useCallback(() => {
     toggle();
   }, [toggle]);
@@ -45,12 +54,19 @@ const Plugin = () => {
       window.removeEventListener("message", messageListener);
     };
   }, [toggle]);
+  const renderFloating = useCallback(() => {
+    if (outsideUrlType === "main")
+      return <CommunityFloat bubbleOpen={pluginOpen} shadow />;
+    if (outsideUrlType === "detail")
+      return <ChatBoxChannel bubbleOpen={pluginOpen} shadow />;
+    return null;
+  }, [pluginOpen, outsideUrlType]);
   return (
     <div className={styles["b-root-chat"]}>
       <div className={styles["b-chat__wrapper"]}>
         <div
           className={`${styles["b-chat-box__wrapper"]} ${
-            open ? styles["b-bounce-in"] : styles["b-bounce-out"]
+            pluginOpen ? styles["b-bounce-in"] : styles["b-bounce-out"]
           }`}
           style={style}
         >
@@ -58,13 +74,9 @@ const Plugin = () => {
             <MessageChatBox />
           </div>
         </div>
-        <CommunityFloat bubbleOpen={open} shadow />
-      </div>
-      <div
-        className={`${styles["b-bubble__wrap"]} normal-button-clear`}
-        onClick={onBubbleClick}
-      >
-        <IconBubble />
+        <div onClick={onBubbleClick} style={{ width: 390 }}>
+          {renderFloating()}
+        </div>
       </div>
     </div>
   );

@@ -3,17 +3,22 @@ import { logoutAction } from "./UserActions";
 import { getDataFromExternalUrl } from "./UserReducers";
 
 interface OutsideState {
-  urlType: "main" | "detail";
+  urlType?: "main" | "detail";
+  pluginOpen: boolean;
 }
 
 const initialState: OutsideState = {
-  urlType: "main",
+  pluginOpen: false,
 };
 
 const outsideSlice = createSlice({
   name: "outside",
   initialState,
-  reducers: {},
+  reducers: {
+    toggle: (state: OutsideState) => {
+      state.pluginOpen = !state.pluginOpen;
+    },
+  },
   extraReducers: (builder) =>
     builder
       .addCase(logoutAction, () => initialState)
