@@ -199,22 +199,22 @@ const messageSlice = createSlice({
     },
     emitMessage: (state: MessageState, action: PayloadAction<MessageData>) => {
       const message = action.payload;
-      if (
-        message.entity_type === "channel" &&
-        state.messageData?.[message.entity_id]
-      ) {
+      if (state.messageData?.[message.entity_id]) {
         state.messageData[message.entity_id].data = normalizeMessage([
           message,
           ...state.messageData[message.entity_id].data,
         ]);
+      } else {
+        state.messageData[message.entity_id] = {
+          data: normalizeMessage([message]),
+          canMore: true,
+          canMoreAfter: false,
+        };
       }
     },
     newMessage: (state: MessageState, action: PayloadAction<MessageData>) => {
       const message = action.payload;
-      if (
-        message.entity_type === "channel" &&
-        state.messageData?.[message.entity_id]
-      ) {
+      if (state.messageData?.[message.entity_id]) {
         const isExited = !!state.messageData[message.entity_id]?.data?.find?.(
           (el) => el.message_id === message.message_id
         );
@@ -233,6 +233,12 @@ const messageSlice = createSlice({
             ...state.messageData[message.entity_id].data,
           ]);
         }
+      } else {
+        state.messageData[message.entity_id] = {
+          data: normalizeMessage([message]),
+          canMore: true,
+          canMoreAfter: false,
+        };
       }
     },
     updateActiveTab: (
