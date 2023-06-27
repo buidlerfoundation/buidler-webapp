@@ -29,6 +29,7 @@ export interface Community {
   ens?: string;
   total_members?: number;
   total_online_members?: number;
+  total_community_members?: number;
 }
 
 export interface Channel {

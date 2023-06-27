@@ -10,6 +10,7 @@ import AppConfig, {
 import { clearData, getCookie } from "../common/Cookie";
 import { refreshTokenAction } from "reducers/UserReducers";
 import { BaseDataApi } from "models/User";
+import { logoutAction } from "reducers/UserActions";
 
 const METHOD_GET = "get";
 const METHOD_POST = "post";
@@ -23,15 +24,25 @@ export const sleep = (timeout = 1000) => {
   });
 };
 
+const handleClearDataAndReload = () => {
+  if (!GlobalVariable.sessionExpired) {
+    GlobalVariable.sessionExpired = true;
+    toast.error("Session expired");
+    clearData(() => {
+      const path = window.location.pathname;
+      if (path.includes("/channels")) {
+        window.location.reload();
+      } else {
+        store.dispatch(logoutAction());
+        window.parent.postMessage("session-expired", "*");
+      }
+    });
+  }
+};
+
 const handleError = (message: string, apiData: any, withoutError?: boolean) => {
   if (message === "Failed to authenticate token") {
-    if (!GlobalVariable.sessionExpired) {
-      GlobalVariable.sessionExpired = true;
-      toast.error("Session expired");
-      clearData(() => {
-        window.location.reload();
-      });
-    }
+    handleClearDataAndReload();
     return;
   }
   const { uri, fetchOptions } = apiData;
@@ -166,13 +177,7 @@ async function requestAPI<T = any>(
           message === "Failed to authenticate refresh token" ||
           message === "Failed to authenticate token"
         ) {
-          if (!GlobalVariable.sessionExpired) {
-            GlobalVariable.sessionExpired = true;
-            toast.error("Session expired");
-            clearData(() => {
-              window.location.reload();
-            });
-          }
+          handleClearDataAndReload();
         } else {
           toast.error(message);
         }
