@@ -17,7 +17,7 @@ const METHOD_PUT = "put";
 const METHOD_DELETE = "delete";
 const METHOD_PATCH = "patch";
 
-const sleep = (timeout = 1000) => {
+export const sleep = (timeout = 1000) => {
   return new Promise((resolve) => {
     setTimeout(resolve, timeout);
   });
