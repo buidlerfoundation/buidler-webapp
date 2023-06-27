@@ -3,6 +3,7 @@ import ConfigReducers from "./ConfigReducers";
 import MessageReducers from "./MessageReducers";
 import NetworkReducers from "./NetworkReducers";
 import NotificationReducers from "./NotificationReducers";
+import OutsideReducers from "./OutsideReducers";
 import PinPostReducers from "./PinPostReducers";
 import ReactReducers from "./ReactReducers";
 import SessionReducers from "./SessionReducers";
@@ -21,6 +22,7 @@ const reducers = combineReducers({
   react: ReactReducers,
   session: SessionReducers,
   pinPost: PinPostReducers,
+  outside: OutsideReducers,
 });
 
 export default reducers;
