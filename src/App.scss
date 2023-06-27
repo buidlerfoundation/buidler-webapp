@@ -319,6 +319,8 @@ a {
 }
 .MuiPopover-paper {
   -webkit-transition: all 200ms !important;
+  border-radius: 10px !important;
+  box-shadow: 8px 8px 20px 0 #00000040 !important;
   &::-webkit-scrollbar-track {
     display: none;
   }

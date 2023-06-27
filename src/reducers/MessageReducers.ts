@@ -4,7 +4,11 @@ import { normalizeMessage } from "helpers/MessageHelper";
 import { GeneratedPrivateKey } from "common/Cookie";
 import api from "api";
 import { normalizePublicMessageData } from "helpers/ChannelHelper";
-import { MessageData, PayloadMessageListAction } from "models/Message";
+import {
+  ActiveTab,
+  MessageData,
+  PayloadMessageListAction,
+} from "models/Message";
 
 interface MessageState {
   messageData: {
@@ -19,11 +23,13 @@ interface MessageState {
   loadMoreAfterMessage?: boolean;
   loadMoreMessage?: boolean;
   loadingMessage?: boolean;
+  chatBoxActiveTab: ActiveTab;
 }
 
 const initialState: MessageState = {
   messageData: {},
   apiController: null,
+  chatBoxActiveTab: "chat",
 };
 
 export const getMessages = createAsyncThunk(
@@ -228,6 +234,12 @@ const messageSlice = createSlice({
           ]);
         }
       }
+    },
+    updateActiveTab: (
+      state: MessageState,
+      action: PayloadAction<ActiveTab>
+    ) => {
+      state.chatBoxActiveTab = action.payload;
     },
   },
   extraReducers: (builder) => {
