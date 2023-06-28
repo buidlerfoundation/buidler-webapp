@@ -39,7 +39,7 @@ export interface Channel {
   updated_at?: string;
   channel_emoji?: string;
   channel_id: string;
-  channel_image_url?: string;
+  channel_image?: string;
   channel_members?: Array<string>;
   channel_name: string;
   channel_type: "public" | "private" | "direct" | "global";

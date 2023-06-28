@@ -23,6 +23,7 @@ export const normalizePublicMessageData = (
   privateKey?: string,
   encryptMessageKey?: string
 ) => {
+  if (!encryptMessageKey) return messages || [];
   if (!privateKey) return [];
   const decryptMessageKey = decrypt(
     privateKey,
