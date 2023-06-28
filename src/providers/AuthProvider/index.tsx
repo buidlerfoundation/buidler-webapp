@@ -22,6 +22,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { toast } from "react-hot-toast";
@@ -76,7 +77,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const channels = useChannels();
   const currentToken = useAppSelector((state) => state.configs.currentToken);
   const [loading, setLoading] = useState(true);
-  const [isQuickLogin, setQuickLogin] = useState(false);
+  const isQuickLogin = useRef(false)
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
   const ott = useMemo(() => query.get("ott"), [query]);
   const externalUrl = useMemo(() => query.get("external_url"), [query]);
@@ -139,7 +140,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
             user: userRes.data,
           })
         );
-        if (!isQuickLogin) {
+        if (!isQuickLogin.current) {
           if (isExternalUrl) {
             await handleDataFromExternalUrl();
           } else {
@@ -163,7 +164,6 @@ const AuthProvider = ({ children }: IAuthProps) => {
       handleDataFromExternalUrl,
       isExternalUrl,
       loginPath,
-      isQuickLogin,
     ]
   );
   const handleInvitation = useCallback(async () => {
@@ -453,13 +453,13 @@ const AuthProvider = ({ children }: IAuthProps) => {
     setLoadingWeb3Auth(false);
   }, [getMessageSignTypedData, handleResponseVerify, location.state]);
   const quickLogin = useCallback(async () => {
-    setQuickLogin(true);
+    isQuickLogin.current = true;
     if (window.ethereum) {
       await loginWithMetaMask();
     } else {
       await loginWithWalletConnect();
     }
-    setQuickLogin(false);
+    isQuickLogin.current = false;
   }, [loginWithMetaMask, loginWithWalletConnect]);
   const logout = useCallback(async () => {
     const loginType = await getCookie(AsyncKey.loginType);
