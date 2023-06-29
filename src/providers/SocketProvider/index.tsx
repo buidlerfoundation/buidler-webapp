@@ -137,6 +137,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
         ...payload,
         created_at: new Date().toISOString(),
         sender_id: user.user_id,
+        sender: user,
         isSending: true,
         conversation_data: null,
         content: payload.text || "",
@@ -145,7 +146,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
       dispatch(MESSAGE_ACTIONS.emitMessage(message));
       socket.current?.emit("NEW_MESSAGE", payload);
     },
-    [dispatch, user.user_id]
+    [dispatch, user]
   );
   const disconnect = useCallback(() => {
     socket.current?.disconnect();
