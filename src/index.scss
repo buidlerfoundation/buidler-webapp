@@ -214,6 +214,13 @@ code {
 .normal-button-clear:hover {
   cursor: pointer;
 }
+.cursor-pointer:hover {
+  cursor: pointer;
+}
+.cursor-pointer-link:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
 
 .normal-button {
   display: flex;

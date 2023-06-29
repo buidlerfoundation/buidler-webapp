@@ -236,19 +236,21 @@ const AuthProvider = ({ children }: IAuthProps) => {
   useEffect(() => {
     checkingAuth();
   }, [checkingAuth]);
-  useEffect(() => {
-    const eventFocus = async (e: FocusEvent) => {
-      const token = await getCookie(AsyncKey.accessTokenKey);
-      if (token !== currentToken) {
-        window.location.reload();
-      }
-      dispatch(CONFIG_ACTIONS.updateCurrentToken(token));
-    };
-    window.addEventListener("focus", eventFocus);
-    return () => {
-      window.removeEventListener("focus", eventFocus);
-    };
-  }, [currentToken, dispatch]);
+
+  // Temporary comment out event check difference token
+  // useEffect(() => {
+  //   const eventFocus = async (e: FocusEvent) => {
+  //     const token = await getCookie(AsyncKey.accessTokenKey);
+  //     if (token !== currentToken) {
+  //       window.location.reload();
+  //     }
+  //     dispatch(CONFIG_ACTIONS.updateCurrentToken(token));
+  //   };
+  //   window.addEventListener("focus", eventFocus);
+  //   return () => {
+  //     window.removeEventListener("focus", eventFocus);
+  //   };
+  // }, [currentToken, dispatch]);
 
   const getMessageSignTypedData = useCallback(async (address: string) => {
     const deviceCode = await getDeviceCode();
