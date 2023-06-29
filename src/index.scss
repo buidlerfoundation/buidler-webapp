@@ -230,7 +230,7 @@ code {
   -webkit-tap-highlight-color: transparent;
 }
 .normal-button:hover {
-  border-radius: 5px;
+  border-radius: 10px;
   background-color: var(--color-highlight-action);
 }
 .normal-icon {
@@ -239,7 +239,7 @@ code {
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: 5px;
+  border-radius: 10px;
 }
 .logo-app {
   width: 50px;

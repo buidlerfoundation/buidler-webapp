@@ -3,6 +3,7 @@ import styles from "./index.module.scss";
 import MessageChatBox from "shared/MessageChatBox";
 import useChannel from "hooks/useChannel";
 import useCurrentCommunity from "hooks/useCurrentCommunity";
+import { CircularProgress } from "@mui/material";
 
 const Home = () => {
   const channel = useChannel();
@@ -13,6 +14,11 @@ const Home = () => {
   const onLoad = useCallback(() => {
     setLoadingIframe(false);
   }, []);
+  useEffect(() => {
+    if (channel?.dapp_integration_url) {
+      setLoadingIframe(true);
+    }
+  }, [channel?.dapp_integration_url]);
   useEffect(() => {
     if (channel?.channel_name && community?.community_name) {
       document.title = `${community?.community_name} • #${channel?.channel_name} | Buidler`;
@@ -35,6 +41,11 @@ const Home = () => {
             allow="camera; microphone; clipboard-read; clipboard-write; display-capture"
             allowFullScreen
           />
+        )}
+        {loadingIframe && (
+          <div className={styles["loading"]}>
+            <CircularProgress size={30} color="inherit" />
+          </div>
         )}
       </div>
       <div className={styles["chat-box__container"]}>

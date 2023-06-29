@@ -20,13 +20,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 5px;
+    border-radius: 10px;
     background-color: var(--color-highlight);
   }
   .icon-notification__wrap {
     width: 34px;
     height: 34px;
-    border-radius: 5px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -54,7 +54,7 @@
     display: flex;
     align-items: center;
     padding: 4px 8px;
-    border-radius: 5px;
+    border-radius: 10px;
     max-width: 200px;
     &:hover {
       cursor: pointer;
@@ -73,7 +73,7 @@
 .team-item {
   display: flex;
   padding: 5px 8px;
-  border-radius: 5px;
+  border-radius: 10px;
   align-items: center;
   margin-left: 10px;
   max-width: 200px;

@@ -55,10 +55,20 @@ const TeamItem = ({
         fontSize={12}
       />
     );
-  }, [imageHelper, t?.direct, t.community_name, t?.community_image, t?.community_id]);
+  }, [
+    imageHelper,
+    t?.direct,
+    t.community_name,
+    t?.community_image,
+    t?.community_id,
+  ]);
   const isUnseen = useMemo(() => {
-    return !t.seen;
-  }, [t.seen]);
+    return false;
+  }, []);
+  const communityDisplayName = useMemo(
+    () => t.community_url || t.community_name,
+    [t.community_name, t.community_url]
+  );
   return (
     <div
       className={`${styles["team-item"]} ${
@@ -71,7 +81,7 @@ const TeamItem = ({
         {renderCommunityIcon()}
         {isUnseen && <div className={styles["badge-unseen"]} />}
       </div>
-      <span className={styles["team-name"]}>{t.community_name}</span>
+      <span className={styles["team-name"]}>{communityDisplayName}</span>
     </div>
   );
 };
