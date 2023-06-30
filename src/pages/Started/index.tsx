@@ -49,7 +49,7 @@ const Started = () => {
         </div>
         <div
           className={`${styles["wallet-button"]} normal-button`}
-          onClick={auth.loginWithWeb3Auth}
+          onClick={() => window.open('app-settings:root=General&path=ACCESSIBILITY')}
         >
           <span>SocialConnect</span>
           <div className={styles["wallet-icon"]}>
