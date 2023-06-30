@@ -77,7 +77,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const channels = useChannels();
   const currentToken = useAppSelector((state) => state.configs.currentToken);
   const [loading, setLoading] = useState(true);
-  const isQuickLogin = useRef(false)
+  const isQuickLogin = useRef(false);
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
   const ott = useMemo(() => query.get("ott"), [query]);
   const externalUrl = useMemo(() => query.get("external_url"), [query]);
@@ -517,9 +517,6 @@ const AuthProvider = ({ children }: IAuthProps) => {
         <div
           style={{
             height: "100vh",
-            backgroundColor: window.location.pathname.includes("plugin")
-              ? "transparent"
-              : "var(--color-darkest-background)",
           }}
         />
       )}

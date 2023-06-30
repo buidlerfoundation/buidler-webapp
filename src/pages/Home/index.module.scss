@@ -5,7 +5,14 @@
   position: relative;
   .dapp-iframe-full {
     width: 100%;
-    border-radius: 10px;
+  }
+  .space-bottom {
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background-color: var(--color-darkest-background);
   }
   .loading {
     position: absolute;
@@ -17,13 +24,18 @@
     align-items: center;
     justify-content: center;
     color: var(--color-secondary-text);
+    background-color: var(--color-lighter-background);
   }
 }
 .chat-box__container {
-  margin: 0 10px;
-  width: 390px;
-  height: calc(100% - 10px);
-  border-radius: 10px;
-  background-color: var(--color-lighter-background);
-  overflow: hidden;
+  padding: 0 10px;
+  width: 410px;
+  height: 100%;
+  background-color: var(--color-darkest-background);
+  .chat-box {
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: var(--color-lighter-background);
+    height: calc(100% - 10px);
+  }
 }

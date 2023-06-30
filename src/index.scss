@@ -178,7 +178,6 @@ code {
   font-size: 16px;
   color: var(--color-primary-text);
   position: relative;
-  background-color: var(--color-darkest-background);
   overflow: hidden;
 }
 
@@ -187,6 +186,7 @@ code {
   width: 100%;
   display: flex;
   align-items: center;
+  background-color: var(--color-darkest-background);
   -webkit-app-region: drag;
   &.hide {
     height: 50px;

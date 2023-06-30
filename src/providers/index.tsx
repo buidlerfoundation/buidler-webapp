@@ -22,9 +22,7 @@ const Providers = ({ children }: ProvidersProps) => {
         },
         palette: {
           background: {
-            default: window.location.pathname.includes("plugin")
-              ? "transparent"
-              : "var(--color-lighter-background)",
+            default: "transparent",
           },
         },
       }),

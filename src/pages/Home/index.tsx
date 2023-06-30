@@ -4,6 +4,10 @@ import MessageChatBox from "shared/MessageChatBox";
 import useChannel from "hooks/useChannel";
 import useCurrentCommunity from "hooks/useCurrentCommunity";
 import { CircularProgress } from "@mui/material";
+import IconCornerBottomLeft from "shared/SVG/IconCornerBottomLeft";
+import IconCornerBottomRight from "shared/SVG/IconCornerBottomRight";
+import IconCornerTopLeft from "shared/SVG/IconCornerTopLeft";
+import IconCornerTopRight from "shared/SVG/IconCornerTopRight";
 
 const Home = () => {
   const channel = useChannel();
@@ -47,9 +51,16 @@ const Home = () => {
             <CircularProgress size={30} color="inherit" />
           </div>
         )}
+        <IconCornerBottomLeft />
+        <IconCornerBottomRight />
+        <IconCornerTopLeft />
+        <IconCornerTopRight />
+        <div className={styles["space-bottom"]} />
       </div>
       <div className={styles["chat-box__container"]}>
-        <MessageChatBox hideCommunity />
+        <div className={styles["chat-box"]}>
+          <MessageChatBox hideCommunity />
+        </div>
       </div>
     </>
   );

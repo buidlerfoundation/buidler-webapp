@@ -31,6 +31,7 @@ import ModalTeamSetting from "shared/ModalTeamSetting";
 import ModalTransactionDetail from "shared/ModalTransactionDetail";
 import api from "api";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
+import MyCommunityItem from "shared/MyCommunityItem";
 
 type AppTitleBarProps = {
   onJumpToMessage?: (messageId: string) => void;
@@ -273,6 +274,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
     return (
       <div id="title-bar">
         <div className={`${styles["list-team"]} hide-scroll-bar`}>
+          <MyCommunityItem />
           {communities?.map?.(renderTeam)}
           {highlightCreateCommunityButton ? (
             <div
