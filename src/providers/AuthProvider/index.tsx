@@ -81,7 +81,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
   const ott = useMemo(() => query.get("ott"), [query]);
   const externalUrl = useMemo(
-    () => window.location.href.split("external_url=")?.[1],
+    () => window.location.href.split("external_url=")?.[1]?.split("&ott")?.[0],
     []
   );
   const invitationId = useMemo(() => query.get("invitation"), [query]);
