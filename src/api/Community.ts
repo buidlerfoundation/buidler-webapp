@@ -27,8 +27,9 @@ export const getTeamUsers = (
 };
 
 export const getCommunityDataFromUrl = (url: string) =>
-  Caller.get<{ community: Community; space: Space | null; channel: Channel }>(
-    `external?url=${url}`
+  Caller.post<{ community: Community; space: Space | null; channel: Channel }>(
+    "external",
+    { url }
   );
 
 export const joinChannel = (channelId: string) =>

@@ -80,7 +80,10 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const isQuickLogin = useRef(false);
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
   const ott = useMemo(() => query.get("ott"), [query]);
-  const externalUrl = useMemo(() => query.get("external_url"), [query]);
+  const externalUrl = useMemo(
+    () => window.location.href.split("external_url=")?.[1],
+    []
+  );
   const invitationId = useMemo(() => query.get("invitation"), [query]);
   const invitationRef = useMemo(() => query.get("ref"), [query]);
   const loginPath = useMemo(() => {
