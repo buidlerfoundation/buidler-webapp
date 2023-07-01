@@ -4,7 +4,7 @@ import { getCookie } from "common/Cookie";
 import useAppDispatch from "hooks/useAppDispatch";
 import useUser from "hooks/useUser";
 import { Community } from "models/Community";
-import { EmitMessageData } from "models/Message";
+import { EmitMessageData, MessageData } from "models/Message";
 import {
   createContext,
   ReactNode,
@@ -19,6 +19,7 @@ import { MESSAGE_ACTIONS } from "reducers/MessageReducers";
 import { REACT_ACTIONS } from "reducers/ReactReducers";
 import { USER_ACTIONS } from "reducers/UserReducers";
 import { Socket, io } from "socket.io-client";
+import EventName from "./EventName";
 
 type SocketState = "connecting" | "connected" | "disconnected";
 
@@ -50,30 +51,40 @@ const SocketProvider = ({ children }: ISocketProps) => {
   const dispatch = useAppDispatch();
   const [socketState, setSocketState] = useState<SocketState>("disconnected");
   const removeListener = useCallback(() => {
-    socket.current?.off("ON_NEW_MESSAGE");
-    socket.current?.off("ON_DELETE_MESSAGE");
-    socket.current?.off("ON_EDIT_MESSAGE");
-    socket.current?.off("ON_REACTION_ADDED");
-    socket.current?.off("ON_REACTION_REMOVED");
-    socket.current?.off("ON_CREATE_NEW_COMMUNITY");
+    socket.current?.off(EventName.ON_NEW_MESSAGE);
+    socket.current?.off(EventName.ON_DELETE_MESSAGE);
+    socket.current?.off(EventName.ON_EDIT_MESSAGE);
+    socket.current?.off(EventName.ON_REACTION_ADDED);
+    socket.current?.off(EventName.ON_REACTION_REMOVED);
+    socket.current?.off(EventName.ON_CREATE_NEW_COMMUNITY);
+    socket.current?.off(EventName.ON_USER_JOIN_COMMUNITY);
     socket.current?.off("disconnect");
   }, []);
-  const listener = useCallback(() => {
-    socket.current?.on("ON_NEW_MESSAGE", async (data: any) => {
+  const onNewMessage = useCallback(
+    (data: MessageData) => {
       dispatch(MESSAGE_ACTIONS.newMessage(data));
-    });
-    socket.current?.on("ON_DELETE_MESSAGE", async (data: any) => {
+    },
+    [dispatch]
+  );
+  const onDeleteMessage = useCallback(
+    (data: any) => {
       dispatch(
         MESSAGE_ACTIONS.deleteMessage({
           entityId: data.entity_id,
           messageId: data.message_id,
         })
       );
-    });
-    socket.current?.on("ON_EDIT_MESSAGE", async (data: any) => {
+    },
+    [dispatch]
+  );
+  const onEditMessage = useCallback(
+    (data: MessageData) => {
       dispatch(MESSAGE_ACTIONS.editMessage(data));
-    });
-    socket.current?.on("ON_REACTION_ADDED", (data: any) => {
+    },
+    [dispatch]
+  );
+  const onAddReact = useCallback(
+    (data: any) => {
       const { attachment_id, emoji_id, user_id } = data.reaction_data;
       dispatch(
         REACT_ACTIONS.addReact({
@@ -82,8 +93,11 @@ const SocketProvider = ({ children }: ISocketProps) => {
           mine: user.user_id === user_id,
         })
       );
-    });
-    socket.current?.on("ON_REACTION_REMOVED", (data: any) => {
+    },
+    [dispatch, user.user_id]
+  );
+  const onRemoveReact = useCallback(
+    (data: any) => {
       const { attachment_id, emoji_id, user_id } = data.reaction_data;
       dispatch(
         REACT_ACTIONS.removeReact({
@@ -92,11 +106,30 @@ const SocketProvider = ({ children }: ISocketProps) => {
           mine: user.user_id === user_id,
         })
       );
-    });
-    socket.current?.on("ON_CREATE_NEW_COMMUNITY", (data: Community) => {
+    },
+    [dispatch, user.user_id]
+  );
+  const onCreateCommunity = useCallback(
+    (data: Community) => {
       dispatch(USER_ACTIONS.createNewCommunity(data));
-    });
-  }, [dispatch, user.user_id]);
+    },
+    [dispatch]
+  );
+  const listener = useCallback(() => {
+    socket.current?.on(EventName.ON_NEW_MESSAGE, onNewMessage);
+    socket.current?.on(EventName.ON_DELETE_MESSAGE, onDeleteMessage);
+    socket.current?.on(EventName.ON_EDIT_MESSAGE, onEditMessage);
+    socket.current?.on(EventName.ON_REACTION_ADDED, onAddReact);
+    socket.current?.on(EventName.ON_REACTION_REMOVED, onRemoveReact);
+    socket.current?.on(EventName.ON_CREATE_NEW_COMMUNITY, onCreateCommunity);
+  }, [
+    onAddReact,
+    onCreateCommunity,
+    onDeleteMessage,
+    onEditMessage,
+    onNewMessage,
+    onRemoveReact,
+  ]);
   const initSocket = useCallback(async (onConnected: () => void) => {
     if (socket.current?.connected) return;
     setSocketState("connecting");

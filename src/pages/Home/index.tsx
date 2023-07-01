@@ -15,7 +15,8 @@ const Home = () => {
   const iframeRef =
     useRef<HTMLIFrameElement>() as React.MutableRefObject<HTMLIFrameElement>;
   const [loadingIframe, setLoadingIframe] = useState(false);
-  const onLoad = useCallback(() => {
+  const onLoad = useCallback((e: React.SyntheticEvent<HTMLIFrameElement, Event>) => {
+    console.log('XXX: ', e);
     setLoadingIframe(false);
   }, []);
   useEffect(() => {
@@ -30,9 +31,10 @@ const Home = () => {
   }, [channel?.channel_name, community?.community_name]);
   return (
     <>
-      <div className={styles["content-side"]}>
+      <div className={`${styles["content-side"]} hide-scroll-bar`}>
         {channel?.dapp_integration_url && (
           <iframe
+            id="dapp-browser"
             ref={iframeRef}
             src={channel?.dapp_integration_url}
             className={styles["dapp-iframe-full"]}
