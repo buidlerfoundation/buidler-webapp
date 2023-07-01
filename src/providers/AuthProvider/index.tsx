@@ -477,34 +477,34 @@ const AuthProvider = ({ children }: IAuthProps) => {
       onDisconnected();
     }
   }, [onDisconnected]);
-  useEffect(() => {
-    getCookie(AsyncKey.loginType)
-      .then(async (res) => {
-        dispatch(CONFIG_ACTIONS.updateLoginType(res));
-        if (res === LoginType.WalletConnect) {
-          WalletConnectUtils.init(onDisconnected);
-          if (!WalletConnectUtils.connector?.connected) {
-            onDisconnected();
-          }
-        } else if (res === LoginType.Metamask) {
-          MetamaskUtils.connected = true;
-          MetamaskUtils.init(
-            metamaskDisconnect,
-            onMetamaskUpdate,
-            metamaskConnected
-          );
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [
-    onDisconnected,
-    dispatch,
-    metamaskConnected,
-    metamaskDisconnect,
-    onMetamaskUpdate,
-  ]);
+  // useEffect(() => {
+  //   getCookie(AsyncKey.loginType)
+  //     .then(async (res) => {
+  //       dispatch(CONFIG_ACTIONS.updateLoginType(res));
+  //       if (res === LoginType.WalletConnect) {
+  //         WalletConnectUtils.init(onDisconnected);
+  //         if (!WalletConnectUtils.connector?.connected) {
+  //           onDisconnected();
+  //         }
+  //       } else if (res === LoginType.Metamask) {
+  //         MetamaskUtils.connected = true;
+  //         MetamaskUtils.init(
+  //           metamaskDisconnect,
+  //           onMetamaskUpdate,
+  //           metamaskConnected
+  //         );
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, [
+  //   onDisconnected,
+  //   dispatch,
+  //   metamaskConnected,
+  //   metamaskDisconnect,
+  //   onMetamaskUpdate,
+  // ]);
   return (
     <AuthContext.Provider
       value={{
