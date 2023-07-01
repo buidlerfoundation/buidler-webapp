@@ -55,6 +55,7 @@ export interface Channel {
   is_channel_member?: boolean;
   total_channel_members?: number;
   total_channel_messages?: number;
+  display_channel_url?: string;
 }
 
 export interface Space {
@@ -76,6 +77,7 @@ export interface Space {
   created_at?: string;
   updated_at?: string;
   channels?: Channel[];
+  display_space_url?: string;
 }
 
 export type CreateChannelData = {
