@@ -12,7 +12,7 @@ const MyCommunity = () => {
   }, []);
   return (
     <Stack className={styles.container}>
-      <span className={styles.title}>Your community</span>
+      <span className={styles.title}>Community</span>
       {communities && communities?.length > 0 && (
         <Stack direction="row" flexWrap="wrap">
           {communities.map(renderCommunityItem)}
