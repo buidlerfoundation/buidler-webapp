@@ -10,9 +10,12 @@ import styles from "./index.module.scss";
 import usePluginOpen from "hooks/usePluginOpen";
 import useAppDispatch from "hooks/useAppDispatch";
 import { OUTSIDE_ACTIONS } from "reducers/OutsideReducers";
+import { getDataFromExternalUrl } from "reducers/UserReducers";
+import { useNavigate } from "react-router-dom";
 
 const Plugin = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const pluginOpen = usePluginOpen();
   const [style, setStyle] = useState<CSSProperties>({ height: "auto" });
   const toggle = useCallback(
@@ -33,16 +36,33 @@ const Plugin = () => {
     }
   }, [pluginOpen]);
   useEffect(() => {
-    const messageListener = (e: any) => {
-      if (e.data === "toggle-plugin") {
+    const messageListener = (
+      e: MessageEvent<{ type: string; payload: any }>
+    ) => {
+      if (typeof e.data !== "object") return;
+      if (!e.data.type) return;
+      const { type, payload } = e.data;
+      if (type === "toggle-plugin") {
         toggle();
+      }
+      if (type === "update-external" && payload) {
+        dispatch(getDataFromExternalUrl({ url: payload }))
+          .unwrap()
+          .then((res) => {
+            if (res) {
+              const { community, channel } = res;
+              const path = `${window.location.pathname}/${community.community_id}/${channel.channel_id}`;
+              navigate(path, { replace: true });
+            }
+          });
       }
     };
     window.addEventListener("message", messageListener);
     return () => {
       window.removeEventListener("message", messageListener);
     };
-  }, [toggle]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, toggle]);
   return (
     <div className={styles.container} style={style}>
       <div
