@@ -156,8 +156,14 @@ const AuthProvider = ({ children }: IAuthProps) => {
         }
         socket.initSocket(onSocketConnected);
       } else {
-        dispatch(logoutAction());
-        navigate(loginPath, { replace: true });
+        clearData(async () => {
+          dispatch(logoutAction());
+          if (canViewOnly) {
+            await handleDataFromExternalUrl();
+          } else {
+            navigate(loginPath, { replace: true });
+          }
+        });
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
