@@ -27,12 +27,13 @@ export const sleep = (timeout = 1000) => {
 const handleClearDataAndReload = () => {
   if (!GlobalVariable.sessionExpired) {
     GlobalVariable.sessionExpired = true;
-    toast.error("Session expired");
     clearData(() => {
       const path = window.location.pathname;
       if (path.includes("/channels")) {
+        toast.error("Session expired");
         window.location.reload();
       } else {
+        GlobalVariable.sessionExpired = false;
         store.dispatch(logoutAction());
         window.parent.postMessage("session-expired", "*");
       }
