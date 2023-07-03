@@ -12,11 +12,13 @@ import useAppDispatch from "hooks/useAppDispatch";
 import { OUTSIDE_ACTIONS } from "reducers/OutsideReducers";
 import { getDataFromExternalUrl } from "reducers/UserReducers";
 import { useNavigate } from "react-router-dom";
+import useOutsideLoading from "hooks/useOutsideLoading";
 
 const Plugin = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const pluginOpen = usePluginOpen();
+  const loading = useOutsideLoading();
   const [style, setStyle] = useState<CSSProperties>({ height: "auto" });
   const toggle = useCallback(
     () => dispatch(OUTSIDE_ACTIONS.toggle()),
@@ -51,7 +53,7 @@ const Plugin = () => {
           .then((res) => {
             if (res) {
               const { community, channel } = res;
-              const path = `${window.location.pathname}/${community.community_id}/${channel.channel_id}`;
+              const path = `/plugin/${community.community_id}/${channel.channel_id}`;
               navigate(path, { replace: true });
             }
           });
@@ -70,7 +72,7 @@ const Plugin = () => {
           pluginOpen ? styles["b-root-chat-on"] : styles["b-root-chat-off"]
         }`}
       >
-        <MessageChatBox toggleOutside={toggle} />
+        <MessageChatBox toggleOutside={toggle} contentLoading={loading} />
       </div>
     </div>
   );

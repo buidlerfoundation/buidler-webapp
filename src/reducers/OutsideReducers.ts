@@ -5,10 +5,12 @@ import { getDataFromExternalUrl } from "./UserReducers";
 interface OutsideState {
   urlType?: "main" | "detail";
   pluginOpen: boolean;
+  loading?: boolean;
 }
 
 const initialState: OutsideState = {
   pluginOpen: false,
+  loading: false,
 };
 
 const outsideSlice = createSlice({
@@ -22,16 +24,20 @@ const outsideSlice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(logoutAction, () => initialState)
-      .addCase(
-        getDataFromExternalUrl.fulfilled,
-        (state: OutsideState, action) => {
-          const { url } = action.meta.arg;
-          if (url) {
-            const uri = new URL(url);
-            state.urlType = uri.pathname === "/" ? "main" : "detail";
-          }
+      .addCase(getDataFromExternalUrl.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getDataFromExternalUrl.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(getDataFromExternalUrl.fulfilled, (state, action) => {
+        state.loading = false;
+        const { url } = action.meta.arg;
+        if (url) {
+          const uri = new URL(url);
+          state.urlType = uri.pathname === "/" ? "main" : "detail";
         }
-      ),
+      }),
 });
 
 export const OUTSIDE_ACTIONS = outsideSlice.actions;
