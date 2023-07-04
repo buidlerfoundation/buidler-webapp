@@ -59,7 +59,7 @@ const Home = () => {
       </div>
       <div className={styles["chat-box__container"]}>
         <div className={styles["chat-box"]}>
-          <MessageChatBox hideCommunity />
+          <MessageChatBox />
         </div>
       </div>
     </>

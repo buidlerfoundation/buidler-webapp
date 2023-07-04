@@ -341,6 +341,10 @@ iframe {
   border: none;
 }
 
+.MuiSkeleton-root {
+  background-color: var(--color-highlight-action-high)  !important;
+}
+
 :root {
   --color-accent: #092555;
   --color-darkest-background: #121212;
