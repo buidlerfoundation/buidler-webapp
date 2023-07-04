@@ -13,7 +13,6 @@ import styles from "./index.module.scss";
 import useCurrentCommunity from "hooks/useCurrentCommunity";
 import images from "common/images";
 import useUser from "hooks/useUser";
-import useCommunities from "hooks/useCommunities";
 import IconNotification from "shared/SVG/IconNotification";
 import AvatarView from "shared/AvatarView";
 import TeamItem from "./TeamItem";
@@ -32,6 +31,8 @@ import ModalTransactionDetail from "shared/ModalTransactionDetail";
 import api from "api";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import MyCommunityItem from "shared/MyCommunityItem";
+import usePinnedCommunities from "hooks/usePinnedCommunities";
+import { unPinCommunity } from "reducers/UserActions";
 
 type AppTitleBarProps = {
   onJumpToMessage?: (messageId: string) => void;
@@ -42,7 +43,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
   const dispatch = useAppDispatch();
   const userData = useUser();
   const auth = useAuth();
-  const communities = useCommunities();
+  const pinnedCommunities = usePinnedCommunities();
   const notificationRef = useRef<any>();
   const communityId = useCommunityId();
   const currentCommunity = useCurrentCommunity();
@@ -142,8 +143,8 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
     null
   );
   const highlightCreateCommunityButton = useMemo(() => {
-    return !communities || communities?.length <= 1;
-  }, [communities]);
+    return !pinnedCommunities || pinnedCommunities?.length <= 1;
+  }, [pinnedCommunities]);
   const setTeam = useCallback(
     async (t?: Community) => {
       navigate(`/channels/${t?.community_id}`, { replace: true });
@@ -227,6 +228,25 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
     }
   }, []);
 
+  const onUnPin = useCallback(
+    (community: Community) => {
+      api.unPinCommunity(community.community_id);
+      dispatch(unPinCommunity(community.community_id));
+      if (communityId === community.community_id) {
+        const currentIndex =
+          pinnedCommunities?.findIndex(
+            (el) => el.community_id === community.community_id
+          ) || 0;
+        const prevCommunity = pinnedCommunities?.[currentIndex - 1];
+        const path = prevCommunity
+          ? `/channels/${prevCommunity.community_id}`
+          : "/communities";
+        navigate(path, { replace: true });
+      }
+    },
+    [communityId, dispatch, navigate, pinnedCommunities]
+  );
+
   const renderTeam = useCallback(
     (el: Community) => {
       return (
@@ -236,10 +256,11 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
           t={el}
           onChangeTeam={setTeam}
           onContextMenu={handleCommunityContextMenu}
+          onRemove={onUnPin}
         />
       );
     },
-    [communityId, handleCommunityContextMenu, setTeam]
+    [communityId, handleCommunityContextMenu, onUnPin, setTeam]
   );
 
   const openPopupNotification = useCallback(() => {
@@ -275,7 +296,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
       <div id="title-bar">
         <div className={`${styles["list-team"]} hide-scroll-bar`}>
           <MyCommunityItem />
-          {communities?.map?.(renderTeam)}
+          {pinnedCommunities?.map?.(renderTeam)}
           {highlightCreateCommunityButton ? (
             <div
               className={`${styles["team-item"]} ${styles["btn-create-community"]}`}

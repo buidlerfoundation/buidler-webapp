@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { logoutAction } from "./UserActions";
-import { getDataFromExternalUrl } from "./UserReducers";
+import { logoutAction } from "./actions";
+import { getDataFromExternalUrl } from "./UserActions";
 
 interface OutsideState {
   urlType?: "main" | "detail";

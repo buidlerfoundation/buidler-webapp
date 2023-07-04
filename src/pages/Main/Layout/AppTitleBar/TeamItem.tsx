@@ -5,6 +5,7 @@ import { useImage } from "providers/ImageProvider";
 import IconCommunityDirect from "shared/SVG/IconCommunityDirect";
 import DefaultSpaceIcon from "shared/DefaultSpaceIcon";
 import ImageView from "shared/ImageView";
+import IconMenuClose from "shared/SVG/IconMenuClose";
 
 type TeamItemProps = {
   t: Community;
@@ -14,6 +15,7 @@ type TeamItemProps = {
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     team: Community
   ) => void;
+  onRemove: (team: Community) => void;
 };
 
 const TeamItem = ({
@@ -21,11 +23,19 @@ const TeamItem = ({
   isSelected,
   onChangeTeam,
   onContextMenu,
+  onRemove,
 }: TeamItemProps) => {
   const imageHelper = useImage();
   const handleClick = useCallback(() => {
     if (!isSelected) onChangeTeam(t);
   }, [isSelected, onChangeTeam, t]);
+  const handleRemove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      e.stopPropagation();
+      onRemove(t);
+    },
+    [onRemove, t]
+  );
   const handleContextMenu = useCallback(
     (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       if (t.direct) return;
@@ -82,6 +92,9 @@ const TeamItem = ({
         {isUnseen && <div className={styles["badge-unseen"]} />}
       </div>
       <span className={styles["team-name"]}>{communityDisplayName}</span>
+      <div className={styles["btn-close"]} onClick={handleRemove}>
+        <IconMenuClose size={20} background="var(--color-secondary-text)" />
+      </div>
     </div>
   );
 };

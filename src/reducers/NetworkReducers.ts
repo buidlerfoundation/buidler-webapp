@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import ChainId from "services/connectors/ChainId";
-import { logoutAction } from "./UserActions";
+import { logoutAction } from "./actions";
 
 interface NetworkState {
   chainId: number | string;

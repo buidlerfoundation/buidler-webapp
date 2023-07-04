@@ -10,7 +10,7 @@ import styles from "./index.module.scss";
 import usePluginOpen from "hooks/usePluginOpen";
 import useAppDispatch from "hooks/useAppDispatch";
 import { OUTSIDE_ACTIONS } from "reducers/OutsideReducers";
-import { getDataFromExternalUrl } from "reducers/UserReducers";
+import { getDataFromExternalUrl } from "reducers/UserActions";
 import { useNavigate } from "react-router-dom";
 import useOutsideLoading from "hooks/useOutsideLoading";
 

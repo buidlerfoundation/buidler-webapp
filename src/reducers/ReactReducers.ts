@@ -4,7 +4,7 @@ import {
   createAsyncThunk,
   createSlice,
 } from "@reduxjs/toolkit";
-import { logoutAction } from "./UserActions";
+import { logoutAction } from "./actions";
 import { ReactReducerData } from "models/Message";
 import { getMessages } from "./MessageReducers";
 import api from "api";

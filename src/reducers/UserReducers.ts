@@ -1,20 +1,24 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import api from "api";
-import { AsyncKey } from "common/AppConfig";
-import {
-  getCookie,
-  getLastChannelIdByCommunityId,
-  setCookie,
-} from "common/Cookie";
-import { Channel, Community, Space } from "models/Community";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Community, Space } from "models/Community";
 import { BalanceApiData, InitialApiData, UserData } from "models/User";
-import { logoutAction } from "./UserActions";
+import {
+  getCommunities,
+  getDataFromExternalUrl,
+  getPinnedCommunities,
+  getUserAction,
+  getWalletBalance,
+  pinCommunity,
+  setUserCommunityData,
+  unPinCommunity,
+} from "./UserActions";
+import { logoutAction } from "./actions";
 
 interface UserState {
   data: UserData;
   imgDomain?: string;
   imgBucket?: string;
   currentToken?: string;
+  pinnedCommunities?: Community[];
   communities?: Community[];
   spaceMap: { [key: string]: Space[] };
   teamUserMap: {
@@ -42,156 +46,6 @@ const initialState: UserState = {
   currentToken: "",
 };
 
-export const getUserAction = createAsyncThunk("user/me", async () => {
-  const res = await api.findUser();
-  if (res.statusCode === 200) {
-    return res.data;
-  }
-});
-
-export const getWalletBalance = createAsyncThunk("user/balance", async () => {
-  const res = await api.fetchWalletBalance();
-  if (res.statusCode === 200) {
-    return res.data;
-  }
-});
-
-export const getUserCommunity = createAsyncThunk("user/community", async () => {
-  const res = await api.findTeam();
-  if (res.statusCode === 200) {
-    // const communitiesWithDM = res.data || [];
-    // const communities = communitiesWithDM.filter(
-    //   (el) => el.community_id !== DirectCommunity.community_id
-    // );
-    // const DM = communitiesWithDM.find(
-    //   (el) => el.community_id === DirectCommunity.community_id
-    // );
-    // communities.unshift({ ...DirectCommunity, seen: DM?.seen });
-    return res.data || [];
-  }
-});
-
-export const setUserCommunityData = createAsyncThunk(
-  "user/setCommunity",
-  async (communityId: string) => {
-    const [resChannel, teamUsersRes] = await Promise.all([
-      api.getListChannel(communityId),
-      api.getTeamUsers(communityId),
-    ]);
-    const channels: Channel[] = [];
-    resChannel.data?.forEach((space) => {
-      if (space.channels && space.channels?.length > 0) {
-        channels.push(...space.channels);
-      }
-    });
-    const initialSpace = resChannel.data?.find(
-      (el) => el.channels && el.channels?.length > 0
-    );
-    let channelId = initialSpace?.channels?.[0]?.channel_id;
-
-    const lastChannelIdByCommunityId = await getLastChannelIdByCommunityId(
-      communityId
-    );
-    if (lastChannelIdByCommunityId) {
-      channelId = lastChannelIdByCommunityId;
-    }
-    return {
-      resChannel,
-      teamUsersRes,
-      communityId,
-      channelId,
-      channels,
-    };
-  }
-);
-
-export const getDataFromExternalUrl = createAsyncThunk(
-  "user/external_url",
-  async (payload: { url?: string | null }) => {
-    if (!payload.url) return null;
-    const res = await api.getCommunityDataFromUrl(payload.url);
-    if (res.success) {
-      return res.data;
-    }
-  }
-);
-
-export const refreshTokenAction = createAsyncThunk("user/refresh", async () => {
-  const token = await getCookie(AsyncKey.refreshTokenKey);
-  try {
-    const refreshTokenRes = await api.refreshToken(token);
-    if (refreshTokenRes.success) {
-      await setCookie(AsyncKey.accessTokenKey, refreshTokenRes?.data?.token);
-      await setCookie(
-        AsyncKey.refreshTokenKey,
-        refreshTokenRes?.data?.refresh_token
-      );
-      await setCookie(
-        AsyncKey.tokenExpire,
-        refreshTokenRes?.data?.token_expire_at
-      );
-      await setCookie(
-        AsyncKey.refreshTokenExpire,
-        refreshTokenRes?.data?.refresh_token_expire_at
-      );
-    } else if (
-      refreshTokenRes.message === "Failed to authenticate refresh token" ||
-      refreshTokenRes.message === "Failed to authenticate token"
-    ) {
-      // GoogleAnalytics.tracking("Refresh failed", {
-      //   refreshTokenExpire,
-      //   message: refreshTokenRes.message || "Some thing wrong",
-      // });
-    }
-    return refreshTokenRes;
-  } catch (error: any) {
-    const errMessage = error.message || error;
-    // GoogleAnalytics.tracking("Refresh failed", {
-    //   refreshTokenExpire,
-    //   message: errMessage,
-    // });
-    return {
-      success: false,
-      message: errMessage,
-    };
-  }
-});
-
-export const updateUser = createAsyncThunk(
-  "user/update",
-  async (userData: any) => {
-    const dataUpdate: any = {};
-    if (userData.isUpdateENS && userData?.ensAsset) {
-      dataUpdate.ens_asset = {
-        contract_address: userData?.ensAsset?.contract_address,
-        token_id: userData?.ensAsset?.token_id,
-        network: userData?.ensAsset?.network,
-      };
-    }
-    if (!userData?.ensAsset && userData?.userName) {
-      dataUpdate.username = userData?.userName;
-    }
-    if (userData?.nftAsset) {
-      dataUpdate.nft_asset = {
-        contract_address: userData?.nftAsset?.contract_address,
-        token_id: userData?.nftAsset?.token_id,
-        network: userData?.nftAsset?.network,
-      };
-    }
-    const res = await api.updateUser(dataUpdate);
-    return res;
-  }
-);
-
-export const acceptInvitation = createAsyncThunk(
-  "user/accept-invitation",
-  async (payload: { invitationId: string; ref?: string | null }) => {
-    const { invitationId, ref } = payload;
-    const res = await api.acceptInvitation(invitationId, ref);
-    return res;
-  }
-);
-
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -218,9 +72,9 @@ const userSlice = createSlice({
       state: UserState,
       action: PayloadAction<Community>
     ) => {
-      const communities = state.communities || [];
-      communities.push({ ...action.payload, seen: true });
-      state.communities = communities;
+      const pinnedCommunities = state.pinnedCommunities || [];
+      pinnedCommunities.push({ ...action.payload, seen: true });
+      state.pinnedCommunities = pinnedCommunities;
     },
     updateChannel: (
       state: UserState,
@@ -276,13 +130,31 @@ const userSlice = createSlice({
           imgDomain: state.imgDomain,
         };
       })
+      .addCase(pinCommunity, (state, action) => {
+        const community = action.payload;
+        const pinnedCommunities = state.pinnedCommunities || [];
+        pinnedCommunities.push(community);
+        state.pinnedCommunities = pinnedCommunities;
+      })
+      .addCase(unPinCommunity, (state, action) => {
+        const communityId = action.payload;
+        state.pinnedCommunities = state.pinnedCommunities?.filter(
+          (el) => el.community_id !== communityId
+        );
+      })
       .addCase(getUserAction.fulfilled, (state: UserState, action) => {
         const user = action.payload;
         if (user) {
           state.data = user;
         }
       })
-      .addCase(getUserCommunity.fulfilled, (state: UserState, action) => {
+      .addCase(getPinnedCommunities.fulfilled, (state: UserState, action) => {
+        const communities = action.payload;
+        if (communities) {
+          state.pinnedCommunities = communities;
+        }
+      })
+      .addCase(getCommunities.fulfilled, (state, action) => {
         const communities = action.payload;
         if (communities) {
           state.communities = communities;
@@ -319,7 +191,7 @@ const userSlice = createSlice({
       .addCase(getDataFromExternalUrl.fulfilled, (state: UserState, action) => {
         if (action.payload) {
           const { channel, community } = action.payload;
-          state.communities = [community];
+          state.pinnedCommunities = [community];
           state.spaceMap = {
             [community.community_id]: [
               {

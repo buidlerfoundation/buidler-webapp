@@ -9,6 +9,11 @@ import Caller from "./Caller";
 import { UserData } from "models/User";
 import { PostData } from "models/Message";
 
+export const getPinnedCommunities = () =>
+  Caller.get<Community[]>("community?type=pin");
+
+export const getCommunities = () => Caller.get<Community[]>("community");
+
 export const createCommunity = (body: any) =>
   Caller.post<Community>("community", body);
 
@@ -49,3 +54,7 @@ export const getListPost = (reqPostList: RequestPostList) => {
   }
   return Caller.get<PostData[]>(uri);
 };
+
+export const pinCommunity = (id: string) => Caller.post(`community/${id}/pin`);
+export const unPinCommunity = (id: string) =>
+  Caller.delete(`community/${id}/pin`);

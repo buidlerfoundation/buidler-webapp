@@ -20,6 +20,7 @@ import { REACT_ACTIONS } from "reducers/ReactReducers";
 import { USER_ACTIONS } from "reducers/UserReducers";
 import { Socket, io } from "socket.io-client";
 import EventName from "./EventName";
+import { UserData } from "models/User";
 
 type SocketState = "connecting" | "connected" | "disconnected";
 
@@ -115,6 +116,14 @@ const SocketProvider = ({ children }: ISocketProps) => {
     },
     [dispatch]
   );
+  const onUserJoinCommunity = useCallback(
+    (data: { community: Community; user: UserData }) => {
+      if (user.user_id === data.user.user_id) {
+        dispatch(USER_ACTIONS.createNewCommunity(data.community));
+      }
+    },
+    [dispatch, user.user_id]
+  );
   const listener = useCallback(() => {
     socket.current?.on(EventName.ON_NEW_MESSAGE, onNewMessage);
     socket.current?.on(EventName.ON_DELETE_MESSAGE, onDeleteMessage);
@@ -122,6 +131,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.on(EventName.ON_REACTION_ADDED, onAddReact);
     socket.current?.on(EventName.ON_REACTION_REMOVED, onRemoveReact);
     socket.current?.on(EventName.ON_CREATE_NEW_COMMUNITY, onCreateCommunity);
+    socket.current?.on(EventName.ON_USER_JOIN_COMMUNITY, onUserJoinCommunity);
   }, [
     onAddReact,
     onCreateCommunity,
@@ -129,6 +139,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     onEditMessage,
     onNewMessage,
     onRemoveReact,
+    onUserJoinCommunity,
   ]);
   const initSocket = useCallback(async (onConnected: () => void) => {
     if (socket.current?.connected) return;

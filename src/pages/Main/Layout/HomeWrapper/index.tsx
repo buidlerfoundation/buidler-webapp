@@ -4,14 +4,14 @@ import SideBar from "shared/SideBar";
 import useAppDispatch from "hooks/useAppDispatch";
 import useCommunityId from "hooks/useCommunityId";
 import useChannelId from "hooks/useChannelId";
-import useCommunities from "hooks/useCommunities";
 import useChannels from "hooks/useChannels";
 import { getCookie, getLastChannelIdByCommunityId } from "common/Cookie";
 import { validateUUID } from "helpers/ChannelHelper";
 import { getMessages } from "reducers/MessageReducers";
 import { AsyncKey } from "common/AppConfig";
-import { setUserCommunityData } from "reducers/UserReducers";
+import { setUserCommunityData } from "reducers/UserActions";
 import { getPinPosts } from "reducers/PinPostReducers";
+import usePinnedCommunities from "hooks/usePinnedCommunities";
 
 const HomeWrapper = () => {
   const dispatch = useAppDispatch();
@@ -21,7 +21,7 @@ const HomeWrapper = () => {
   const navigate = useNavigate();
   const matchCommunityId = useCommunityId();
   const matchChannelId = useChannelId();
-  const communities = useCommunities();
+  const pinnedCommunities = usePinnedCommunities();
   const channels = useChannels();
   const hideLayoutElement = useMemo(
     () =>
@@ -30,14 +30,14 @@ const HomeWrapper = () => {
     [location.pathname]
   );
   const initialCommunityData = useCallback(async () => {
-    const community = communities?.find(
+    const community = pinnedCommunities?.find(
       (el) => el.community_id === matchCommunityId
     );
     const initialCommunityId =
       community?.community_id ||
       (await getCookie(AsyncKey.lastTeamId)) ||
-      communities?.[1]?.community_id ||
-      communities?.[0]?.community_id;
+      pinnedCommunities?.[1]?.community_id ||
+      pinnedCommunities?.[0]?.community_id;
     if (initialCommunityId) {
       let initialChannelId = "";
       if (!channels || channels.length === 0) {
@@ -69,7 +69,7 @@ const HomeWrapper = () => {
     }
   }, [
     channels,
-    communities,
+    pinnedCommunities,
     dispatch,
     navigate,
     matchChannelId,

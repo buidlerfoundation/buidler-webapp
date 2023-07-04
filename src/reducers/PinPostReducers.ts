@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { logoutAction } from "./UserActions";
+import { logoutAction } from "./actions";
 import { PostData } from "models/Message";
 import { RequestPostList } from "models/Community";
 import api from "api";

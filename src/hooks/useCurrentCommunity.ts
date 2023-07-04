@@ -1,14 +1,16 @@
 import React from "react";
 import useCommunityId from "./useCommunityId";
-import useCommunities from "./useCommunities";
 import { Community } from "models/Community";
+import usePinnedCommunities from "./usePinnedCommunities";
 
 function useCurrentCommunity() {
   const communityId = useCommunityId();
-  const communities = useCommunities();
+  const pinnedCommunities = usePinnedCommunities();
 
   return React.useMemo<Community>(() => {
-    const res = communities?.find((el) => el.community_id === communityId) || {
+    const res = pinnedCommunities?.find(
+      (el) => el.community_id === communityId
+    ) || {
       community_name: "",
       community_image: "",
       community_id: "",
@@ -16,7 +18,7 @@ function useCurrentCommunity() {
       role: "",
     };
     return res;
-  }, [communities, communityId]);
+  }, [pinnedCommunities, communityId]);
 }
 
 export default useCurrentCommunity;

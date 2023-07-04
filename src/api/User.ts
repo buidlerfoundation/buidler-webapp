@@ -21,9 +21,6 @@ export const findUser = async () => {
 export const fetchWalletBalance = () =>
   Caller.get<BalanceApiData>("user/balance");
 
-export const findTeam = () =>
-  Caller.get<Community[]>("community?include_direct=1");
-
 export const findDirectChannel = (
   status?: "pending" | "blocked" | "accepted",
   controller?: AbortController

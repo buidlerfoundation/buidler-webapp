@@ -8,9 +8,9 @@ import AppConfig, {
   whiteListRefreshTokenApis,
 } from "../common/AppConfig";
 import { clearData, getCookie } from "../common/Cookie";
-import { refreshTokenAction } from "reducers/UserReducers";
+import { refreshTokenAction } from "reducers/UserActions";
 import { BaseDataApi } from "models/User";
-import { logoutAction } from "reducers/UserActions";
+import { logoutAction } from "reducers/actions";
 
 const METHOD_GET = "get";
 const METHOD_POST = "post";

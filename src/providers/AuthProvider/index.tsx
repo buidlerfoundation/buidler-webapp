@@ -11,7 +11,7 @@ import { ethers, utils } from "ethers";
 import useAppDispatch from "hooks/useAppDispatch";
 import useAppSelector from "hooks/useAppSelector";
 import useChannels from "hooks/useChannels";
-import useCommunities from "hooks/useCommunities";
+import usePinnedCommunities from "hooks/usePinnedCommunities";
 import useQuery from "hooks/useQuery";
 import { LoginApiData } from "models/User";
 import { useSocket } from "providers/SocketProvider";
@@ -29,12 +29,13 @@ import { toast } from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CONFIG_ACTIONS } from "reducers/ConfigReducers";
 import { NETWORK_ACTIONS } from "reducers/NetworkReducers";
-import { logoutAction } from "reducers/UserActions";
+import { logoutAction } from "reducers/actions";
 import {
   acceptInvitation,
   getDataFromExternalUrl,
-} from "reducers/UserReducers";
-import { getUserCommunity, USER_ACTIONS } from "reducers/UserReducers";
+  getPinnedCommunities,
+} from "reducers/UserActions";
+import { USER_ACTIONS } from "reducers/UserReducers";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import ChainId from "services/connectors/ChainId";
 import MetamaskUtils from "services/connectors/MetamaskUtils";
@@ -73,7 +74,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const query = useQuery();
   const navigate = useNavigate();
   const location = useLocation();
-  const communities = useCommunities();
+  const pinnedCommunities = usePinnedCommunities();
   const channels = useChannels();
   const currentToken = useAppSelector((state) => state.configs.currentToken);
   const [loading, setLoading] = useState(true);
@@ -101,12 +102,12 @@ const AuthProvider = ({ children }: IAuthProps) => {
     const isPublicPage = path.includes("panel") || path.includes("plugin");
     return (
       (externalUrl && isPublicPage) ||
-      (communities &&
-        communities?.length > 0 &&
+      (pinnedCommunities &&
+        pinnedCommunities?.length > 0 &&
         channels.length > 0 &&
         isPublicPage)
     );
-  }, [channels.length, communities, externalUrl, location.pathname]);
+  }, [channels.length, pinnedCommunities, externalUrl, location.pathname]);
   const isExternalUrl = useMemo(() => {
     const path = window.location.pathname;
     return externalUrl && (path === "/panel" || path === "/plugin");
@@ -147,7 +148,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
           if (isExternalUrl) {
             await handleDataFromExternalUrl();
           } else {
-            await dispatch(getUserCommunity());
+            await dispatch(getPinnedCommunities());
             if (window.location.pathname.includes(AppConfig.loginPath)) {
               const path = previousLocation?.from?.pathname || "/";
               navigate(path, { replace: true });

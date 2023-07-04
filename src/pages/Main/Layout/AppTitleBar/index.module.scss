@@ -77,6 +77,7 @@
   align-items: center;
   margin-left: 10px;
   max-width: 200px;
+  position: relative;
   &.team-selected {
     background-color: var(--color-highlight-action-high);
     .team-icon-mini__wrap {
@@ -93,12 +94,25 @@
     white-space: nowrap;
     flex: 1;
   }
+  .btn-close {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    right: 0;
+    padding: 5px;
+  }
   &:hover {
     background-color: var(--color-stroke);
     .team-icon-mini__wrap {
       .badge-unseen {
         border-color: var(--color-stroke);
       }
+    }
+    .btn-close {
+      display: flex;
     }
     cursor: pointer;
   }
