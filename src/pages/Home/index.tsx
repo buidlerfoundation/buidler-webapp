@@ -33,6 +33,7 @@ const Home = () => {
       <div className={`${styles["content-side"]} hide-scroll-bar`}>
         {channel?.dapp_integration_url && (
           <iframe
+            id="buidler-iframe"
             ref={iframeRef}
             src={channel?.dapp_integration_url}
             className={styles["dapp-iframe-full"]}
