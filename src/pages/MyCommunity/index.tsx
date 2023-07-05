@@ -8,18 +8,26 @@ import useAppDispatch from "hooks/useAppDispatch";
 import { getCommunities, pinCommunity } from "reducers/UserActions";
 import { useNavigate } from "react-router-dom";
 import api from "api";
+import usePinnedCommunities from "hooks/usePinnedCommunities";
 
 const MyCommunity = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const communities = useCommunities();
+  const pinnedCommunities = usePinnedCommunities();
   const onClick = useCallback(
     (community: Community) => {
-      api.pinCommunity(community.community_id);
-      dispatch(pinCommunity(community));
+      if (
+        !pinnedCommunities?.find(
+          (el) => el.community_id === community.community_id
+        )
+      ) {
+        api.pinCommunity(community.community_id);
+        dispatch(pinCommunity(community));
+      }
       navigate(`/channels/${community.community_id}`, { replace: true });
     },
-    [dispatch, navigate]
+    [dispatch, navigate, pinnedCommunities]
   );
   const renderCommunityItem = useCallback(
     (community: Community) => {
