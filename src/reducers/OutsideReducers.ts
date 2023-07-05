@@ -24,19 +24,19 @@ const outsideSlice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(logoutAction, () => initialState)
-      .addCase(getDataFromExternalUrl.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(getDataFromExternalUrl.rejected, (state) => {
-        state.loading = false;
-      })
-      .addCase(getDataFromExternalUrl.fulfilled, (state, action) => {
-        state.loading = false;
+      .addCase(getDataFromExternalUrl.pending, (state, action) => {
         const { url } = action.meta.arg;
         if (url) {
           const uri = new URL(url);
           state.urlType = uri.pathname === "/" ? "main" : "detail";
         }
+        state.loading = true;
+      })
+      .addCase(getDataFromExternalUrl.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(getDataFromExternalUrl.fulfilled, (state) => {
+        state.loading = false;
       }),
 });
 
