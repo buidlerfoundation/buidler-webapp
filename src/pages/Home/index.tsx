@@ -8,16 +8,57 @@ import IconCornerBottomLeft from "shared/SVG/IconCornerBottomLeft";
 import IconCornerBottomRight from "shared/SVG/IconCornerBottomRight";
 import IconCornerTopLeft from "shared/SVG/IconCornerTopLeft";
 import IconCornerTopRight from "shared/SVG/IconCornerTopRight";
+import useAppDispatch from "hooks/useAppDispatch";
+import { openNewTabFromIframe } from "reducers/UserActions";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const channel = useChannel();
   const community = useCurrentCommunity();
   const iframeRef =
     useRef<HTMLIFrameElement>() as React.MutableRefObject<HTMLIFrameElement>;
   const [loadingIframe, setLoadingIframe] = useState(false);
-  const onLoad = useCallback((e: React.SyntheticEvent<HTMLIFrameElement, Event>) => {
-    setLoadingIframe(false);
-  }, []);
+  const [openNewChannel, setOpenNewChannel] = useState(false);
+  const onLoad = useCallback(
+    (e: React.SyntheticEvent<HTMLIFrameElement, Event>) => {
+      setLoadingIframe(false);
+      setOpenNewChannel(false);
+    },
+    []
+  );
+  const handleOpenNewTab = useCallback(
+    async (url: string) => {
+      setOpenNewChannel(true);
+      setLoadingIframe(true);
+      const res = await dispatch(openNewTabFromIframe({ url })).unwrap();
+      if (res) {
+        const { channel, community } = res;
+        navigate(`/channels/${community.community_id}/${channel.channel_id}`, {
+          replace: true,
+        });
+      }
+      setLoadingIframe(false);
+    },
+    [dispatch, navigate]
+  );
+  useEffect(() => {
+    const messageListener = (e: any) => {
+      if (e.data.type === "frame-update") {
+        if (
+          e.data?.frame?.url !== channel?.dapp_integration_url &&
+          !openNewChannel
+        ) {
+          handleOpenNewTab(e.data?.frame?.url);
+        }
+      }
+    };
+    window.addEventListener("message", messageListener);
+    return () => {
+      window.removeEventListener("message", messageListener);
+    };
+  }, [channel?.dapp_integration_url, handleOpenNewTab, openNewChannel]);
   useEffect(() => {
     if (channel?.dapp_integration_url) {
       setLoadingIframe(true);

@@ -84,6 +84,17 @@ export const getDataFromExternalUrl = createAsyncThunk(
   }
 );
 
+export const openNewTabFromIframe = createAsyncThunk(
+  "user/open-new-url",
+  async (payload: { url?: string | null }) => {
+    if (!payload.url) return null;
+    const res = await api.getCommunityDataFromUrl(payload.url);
+    if (res.success) {
+      return res.data;
+    }
+  }
+);
+
 export const refreshTokenAction = createAsyncThunk("user/refresh", async () => {
   const token = await getCookie(AsyncKey.refreshTokenKey);
   try {
