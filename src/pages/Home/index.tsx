@@ -61,6 +61,7 @@ const Home = () => {
   }, [channel?.dapp_integration_url, handleOpenNewTab, openNewChannel]);
   useEffect(() => {
     if (channel?.dapp_integration_url) {
+      setOpenNewChannel(true);
       setLoadingIframe(true);
     }
   }, [channel?.dapp_integration_url]);
