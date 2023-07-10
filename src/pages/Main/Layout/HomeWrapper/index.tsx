@@ -10,14 +10,12 @@ import { validateUUID } from "helpers/ChannelHelper";
 import { getMessages } from "reducers/MessageReducers";
 import { AsyncKey } from "common/AppConfig";
 import { setUserCommunityData } from "reducers/UserActions";
-import { getPinPosts } from "reducers/PinPostReducers";
 import usePinnedCommunities from "hooks/usePinnedCommunities";
 
 const HomeWrapper = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const getMessageActionRef = useRef<any>();
-  const getPostActionRef = useRef<any>();
   const navigate = useNavigate();
   const matchCommunityId = useCommunityId();
   const matchChannelId = useChannelId();
@@ -87,16 +85,6 @@ const HomeWrapper = () => {
       }
       getMessageActionRef.current = dispatch(
         getMessages({ channelId: matchChannelId })
-      );
-    }
-  }, [dispatch, matchChannelId]);
-  useEffect(() => {
-    if (matchChannelId && validateUUID(matchChannelId)) {
-      if (getPostActionRef.current) {
-        getPostActionRef.current.abort();
-      }
-      getPostActionRef.current = dispatch(
-        getPinPosts({ channel_id: matchChannelId })
       );
     }
   }, [dispatch, matchChannelId]);

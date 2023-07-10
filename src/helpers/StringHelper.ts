@@ -57,3 +57,8 @@ export const normalizeUserName = (str: string, length = 5) => {
   }
   return str;
 };
+
+export const humanFormatNumber = (num?: number) => {
+  if (!num) return "";
+  return numeral(num).format("0[.][0]a");
+};

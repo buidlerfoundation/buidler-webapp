@@ -13,17 +13,25 @@ import { OUTSIDE_ACTIONS } from "reducers/OutsideReducers";
 import { getDataFromExternalUrl } from "reducers/UserActions";
 import { useNavigate } from "react-router-dom";
 import useOutsideLoading from "hooks/useOutsideLoading";
+import useChannel from "hooks/useChannel";
+import { getStories } from "reducers/PinPostReducers";
 
 const Plugin = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const pluginOpen = usePluginOpen();
   const loading = useOutsideLoading();
+  const channel = useChannel();
   const [style, setStyle] = useState<CSSProperties>({ height: "auto" });
   const toggle = useCallback(
     () => dispatch(OUTSIDE_ACTIONS.toggle()),
     [dispatch]
   );
+  useEffect(() => {
+    if (channel?.dapp_integration_url) {
+      dispatch(getStories({ url: channel?.dapp_integration_url }));
+    }
+  }, [channel?.dapp_integration_url, dispatch]);
   useEffect(() => {
     if (pluginOpen) {
       setStyle({

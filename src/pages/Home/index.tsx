@@ -11,6 +11,7 @@ import IconCornerTopRight from "shared/SVG/IconCornerTopRight";
 import useAppDispatch from "hooks/useAppDispatch";
 import { openNewTabFromIframe } from "reducers/UserActions";
 import { useNavigate } from "react-router-dom";
+import { getStories } from "reducers/PinPostReducers";
 
 const Home = () => {
   const dispatch = useAppDispatch();
@@ -63,8 +64,9 @@ const Home = () => {
     if (channel?.dapp_integration_url) {
       setOpenNewChannel(true);
       setLoadingIframe(true);
+      dispatch(getStories({ url: channel?.dapp_integration_url }));
     }
-  }, [channel?.dapp_integration_url]);
+  }, [channel?.dapp_integration_url, dispatch]);
   useEffect(() => {
     if (channel?.channel_name && community?.community_name) {
       document.title = `${community?.community_name} • #${channel?.channel_name} | Buidler`;

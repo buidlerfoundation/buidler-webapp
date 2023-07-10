@@ -103,6 +103,7 @@ export interface BaseDataApi<T> {
   token?: string;
   metadata?: {
     total?: number;
+    total_pages?: number;
     encrypt_message_key?: string;
     can_loadmore_message_after?: boolean;
     can_loadmore_message_before?: boolean;

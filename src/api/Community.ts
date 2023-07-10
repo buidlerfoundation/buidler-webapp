@@ -2,6 +2,8 @@ import {
   Channel,
   Community,
   CreatePostBody,
+  IHNComment,
+  IHNStory,
   RequestPostList,
   Space,
 } from "models/Community";
@@ -58,3 +60,14 @@ export const getListPost = (reqPostList: RequestPostList) => {
 export const pinCommunity = (id: string) => Caller.post(`community/${id}/pin`);
 export const unPinCommunity = (id: string) =>
   Caller.delete(`community/${id}/pin`);
+
+export const getStories = (payload: { url: string; page?: number }) =>
+  Caller.post<IHNStory[]>(
+    `external/hacker-new/story?page=${payload.page || 1}&limit=10`,
+    { url: payload.url }
+  );
+
+export const getCommentFromStory = (id: string) =>
+  Caller.get<IHNComment[]>(
+    `external/hacker-new/story/${id}/comments?page=1&limit=20`
+  );

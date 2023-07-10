@@ -106,3 +106,22 @@ export interface RequestPostList {
   before_id?: string;
   limit?: string;
 }
+
+export interface IHNStory {
+  id: string;
+  title: string;
+  content?: string | null;
+  url: string;
+  author: string;
+  points: number;
+  created_at: string;
+  total_comments: number;
+}
+
+export interface IHNComment {
+  id: string;
+  author: string;
+  content: string;
+  parent_id: number;
+  created_at: string;
+}

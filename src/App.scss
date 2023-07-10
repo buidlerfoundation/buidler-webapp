@@ -342,7 +342,45 @@ iframe {
 }
 
 .MuiSkeleton-root {
-  background-color: var(--color-highlight-action-high)  !important;
+  background-color: var(--color-highlight-action-high) !important;
+}
+
+.MuiTab-root {
+  display: flex;
+  align-items: center;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 8px !important;
+  margin-right: 12px !important;
+  border-radius: 10px !important;
+  color: var(--color-secondary-text) !important;
+  text-transform: none !important;
+  font-size: 15px !important;
+  line-height: 20px !important;
+  &:first-child {
+    margin-left: 15px;
+  }
+  &:last-child {
+    margin-right: 15px;
+  }
+}
+
+.MuiTabPanel-root {
+  padding: 0 !important;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+  }
+}
+
+.MuiTab-root.Mui-selected {
+  color: var(--color-primary-text) !important;
+  background-color: var(--color-stroke) !important;
+}
+
+.MuiTabs-indicator {
+  display: none;
 }
 
 :root {

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { logoutAction } from "./actions";
 import { PostData } from "models/Message";
-import { RequestPostList } from "models/Community";
+import { IHNStory, RequestPostList } from "models/Community";
 import api from "api";
 
 interface PostReducerData {
@@ -17,12 +17,23 @@ interface PinPostState {
       archived?: PostReducerData;
     };
   };
+  topicData: {
+    [key: string]: {
+      stories: IHNStory[];
+      page: number;
+      total: number;
+      totalPage: number;
+      loading?: boolean;
+      loadMore?: boolean;
+    };
+  };
   loading?: boolean;
   loadMore?: boolean;
 }
 
 const initialState: PinPostState = {
   pinPostData: {},
+  topicData: {},
   loading: false,
   loadMore: false,
 };
@@ -36,6 +47,16 @@ export const getPinPosts = createAsyncThunk(
         res,
         request: payload,
       };
+    }
+  }
+);
+
+export const getStories = createAsyncThunk(
+  "pinPost/topic",
+  async (payload: { url: string; page?: number }) => {
+    const res = await api.getStories(payload);
+    if (res.success) {
+      return res;
     }
   }
 );
@@ -80,6 +101,47 @@ const pinPostSlice = createSlice({
         }
         state.loadMore = false;
         state.loading = false;
+      })
+      .addCase(getStories.pending, (state, action) => {
+        const { url, page = 1 } = action.meta.arg;
+        state.topicData = {
+          ...state.topicData,
+          [url]: {
+            ...(state.topicData[url] || {}),
+            loading: page === 1,
+            loadMore: page > 1,
+          },
+        };
+      })
+      .addCase(getStories.rejected, (state, action) => {
+        const { url } = action.meta.arg;
+        state.topicData = {
+          ...state.topicData,
+          [url]: {
+            ...(state.topicData[url] || {}),
+            loading: false,
+            loadMore: false,
+          },
+        };
+      })
+      .addCase(getStories.fulfilled, (state, action) => {
+        if (action.payload) {
+          const { url, page } = action.meta.arg;
+          const currentStories = state.topicData?.[url]?.stories || [];
+          const stories = action.payload.data || [];
+          const data = !page ? stories : [...currentStories, ...stories];
+          state.topicData = {
+            ...state.topicData,
+            [url]: {
+              page: page || 1,
+              total: action.payload.metadata?.total || 0,
+              totalPage: action.payload.metadata?.total_pages || 0,
+              stories: data,
+              loading: false,
+              loadMore: false,
+            },
+          };
+        }
       }),
 });
 
