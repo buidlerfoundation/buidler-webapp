@@ -383,6 +383,10 @@ iframe {
   display: none;
 }
 
+.MuiIconButton-root {
+  padding: 0 !important;
+}
+
 :root {
   --color-accent: #092555;
   --color-darkest-background: #121212;

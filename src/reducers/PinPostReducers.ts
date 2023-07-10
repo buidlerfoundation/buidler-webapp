@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { logoutAction } from "./actions";
 import { PostData } from "models/Message";
 import { IHNStory, RequestPostList } from "models/Community";
@@ -29,6 +29,7 @@ interface PinPostState {
   };
   loading?: boolean;
   loadMore?: boolean;
+  selectedStoryId?: string | null;
 }
 
 const initialState: PinPostState = {
@@ -64,7 +65,11 @@ export const getStories = createAsyncThunk(
 const pinPostSlice = createSlice({
   name: "pinPost",
   initialState,
-  reducers: {},
+  reducers: {
+    updateSelectedStoryId: (state, action: PayloadAction<string | null>) => {
+      state.selectedStoryId = action.payload;
+    },
+  },
   extraReducers: (builder) =>
     builder
       .addCase(logoutAction, () => initialState)

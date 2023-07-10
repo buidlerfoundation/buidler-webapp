@@ -7,6 +7,7 @@ import OutsideReducers from "./OutsideReducers";
 import PinPostReducers from "./PinPostReducers";
 import ReactReducers from "./ReactReducers";
 import SessionReducers from "./SessionReducers";
+import StoryReducers from "./StoryReducers";
 import TransactionReducers from "./TransactionReducers";
 import UserReducers from "./UserReducers";
 import { combineReducers } from "redux";
@@ -23,6 +24,7 @@ const reducers = combineReducers({
   session: SessionReducers,
   pinPost: PinPostReducers,
   outside: OutsideReducers,
+  story: StoryReducers,
 });
 
 export default reducers;

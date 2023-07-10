@@ -67,7 +67,12 @@ export const getStories = (payload: { url: string; page?: number }) =>
     { url: payload.url }
   );
 
-export const getCommentFromStory = (id: string) =>
+export const getCommentFromStory = (payload: { id: string; page?: number }) =>
   Caller.get<IHNComment[]>(
-    `external/hacker-new/story/${id}/comments?page=1&limit=20`
+    `external/hacker-new/story/${payload.id}/comments?page=${
+      payload.page || 1
+    }&limit=20`
   );
+
+export const getStoryById = (id: string) =>
+  Caller.get<IHNStory>(`external/story/${id}`);
