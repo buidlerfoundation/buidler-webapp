@@ -387,6 +387,14 @@ iframe {
   padding: 0 !important;
 }
 
+.MuiTabs-flexContainer {
+  overflow-x: auto !important;
+  &::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+  }
+}
+
 :root {
   --color-accent: #092555;
   --color-darkest-background: #121212;
