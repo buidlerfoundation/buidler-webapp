@@ -12,6 +12,7 @@ import useAppDispatch from "hooks/useAppDispatch";
 import { openNewTabFromIframe } from "reducers/UserActions";
 import { useNavigate } from "react-router-dom";
 import { getStories } from "reducers/PinPostReducers";
+import Loading from "./Loading";
 
 const Home = () => {
   const dispatch = useAppDispatch();
@@ -22,6 +23,7 @@ const Home = () => {
     useRef<HTMLIFrameElement>() as React.MutableRefObject<HTMLIFrameElement>;
   const [loadingIframe, setLoadingIframe] = useState(false);
   const [openNewChannel, setOpenNewChannel] = useState(false);
+  const [loadingOpenNewChannel, setLoadingOpenNewChannel] = useState(false);
   const onLoad = useCallback(
     (e: React.SyntheticEvent<HTMLIFrameElement, Event>) => {
       setLoadingIframe(false);
@@ -29,10 +31,15 @@ const Home = () => {
     },
     []
   );
+  const onError = useCallback((e: any) => {
+    setLoadingIframe(false);
+    setOpenNewChannel(false);
+  }, []);
   const handleOpenNewTab = useCallback(
     async (url: string) => {
       setOpenNewChannel(true);
       setLoadingIframe(true);
+      setLoadingOpenNewChannel(true);
       const res = await dispatch(openNewTabFromIframe({ url })).unwrap();
       if (res) {
         const { channel, community } = res;
@@ -40,7 +47,10 @@ const Home = () => {
           replace: true,
         });
       }
-      setLoadingIframe(false);
+      setTimeout(() => {
+        setLoadingIframe(false);
+        setLoadingOpenNewChannel(false);
+      }, 500);
     },
     [dispatch, navigate]
   );
@@ -48,10 +58,19 @@ const Home = () => {
     const messageListener = (e: any) => {
       if (e.data.type === "frame-update") {
         if (
+          channel?.dapp_integration_url &&
           e.data?.frame?.url !== channel?.dapp_integration_url &&
           !openNewChannel
         ) {
-          handleOpenNewTab(e.data?.frame?.url);
+          const url = new URL(channel?.dapp_integration_url);
+          const newUrl = new URL(e.data?.frame?.url);
+          if (
+            (e.data?.frame?.url?.includes(url.origin) &&
+              newUrl.pathname !== url.pathname) ||
+            !e.data?.frame?.url?.includes(url.origin)
+          ) {
+            handleOpenNewTab(e.data?.frame?.url);
+          }
         }
       }
     };
@@ -82,8 +101,8 @@ const Home = () => {
             src={channel?.dapp_integration_url}
             className={styles["dapp-iframe-full"]}
             title="dapp-browser"
-            loading="lazy"
             onLoad={onLoad}
+            onError={onError}
             style={{
               opacity: loadingIframe ? 0 : 1,
             }}
@@ -107,6 +126,7 @@ const Home = () => {
           <MessageChatBox />
         </div>
       </div>
+      {loadingOpenNewChannel && <Loading />}
     </>
   );
 };

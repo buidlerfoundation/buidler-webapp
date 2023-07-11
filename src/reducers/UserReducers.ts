@@ -206,24 +206,55 @@ const userSlice = createSlice({
       })
       .addCase(openNewTabFromIframe.fulfilled, (state, action) => {
         if (action.payload) {
-          const { channel, community } = action.payload;
-          state.spaceMap = {
-            ...state.spaceMap,
-            [community.community_id]: state.spaceMap[
-              community.community_id
-            ].map((el) => {
-              if (
-                el.space_id === channel.space_id &&
-                !el.channels?.find((c) => c.channel_id === channel.channel_id)
-              ) {
-                return {
-                  ...el,
-                  channels: [...(el.channels || []), channel],
-                };
-              }
-              return el;
-            }),
-          };
+          const { channel, community, space } = action.payload;
+          if (
+            !state.pinnedCommunities?.find(
+              (el) => el.community_id === community.community_id
+            )
+          ) {
+            state.pinnedCommunities = [
+              ...(state.pinnedCommunities || []),
+              community,
+            ];
+            if (space && channel) {
+              state.spaceMap = {
+                ...state.spaceMap,
+                [community.community_id]: [{ ...space, channels: [channel] }],
+              };
+            }
+          } else if (
+            !state.spaceMap?.[community.community_id]?.find(
+              (el) => el.space_id === space?.space_id
+            )
+          ) {
+            if (space && channel) {
+              state.spaceMap = {
+                ...state.spaceMap,
+                [community.community_id]: [
+                  ...(state.spaceMap?.[community.community_id] || []),
+                  { ...space, channels: [channel] },
+                ],
+              };
+            }
+          } else {
+            state.spaceMap = {
+              ...state.spaceMap,
+              [community.community_id]: state.spaceMap[
+                community.community_id
+              ]?.map((el) => {
+                if (
+                  el.space_id === channel.space_id &&
+                  !el.channels?.find((c) => c.channel_id === channel.channel_id)
+                ) {
+                  return {
+                    ...el,
+                    channels: [...(el.channels || []), channel],
+                  };
+                }
+                return el;
+              }),
+            };
+          }
         }
       });
   },

@@ -39,3 +39,13 @@
     height: calc(100% - 10px);
   }
 }
+
+.loading {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50px;
+  bottom: 10px;
+  display: flex;
+  background-color: var(--color-darkest-background);
+}
