@@ -126,3 +126,21 @@ export interface IHNComment {
   parent_id: number;
   created_at: string;
 }
+
+export interface IHNStoryComment {
+  id: number;
+  author: string;
+  content: string;
+  total_comments: number;
+  time: number;
+}
+
+export interface IHNStoryDetail {
+  id: number;
+  title: string;
+  url: string;
+  author: string;
+  total_comments: number;
+  comments: IHNStoryComment[];
+  time: number;
+}

@@ -4,6 +4,8 @@ import {
   CreatePostBody,
   IHNComment,
   IHNStory,
+  IHNStoryComment,
+  IHNStoryDetail,
   RequestPostList,
   Space,
 } from "models/Community";
@@ -75,4 +77,7 @@ export const getCommentFromStory = (payload: { id: string; page?: number }) =>
   );
 
 export const getStoryById = (id: string) =>
-  Caller.get<IHNStory>(`external/story/${id}`);
+  Caller.get<IHNStoryDetail>(`external/hacker-new/story/${id}`);
+
+export const getCommentsById = (id: string) =>
+  Caller.get<IHNStoryComment[]>(`external/hacker-new/${id}/comments`);
