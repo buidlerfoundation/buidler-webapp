@@ -80,8 +80,7 @@ const HomeWrapper = () => {
 
   useEffect(() => {
     initialCommunityData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialCommunityData]);
 
   useEffect(() => {
     if (matchChannelId && validateUUID(matchChannelId)) {
