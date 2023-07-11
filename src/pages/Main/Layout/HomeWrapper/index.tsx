@@ -28,6 +28,10 @@ const HomeWrapper = () => {
     [location.pathname]
   );
   const initialCommunityData = useCallback(async () => {
+    if (pinnedCommunities?.length === 0) {
+      navigate("/communities", { replace: true });
+      return;
+    }
     const community = pinnedCommunities?.find(
       (el) => el.community_id === matchCommunityId
     );
@@ -36,9 +40,9 @@ const HomeWrapper = () => {
       (await getCookie(AsyncKey.lastTeamId)) ||
       pinnedCommunities?.[1]?.community_id ||
       pinnedCommunities?.[0]?.community_id;
-    if (initialCommunityId) {
+    if (initialCommunityId && !community?.fromExternal) {
       let initialChannelId = "";
-      if (!channels || channels.length === 0) {
+      if (!channels) {
         const { channelId, channels } = await dispatch(
           setUserCommunityData(initialCommunityId)
         ).unwrap();
@@ -76,7 +80,8 @@ const HomeWrapper = () => {
 
   useEffect(() => {
     initialCommunityData();
-  }, [initialCommunityData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (matchChannelId && validateUUID(matchChannelId)) {

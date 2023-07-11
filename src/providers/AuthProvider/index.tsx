@@ -9,7 +9,6 @@ import {
 } from "common/Cookie";
 import { ethers, utils } from "ethers";
 import useAppDispatch from "hooks/useAppDispatch";
-import useAppSelector from "hooks/useAppSelector";
 import useChannels from "hooks/useChannels";
 import usePinnedCommunities from "hooks/usePinnedCommunities";
 import useQuery from "hooks/useQuery";
@@ -76,7 +75,6 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const location = useLocation();
   const pinnedCommunities = usePinnedCommunities();
   const channels = useChannels();
-  const currentToken = useAppSelector((state) => state.configs.currentToken);
   const [loading, setLoading] = useState(true);
   const isQuickLogin = useRef(false);
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
@@ -104,10 +102,10 @@ const AuthProvider = ({ children }: IAuthProps) => {
       (externalUrl && isPublicPage) ||
       (pinnedCommunities &&
         pinnedCommunities?.length > 0 &&
-        channels.length > 0 &&
+        channels?.length > 0 &&
         isPublicPage)
     );
-  }, [channels.length, pinnedCommunities, externalUrl, location.pathname]);
+  }, [channels?.length, pinnedCommunities, externalUrl, location.pathname]);
   const isExternalUrl = useMemo(() => {
     const path = window.location.pathname;
     return externalUrl && (path === "/panel" || path === "/plugin");
@@ -136,7 +134,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   }, [dispatch]);
   const onSocketConnected = useCallback(async () => {}, []);
   const initialUserData = useCallback(
-    async (previousLocation?: any) => {
+    async (previousState?: any) => {
       const userRes = await api.findUser();
       if (userRes.statusCode === 200) {
         dispatch(
@@ -148,9 +146,21 @@ const AuthProvider = ({ children }: IAuthProps) => {
           if (isExternalUrl) {
             await handleDataFromExternalUrl();
           } else {
-            await dispatch(getPinnedCommunities());
-            if (window.location.pathname.includes(AppConfig.loginPath)) {
-              const path = previousLocation?.from?.pathname || "/";
+            const actionRes = await dispatch(
+              getPinnedCommunities({
+                externalUrl: externalUrl || previousState?.externalUrl,
+              })
+            ).unwrap();
+            if (actionRes?.externalUrlRes?.data) {
+              const { community, channel } = actionRes?.externalUrlRes?.data;
+              if (community && channel) {
+                navigate(
+                  `/channels/${community.community_id}/${channel.channel_id}`,
+                  { replace: true }
+                );
+              }
+            } else if (window.location.pathname.includes(AppConfig.loginPath)) {
+              const path = previousState?.from?.pathname || "/";
               navigate(path, { replace: true });
             }
           }
@@ -162,7 +172,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
           if (canViewOnly) {
             await handleDataFromExternalUrl();
           } else {
-            navigate(loginPath, { replace: true });
+            navigate(loginPath, { replace: true, state: { externalUrl } });
           }
         });
       }
@@ -196,7 +206,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     }
   }, [dispatch, invitationId, invitationRef]);
   const handleResponseVerify = useCallback(
-    async (res?: LoginApiData, loginType?: string, previousLocation?: any) => {
+    async (res?: LoginApiData, loginType?: string, previousState?: any) => {
       if (!res) return;
       await setCookie(AsyncKey.accessTokenKey, res?.token);
       await setCookie(AsyncKey.loginType, loginType);
@@ -209,7 +219,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
       dispatch(CONFIG_ACTIONS.updateCurrentToken(res?.token));
       dispatch(CONFIG_ACTIONS.updateLoginType(loginType));
       await handleInvitation();
-      await initialUserData(previousLocation);
+      await initialUserData(previousState);
     },
     [dispatch, handleInvitation, initialUserData]
   );

@@ -31,10 +31,17 @@ export const getWalletBalance = createAsyncThunk("user/balance", async () => {
 
 export const getPinnedCommunities = createAsyncThunk(
   "user/pinned-community",
-  async () => {
+  async (payload: { externalUrl?: string }) => {
+    let externalUrlRes;
+    if (payload.externalUrl) {
+      externalUrlRes = await api.getCommunityDataFromUrl(payload.externalUrl);
+    }
     const res = await api.getPinnedCommunities();
     if (res.statusCode === 200) {
-      return res.data || [];
+      return {
+        pinnedCommunities: res.data || [],
+        externalUrlRes,
+      };
     }
   }
 );

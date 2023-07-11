@@ -74,7 +74,13 @@ const userSlice = createSlice({
       action: PayloadAction<Community>
     ) => {
       const pinnedCommunities = state.pinnedCommunities || [];
-      pinnedCommunities.push({ ...action.payload, seen: true });
+      if (
+        !pinnedCommunities.find(
+          (el) => el.community_id === action.payload.community_id
+        )
+      ) {
+        pinnedCommunities.push({ ...action.payload, seen: true });
+      }
       state.pinnedCommunities = pinnedCommunities;
     },
     updateChannel: (
@@ -150,9 +156,30 @@ const userSlice = createSlice({
         }
       })
       .addCase(getPinnedCommunities.fulfilled, (state: UserState, action) => {
-        const communities = action.payload;
-        if (communities) {
-          state.pinnedCommunities = communities;
+        if (action.payload) {
+          const { pinnedCommunities, externalUrlRes } = action.payload;
+          if (!externalUrlRes?.data) {
+            if (pinnedCommunities) {
+              state.pinnedCommunities = pinnedCommunities;
+            }
+          } else {
+            const { community, space, channel } = externalUrlRes.data;
+            const communities = pinnedCommunities;
+            if (
+              !communities.find(
+                (el) => el.community_id === community.community_id
+              )
+            ) {
+              communities.push({ ...community, fromExternal: true });
+              if (space && channel) {
+                state.spaceMap = {
+                  ...state.spaceMap,
+                  [community.community_id]: [{ ...space, channels: [channel] }],
+                };
+              }
+            }
+            state.pinnedCommunities = communities;
+          }
         }
       })
       .addCase(getCommunities.fulfilled, (state, action) => {
