@@ -279,6 +279,9 @@ const AuthProvider = ({ children }: IAuthProps) => {
     const publicKey = utils.computePublicKey(generatedPrivateKey, true);
     return {
       device: {
+        platform: "web",
+        user_agent: navigator.userAgent,
+        device_name: "",
         device_code: deviceCode,
         device_token: deviceToken || "",
         encrypt_message_key: publicKey,

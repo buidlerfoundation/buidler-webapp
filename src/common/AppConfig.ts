@@ -137,6 +137,18 @@ export const signTypeData = {
   types: {
     Device: [
       {
+        name: "platform",
+        type: "string",
+      },
+      {
+        name: "user_agent",
+        type: "string",
+      },
+      {
+        name: "device_name",
+        type: "string",
+      },
+      {
         name: "device_code",
         type: "string",
       },
