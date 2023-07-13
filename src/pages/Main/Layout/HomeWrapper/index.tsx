@@ -11,6 +11,7 @@ import { getMessages } from "reducers/MessageReducers";
 import { AsyncKey } from "common/AppConfig";
 import { setUserCommunityData } from "reducers/UserActions";
 import usePinnedCommunities from "hooks/usePinnedCommunities";
+import { channelChanged } from "reducers/actions";
 
 const HomeWrapper = () => {
   const dispatch = useAppDispatch();
@@ -63,7 +64,12 @@ const HomeWrapper = () => {
           channels?.[0]?.channel_id ||
           "";
       }
-      if (!matchCommunityId || !community || !matchChannelId) {
+      if (
+        !matchCommunityId ||
+        !community ||
+        !matchChannelId ||
+        matchChannelId !== initialChannelId
+      ) {
         navigate(`/channels/${initialCommunityId}/${initialChannelId}`, {
           replace: true,
         });
@@ -84,6 +90,7 @@ const HomeWrapper = () => {
 
   useEffect(() => {
     if (matchChannelId && validateUUID(matchChannelId)) {
+      dispatch(channelChanged());
       if (getMessageActionRef.current) {
         getMessageActionRef.current.abort();
       }
