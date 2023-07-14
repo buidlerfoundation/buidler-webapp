@@ -112,10 +112,10 @@ export interface IHNStory {
   id: string;
   title: string;
   content?: string | null;
-  url: string;
+  url?: string;
   author: string;
-  points: number;
-  created_at: string;
+  points?: number;
+  created_at: string | number;
   total_comments: number;
 }
 
