@@ -9,6 +9,7 @@ import Panel from "pages/Panel";
 import Plugin from "pages/Plugin";
 import HomeWrapper from "./Layout/HomeWrapper";
 import MyCommunity from "pages/MyCommunity";
+import OutsideWrapper from "./Layout/OutsideWrapper";
 
 const Main = () => {
   return (
@@ -23,11 +24,16 @@ const Main = () => {
               element={<Home />}
             />
           </Route>
-          <Route path="/panel/:community_id/:channel_id" element={<Panel />} />
-          <Route
-            path="/plugin/:community_id/:channel_id"
-            element={<Plugin />}
-          />
+          <Route element={<OutsideWrapper />}>
+            <Route
+              path="/panel/:community_id/:channel_id"
+              element={<Panel />}
+            />
+            <Route
+              path="/plugin/:community_id/:channel_id"
+              element={<Plugin />}
+            />
+          </Route>
         </Route>
         <Route path="/started" element={<Started />} />
         <Route path="*" element={<PageNotFound />} />
