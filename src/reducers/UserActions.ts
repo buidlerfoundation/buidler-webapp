@@ -48,7 +48,9 @@ export const getPinnedCommunities = createAsyncThunk(
 
 export const setUserCommunityData = createAsyncThunk(
   "user/setCommunity",
-  async (communityId: string) => {
+  async (communityId: string, store) => {
+    const state: any = store.getState();
+    const { community, channel } = state?.user?.externalData || {};
     const [resChannel, teamUsersRes] = await Promise.all([
       api.getListChannel(communityId),
       api.getTeamUsers(communityId),
@@ -59,6 +61,13 @@ export const setUserCommunityData = createAsyncThunk(
         channels.push(...space.channels);
       }
     });
+    if (
+      communityId === community?.community_id &&
+      channel &&
+      !channels.find((el) => el.channel_id === channel.channel_id)
+    ) {
+      channels.push(channel);
+    }
     const initialSpace = resChannel.data?.find(
       (el) => el.channels && el.channels?.length > 0
     );

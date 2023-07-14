@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import React, { useCallback, useEffect, useRef } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import SideBar from "shared/SideBar";
 import useAppDispatch from "hooks/useAppDispatch";
 import useCommunityId from "hooks/useCommunityId";
@@ -15,19 +15,12 @@ import { channelChanged } from "reducers/actions";
 
 const HomeWrapper = () => {
   const dispatch = useAppDispatch();
-  const location = useLocation();
   const getMessageActionRef = useRef<any>();
   const navigate = useNavigate();
   const matchCommunityId = useCommunityId();
   const matchChannelId = useChannelId();
   const pinnedCommunities = usePinnedCommunities();
   const channels = useChannels();
-  const hideLayoutElement = useMemo(
-    () =>
-      location.pathname.includes("panel") ||
-      location.pathname.includes("plugin"),
-    [location.pathname]
-  );
   const initialCommunityData = useCallback(async () => {
     if (pinnedCommunities?.length === 0) {
       navigate("/communities", { replace: true });
@@ -110,9 +103,6 @@ const HomeWrapper = () => {
   const handleOpenInviteMember = useCallback(() => {}, []);
   const toggleOpenMembers = useCallback(() => {}, []);
   const onOpenChannelSetting = useCallback(() => {}, []);
-  if (hideLayoutElement) {
-    return <Outlet />;
-  }
   return (
     <>
       <SideBar

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Community, Space } from "models/Community";
+import { Channel, Community, Space } from "models/Community";
 import { BalanceApiData, InitialApiData, UserData } from "models/User";
 import {
   getCommunities,
@@ -13,6 +13,7 @@ import {
   unPinCommunity,
 } from "./UserActions";
 import { logoutAction } from "./actions";
+import { uniqBy } from "lodash";
 
 interface UserState {
   data: UserData;
@@ -30,6 +31,11 @@ interface UserState {
   };
   loadingCommunityData?: boolean;
   walletBalance?: BalanceApiData | null;
+  externalData?: {
+    community: Community;
+    space: Space | null;
+    channel: Channel;
+  };
 }
 
 const initialState: UserState = {
@@ -177,6 +183,12 @@ const userSlice = createSlice({
                   [community.community_id]: [{ ...space, channels: [channel] }],
                 };
               }
+            } else if (community && space && channel) {
+              state.externalData = {
+                community,
+                space,
+                channel,
+              };
             }
             state.pinnedCommunities = communities;
           }
@@ -197,9 +209,29 @@ const userSlice = createSlice({
       .addCase(setUserCommunityData.fulfilled, (state: UserState, action) => {
         const { resChannel, teamUsersRes, communityId } = action.payload;
         if (resChannel.success && resChannel.data) {
+          let spaces = resChannel.data || [];
+          const { community, space, channel } = state.externalData || {};
+          if (space && channel && community?.community_id === communityId) {
+            if (!spaces.find((el) => el.space_id === space?.space_id)) {
+              spaces.push({ ...space, channels: [channel] });
+            } else {
+              spaces = spaces.map((el) => {
+                if (el.space_id === space.space_id) {
+                  return {
+                    ...el,
+                    channels: uniqBy(
+                      [...(el.channels || []), channel],
+                      "channel_id"
+                    ),
+                  };
+                }
+                return el;
+              });
+            }
+          }
           state.spaceMap = {
             ...state.spaceMap,
-            [communityId]: resChannel.data || [],
+            [communityId]: spaces,
           };
         }
         if (teamUsersRes.success && teamUsersRes.data) {

@@ -22,15 +22,12 @@ const Main = () => {
               path="/channels/:community_id?/:channel_id?/:entity_type?/:entity_id?"
               element={<Home />}
             />
-            <Route
-              path="/panel/:community_id/:channel_id"
-              element={<Panel />}
-            />
-            <Route
-              path="/plugin/:community_id/:channel_id"
-              element={<Plugin />}
-            />
           </Route>
+          <Route path="/panel/:community_id/:channel_id" element={<Panel />} />
+          <Route
+            path="/plugin/:community_id/:channel_id"
+            element={<Plugin />}
+          />
         </Route>
         <Route path="/started" element={<Started />} />
         <Route path="*" element={<PageNotFound />} />
