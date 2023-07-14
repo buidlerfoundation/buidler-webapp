@@ -86,7 +86,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
   );
   const onAddReact = useCallback(
     (data: any) => {
-      const { attachment_id, emoji_id, user_id } = data.reaction_data;
+      const { attachment_id, emoji_id, user_id } = data;
       dispatch(
         REACT_ACTIONS.addReact({
           id: attachment_id,
@@ -99,7 +99,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
   );
   const onRemoveReact = useCallback(
     (data: any) => {
-      const { attachment_id, emoji_id, user_id } = data.reaction_data;
+      const { attachment_id, emoji_id, user_id } = data;
       dispatch(
         REACT_ACTIONS.removeReact({
           id: attachment_id,
