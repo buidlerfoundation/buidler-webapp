@@ -29,7 +29,7 @@ interface MessageState {
 const initialState: MessageState = {
   messageData: {},
   apiController: null,
-  chatBoxActiveTab: "chat",
+  chatBoxActiveTab: "pin",
 };
 
 export const getMessages = createAsyncThunk(
@@ -252,7 +252,7 @@ const messageSlice = createSlice({
     builder
       .addCase(logoutAction, () => initialState)
       .addCase(channelChanged, (state) => {
-        state.chatBoxActiveTab = "chat";
+        state.chatBoxActiveTab = "pin";
       })
       .addCase(getMessages.pending, (state, action) => {
         if (action.meta.arg.before) {
