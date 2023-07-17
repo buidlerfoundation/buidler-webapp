@@ -17,7 +17,7 @@ const AppConfig = {
   estimateGasRecipientAddress: "0x1908bf9Dae06BB1F6E4C7eE0f7B5D4c82D1Ba6ad",
   buidlerExtensionId: "ldbjeldeabnbghmhakiijnpfggokmhib",
   loginPath: "/started",
-  walletConnectProjectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID || "",
+  walletConnectProjectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID || "xxx",
 };
 
 export default AppConfig;
