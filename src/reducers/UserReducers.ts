@@ -79,15 +79,15 @@ const userSlice = createSlice({
       state: UserState,
       action: PayloadAction<Community>
     ) => {
-      const pinnedCommunities = state.pinnedCommunities || [];
+      const communities = state.communities || [];
       if (
-        !pinnedCommunities.find(
+        !communities.find(
           (el) => el.community_id === action.payload.community_id
         )
       ) {
-        pinnedCommunities.push({ ...action.payload, seen: true });
+        communities.push({ ...action.payload, seen: true });
       }
-      state.pinnedCommunities = pinnedCommunities;
+      state.communities = communities;
     },
     updateChannel: (
       state: UserState,
