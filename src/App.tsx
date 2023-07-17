@@ -52,7 +52,22 @@ function App() {
         changeRouteListener
       );
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    const eventClick = async (e: any) => {
+      if (!e.target.download) {
+        const href = e?.target?.href || e?.target?.parentElement?.href;
+        if (href) {
+          window.open(href, "_blank");
+        }
+        e.preventDefault();
+      }
+    };
+    window.addEventListener("click", eventClick);
+    return () => {
+      window.removeEventListener("click", eventClick);
+    };
   }, []);
   return (
     <ErrorBoundary>

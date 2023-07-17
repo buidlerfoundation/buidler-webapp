@@ -431,7 +431,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     connect();
   }, [connect]);
   useEffect(() => {
-    if (accounts.length > 0 && !loading && !user.user_id) {
+    if (accounts?.length > 0 && !loading && !user.user_id) {
       doingWCLogin();
     }
   }, [accounts, doingWCLogin, loading, user.user_id]);
