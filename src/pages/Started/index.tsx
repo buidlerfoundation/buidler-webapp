@@ -4,9 +4,11 @@ import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import IconWeb3Auth from "shared/SVG/IconWeb3Auth";
 import images from "common/images";
 import { useAuth } from "providers/AuthProvider";
+import { useWalletConnectClient } from "providers/WalletConnectProvider";
 
 const Started = () => {
   const auth = useAuth();
+  const { isInitializing, client } = useWalletConnectClient();
   useEffect(() => {
     GoogleAnalytics.tracking("Login Started", { category: "Login" });
   }, []);
@@ -38,15 +40,17 @@ const Started = () => {
             </div>
           </div>
         )}
-        <div
-          className={`${styles["wallet-button"]} normal-button`}
-          onClick={auth.loginWithWalletConnect}
-        >
-          <span>WalletConnect</span>
-          <div className={styles["wallet-icon"]}>
-            <img src={images.icWalletConnect} alt="" />
+        {!isInitializing && client && (
+          <div
+            className={`${styles["wallet-button"]} normal-button`}
+            onClick={auth.loginWithWalletConnect}
+          >
+            <span>WalletConnect</span>
+            <div className={styles["wallet-icon"]}>
+              <img src={images.icWalletConnect} alt="" />
+            </div>
           </div>
-        </div>
+        )}
         <div
           className={`${styles["wallet-button"]} normal-button`}
           onClick={auth.loginWithWeb3Auth}
