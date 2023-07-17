@@ -58,7 +58,7 @@ function App() {
     const eventClick = async (e: any) => {
       if (!e.target.download) {
         const href = e?.target?.href || e?.target?.parentElement?.href;
-        if (href) {
+        if (href && !href?.includes(window.location.origin)) {
           window.open(href, "_blank");
         }
         e.preventDefault();
