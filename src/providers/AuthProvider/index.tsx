@@ -38,9 +38,10 @@ import { USER_ACTIONS } from "reducers/UserReducers";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import ChainId from "services/connectors/ChainId";
 import MetamaskUtils from "services/connectors/MetamaskUtils";
-import WalletConnectUtils from "services/connectors/WalletConnectUtils";
 import Web3AuthUtils from "services/connectors/Web3AuthUtils";
 import { getDeviceToken } from "services/firebase";
+import { useWalletConnectClient } from "providers/WalletConnectProvider";
+import useUser from "hooks/useUser";
 
 export interface IAuthContext {
   loginWithMetaMask: () => Promise<void>;
@@ -69,12 +70,15 @@ interface IAuthProps {
 }
 
 const AuthProvider = ({ children }: IAuthProps) => {
+  const { connect, disconnect, accounts, web3Provider } =
+    useWalletConnectClient();
   const socket = useSocket();
   const query = useQuery();
   const navigate = useNavigate();
   const location = useLocation();
   const pinnedCommunities = usePinnedCommunities();
   const channels = useChannels();
+  const user = useUser();
   const [loading, setLoading] = useState(true);
   const isQuickLogin = useRef(false);
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
@@ -376,25 +380,15 @@ const AuthProvider = ({ children }: IAuthProps) => {
     onMetamaskUpdate,
   ]);
   const doingWCLogin = useCallback(async () => {
-    if (
-      !WalletConnectUtils.connector ||
-      !WalletConnectUtils.connector?.connected
-    )
-      return;
+    const address = accounts?.[0];
+    if (!address) return;
     try {
-      const { accounts } = WalletConnectUtils.connector;
-      const address = accounts?.[0];
       const message = await getMessageSignTypedData(address);
-      const params = [
-        address,
-        {
-          domain: signTypeData.domain,
-          types: signTypeData.types,
-          message,
-        },
-      ];
-      const signature = await WalletConnectUtils.connector.signTypedData(
-        params
+      const signer = web3Provider?.getSigner();
+      const signature = await signer?._signTypedData(
+        signTypeData.domain,
+        signTypeData.types,
+        message
       );
       const res = await api.verifyNonce(
         {
@@ -402,7 +396,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
           types: signTypeData.types,
           value: message,
         },
-        signature
+        signature || ""
       );
       if (res.statusCode === 200) {
         await handleResponseVerify(
@@ -411,16 +405,20 @@ const AuthProvider = ({ children }: IAuthProps) => {
           location.state
         );
       } else {
-        WalletConnectUtils.connector.killSession();
+        disconnect();
       }
     } catch (err: any) {
       console.log(err);
-      WalletConnectUtils.connector.killSession();
+      disconnect();
     }
-  }, [getMessageSignTypedData, handleResponseVerify, location.state]);
-  const onWCConnected = useCallback(() => {
-    setTimeout(doingWCLogin, 300);
-  }, [doingWCLogin]);
+  }, [
+    accounts,
+    disconnect,
+    getMessageSignTypedData,
+    handleResponseVerify,
+    location.state,
+    web3Provider,
+  ]);
   const onDisconnected = useCallback(async () => {
     api.logout();
     socket.disconnect();
@@ -430,8 +428,13 @@ const AuthProvider = ({ children }: IAuthProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
   const loginWithWalletConnect = useCallback(async () => {
-    WalletConnectUtils.connect(onWCConnected, onDisconnected);
-  }, [onDisconnected, onWCConnected]);
+    connect();
+  }, [connect]);
+  useEffect(() => {
+    if (accounts.length > 0 && !loading && !user.user_id) {
+      doingWCLogin();
+    }
+  }, [accounts, doingWCLogin, loading, user.user_id]);
   const loginWithWeb3Auth = useCallback(async () => {
     setLoadingWeb3Auth(true);
     try {
@@ -489,14 +492,14 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const logout = useCallback(async () => {
     const loginType = await getCookie(AsyncKey.loginType);
     if (loginType === LoginType.WalletConnect) {
-      WalletConnectUtils.disconnect();
+      disconnect();
     } else {
       if (loginType === LoginType.Web3Auth) {
         Web3AuthUtils.disconnect();
       }
-      onDisconnected();
     }
-  }, [onDisconnected]);
+    onDisconnected();
+  }, [disconnect, onDisconnected]);
   // useEffect(() => {
   //   getCookie(AsyncKey.loginType)
   //     .then(async (res) => {

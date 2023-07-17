@@ -5,6 +5,7 @@ import store from "store";
 import SocketProvider from "./SocketProvider";
 import AuthProvider from "./AuthProvider";
 import ImageProvider from "./ImageProvider";
+import { WalletConnectProvider } from "./WalletConnectProvider";
 
 type ProvidersProps = {
   children: React.ReactNode;
@@ -32,9 +33,11 @@ const Providers = ({ children }: ProvidersProps) => {
     <Provider store={store}>
       <ThemeProvider theme={materialTheme}>
         <SocketProvider>
-          <AuthProvider>
-            <ImageProvider>{children}</ImageProvider>
-          </AuthProvider>
+          <WalletConnectProvider>
+            <AuthProvider>
+              <ImageProvider>{children}</ImageProvider>
+            </AuthProvider>
+          </WalletConnectProvider>
         </SocketProvider>
         <CssBaseline />
       </ThemeProvider>
