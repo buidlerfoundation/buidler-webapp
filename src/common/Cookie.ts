@@ -66,6 +66,26 @@ export const GeneratedPrivateKey = async () => {
   return privateKey;
 };
 
+export const setLastChannelIdByCommunityId = async (
+  communityId: string,
+  channelId: string
+) => {
+  const lastChannelIdByTeamIdCookie = await getCookie(
+    AsyncKey.lastChannelIdByTeamId
+  );
+  let lastChannelIdByTeamId: { [key: string]: string } = {};
+  try {
+    lastChannelIdByTeamId = JSON.parse(lastChannelIdByTeamIdCookie);
+  } catch (error) {
+    console.log(error);
+  }
+  lastChannelIdByTeamId[communityId] = channelId;
+  setCookie(
+    AsyncKey.lastChannelIdByTeamId,
+    JSON.stringify(lastChannelIdByTeamId)
+  );
+};
+
 export const getLastChannelIdByCommunityId = async (communityId: string) => {
   const lastChannelIdByTeamIdCookie = await getCookie(
     AsyncKey.lastChannelIdByTeamId

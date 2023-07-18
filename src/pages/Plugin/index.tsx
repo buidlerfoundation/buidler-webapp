@@ -28,10 +28,10 @@ const Plugin = () => {
     [dispatch]
   );
   useEffect(() => {
-    if (channel?.dapp_integration_url) {
-      dispatch(getStories({ url: channel?.dapp_integration_url }));
+    if (channel?.display_channel_url) {
+      dispatch(getStories({ url: channel?.display_channel_url }));
     }
-  }, [channel?.dapp_integration_url, dispatch]);
+  }, [channel?.display_channel_url, dispatch]);
   useEffect(() => {
     if (pluginOpen) {
       setStyle({

@@ -80,12 +80,12 @@ const Home = () => {
     };
   }, [channel?.dapp_integration_url, handleOpenNewTab, openNewChannel]);
   useEffect(() => {
-    if (channel?.dapp_integration_url) {
+    if (channel?.display_channel_url) {
       setOpenNewChannel(true);
       setLoadingIframe(true);
-      dispatch(getStories({ url: channel?.dapp_integration_url }));
+      dispatch(getStories({ url: channel?.display_channel_url }));
     }
-  }, [channel?.dapp_integration_url, dispatch]);
+  }, [channel?.display_channel_url, dispatch]);
   useEffect(() => {
     if (channel?.channel_name && community?.community_name) {
       document.title = `${community?.community_name} • #${channel?.channel_name} | Buidler`;

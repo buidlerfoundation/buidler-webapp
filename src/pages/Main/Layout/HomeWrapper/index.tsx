@@ -5,7 +5,11 @@ import useAppDispatch from "hooks/useAppDispatch";
 import useCommunityId from "hooks/useCommunityId";
 import useChannelId from "hooks/useChannelId";
 import useChannels from "hooks/useChannels";
-import { getCookie, getLastChannelIdByCommunityId } from "common/Cookie";
+import {
+  getCookie,
+  getLastChannelIdByCommunityId,
+  setLastChannelIdByCommunityId,
+} from "common/Cookie";
 import { validateUUID } from "helpers/ChannelHelper";
 import { getMessages } from "reducers/MessageReducers";
 import { AsyncKey } from "common/AppConfig";
@@ -80,6 +84,17 @@ const HomeWrapper = () => {
   useEffect(() => {
     initialCommunityData();
   }, [initialCommunityData]);
+
+  useEffect(() => {
+    if (
+      matchChannelId &&
+      matchCommunityId &&
+      validateUUID(matchChannelId) &&
+      validateUUID(matchCommunityId)
+    ) {
+      setLastChannelIdByCommunityId(matchCommunityId, matchChannelId);
+    }
+  }, [matchChannelId, matchCommunityId]);
 
   useEffect(() => {
     if (matchChannelId && validateUUID(matchChannelId)) {
