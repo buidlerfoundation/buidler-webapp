@@ -42,6 +42,7 @@ import Web3AuthUtils from "services/connectors/Web3AuthUtils";
 import { getDeviceToken } from "services/firebase";
 import { useWalletConnectClient } from "providers/WalletConnectProvider";
 import useUser from "hooks/useUser";
+import { OUTSIDE_ACTIONS } from "reducers/OutsideReducers";
 
 export interface IAuthContext {
   loginWithMetaMask: () => Promise<void>;
@@ -83,6 +84,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const isQuickLogin = useRef(false);
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
   const ott = useMemo(() => query.get("ott"), [query]);
+  const autoOff = useMemo(() => query.get("auto_off"), [query]);
   const externalUrl = useMemo(
     () => window.location.href.split("external_url=")?.[1]?.split("&ott")?.[0],
     []
@@ -254,6 +256,11 @@ const AuthProvider = ({ children }: IAuthProps) => {
     setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    if (autoOff) {
+      dispatch(OUTSIDE_ACTIONS.updateAutoOff(autoOff === "true"));
+    }
+  }, [autoOff, dispatch]);
   useEffect(() => {
     GoogleAnalytics.init();
   }, []);

@@ -20,6 +20,7 @@ export const clearData = (callback = () => {}) => {
   Cookies.remove(AsyncKey.loginType);
   Cookies.remove(AsyncKey.socketConnectKey);
   Cookies.remove(AsyncKey.draftMessageKey);
+  Cookies.remove(AsyncKey.autoOffPlugin);
   callback();
 };
 

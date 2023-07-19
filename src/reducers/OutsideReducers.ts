@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { logoutAction } from "./actions";
 import { getDataFromExternalUrl } from "./UserActions";
 
@@ -6,17 +6,22 @@ interface OutsideState {
   urlType?: "main" | "detail";
   pluginOpen: boolean;
   loading?: boolean;
+  autoOff?: boolean;
 }
 
 const initialState: OutsideState = {
   pluginOpen: false,
   loading: false,
+  autoOff: false,
 };
 
 const outsideSlice = createSlice({
   name: "outside",
   initialState,
   reducers: {
+    updateAutoOff: (state, action: PayloadAction<boolean>) => {
+      state.autoOff = action.payload;
+    },
     toggle: (state: OutsideState) => {
       state.pluginOpen = !state.pluginOpen;
     },

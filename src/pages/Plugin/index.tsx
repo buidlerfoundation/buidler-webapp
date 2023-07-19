@@ -15,10 +15,12 @@ import { useNavigate } from "react-router-dom";
 import useOutsideLoading from "hooks/useOutsideLoading";
 import useChannel from "hooks/useChannel";
 import { getStories } from "reducers/PinPostReducers";
+import useShowPlugin from "hooks/useShowPlugin";
 
 const Plugin = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const isShowPlugin = useShowPlugin();
   const pluginOpen = usePluginOpen();
   const loading = useOutsideLoading();
   const channel = useChannel();
@@ -27,6 +29,11 @@ const Plugin = () => {
     () => dispatch(OUTSIDE_ACTIONS.toggle()),
     [dispatch]
   );
+  useEffect(() => {
+    if (isShowPlugin) {
+      window.parent.postMessage("show-plugin", "*");
+    }
+  }, [isShowPlugin]);
   useEffect(() => {
     if (channel?.display_channel_url) {
       dispatch(getStories({ url: channel?.display_channel_url }));

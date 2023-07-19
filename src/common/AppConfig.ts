@@ -43,6 +43,7 @@ export const AsyncKey = {
   isBackup: `${Prefix}_is_backup`,
   draftMessageKey: `${Prefix}_draft_message`,
   lastChannelIdByTeamId: `${Prefix}_last_channel_id_by_team_id`,
+  autoOffPlugin: `${Prefix}_auto_off_plugin`
 };
 
 export const ProgressStatus = [
