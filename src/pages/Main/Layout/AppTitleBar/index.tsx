@@ -301,6 +301,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
             <div
               className={`${styles["team-item"]} ${styles["btn-create-community"]}`}
               onClick={handleOpenModalTeam}
+              style={{ display: "none" }}
             >
               <IconPlus />
               <span className={styles["team-name"]} style={{ marginLeft: 11 }}>
@@ -311,6 +312,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
             <div
               className={`normal-button ${styles["create-team-button"]}`}
               onClick={handleOpenModalTeam}
+              style={{ display: "none" }}
             >
               <img alt="" src={images.icPlus} />
             </div>
