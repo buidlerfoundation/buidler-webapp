@@ -9,7 +9,7 @@ function useShowPlugin() {
   const messageData = useMessageData();
   return useMemo(
     () =>
-      (topicData?.stories?.length || 0) > 0 &&
+      (topicData?.stories?.length || 0) > 0 ||
       (messageData?.data?.length || 0) > 0,
     [messageData?.data?.length, topicData?.stories?.length]
   );
