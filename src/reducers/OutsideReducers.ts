@@ -7,6 +7,7 @@ interface OutsideState {
   pluginOpen: boolean;
   loading?: boolean;
   autoOff?: boolean;
+  externalUrl?: string;
 }
 
 const initialState: OutsideState = {
@@ -34,6 +35,7 @@ const outsideSlice = createSlice({
         if (url) {
           const uri = new URL(url);
           state.urlType = uri.pathname === "/" ? "main" : "detail";
+          state.externalUrl = url;
         }
         state.loading = true;
       })
