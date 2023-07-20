@@ -33,6 +33,7 @@ import {
   acceptInvitation,
   getDataFromExternalUrl,
   getPinnedCommunities,
+  setUserCommunityData,
 } from "reducers/UserActions";
 import { USER_ACTIONS } from "reducers/UserReducers";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
@@ -160,6 +161,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
             if (actionRes?.externalUrlRes?.data) {
               const { community, channel } = actionRes?.externalUrlRes?.data;
               if (community && channel) {
+                await dispatch(setUserCommunityData(community.community_id));
                 navigate(
                   `/channels/${community.community_id}/${channel.channel_id}`,
                   { replace: true }
