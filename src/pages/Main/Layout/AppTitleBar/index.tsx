@@ -33,6 +33,7 @@ import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import MyCommunityItem from "shared/MyCommunityItem";
 import usePinnedCommunities from "hooks/usePinnedCommunities";
 import { unPinCommunity } from "reducers/UserActions";
+import { getLastChannelIdByCommunityId } from "common/Cookie";
 
 type AppTitleBarProps = {
   onJumpToMessage?: (messageId: string) => void;
@@ -147,7 +148,17 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
   }, [pinnedCommunities]);
   const setTeam = useCallback(
     async (t?: Community) => {
-      navigate(`/channels/${t?.community_id}`, { replace: true });
+      if (t?.community_id) {
+        const lastChannelIdByCommunityId = await getLastChannelIdByCommunityId(
+          t?.community_id
+        );
+        navigate(
+          `/channels/${t?.community_id}/${lastChannelIdByCommunityId || ""}`,
+          {
+            replace: true,
+          }
+        );
+      }
     },
     [navigate]
   );

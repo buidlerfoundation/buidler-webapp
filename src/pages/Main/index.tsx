@@ -36,6 +36,7 @@ const Main = () => {
           </Route>
         </Route>
         <Route path="/started" element={<Started />} />
+        <Route path="/plugin/*" element={<div />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </div>

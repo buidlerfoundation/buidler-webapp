@@ -9,6 +9,7 @@ import { getCommunities, pinCommunity } from "reducers/UserActions";
 import { useNavigate } from "react-router-dom";
 import api from "api";
 import usePinnedCommunities from "hooks/usePinnedCommunities";
+import { getLastChannelIdByCommunityId } from "common/Cookie";
 
 const MyCommunity = () => {
   const dispatch = useAppDispatch();
@@ -16,7 +17,7 @@ const MyCommunity = () => {
   const communities = useCommunities();
   const pinnedCommunities = usePinnedCommunities();
   const onClick = useCallback(
-    (community: Community) => {
+    async (community: Community) => {
       if (
         !pinnedCommunities?.find(
           (el) => el.community_id === community.community_id
@@ -25,7 +26,15 @@ const MyCommunity = () => {
         api.pinCommunity(community.community_id);
         dispatch(pinCommunity(community));
       }
-      navigate(`/channels/${community.community_id}`, { replace: true });
+      const lastChannelIdByCommunityId = await getLastChannelIdByCommunityId(
+        community.community_id
+      );
+      navigate(
+        `/channels/${community.community_id}/${
+          lastChannelIdByCommunityId || ""
+        }`,
+        { replace: true }
+      );
     },
     [dispatch, navigate, pinnedCommunities]
   );
