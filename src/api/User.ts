@@ -124,3 +124,6 @@ export const modifyRole = (
 ) => {
   return Caller.put(`team/${teamId}/${role}`, body);
 };
+
+export const getUsersByName = (q: string) =>
+  Caller.get<UserData[]>(`user/search?user_name=${q}`);
