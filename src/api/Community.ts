@@ -65,7 +65,7 @@ export const unPinCommunity = (id: string) =>
 
 export const getStories = (payload: { url: string; page?: number }) =>
   Caller.post<IHNStory[]>(
-    `external/hacker-new/story?page=${payload.page || 1}&limit=10`,
+    `external/hacker-new/story?page=${payload.page || 1}`,
     { url: payload.url }
   );
 

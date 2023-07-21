@@ -144,7 +144,7 @@ const pinPostSlice = createSlice({
             ...state.topicData,
             [url]: {
               page: currentPage || 1,
-              total: action.payload.metadata?.total || 0,
+              total: action.payload.metadata?.total || data?.length || 0,
               totalPage: action.payload.metadata?.total_pages || 0,
               stories: data,
               loading: false,
