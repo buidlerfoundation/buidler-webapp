@@ -108,6 +108,7 @@ export interface BaseDataApi<T> {
     can_loadmore_message_after?: boolean;
     can_loadmore_message_before?: boolean;
     is_new_team_member?: boolean;
+    current_page?: number;
   };
   refresh_token?: string;
   token_expire_at?: number;

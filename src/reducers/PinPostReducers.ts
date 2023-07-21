@@ -134,14 +134,16 @@ const pinPostSlice = createSlice({
       })
       .addCase(getStories.fulfilled, (state, action) => {
         if (action.payload) {
-          const { url, page } = action.meta.arg;
+          const { url } = action.meta.arg;
+          const currentPage = action.payload?.metadata?.current_page || 1;
           const currentStories = state.topicData?.[url]?.stories || [];
           const stories = action.payload.data || [];
-          const data = !page ? stories : [...currentStories, ...stories];
+          const data =
+            currentPage === 1 ? stories : [...currentStories, ...stories];
           state.topicData = {
             ...state.topicData,
             [url]: {
-              page: page || 1,
+              page: currentPage || 1,
               total: action.payload.metadata?.total || 0,
               totalPage: action.payload.metadata?.total_pages || 0,
               stories: data,
