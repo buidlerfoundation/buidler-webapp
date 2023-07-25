@@ -52,11 +52,9 @@ const HomeWrapper = () => {
         const lastChannelIdByCommunityId = await getLastChannelIdByCommunityId(
           initialCommunityId
         );
-        const channel = channels?.find(
-          (el) =>
-            el.channel_id === matchChannelId ||
-            el.channel_id === lastChannelIdByCommunityId
-        );
+        const channel =
+          channels?.find((el) => el.channel_id === matchChannelId) ||
+          channels?.find((el) => el.channel_id === lastChannelIdByCommunityId);
         initialChannelId =
           channel?.channel_id || channels?.[0]?.channel_id || "";
       }
