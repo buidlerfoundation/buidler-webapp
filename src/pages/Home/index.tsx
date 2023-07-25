@@ -37,15 +37,40 @@ const Home = () => {
   }, []);
   const handleOpenNewTab = useCallback(
     async (url: string) => {
+      // const { channel_url, space_url, community_url } = getURLObject(url);
+      // if (community_url === community.community_url) {
+      //   const existedChannel = channels.find(
+      //     (el) => el.channel_url === channel_url
+      //   );
+      //   if (existedChannel) {
+      //     navigate(
+      //       `/channels/${community.community_id}/${existedChannel.channel_id}`,
+      //       {
+      //         replace: true,
+      //       }
+      //     );
+      //   } else {
+      //     const existedSpace = spaces.find((el) => el.space_url === space_url);
+      //     if (existedSpace) {
+      //       // fake loading channel
+      //     } else {
+      //       // fake loading space
+      //     }
+      //   }
+      // } else {
+      //   // fake loading community
+      // }
       setOpenNewChannel(true);
       setLoadingIframe(true);
       setLoadingOpenNewChannel(true);
       const res = await dispatch(openNewTabFromIframe({ url })).unwrap();
       if (res) {
-        const { channel, community } = res;
-        navigate(`/channels/${community.community_id}/${channel.channel_id}`, {
-          replace: true,
-        });
+        navigate(
+          `/channels/${res.community.community_id}/${res.channel.channel_id}`,
+          {
+            replace: true,
+          }
+        );
       }
       setTimeout(() => {
         setLoadingIframe(false);
@@ -98,7 +123,7 @@ const Home = () => {
           <iframe
             id="buidler-iframe"
             ref={iframeRef}
-            src={channel?.dapp_integration_url}
+            src={channel?.dapp_integration_url?.replace("www.", "")}
             className={styles["dapp-iframe-full"]}
             title="dapp-browser"
             onLoad={onLoad}
