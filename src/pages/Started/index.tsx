@@ -5,8 +5,10 @@ import IconWeb3Auth from "shared/SVG/IconWeb3Auth";
 import images from "common/images";
 import { useAuth } from "providers/AuthProvider";
 import { useWalletConnectClient } from "providers/WalletConnectProvider";
+import { useLocation } from "react-router-dom";
 
 const Started = () => {
+  const location = useLocation();
   const auth = useAuth();
   const { isInitializing, client } = useWalletConnectClient();
   useEffect(() => {
@@ -16,6 +18,18 @@ const Started = () => {
     const userAgent = window.navigator.userAgent;
     return !/Chrome/.test(userAgent);
   }, []);
+  useEffect(() => {
+    if (location) {
+      const query = new URLSearchParams(location.search);
+      GoogleAnalytics.tracking("Page Viewed", {
+        category: "Traffic",
+        page_name: "Login",
+        source: query.get("ref") || "",
+        path: location.pathname,
+        type: "web-app",
+      });
+    }
+  }, [location]);
   return (
     <div className={styles.container}>
       <div className={styles.body}>
