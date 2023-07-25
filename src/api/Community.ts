@@ -63,11 +63,14 @@ export const pinCommunity = (id: string) => Caller.post(`community/${id}/pin`);
 export const unPinCommunity = (id: string) =>
   Caller.delete(`community/${id}/pin`);
 
-export const getStories = (payload: { url: string; page?: number }) =>
-  Caller.post<IHNStory[]>(
-    `external/hacker-new/story?page=${payload.page || 1}`,
-    { url: payload.url }
+export const getStories = (payload: { url: string; page?: number }) => {
+  return Caller.get<IHNStory[]>(
+    `external/hacker-new/story?${new URLSearchParams({
+      url: payload.url,
+      page: `${payload.page || 1}`,
+    })}`
   );
+};
 
 export const getCommentFromStory = (payload: { id: string; page?: number }) =>
   Caller.get<IHNComment[]>(
