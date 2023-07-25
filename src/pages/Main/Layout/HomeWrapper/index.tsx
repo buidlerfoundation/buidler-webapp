@@ -53,13 +53,12 @@ const HomeWrapper = () => {
           initialCommunityId
         );
         const channel = channels?.find(
-          (el) => el.channel_id === matchChannelId
+          (el) =>
+            el.channel_id === matchChannelId ||
+            el.channel_id === lastChannelIdByCommunityId
         );
         initialChannelId =
-          channel?.channel_id ||
-          lastChannelIdByCommunityId ||
-          channels?.[0]?.channel_id ||
-          "";
+          channel?.channel_id || channels?.[0]?.channel_id || "";
       }
       if (
         !matchCommunityId ||
