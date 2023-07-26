@@ -16,6 +16,12 @@ import {
 import { logoutAction } from "./actions";
 import { uniqBy } from "lodash";
 
+interface IOpeningNewTab {
+  entityType: "channel" | "space" | "community";
+  entityId?: string;
+  url?: string;
+}
+
 interface UserState {
   data: UserData;
   imgDomain?: string;
@@ -37,6 +43,7 @@ interface UserState {
     space: Space | null;
     channel: Channel;
   };
+  openingNewTab?: IOpeningNewTab;
 }
 
 const initialState: UserState = {
@@ -122,18 +129,12 @@ const userSlice = createSlice({
       }
       state.spaceMap = newSpaceMap;
     },
-    // updateCommunity: (
-    //   state: UserState,
-    //   action: PayloadAction<Community | undefined>
-    // ) => {
-    //   state.community = action.payload;
-    // },
-    // updateCurrentChannel: (
-    //   state: UserState,
-    //   action: PayloadAction<Channel | undefined>
-    // ) => {
-    //   state.channel = action.payload;
-    // },
+    updateOpeningNewTab: (
+      state,
+      action: PayloadAction<IOpeningNewTab | undefined>
+    ) => {
+      state.openingNewTab = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -305,6 +306,7 @@ const userSlice = createSlice({
         }
       })
       .addCase(openNewTabFromIframe.fulfilled, (state, action) => {
+        state.openingNewTab = undefined;
         if (action.payload) {
           const { channel, community, space } = action.payload;
           if (

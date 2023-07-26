@@ -13,17 +13,27 @@ import { openNewTabFromIframe } from "reducers/UserActions";
 import { useNavigate } from "react-router-dom";
 import { getStories } from "reducers/PinPostReducers";
 import Loading from "./Loading";
+import { getURLObject } from "helpers/LinkHelper";
+import useChannels from "hooks/useChannels";
+import useSpaces from "hooks/useSpaceChannel";
+import { USER_ACTIONS } from "reducers/UserReducers";
+import useAppSelector from "hooks/useAppSelector";
+import usePinnedCommunities from "hooks/usePinnedCommunities";
+import { getLastChannelIdByCommunityId } from "common/Cookie";
 
 const Home = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const openingNewTab = useAppSelector((state) => state.user.openingNewTab);
+  const pinnedCommunities = usePinnedCommunities();
   const channel = useChannel();
+  const channels = useChannels();
+  const spaces = useSpaces();
   const community = useCurrentCommunity();
   const iframeRef =
     useRef<HTMLIFrameElement>() as React.MutableRefObject<HTMLIFrameElement>;
   const [loadingIframe, setLoadingIframe] = useState(false);
   const [openNewChannel, setOpenNewChannel] = useState(false);
-  const [loadingOpenNewChannel, setLoadingOpenNewChannel] = useState(false);
   const onLoad = useCallback(
     (e: React.SyntheticEvent<HTMLIFrameElement, Event>) => {
       setLoadingIframe(false);
@@ -37,32 +47,61 @@ const Home = () => {
   }, []);
   const handleOpenNewTab = useCallback(
     async (url: string) => {
-      // const { channel_url, space_url, community_url } = getURLObject(url);
-      // if (community_url === community.community_url) {
-      //   const existedChannel = channels.find(
-      //     (el) => el.channel_url === channel_url
-      //   );
-      //   if (existedChannel) {
-      //     navigate(
-      //       `/channels/${community.community_id}/${existedChannel.channel_id}`,
-      //       {
-      //         replace: true,
-      //       }
-      //     );
-      //   } else {
-      //     const existedSpace = spaces.find((el) => el.space_url === space_url);
-      //     if (existedSpace) {
-      //       // fake loading channel
-      //     } else {
-      //       // fake loading space
-      //     }
-      //   }
-      // } else {
-      //   // fake loading community
-      // }
+      const { channel_url, space_url, community_url } = getURLObject(url);
+      if (community_url === community.community_url) {
+        const existedChannel = channels.find(
+          (el) => el.channel_url === channel_url
+        );
+        if (existedChannel) {
+          navigate(
+            `/channels/${community.community_id}/${existedChannel.channel_id}`,
+            {
+              replace: true,
+            }
+          );
+          return;
+        } else {
+          const existedSpace = spaces.find((el) => el.space_url === space_url);
+          if (existedSpace) {
+            dispatch(
+              USER_ACTIONS.updateOpeningNewTab({
+                entityType: "channel",
+                entityId: existedSpace.space_id,
+              })
+            );
+          } else {
+            dispatch(
+              USER_ACTIONS.updateOpeningNewTab({
+                entityType: "space",
+              })
+            );
+          }
+        }
+      } else {
+        const existedCommunity = pinnedCommunities?.find(
+          (el) => el.community_url === community_url
+        );
+        if (existedCommunity) {
+          const lastChannelId = await getLastChannelIdByCommunityId(
+            existedCommunity.community_id
+          );
+          navigate(
+            `/channels/${existedCommunity.community_id}/${lastChannelId || ""}`,
+            {
+              replace: true,
+            }
+          );
+        } else {
+          dispatch(
+            USER_ACTIONS.updateOpeningNewTab({
+              entityType: "community",
+              url,
+            })
+          );
+        }
+      }
       setOpenNewChannel(true);
       setLoadingIframe(true);
-      setLoadingOpenNewChannel(true);
       const res = await dispatch(openNewTabFromIframe({ url })).unwrap();
       if (res) {
         navigate(
@@ -72,12 +111,16 @@ const Home = () => {
           }
         );
       }
-      setTimeout(() => {
-        setLoadingIframe(false);
-        setLoadingOpenNewChannel(false);
-      }, 500);
     },
-    [dispatch, navigate]
+    [
+      channels,
+      community.community_id,
+      community.community_url,
+      dispatch,
+      navigate,
+      pinnedCommunities,
+      spaces,
+    ]
   );
   useEffect(() => {
     const messageListener = (e: any) => {
@@ -151,7 +194,9 @@ const Home = () => {
           <MessageChatBox />
         </div>
       </div>
-      {loadingOpenNewChannel && <Loading />}
+      {openingNewTab?.entityType === "community" && openingNewTab?.url && (
+        <Loading url={openingNewTab?.url} />
+      )}
     </>
   );
 };

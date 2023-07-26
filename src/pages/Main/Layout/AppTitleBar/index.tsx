@@ -34,6 +34,8 @@ import MyCommunityItem from "shared/MyCommunityItem";
 import usePinnedCommunities from "hooks/usePinnedCommunities";
 import { unPinCommunity } from "reducers/UserActions";
 import { getLastChannelIdByCommunityId } from "common/Cookie";
+import TeamItemLoading from "./TeamItemLoading";
+import useAppSelector from "hooks/useAppSelector";
 
 type AppTitleBarProps = {
   onJumpToMessage?: (messageId: string) => void;
@@ -42,6 +44,7 @@ type AppTitleBarProps = {
 const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
   // const toastData = useAppSelector((state) => state.transaction.toastData);
   const dispatch = useAppDispatch();
+  const openingNewTab = useAppSelector((state) => state.user.openingNewTab);
   const userData = useUser();
   const auth = useAuth();
   const pinnedCommunities = usePinnedCommunities();
@@ -263,7 +266,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
       return (
         <TeamItem
           key={el.community_id}
-          isSelected={el.community_id === communityId}
+          isSelected={el.community_id === communityId && !openingNewTab}
           t={el}
           onChangeTeam={setTeam}
           onContextMenu={handleCommunityContextMenu}
@@ -271,7 +274,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
         />
       );
     },
-    [communityId, handleCommunityContextMenu, onUnPin, setTeam]
+    [communityId, handleCommunityContextMenu, onUnPin, openingNewTab, setTeam]
   );
 
   const openPopupNotification = useCallback(() => {
@@ -308,6 +311,9 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
         <div className={`${styles["list-team"]} hide-scroll-bar`}>
           <MyCommunityItem />
           {pinnedCommunities?.map?.(renderTeam)}
+          {openingNewTab?.entityType === "community" && openingNewTab.url && (
+            <TeamItemLoading url={openingNewTab.url} />
+          )}
           {highlightCreateCommunityButton ? (
             <div
               className={`${styles["team-item"]} ${styles["btn-create-community"]}`}
