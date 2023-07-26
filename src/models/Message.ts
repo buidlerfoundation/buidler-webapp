@@ -80,7 +80,7 @@ export interface ConversationData {
   isHead: boolean;
   isSending?: boolean;
   isConversationHead?: boolean;
-  reaction_data: Array<ReactionData>;
+  reaction_data: { [key: string]: number };
   user_reaction: Array<UserReaction>;
   entity_id: string;
   entity_type: string;
@@ -129,4 +129,5 @@ export interface ReactUserApiData {
   emoji_id: string;
   skin: number;
   user_id: string;
+  user?: UserData;
 }

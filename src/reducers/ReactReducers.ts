@@ -98,16 +98,16 @@ const reactSlice = createSlice({
       .addCase(getMessages.fulfilled, (state: ReactState, action) => {
         const currentReact: ReactDataType = {};
         action.payload?.data?.map((dt) => {
-          if (dt.reaction_data?.length > 0) {
-            currentReact[dt.message_id] = dt.reaction_data.map((react) => ({
-              reactName: react.emoji_id,
-              count: parseInt(react.reaction_count),
-              skin: react.skin,
-              isReacted: !!dt.user_reaction.find(
-                (uReact) => uReact.emoji_id === react.emoji_id
-              ),
-            }));
-          }
+          currentReact[dt.message_id] = Object.keys(dt.reaction_data || {}).map(
+            (key) => ({
+              reactName: key,
+              count: dt.reaction_data?.[key] || 0,
+              skin: 1,
+              // isReacted: !!dt.user_reaction.find(
+              //   (uReact) => uReact.emoji_id === react.emoji_id
+              // ),
+            })
+          );
           return dt;
         });
         state.reactData = {
