@@ -26,6 +26,9 @@ const outsideSlice = createSlice({
     toggle: (state: OutsideState) => {
       state.pluginOpen = !state.pluginOpen;
     },
+    openAtFirst: (state: OutsideState) => {
+      state.pluginOpen = true;
+    },
   },
   extraReducers: (builder) =>
     builder

@@ -86,6 +86,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
   const ott = useMemo(() => query.get("ott"), [query]);
   const autoOff = useMemo(() => query.get("auto_off"), [query]);
+  const openAtFirst = useMemo(() => query.get("open_at_first"), [query]);
   const externalUrl = useMemo(
     () => window.location.href.split("external_url=")?.[1]?.split("&ott")?.[0],
     []
@@ -263,6 +264,11 @@ const AuthProvider = ({ children }: IAuthProps) => {
       dispatch(OUTSIDE_ACTIONS.updateAutoOff(autoOff === "true"));
     }
   }, [autoOff, dispatch]);
+  useEffect(() => {
+    if (openAtFirst) {
+      dispatch(OUTSIDE_ACTIONS.openAtFirst());
+    }
+  }, [dispatch, openAtFirst]);
   useEffect(() => {
     GoogleAnalytics.init();
   }, []);
