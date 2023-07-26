@@ -46,6 +46,16 @@ export const getPinnedCommunities = createAsyncThunk(
   }
 );
 
+export const getExternalCommunityByChannelId = createAsyncThunk(
+  "user/external-by-channel",
+  async (payload: { channelId: string }) => {
+    const externalUrlRes = await api.getCommunityDataFromChannel(
+      payload.channelId
+    );
+    return externalUrlRes;
+  }
+);
+
 export const setUserCommunityData = createAsyncThunk(
   "user/setCommunity",
   async (communityId: string, store) => {

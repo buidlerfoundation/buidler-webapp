@@ -41,6 +41,11 @@ export const getCommunityDataFromUrl = (url: string) =>
     { url }
   );
 
+export const getCommunityDataFromChannel = (channelId: string) =>
+  Caller.get<{ community: Community; space: Space | null; channel: Channel }>(
+    `external/information?channel_id=${channelId}`
+  );
+
 export const joinChannel = (channelId: string) =>
   Caller.post(`channel/${channelId}/members`);
 

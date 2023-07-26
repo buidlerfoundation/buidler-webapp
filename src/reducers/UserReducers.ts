@@ -4,6 +4,7 @@ import { BalanceApiData, InitialApiData, UserData } from "models/User";
 import {
   getCommunities,
   getDataFromExternalUrl,
+  getExternalCommunityByChannelId,
   getPinnedCommunities,
   getUserAction,
   getWalletBalance,
@@ -159,6 +160,46 @@ const userSlice = createSlice({
         const user = action.payload;
         if (user) {
           state.data = user;
+        }
+      })
+      .addCase(getExternalCommunityByChannelId.fulfilled, (state, action) => {
+        const externalUrlRes = action.payload;
+        const { community, space, channel } = externalUrlRes.data || {};
+        if (community && space && channel) {
+          const communities = state.pinnedCommunities || [];
+          let spaces = state.spaceMap?.[community.community_id] || [];
+          if (
+            !communities.find(
+              (el) => el.community_id === community.community_id
+            )
+          ) {
+            communities.push({ ...community, fromExternal: true });
+            if (space && channel) {
+              state.spaceMap = {
+                ...state.spaceMap,
+                [community.community_id]: [{ ...space, channels: [channel] }],
+              };
+            }
+            state.pinnedCommunities = communities;
+          } else {
+            if (!spaces.find((el) => el.space_id === space?.space_id)) {
+              spaces.push({ ...space, channels: [channel] });
+            } else {
+              spaces = spaces.map((el) => {
+                if (el.space_id === space.space_id) {
+                  return {
+                    ...el,
+                    channels: uniqBy(
+                      [...(el.channels || []), channel],
+                      "channel_id"
+                    ),
+                  };
+                }
+                return el;
+              });
+            }
+            state.spaceMap[community.community_id] = spaces;
+          }
         }
       })
       .addCase(getPinnedCommunities.fulfilled, (state: UserState, action) => {

@@ -13,7 +13,10 @@ import {
 import { validateUUID } from "helpers/ChannelHelper";
 import { getMessages } from "reducers/MessageReducers";
 import { AsyncKey } from "common/AppConfig";
-import { setUserCommunityData } from "reducers/UserActions";
+import {
+  getExternalCommunityByChannelId,
+  setUserCommunityData,
+} from "reducers/UserActions";
 import usePinnedCommunities from "hooks/usePinnedCommunities";
 import { channelChanged } from "reducers/actions";
 
@@ -64,6 +67,12 @@ const HomeWrapper = () => {
         !matchChannelId ||
         matchChannelId !== initialChannelId
       ) {
+        if (matchCommunityId && matchChannelId) {
+          const res = await dispatch(
+            getExternalCommunityByChannelId({ channelId: matchChannelId })
+          ).unwrap();
+          if (res.success) return;
+        }
         navigate(`/channels/${initialCommunityId}/${initialChannelId}`, {
           replace: true,
         });
