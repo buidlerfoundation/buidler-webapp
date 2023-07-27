@@ -35,12 +35,10 @@ const Started = () => {
       <div className={styles.body}>
         <div className={styles["info-view"]}>
           <img className={styles.logo} alt="" src={images.icLogoSquare} />
-          <span className={styles.title}>
-            Release the on-chain superpower to buidl a trustless community
-          </span>
+          <span className={styles.title}>One extension. Any communities.</span>
           <span className={styles.description}>
-            The web3 messaging platform offers wallet-to-wallet messaging,
-            token-based membership, and on-chain verification.
+            Dive into communities right on the sites you're browsing, instantly.
+            Enjoy the freedom of communication now!
           </span>
         </div>
         {!hideMetaMask && (
