@@ -81,7 +81,7 @@ export interface ConversationData {
   isSending?: boolean;
   isConversationHead?: boolean;
   reaction_data: { [key: string]: number };
-  user_reaction: Array<UserReaction>;
+  user_reaction_data: { [key: string]: number };
   entity_id: string;
   entity_type: string;
   metadata?: {

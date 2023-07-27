@@ -103,9 +103,7 @@ const reactSlice = createSlice({
               reactName: key,
               count: dt.reaction_data?.[key] || 0,
               skin: 1,
-              // isReacted: !!dt.user_reaction.find(
-              //   (uReact) => uReact.emoji_id === react.emoji_id
-              // ),
+              isReacted: !!dt?.user_reaction_data?.[key],
             })
           );
           return dt;
