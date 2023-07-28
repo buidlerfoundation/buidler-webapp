@@ -482,17 +482,10 @@ const AuthProvider = ({ children }: IAuthProps) => {
       const signer = Web3AuthUtils.provider.getSigner();
       const address = await signer.getAddress();
       const message = await getMessageSignTypedData(address);
-      const params = [
-        address,
-        {
-          domain: signTypeData.domain,
-          types: signTypeData.types,
-          message,
-        },
-      ];
-      const signature = await signer.provider.send(
-        "eth_signTypedData_v4",
-        params
+      const signature = await signer._signTypedData(
+        signTypeData.domain,
+        signTypeData.types,
+        message
       );
       const res = await api.verifyNonce(
         {
