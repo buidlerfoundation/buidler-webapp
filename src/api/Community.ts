@@ -49,6 +49,9 @@ export const getCommunityDataFromChannel = (channelId: string) =>
 export const joinChannel = (channelId: string) =>
   Caller.post(`channel/${channelId}/members`);
 
+export const leaveChannel = (channelId: string) =>
+  Caller.delete(`channel/${channelId}/members`);
+
 export const getChannel = (channelId: string) =>
   Caller.get<Channel>(`channel/${channelId}`);
 
