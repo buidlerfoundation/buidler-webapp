@@ -15,6 +15,7 @@ export type EmitMessageData = {
   entity_type?: string;
   file_ids?: string[];
   files?: LocalAttachment[];
+  conversation_data?: ConversationData | null;
 };
 
 export interface AttachmentData {

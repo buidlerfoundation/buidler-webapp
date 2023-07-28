@@ -183,7 +183,6 @@ const SocketProvider = ({ children }: ISocketProps) => {
         sender_id: user.user_id,
         sender: user,
         isSending: true,
-        conversation_data: null,
         content: payload.text || "",
         plain_text: payload.text || "",
       };
