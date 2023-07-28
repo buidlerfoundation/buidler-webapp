@@ -10,4 +10,6 @@ export const removeReaction = (taskId: string, data: { emoji_id: string }) =>
   Caller.delete(`reaction/${taskId}`, data);
 
 export const getReactionDetail = (id: string, emojiId: string) =>
-  Caller.get<ReactUserApiData[]>(`reaction/${id}/users?emoji_id=${emojiId}`);
+  Caller.get<ReactUserApiData[]>(
+    `reaction/${id}/users?${new URLSearchParams({ emoji_id: emojiId })}`
+  );
