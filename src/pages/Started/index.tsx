@@ -6,8 +6,14 @@ import images from "common/images";
 import { useAuth } from "providers/AuthProvider";
 import { useWalletConnectClient } from "providers/WalletConnectProvider";
 import { useLocation } from "react-router-dom";
+import { CircularProgress } from "@mui/material";
+import IconArrowRight from "shared/SVG/IconArrowRight";
 
-const Started = () => {
+interface IStarted {
+  embedded?: boolean;
+}
+
+const Started = ({ embedded }: IStarted) => {
   const location = useLocation();
   const auth = useAuth();
   const { isInitializing, client } = useWalletConnectClient();
@@ -31,7 +37,11 @@ const Started = () => {
     }
   }, [location]);
   return (
-    <div className={styles.container}>
+    <div
+      className={`${styles.container} ${
+        embedded ? styles["container-embedded"] : ""
+      }`}
+    >
       <div className={styles.body}>
         <div className={styles["info-view"]}>
           <img className={styles.logo} alt="" src={images.icLogoSquare} />
@@ -41,7 +51,7 @@ const Started = () => {
             Enjoy the freedom of communication now!
           </span>
         </div>
-        {!hideMetaMask && (
+        {!hideMetaMask ? (
           <div
             className={`${styles["wallet-button"]} normal-button`}
             onClick={auth.loginWithMetaMask}
@@ -51,25 +61,31 @@ const Started = () => {
               <img src={images.icMetamask} alt="" />
             </div>
           </div>
-        )}
-        {!isInitializing && client && (
-          <div
-            className={`${styles["wallet-button"]} normal-button`}
-            onClick={auth.loginWithWalletConnect}
-          >
-            <span>WalletConnect</span>
-            <div className={styles["wallet-icon"]}>
-              <img src={images.icWalletConnect} alt="" />
+        ) : (
+          !isInitializing &&
+          client && (
+            <div
+              className={`${styles["wallet-button"]} normal-button`}
+              onClick={auth.loginWithWalletConnect}
+            >
+              <span>WalletConnect</span>
+              <div className={styles["wallet-icon"]}>
+                <img src={images.icWalletConnect} alt="" />
+              </div>
             </div>
-          </div>
+          )
         )}
         <div
           className={`${styles["wallet-button"]} normal-button`}
           onClick={auth.loginWithWeb3Auth}
         >
-          <span>SocialConnect</span>
+          <span>Social Connect</span>
           <div className={styles["wallet-icon"]}>
-            <IconWeb3Auth />
+            {auth.loadingWeb3Auth ? (
+              <CircularProgress size={30} color="inherit" />
+            ) : (
+              <IconArrowRight />
+            )}
           </div>
         </div>
       </div>

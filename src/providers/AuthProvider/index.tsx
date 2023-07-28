@@ -52,6 +52,9 @@ export interface IAuthContext {
   quickLogin: () => Promise<void>;
   logout: () => Promise<void>;
   loadingWeb3Auth: boolean;
+  openLogin: boolean;
+  toggleLogin: () => void;
+  onCloseLogin: () => void;
 }
 
 export const AuthContext = createContext<IAuthContext>({
@@ -61,6 +64,9 @@ export const AuthContext = createContext<IAuthContext>({
   quickLogin: async () => {},
   logout: async () => {},
   loadingWeb3Auth: false,
+  openLogin: false,
+  toggleLogin: () => {},
+  onCloseLogin: () => {},
 });
 
 export function useAuth(): IAuthContext {
@@ -84,6 +90,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const [loading, setLoading] = useState(true);
   const isQuickLogin = useRef(false);
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
+  const [openLogin, setOpenLogin] = useState(false);
   const ott = useMemo(() => query.get("ott"), [query]);
   const autoOff = useMemo(() => query.get("auto_off"), [query]);
   const openAtFirst = useMemo(() => query.get("open_at_first"), [query]);
@@ -119,6 +126,14 @@ const AuthProvider = ({ children }: IAuthProps) => {
     return externalUrl && (path === "/panel" || path === "/plugin");
   }, [externalUrl]);
   const dispatch = useAppDispatch();
+  const toggleLogin = useCallback(
+    () => setOpenLogin((current) => !current),
+    []
+  );
+  const onCloseLogin = useCallback(() => {
+    setOpenLogin(false);
+    isQuickLogin.current = false;
+  }, []);
   const handleDataFromExternalUrl = useCallback(async () => {
     if (isExternalUrl) {
       const res = await dispatch(
@@ -173,6 +188,8 @@ const AuthProvider = ({ children }: IAuthProps) => {
               navigate(path, { replace: true });
             }
           }
+        } else {
+          onCloseLogin();
         }
         socket.initSocket(onSocketConnected);
       } else {
@@ -191,6 +208,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
       dispatch,
       onSocketConnected,
       handleDataFromExternalUrl,
+      onCloseLogin,
       isExternalUrl,
       loginPath,
     ]
@@ -454,6 +472,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     setLoadingWeb3Auth(true);
     try {
       await Web3AuthUtils.init();
+      setLoadingWeb3Auth(false);
       if (!Web3AuthUtils.web3auth) return;
       const web3authProvider = await Web3AuthUtils.web3auth.connect();
       if (!web3authProvider) return;
@@ -493,17 +512,11 @@ const AuthProvider = ({ children }: IAuthProps) => {
     } catch (error: any) {
       console.log(error);
     }
-    setLoadingWeb3Auth(false);
   }, [getMessageSignTypedData, handleResponseVerify, location.state]);
   const quickLogin = useCallback(async () => {
     isQuickLogin.current = true;
-    if (window.ethereum) {
-      await loginWithMetaMask();
-    } else {
-      await loginWithWalletConnect();
-    }
-    isQuickLogin.current = false;
-  }, [loginWithMetaMask, loginWithWalletConnect]);
+    toggleLogin();
+  }, [toggleLogin]);
   const logout = useCallback(async () => {
     const loginType = await getCookie(AsyncKey.loginType);
     if (loginType === LoginType.WalletConnect) {
@@ -551,7 +564,10 @@ const AuthProvider = ({ children }: IAuthProps) => {
         loginWithWeb3Auth,
         quickLogin,
         logout,
+        toggleLogin,
+        onCloseLogin,
         loadingWeb3Auth,
+        openLogin,
       }}
     >
       {loading && (
