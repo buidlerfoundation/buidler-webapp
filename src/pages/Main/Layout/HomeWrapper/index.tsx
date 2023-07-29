@@ -6,6 +6,7 @@ import useCommunityId from "hooks/useCommunityId";
 import useChannelId from "hooks/useChannelId";
 import useChannels from "hooks/useChannels";
 import {
+  clearLastChannelId,
   getCookie,
   getLastChannelIdByCommunityId,
   setLastChannelIdByCommunityId,
@@ -19,6 +20,9 @@ import {
 } from "reducers/UserActions";
 import usePinnedCommunities from "hooks/usePinnedCommunities";
 import { channelChanged } from "reducers/actions";
+import { Channel } from "models/Community";
+import api from "api";
+import { USER_ACTIONS } from "reducers/UserReducers";
 
 const HomeWrapper = () => {
   const dispatch = useAppDispatch();
@@ -124,6 +128,32 @@ const HomeWrapper = () => {
   const handleOpenInviteMember = useCallback(() => {}, []);
   const toggleOpenMembers = useCallback(() => {}, []);
   const onOpenChannelSetting = useCallback(() => {}, []);
+  const onLeaveChannel = useCallback(
+    async (channel: Channel) => {
+      const res = await api.leaveChannel(channel.channel_id);
+      if (res.success) {
+        const lastChannelId = await getLastChannelIdByCommunityId(
+          matchCommunityId
+        );
+        if (lastChannelId === channel.channel_id) {
+          clearLastChannelId(matchCommunityId);
+        }
+        dispatch(
+          USER_ACTIONS.updateChannel({
+            channelId: channel.channel_id,
+            spaceId: channel.space_id,
+            communityId: matchCommunityId,
+            data: {
+              is_channel_member: false,
+              total_channel_members: (channel?.total_channel_members || 1) - 1,
+            },
+          })
+        );
+        navigate(`/channels/${matchCommunityId}`, { replace: true });
+      }
+    },
+    [dispatch, matchCommunityId, navigate]
+  );
   return (
     <>
       <SideBar
@@ -138,6 +168,7 @@ const HomeWrapper = () => {
         onInviteMember={handleOpenInviteMember}
         onViewMembers={toggleOpenMembers}
         onOpenChannelSetting={onOpenChannelSetting}
+        onLeaveChannel={onLeaveChannel}
       />
       <Outlet />
     </>

@@ -86,24 +86,24 @@ export const privateChannelMenu = [
   },
 ];
 export const channelMenu = [
+  // {
+  //   label: "Edit channel name",
+  //   value: "Edit channel name",
+  //   icon: images.icSettingChannelEdit,
+  // },
+  // {
+  //   label: "Channel setting",
+  //   value: "Channel setting",
+  //   icon: images.icCommunitySetting,
+  // },
+  // {
+  //   label: "Notification",
+  //   value: "Notification",
+  //   icon: images.icSettingChannelNotification,
+  // },
   {
-    label: "Edit channel name",
-    value: "Edit channel name",
-    icon: images.icSettingChannelEdit,
-  },
-  {
-    label: "Channel setting",
-    value: "Channel setting",
-    icon: images.icCommunitySetting,
-  },
-  {
-    label: "Notification",
-    value: "Notification",
-    icon: images.icSettingChannelNotification,
-  },
-  {
-    label: "Delete channel",
-    value: "Delete channel",
-    icon: images.icSettingChannelDelete,
+    label: "Leave channel",
+    value: "Leave channel",
+    icon: images.icLeaveTeam,
   },
 ];

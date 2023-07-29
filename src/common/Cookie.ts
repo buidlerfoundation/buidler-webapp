@@ -87,6 +87,26 @@ export const setLastChannelIdByCommunityId = async (
   );
 };
 
+export const clearLastChannelId = async (communityId: string) => {
+  const lastChannelIdByTeamIdCookie = await getCookie(
+    AsyncKey.lastChannelIdByTeamId
+  );
+  if (lastChannelIdByTeamIdCookie) {
+    try {
+      const lastChannelIdByTeamId = JSON.parse(lastChannelIdByTeamIdCookie);
+      if (lastChannelIdByTeamId?.[communityId]) {
+        delete lastChannelIdByTeamId[communityId];
+      }
+      setCookie(
+        AsyncKey.lastChannelIdByTeamId,
+        JSON.stringify(lastChannelIdByTeamId)
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+};
+
 export const getLastChannelIdByCommunityId = async (communityId: string) => {
   const lastChannelIdByTeamIdCookie = await getCookie(
     AsyncKey.lastChannelIdByTeamId
