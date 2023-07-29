@@ -41,6 +41,8 @@ const MainWrapper = () => {
         source: query.get("ref") || "",
         path: location.pathname,
         type: location.pathname.includes("channels") ? "web-app" : "extension",
+        community_url: community?.community_url,
+        channel_url: channel?.channel_url,
       });
     }
   }, [channel?.channel_url, community?.community_url, location]);
