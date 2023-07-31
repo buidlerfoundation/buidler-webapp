@@ -57,6 +57,7 @@ export interface Channel {
   total_channel_members?: number;
   total_channel_messages?: number;
   display_channel_url?: string;
+  is_default_channel?: boolean;
 }
 
 export interface Space {

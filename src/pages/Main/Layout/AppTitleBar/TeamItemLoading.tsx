@@ -1,16 +1,13 @@
 import React, { memo, useMemo } from "react";
 import styles from "./index.module.scss";
+import { getLogoFromUrl } from "helpers/LinkHelper";
 
 interface ITeamItemLoading {
   url: string;
 }
 
 const TeamItemLoading = ({ url }: ITeamItemLoading) => {
-  const logo = useMemo(
-    () =>
-      `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${url}&size=256`,
-    [url]
-  );
+  const logo = useMemo(() => getLogoFromUrl(url), [url]);
   const communityDisplayName = useMemo(() => {
     const parsed = new URL(url);
     return parsed.host;

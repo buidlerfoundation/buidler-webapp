@@ -1,19 +1,16 @@
 import React, { memo, useMemo } from "react";
 import styles from "./index.module.scss";
 import Spinner from "shared/Spinner";
-import { Box, Skeleton, Stack } from "@mui/material";
+import { Skeleton, Stack } from "@mui/material";
 import SpaceItemLoading from "shared/SpaceItem/SpaceItemLoading";
+import { getLogoFromUrl } from "helpers/LinkHelper";
 
 interface ILoading {
   url: string;
 }
 
 const Loading = ({ url }: ILoading) => {
-  const logo = useMemo(
-    () =>
-      `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${url}&size=256`,
-    [url]
-  );
+  const logo = useMemo(() => getLogoFromUrl(url), [url]);
   const communityDisplayName = useMemo(() => {
     const parsed = new URL(url);
     return parsed.host;

@@ -17,13 +17,10 @@ import useChannel from "hooks/useChannel";
 import { getStories } from "reducers/PinPostReducers";
 import useShowPlugin from "hooks/useShowPlugin";
 import { MESSAGE_ACTIONS } from "reducers/MessageReducers";
-import { useAuth } from "providers/AuthProvider";
-import Started from "pages/Started";
 
 const Plugin = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const auth = useAuth();
   const { isShow, activeTab } = useShowPlugin();
   const pluginOpen = usePluginOpen();
   const loading = useOutsideLoading();
@@ -93,17 +90,6 @@ const Plugin = () => {
         }`}
       >
         <MessageChatBox toggleOutside={toggle} contentLoading={loading} />
-        <div
-          className={styles["login-backdrop"]}
-          style={auth.openLogin ? { display: "block" } : {}}
-          onClick={auth.onCloseLogin}
-        />
-        <div
-          className={styles["login-bottom-sheet"]}
-          style={auth.openLogin ? { bottom: 0 } : {}}
-        >
-          <Started embedded />
-        </div>
       </div>
     </div>
   );

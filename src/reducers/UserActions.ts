@@ -31,9 +31,9 @@ export const getWalletBalance = createAsyncThunk("user/balance", async () => {
 
 export const getPinnedCommunities = createAsyncThunk(
   "user/pinned-community",
-  async (payload: { externalUrl?: string }) => {
+  async (payload?: { externalUrl?: string }) => {
     let externalUrlRes;
-    if (payload.externalUrl) {
+    if (payload?.externalUrl) {
       externalUrlRes = await api.getCommunityDataFromUrl(payload.externalUrl);
     }
     const res = await api.getPinnedCommunities();
@@ -48,7 +48,7 @@ export const getPinnedCommunities = createAsyncThunk(
 
 export const getExternalCommunityByChannelId = createAsyncThunk(
   "user/external-by-channel",
-  async (payload: { channelId: string }) => {
+  async (payload: { channelId: string; fromExternal?: boolean }) => {
     const externalUrlRes = await api.getCommunityDataFromChannel(
       payload.channelId
     );

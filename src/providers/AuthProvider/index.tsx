@@ -44,6 +44,7 @@ import { getDeviceToken } from "services/firebase";
 import { useWalletConnectClient } from "providers/WalletConnectProvider";
 import useUser from "hooks/useUser";
 import { OUTSIDE_ACTIONS } from "reducers/OutsideReducers";
+import { getParamsFromPath } from "helpers/LinkHelper";
 
 export interface IAuthContext {
   loginWithMetaMask: () => Promise<void>;
@@ -266,8 +267,12 @@ const AuthProvider = ({ children }: IAuthProps) => {
       if (canViewOnly) {
         await handleDataFromExternalUrl();
       } else if (window.location.pathname !== AppConfig.loginPath) {
-        dispatch(logoutAction());
-        navigate(loginPath, { replace: true, state: { from: location } });
+        const matchParams = getParamsFromPath();
+        const { match_channel_id, match_community_id } = matchParams || {};
+        if (!match_channel_id || !match_community_id) {
+          dispatch(logoutAction());
+          navigate(loginPath, { replace: true, state: { from: location } });
+        }
       }
     } else {
       dispatch(CONFIG_ACTIONS.updateCurrentToken(accessToken));

@@ -21,7 +21,8 @@ class Web3AuthUtils {
   }
 
   disconnect() {
-    this.web3auth?.logout();
+    this.web3auth?.logout({ cleanup: true });
+    this.web3auth?.clearCache();
   }
 
   sendERC721Transaction = async (sendData: SendData, from: string) => {

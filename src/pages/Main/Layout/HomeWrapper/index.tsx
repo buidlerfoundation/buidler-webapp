@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import SideBar from "shared/SideBar";
 import useAppDispatch from "hooks/useAppDispatch";
@@ -23,6 +23,7 @@ import { channelChanged } from "reducers/actions";
 import { Channel } from "models/Community";
 import api from "api";
 import { USER_ACTIONS } from "reducers/UserReducers";
+import useUser from "hooks/useUser";
 
 const HomeWrapper = () => {
   const dispatch = useAppDispatch();
@@ -32,6 +33,8 @@ const HomeWrapper = () => {
   const matchChannelId = useChannelId();
   const pinnedCommunities = usePinnedCommunities();
   const channels = useChannels();
+  const user = useUser();
+  const [leavingChannel, setLeavingChannel] = useState(false);
   const initialCommunityData = useCallback(async () => {
     if (pinnedCommunities?.length === 0) {
       navigate("/communities", { replace: true });
@@ -71,9 +74,12 @@ const HomeWrapper = () => {
         !matchChannelId ||
         matchChannelId !== initialChannelId
       ) {
-        if (matchCommunityId && matchChannelId) {
+        if (matchCommunityId && matchChannelId && !leavingChannel) {
           const res = await dispatch(
-            getExternalCommunityByChannelId({ channelId: matchChannelId })
+            getExternalCommunityByChannelId({
+              channelId: matchChannelId,
+              fromExternal: true,
+            })
           ).unwrap();
           if (res.success) return;
         }
@@ -81,14 +87,18 @@ const HomeWrapper = () => {
           replace: true,
         });
       }
+    } else if (!user.user_id && matchCommunityId && matchChannelId) {
+      dispatch(getExternalCommunityByChannelId({ channelId: matchChannelId }));
     }
   }, [
-    channels,
     pinnedCommunities,
-    dispatch,
-    navigate,
-    matchChannelId,
+    user.user_id,
     matchCommunityId,
+    matchChannelId,
+    navigate,
+    channels,
+    dispatch,
+    leavingChannel,
   ]);
 
   useEffect(() => {
@@ -130,13 +140,14 @@ const HomeWrapper = () => {
   const onOpenChannelSetting = useCallback(() => {}, []);
   const onLeaveChannel = useCallback(
     async (channel: Channel) => {
+      setLeavingChannel(true);
       const res = await api.leaveChannel(channel.channel_id);
       if (res.success) {
         const lastChannelId = await getLastChannelIdByCommunityId(
           matchCommunityId
         );
         if (lastChannelId === channel.channel_id) {
-          clearLastChannelId(matchCommunityId);
+          await clearLastChannelId(matchCommunityId);
         }
         dispatch(
           USER_ACTIONS.updateChannel({
@@ -149,10 +160,16 @@ const HomeWrapper = () => {
             },
           })
         );
-        navigate(`/channels/${matchCommunityId}`, { replace: true });
+        if (
+          channel.channel_id === matchChannelId &&
+          !channel.is_default_channel
+        ) {
+          navigate(`/channels/${matchCommunityId}`, { replace: true });
+        }
       }
+      setLeavingChannel(false);
     },
-    [dispatch, matchCommunityId, navigate]
+    [dispatch, matchChannelId, matchCommunityId, navigate]
   );
   return (
     <>

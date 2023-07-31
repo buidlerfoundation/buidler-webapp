@@ -1,3 +1,5 @@
+import { matchPath } from "react-router-dom";
+
 export const OpenSeaURL = "https://opensea.io";
 
 export const buildLinkOpenSea = (slugName: string) =>
@@ -69,4 +71,17 @@ export const getURLObject = (url: string) => {
     space_url: `${subdomain}.${domain}`,
     channel_url: `${subdomain}.${domain}${modifiedPath}${search}${hash}`,
   };
+};
+
+export const getParamsFromPath = () => {
+  const match = matchPath(
+    "/:page_name/:match_community_id/:match_channel_id",
+    window.location.pathname
+  );
+  return match?.params;
+};
+
+export const getLogoFromUrl = (url: string) => {
+  const obj = getURLObject(url);
+  return `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${obj.domain}&size=256`;
 };

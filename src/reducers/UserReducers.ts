@@ -13,7 +13,7 @@ import {
   setUserCommunityData,
   unPinCommunity,
 } from "./UserActions";
-import { logoutAction } from "./actions";
+import { channelChanged, logoutAction } from "./actions";
 import { uniqBy } from "lodash";
 
 interface IOpeningNewTab {
@@ -97,6 +97,70 @@ const userSlice = createSlice({
       }
       state.communities = communities;
     },
+    joinNewChannel: (
+      state,
+      action: PayloadAction<{
+        channel: Channel;
+        space: Space;
+      }>
+    ) => {
+      const { channel, space } = action.payload;
+      if (channel.community_id) {
+        let spaces = state.spaceMap?.[channel.community_id] || [];
+        if (!spaces.find((el) => el.space_id === space.space_id)) {
+          spaces.push({ ...space, channels: [channel] });
+        } else {
+          spaces = spaces.map((el) => {
+            if (el.space_id === space.space_id) {
+              if (
+                el.channels?.find((c) => c.channel_id === channel.channel_id)
+              ) {
+                return {
+                  ...el,
+                  channels: el.channels?.map((c) => {
+                    if (c.channel_id === channel.channel_id) {
+                      return {
+                        ...c,
+                        ...channel,
+                      };
+                    }
+                    return c;
+                  }),
+                };
+              } else {
+                return {
+                  ...el,
+                  channels: uniqBy(
+                    [...(el.channels || []), channel],
+                    "channel_id"
+                  ),
+                };
+              }
+            }
+            return el;
+          });
+        }
+        state.spaceMap[channel.community_id] = spaces;
+      }
+    },
+    leaveChannel: (state, action: PayloadAction<{ channel: Channel }>) => {
+      const { channel } = action.payload;
+      if (channel.community_id) {
+        let spaces = state.spaceMap?.[channel.community_id] || [];
+        spaces = spaces.map((el) => {
+          if (el.space_id === channel.space_id) {
+            return {
+              ...el,
+              channels: el.channels?.filter(
+                (c) => c.channel_id !== channel.channel_id
+              ),
+            };
+          }
+          return el;
+        });
+        state.spaceMap[channel.community_id] = spaces;
+      }
+    },
     updateChannel: (
       state: UserState,
       action: PayloadAction<{
@@ -145,6 +209,9 @@ const userSlice = createSlice({
           imgDomain: state.imgDomain,
         };
       })
+      .addCase(channelChanged, (state) => {
+        state.openingNewTab = undefined;
+      })
       .addCase(pinCommunity, (state, action) => {
         const community = action.payload;
         const pinnedCommunities = state.pinnedCommunities || [];
@@ -174,7 +241,10 @@ const userSlice = createSlice({
               (el) => el.community_id === community.community_id
             )
           ) {
-            communities.push({ ...community, fromExternal: true });
+            communities.push({
+              ...community,
+              fromExternal: action.meta.arg.fromExternal,
+            });
             if (space && channel) {
               state.spaceMap = {
                 ...state.spaceMap,
@@ -306,7 +376,6 @@ const userSlice = createSlice({
         }
       })
       .addCase(openNewTabFromIframe.fulfilled, (state, action) => {
-        state.openingNewTab = undefined;
         if (action.payload) {
           const { channel, community, space } = action.payload;
           if (

@@ -266,7 +266,10 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
       return (
         <TeamItem
           key={el.community_id}
-          isSelected={el.community_id === communityId && !openingNewTab}
+          isSelected={
+            el.community_id === communityId &&
+            openingNewTab?.entityType !== "community"
+          }
           t={el}
           onChangeTeam={setTeam}
           onContextMenu={handleCommunityContextMenu}
@@ -305,36 +308,36 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
     };
   });
 
-  if (!!userData.user_id) {
-    return (
-      <div id="title-bar">
-        <div className={`${styles["list-team"]} hide-scroll-bar`}>
-          <MyCommunityItem />
-          {pinnedCommunities?.map?.(renderTeam)}
-          {openingNewTab?.entityType === "community" && openingNewTab.url && (
-            <TeamItemLoading url={openingNewTab.url} />
-          )}
-          {highlightCreateCommunityButton ? (
-            <div
-              className={`${styles["team-item"]} ${styles["btn-create-community"]}`}
-              onClick={handleOpenModalTeam}
-              style={{ display: "none" }}
-            >
-              <IconPlus />
-              <span className={styles["team-name"]} style={{ marginLeft: 11 }}>
-                New community
-              </span>
-            </div>
-          ) : (
-            <div
-              className={`normal-button ${styles["create-team-button"]}`}
-              onClick={handleOpenModalTeam}
-              style={{ display: "none" }}
-            >
-              <img alt="" src={images.icPlus} />
-            </div>
-          )}
-        </div>
+  return (
+    <div id="title-bar">
+      <div className={`${styles["list-team"]} hide-scroll-bar`}>
+        {!!userData.user_id && <MyCommunityItem />}
+        {pinnedCommunities?.map?.(renderTeam)}
+        {openingNewTab?.entityType === "community" && openingNewTab.url && (
+          <TeamItemLoading url={openingNewTab.url} />
+        )}
+        {highlightCreateCommunityButton ? (
+          <div
+            className={`${styles["team-item"]} ${styles["btn-create-community"]}`}
+            onClick={handleOpenModalTeam}
+            style={{ display: "none" }}
+          >
+            <IconPlus />
+            <span className={styles["team-name"]} style={{ marginLeft: 11 }}>
+              New community
+            </span>
+          </div>
+        ) : (
+          <div
+            className={`normal-button ${styles["create-team-button"]}`}
+            onClick={handleOpenModalTeam}
+            style={{ display: "none" }}
+          >
+            <img alt="" src={images.icPlus} />
+          </div>
+        )}
+      </div>
+      {!!userData.user_id && (
         <div className={styles["action-right"]}>
           <div
             className={styles["icon-notification__wrap"]}
@@ -354,68 +357,66 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
             <AvatarView user={userData} />
           </div>
         </div>
-        <ModalTeam
-          open={isOpenModalTeam}
-          handleClose={handleCloseModalTeam}
-          onCreateTeam={handleCreateTeam}
-          onAcceptTeam={handleAcceptTeam}
-        />
-        <ModalUserSetting
-          open={isOpenModalUser}
-          handleClose={handleCloseModalUserSetting}
-          user={userData}
-          onLogout={handleLogout}
-          onViewTxDetail={onViewTxDetail}
-          isOpenTransaction={isOpenTransaction}
-        />
-        <PopoverButton
-          popupOnly
-          ref={menuTeamRef}
-          data={selectedMenuTeam?.role === "Owner" ? teamMenuOwner : teamMenu}
-          onSelected={onSelectedMenu}
-        />
-        <PopoverButton
-          ref={popupNotificationRef}
-          popupOnly
-          style={{ top: 10 }}
-          componentPopup={
-            <PopupNotification
-              onClose={onClosePopupNotification}
-              onJumpToMessage={onJumpToMessage}
-            />
-          }
-        />
-        <ModalConfirmDelete
-          open={isOpenConfirmLeave}
-          handleClose={handleCloseModalConfirmDelete}
-          title="Leave community"
-          description="Are you sure you want to leave?"
-          contentName={selectedMenuTeam?.community_name || ""}
-          contentDelete="Leave"
-          onDelete={onLeaveTeam}
-        />
-        <ModalConfirmDeleteTeam
-          open={isOpenConfirmDeleteTeam}
-          handleClose={handleCloseDeleteTeam}
-          teamName={selectedMenuTeam?.community_name || ""}
-          onDelete={onDeleteTeam}
-        />
-        <ModalTeamSetting
-          open={openTeamSetting}
-          handleClose={handleCloseTeamSetting}
-          team={selectedMenuTeam}
-          onDeleteClick={onDeleteClick}
-        />
-        <ModalTransactionDetail
-          open={openTxDetail}
-          handleClose={closeTxDetail}
-          txHash={selectedHash}
-        />
-      </div>
-    );
-  }
-
-  return <div id="title-bar" />;
+      )}
+      <ModalTeam
+        open={isOpenModalTeam}
+        handleClose={handleCloseModalTeam}
+        onCreateTeam={handleCreateTeam}
+        onAcceptTeam={handleAcceptTeam}
+      />
+      <ModalUserSetting
+        open={isOpenModalUser}
+        handleClose={handleCloseModalUserSetting}
+        user={userData}
+        onLogout={handleLogout}
+        onViewTxDetail={onViewTxDetail}
+        isOpenTransaction={isOpenTransaction}
+      />
+      <PopoverButton
+        popupOnly
+        ref={menuTeamRef}
+        data={selectedMenuTeam?.role === "Owner" ? teamMenuOwner : teamMenu}
+        onSelected={onSelectedMenu}
+      />
+      <PopoverButton
+        ref={popupNotificationRef}
+        popupOnly
+        style={{ top: 10 }}
+        componentPopup={
+          <PopupNotification
+            onClose={onClosePopupNotification}
+            onJumpToMessage={onJumpToMessage}
+          />
+        }
+      />
+      <ModalConfirmDelete
+        open={isOpenConfirmLeave}
+        handleClose={handleCloseModalConfirmDelete}
+        title="Leave community"
+        description="Are you sure you want to leave?"
+        contentName={selectedMenuTeam?.community_name || ""}
+        contentDelete="Leave"
+        onDelete={onLeaveTeam}
+      />
+      <ModalConfirmDeleteTeam
+        open={isOpenConfirmDeleteTeam}
+        handleClose={handleCloseDeleteTeam}
+        teamName={selectedMenuTeam?.community_name || ""}
+        onDelete={onDeleteTeam}
+      />
+      <ModalTeamSetting
+        open={openTeamSetting}
+        handleClose={handleCloseTeamSetting}
+        team={selectedMenuTeam}
+        onDeleteClick={onDeleteClick}
+      />
+      <ModalTransactionDetail
+        open={openTxDetail}
+        handleClose={closeTxDetail}
+        txHash={selectedHash}
+      />
+    </div>
+  );
 });
 
 export default memo(AppTitleBar);

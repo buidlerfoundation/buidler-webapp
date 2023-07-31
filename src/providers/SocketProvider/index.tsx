@@ -3,7 +3,7 @@ import AppConfig, { AsyncKey } from "common/AppConfig";
 import { getCookie } from "common/Cookie";
 import useAppDispatch from "hooks/useAppDispatch";
 import useUser from "hooks/useUser";
-import { Community } from "models/Community";
+import { Channel, Community, Space } from "models/Community";
 import { EmitMessageData, MessageData } from "models/Message";
 import {
   createContext,
@@ -21,6 +21,8 @@ import { USER_ACTIONS } from "reducers/UserReducers";
 import { Socket, io } from "socket.io-client";
 import EventName from "./EventName";
 import { UserData } from "models/User";
+import { matchPath } from "react-router-dom";
+import { getParamsFromPath } from "helpers/LinkHelper";
 
 type SocketState = "connecting" | "connected" | "disconnected";
 
@@ -59,6 +61,8 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.off(EventName.ON_REACTION_REMOVED);
     socket.current?.off(EventName.ON_CREATE_NEW_COMMUNITY);
     socket.current?.off(EventName.ON_USER_JOIN_COMMUNITY);
+    socket.current?.off(EventName.ON_USER_JOIN_CHANNEL);
+    socket.current?.off(EventName.ON_USER_LEAVE_CHANNEL);
     socket.current?.off("disconnect");
   }, []);
   const onNewMessage = useCallback(
@@ -124,6 +128,52 @@ const SocketProvider = ({ children }: ISocketProps) => {
     },
     [dispatch, user.user_id]
   );
+  const onUserJoinChannel = useCallback(
+    (data: { channel: Channel; space: Space; user: UserData }) => {
+      if (user.user_id === data.user.user_id) {
+        const matchParams = getParamsFromPath();
+        if (data.channel.community_id === matchParams?.match_community_id) {
+          dispatch(
+            USER_ACTIONS.joinNewChannel({
+              channel: {
+                ...data.channel,
+                is_channel_member: true,
+              },
+              space: data.space,
+            })
+          );
+        }
+      }
+    },
+    [dispatch, user.user_id]
+  );
+  const onUserLeaveChannel = useCallback(
+    (data: { channel: Channel; user: UserData }) => {
+      if (user.user_id === data.user.user_id) {
+        if (data.channel.is_default_channel) {
+          dispatch(
+            USER_ACTIONS.updateChannel({
+              channelId: data.channel.channel_id,
+              spaceId: data.channel.space_id,
+              communityId: data.channel.community_id || "",
+              data: {
+                is_channel_member: false,
+                total_channel_members:
+                  (data.channel?.total_channel_members || 1) - 1,
+              },
+            })
+          );
+        } else {
+          dispatch(
+            USER_ACTIONS.leaveChannel({
+              channel: data.channel,
+            })
+          );
+        }
+      }
+    },
+    [dispatch, user.user_id]
+  );
   const listener = useCallback(() => {
     socket.current?.on(EventName.ON_NEW_MESSAGE, onNewMessage);
     socket.current?.on(EventName.ON_DELETE_MESSAGE, onDeleteMessage);
@@ -132,6 +182,8 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.on(EventName.ON_REACTION_REMOVED, onRemoveReact);
     socket.current?.on(EventName.ON_CREATE_NEW_COMMUNITY, onCreateCommunity);
     socket.current?.on(EventName.ON_USER_JOIN_COMMUNITY, onUserJoinCommunity);
+    socket.current?.on(EventName.ON_USER_JOIN_CHANNEL, onUserJoinChannel);
+    socket.current?.on(EventName.ON_USER_LEAVE_CHANNEL, onUserLeaveChannel);
   }, [
     onAddReact,
     onCreateCommunity,
@@ -139,7 +191,9 @@ const SocketProvider = ({ children }: ISocketProps) => {
     onEditMessage,
     onNewMessage,
     onRemoveReact,
+    onUserJoinChannel,
     onUserJoinCommunity,
+    onUserLeaveChannel,
   ]);
   const initSocket = useCallback(async (onConnected: () => void) => {
     if (socket.current?.connected) return;
