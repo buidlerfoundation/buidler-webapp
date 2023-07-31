@@ -21,7 +21,7 @@ export const clearData = (callback = () => {}) => {
   Cookies.remove(AsyncKey.socketConnectKey);
   Cookies.remove(AsyncKey.draftMessageKey);
   Cookies.remove(AsyncKey.autoOffPlugin);
-  window.parent.postMessage(
+  window.top?.postMessage(
     { type: "buidler-plugin-clear-cookie" },
     { targetOrigin: "*" }
   );
@@ -30,7 +30,7 @@ export const clearData = (callback = () => {}) => {
 
 export const setCookie = (key: string, val: any) => {
   return new Promise<void>((resolve, reject) => {
-    window.parent.postMessage(
+    window.top?.postMessage(
       { type: "buidler-plugin-set-cookie", key, value: val },
       { targetOrigin: "*" }
     );
