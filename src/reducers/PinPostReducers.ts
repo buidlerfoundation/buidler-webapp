@@ -1,5 +1,5 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { channelChanged, logoutAction } from "./actions";
+import { channelChanged } from "./actions";
 import { PostData } from "models/Message";
 import { IHNStory, RequestPostList } from "models/Community";
 import api from "api";
@@ -72,7 +72,6 @@ const pinPostSlice = createSlice({
   },
   extraReducers: (builder) =>
     builder
-      .addCase(logoutAction, () => initialState)
       .addCase(channelChanged, (state) => {
         state.selectedStoryId = null;
       })

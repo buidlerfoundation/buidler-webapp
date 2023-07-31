@@ -1,6 +1,5 @@
-import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { logoutAction } from "./actions";
-import { IHNComment, IHNStory, RequestPostList } from "models/Community";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { IHNComment } from "models/Community";
 import api from "api";
 
 interface StoryCommentData {
@@ -38,7 +37,6 @@ const storySlice = createSlice({
   reducers: {},
   extraReducers: (builder) =>
     builder
-      .addCase(logoutAction, () => initialState)
       .addCase(getStoryComments.pending, (state, action) => {
         const { id, page = 1 } = action.meta.arg;
         state.storyCommentData = {

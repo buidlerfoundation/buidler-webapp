@@ -203,11 +203,8 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(logoutAction, (state: UserState) => {
-        return {
-          ...initialState,
-          imgBucket: state.imgBucket,
-          imgDomain: state.imgDomain,
-        };
+        state.data = initialState.data;
+        state.currentToken = "";
       })
       .addCase(channelChanged, (state) => {
         state.openingNewTab = undefined;

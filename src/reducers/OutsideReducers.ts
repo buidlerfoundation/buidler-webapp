@@ -1,5 +1,4 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { logoutAction } from "./actions";
 import { getDataFromExternalUrl } from "./UserActions";
 
 interface OutsideState {
@@ -32,7 +31,6 @@ const outsideSlice = createSlice({
   },
   extraReducers: (builder) =>
     builder
-      .addCase(logoutAction, () => initialState)
       .addCase(getDataFromExternalUrl.pending, (state, action) => {
         const { url } = action.meta.arg;
         if (url) {

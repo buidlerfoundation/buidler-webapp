@@ -1,5 +1,5 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { channelChanged, logoutAction } from "./actions";
+import { channelChanged } from "./actions";
 import { normalizeMessage } from "helpers/MessageHelper";
 import { GeneratedPrivateKey } from "common/Cookie";
 import api from "api";
@@ -250,7 +250,6 @@ const messageSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(logoutAction, () => initialState)
       .addCase(channelChanged, (state) => {
         state.chatBoxActiveTab = "pin";
       })
