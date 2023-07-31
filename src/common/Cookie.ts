@@ -21,19 +21,33 @@ export const clearData = (callback = () => {}) => {
   Cookies.remove(AsyncKey.socketConnectKey);
   Cookies.remove(AsyncKey.draftMessageKey);
   Cookies.remove(AsyncKey.autoOffPlugin);
-  window.parent.postMessage(
-    { type: "buidler-plugin-clear-cookie" },
-    { targetOrigin: "*" }
-  );
+  if (window.self.origin === window?.top?.origin) {
+    window.postMessage(
+      { type: "buidler-plugin-clear-cookie" },
+      { targetOrigin: "*" }
+    );
+  } else {
+    window.parent.postMessage(
+      { type: "buidler-plugin-clear-cookie" },
+      { targetOrigin: "*" }
+    );
+  }
   callback();
 };
 
 export const setCookie = (key: string, val: any) => {
   return new Promise<void>((resolve, reject) => {
-    window.parent.postMessage(
-      { type: "buidler-plugin-set-cookie", key, value: val },
-      { targetOrigin: "*" }
-    );
+    if (window.self.origin === window?.top?.origin) {
+      window.postMessage(
+        { type: "buidler-plugin-set-cookie", key, value: val },
+        { targetOrigin: "*" }
+      );
+    } else {
+      window.parent.postMessage(
+        { type: "buidler-plugin-set-cookie", key, value: val },
+        { targetOrigin: "*" }
+      );
+    }
     store.dispatch(SESSION_ACTIONS.updateSession({ key, value: val }));
     Cookies.set(key, val);
     return resolve();
