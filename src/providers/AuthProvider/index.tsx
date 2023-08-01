@@ -192,7 +192,14 @@ const AuthProvider = ({ children }: IAuthProps) => {
         } else {
           onCloseLogin();
         }
-        socket.initSocket(onSocketConnected);
+        const matchParams = getParamsFromPath();
+        const { page_name, match_channel_id } = matchParams || {};
+        socket.disconnect();
+        if (page_name === "plugin" && match_channel_id) {
+          socket.initSocket(onSocketConnected, match_channel_id);
+        } else {
+          socket.initSocket(onSocketConnected);
+        }
       } else {
         clearData(async () => {
           dispatch(logoutAction());
@@ -254,11 +261,17 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const checkingAuth = useCallback(async () => {
     setLoading(true);
     await getInitial();
+    const matchParams = getParamsFromPath();
+    const { page_name, match_channel_id, match_community_id } =
+      matchParams || {};
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     if (ott) {
       const res = await api.generateTokenFromOTT(ott);
       if (res.success) {
         await handleResponseVerify(res.data, LoginType.OTT);
+        if (page_name === "plugin") {
+          socket.initSocket(onSocketConnected, match_channel_id);
+        }
         setLoading(false);
         return;
       }
@@ -266,12 +279,13 @@ const AuthProvider = ({ children }: IAuthProps) => {
     if (!accessToken) {
       if (canViewOnly) {
         await handleDataFromExternalUrl();
+        socket.initSocket(onSocketConnected, match_channel_id);
       } else if (window.location.pathname !== AppConfig.loginPath) {
-        const matchParams = getParamsFromPath();
-        const { match_channel_id, match_community_id } = matchParams || {};
         if (!match_channel_id || !match_community_id) {
           dispatch(logoutAction());
           navigate(loginPath, { replace: true, state: { from: location } });
+        } else {
+          socket.initSocket(onSocketConnected, match_channel_id);
         }
       }
     } else {

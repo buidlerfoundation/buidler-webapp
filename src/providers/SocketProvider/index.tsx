@@ -21,7 +21,6 @@ import { USER_ACTIONS } from "reducers/UserReducers";
 import { Socket, io } from "socket.io-client";
 import EventName from "./EventName";
 import { UserData } from "models/User";
-import { matchPath } from "react-router-dom";
 import { getParamsFromPath } from "helpers/LinkHelper";
 
 type SocketState = "connecting" | "connected" | "disconnected";
@@ -29,7 +28,7 @@ type SocketState = "connecting" | "connected" | "disconnected";
 export interface ISocketContext {
   emitMessage: (payload: EmitMessageData) => void;
   disconnect: () => void;
-  initSocket: (onConnected: () => void) => void;
+  initSocket: (onConnected?: () => void, channelId?: string) => void;
   socketState: SocketState;
 }
 
@@ -195,34 +194,38 @@ const SocketProvider = ({ children }: ISocketProps) => {
     onUserJoinCommunity,
     onUserLeaveChannel,
   ]);
-  const initSocket = useCallback(async (onConnected: () => void) => {
-    if (socket.current?.connected) return;
-    setSocketState("connecting");
-    const accessToken = await getCookie(AsyncKey.accessTokenKey);
-    socket.current = io(`${AppConfig.apiBaseUrl}`, {
-      query: {
-        token: accessToken,
-        platform: "Web",
-      },
-      transports: ["websocket"],
-      upgrade: false,
-    });
-    socket.current?.on("connect_error", (err) => {
-      toast.error(err.message);
-      setSocketState("disconnected");
-    });
-    socket.current?.on("connect", () => {
-      console.log("socket connected");
-      onConnected?.();
-      setSocketState("connected");
-    });
-    socket.current?.on("disconnect", (reason: string) => {
-      setSocketState("disconnected");
-      if (reason === "io server disconnect") {
-        socket.current?.connect();
-      }
-    });
-  }, []);
+  const initSocket = useCallback(
+    async (onConnected?: () => void, channelId?: string) => {
+      if (socket.current?.connected) return;
+      setSocketState("connecting");
+      const accessToken = await getCookie(AsyncKey.accessTokenKey);
+      socket.current = io(`${AppConfig.apiBaseUrl}`, {
+        query: {
+          token: accessToken || "",
+          platform: "Web",
+          channel_id: channelId || "",
+        },
+        transports: ["websocket"],
+        upgrade: false,
+      });
+      socket.current?.on("connect_error", (err) => {
+        toast.error(err.message);
+        setSocketState("disconnected");
+      });
+      socket.current?.on("connect", () => {
+        console.log("socket connected");
+        onConnected?.();
+        setSocketState("connected");
+      });
+      socket.current?.on("disconnect", (reason: string) => {
+        setSocketState("disconnected");
+        if (reason === "io server disconnect") {
+          socket.current?.connect();
+        }
+      });
+    },
+    []
+  );
   useEffect(() => {
     if (socketState === "connected" && user.user_id) {
       removeListener();
