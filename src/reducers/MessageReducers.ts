@@ -29,7 +29,7 @@ interface MessageState {
 const initialState: MessageState = {
   messageData: {},
   apiController: null,
-  chatBoxActiveTab: "pin",
+  chatBoxActiveTab: "",
 };
 
 export const getMessages = createAsyncThunk(
@@ -148,7 +148,7 @@ const messageSlice = createSlice({
         entity_id,
         message_id,
         content,
-        post,
+        topic,
         attachments,
         plain_text,
         updated_at,
@@ -162,17 +162,17 @@ const messageSlice = createSlice({
             if (msg.message_id === message_id) {
               msg.content = content;
               msg.plain_text = plain_text;
-              if (msg.post || post) {
-                if (msg.post) {
-                  msg.post = {
-                    ...msg.post,
-                    ...post,
+              if (msg.topic || topic) {
+                if (msg.topic) {
+                  msg.topic = {
+                    ...msg.topic,
+                    ...topic,
                   };
                 } else {
-                  msg.post = post;
+                  msg.topic = topic;
                 }
               } else {
-                msg.post = undefined;
+                msg.topic = undefined;
               }
               msg.attachments = attachments;
               msg.updated_at = updated_at;
@@ -184,7 +184,7 @@ const messageSlice = createSlice({
                 ...msg.conversation_data,
                 content,
                 plain_text,
-                post,
+                topic,
                 attachments,
                 updated_at,
                 is_scam_detected,
@@ -251,7 +251,7 @@ const messageSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(channelChanged, (state) => {
-        state.chatBoxActiveTab = "pin";
+        state.chatBoxActiveTab = "chat";
       })
       .addCase(getMessages.pending, (state, action) => {
         if (action.meta.arg.before) {

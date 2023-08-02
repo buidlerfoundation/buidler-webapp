@@ -14,14 +14,14 @@ import { getDataFromExternalUrl } from "reducers/UserActions";
 import { useNavigate } from "react-router-dom";
 import useOutsideLoading from "hooks/useOutsideLoading";
 import useChannel from "hooks/useChannel";
-import { getStories } from "reducers/PinPostReducers";
+import { getPinPosts, getStories } from "reducers/PinPostReducers";
 import useShowPlugin from "hooks/useShowPlugin";
 import { MESSAGE_ACTIONS } from "reducers/MessageReducers";
 
 const Plugin = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { isShow, activeTab } = useShowPlugin();
+  const { isShow } = useShowPlugin();
   const pluginOpen = usePluginOpen();
   const loading = useOutsideLoading();
   const channel = useChannel();
@@ -33,9 +33,13 @@ const Plugin = () => {
   useEffect(() => {
     if (isShow) {
       window.parent.postMessage("show-plugin", "*");
-      dispatch(MESSAGE_ACTIONS.updateActiveTab(activeTab));
     }
-  }, [activeTab, dispatch, isShow]);
+  }, [dispatch, isShow]);
+  useEffect(() => {
+    if (channel?.channel_id) {
+      dispatch(getPinPosts({ channel_id: channel?.channel_id }));
+    }
+  }, [channel?.channel_id, dispatch]);
   useEffect(() => {
     if (channel?.display_channel_url) {
       dispatch(getStories({ url: channel?.display_channel_url }));

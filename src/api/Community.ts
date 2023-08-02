@@ -11,7 +11,7 @@ import {
 } from "models/Community";
 import Caller from "./Caller";
 import { UserData } from "models/User";
-import { PostData } from "models/Message";
+import { ITopicComment, PostData } from "models/Message";
 
 export const getPinnedCommunities = () =>
   Caller.get<Community[]>("community?type=pin");
@@ -56,11 +56,11 @@ export const getChannel = (channelId: string) =>
   Caller.get<Channel>(`channel/${channelId}`);
 
 export const createPinPost = (createPostBody: CreatePostBody) =>
-  Caller.post<PostData>("post", createPostBody);
+  Caller.post<PostData>("topic", createPostBody);
 
 export const getListPost = (reqPostList: RequestPostList) => {
   const { channel_id, before_id, limit = 10 } = reqPostList;
-  let uri = `channel/${channel_id}/posts?pagination[size]=${limit}`;
+  let uri = `channel/${channel_id}/topics?pagination[size]=${limit}`;
   if (before_id) {
     uri += `&pagination[before]=${before_id}`;
   }
@@ -92,3 +92,8 @@ export const getStoryById = (id: string) =>
 
 export const getCommentsById = (id: number) =>
   Caller.get<IHNStoryComment[]>(`external/hacker-new/${id}/comments`);
+
+export const getTopicById = (id: string) => Caller.get<PostData>(`topic/${id}`);
+
+export const getTopicCommentsById = (id: string) =>
+  Caller.get<ITopicComment[]>(`topic/${id}/comments`);

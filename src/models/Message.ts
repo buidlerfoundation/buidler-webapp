@@ -1,7 +1,7 @@
-import { Channel, LocalAttachment } from "./Community";
+import { LocalAttachment } from "./Community";
 import { UserData } from "./User";
 
-export type ActiveTab = "chat" | "pin" | "review";
+export type ActiveTab = "chat" | "pin" | "review" | "hacker-new" | "";
 
 export type EmitMessageData = {
   entity_id: string;
@@ -44,26 +44,30 @@ export interface TagData {
   tag_type: string;
 }
 
-export interface PostData {
-  content?: string;
-  attachments?: AttachmentData[];
+export interface ITopicComment {
+  comment_id: string;
+  content: string;
+  author_id: string;
+  topic_id: string;
+  parent_id: string;
+  is_deleted: boolean;
   created_at: string;
-  creator_id: string;
-  creator: UserData;
-  ipfs_uploaded_at?: string;
-  is_deleted?: boolean;
-  post_id: string;
-  root_message_created_at: string;
   updated_at: string;
-  status: "pinned" | "archived";
-  uploadingIPFS?: boolean;
-  notification_type?: string;
-  post_channels?: { channel: Channel; channel_id: string; post_id: string }[];
-  total_messages?: string;
-  total_unread_notifications?: number;
-  latest_reply_senders?: string[];
-  total_reply_sender?: string;
-  latest_reply_message_at?: string;
+  author: UserData;
+  total_comments: number;
+}
+
+export interface PostData {
+  author_id: string;
+  author?: UserData;
+  comments?: ITopicComment[];
+  content: string;
+  created_at: string;
+  is_deleted: boolean;
+  root_channel_id: string;
+  topic_id: string;
+  total_comments?: number;
+  updated_at: string;
 }
 
 export interface ConversationData {
@@ -76,7 +80,7 @@ export interface ConversationData {
   plain_text: string;
   sender_id: string;
   updated_at: string;
-  post?: PostData;
+  topic?: PostData;
   is_deleted?: boolean;
   isHead: boolean;
   isSending?: boolean;

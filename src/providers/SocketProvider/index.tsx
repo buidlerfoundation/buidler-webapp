@@ -4,7 +4,7 @@ import { getCookie } from "common/Cookie";
 import useAppDispatch from "hooks/useAppDispatch";
 import useUser from "hooks/useUser";
 import { Channel, Community, Space } from "models/Community";
-import { EmitMessageData, MessageData } from "models/Message";
+import { EmitMessageData, MessageData, PostData } from "models/Message";
 import {
   createContext,
   ReactNode,
@@ -22,6 +22,7 @@ import { Socket, io } from "socket.io-client";
 import EventName from "./EventName";
 import { UserData } from "models/User";
 import { getParamsFromPath } from "helpers/LinkHelper";
+import { PIN_POST_ACTIONS } from "reducers/PinPostReducers";
 
 type SocketState = "connecting" | "connected" | "disconnected";
 
@@ -62,6 +63,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.off(EventName.ON_USER_JOIN_COMMUNITY);
     socket.current?.off(EventName.ON_USER_JOIN_CHANNEL);
     socket.current?.off(EventName.ON_USER_LEAVE_CHANNEL);
+    socket.current?.off(EventName.ON_NEW_TOPIC);
     socket.current?.off("disconnect");
   }, []);
   const onNewMessage = useCallback(
@@ -173,6 +175,12 @@ const SocketProvider = ({ children }: ISocketProps) => {
     },
     [dispatch, user.user_id]
   );
+  const onNewTopic = useCallback(
+    (data: PostData) => {
+      dispatch(PIN_POST_ACTIONS.addNewTopic(data));
+    },
+    [dispatch]
+  );
   const listener = useCallback(() => {
     socket.current?.on(EventName.ON_NEW_MESSAGE, onNewMessage);
     socket.current?.on(EventName.ON_DELETE_MESSAGE, onDeleteMessage);
@@ -183,12 +191,14 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.on(EventName.ON_USER_JOIN_COMMUNITY, onUserJoinCommunity);
     socket.current?.on(EventName.ON_USER_JOIN_CHANNEL, onUserJoinChannel);
     socket.current?.on(EventName.ON_USER_LEAVE_CHANNEL, onUserLeaveChannel);
+    socket.current?.on(EventName.ON_NEW_TOPIC, onNewTopic);
   }, [
     onAddReact,
     onCreateCommunity,
     onDeleteMessage,
     onEditMessage,
     onNewMessage,
+    onNewTopic,
     onRemoveReact,
     onUserJoinChannel,
     onUserJoinCommunity,

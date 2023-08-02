@@ -11,7 +11,7 @@ import IconCornerTopRight from "shared/SVG/IconCornerTopRight";
 import useAppDispatch from "hooks/useAppDispatch";
 import { openNewTabFromIframe } from "reducers/UserActions";
 import { useNavigate } from "react-router-dom";
-import { getStories } from "reducers/PinPostReducers";
+import { getPinPosts, getStories } from "reducers/PinPostReducers";
 import Loading from "./Loading";
 import { getURLObject } from "helpers/LinkHelper";
 import useChannels from "hooks/useChannels";
@@ -147,6 +147,11 @@ const Home = () => {
       window.removeEventListener("message", messageListener);
     };
   }, [channel?.dapp_integration_url, handleOpenNewTab, openNewChannel]);
+  useEffect(() => {
+    if (channel?.channel_id) {
+      dispatch(getPinPosts({ channel_id: channel?.channel_id }));
+    }
+  }, [channel?.channel_id, dispatch]);
   useEffect(() => {
     if (channel?.display_channel_url) {
       setOpenNewChannel(true);

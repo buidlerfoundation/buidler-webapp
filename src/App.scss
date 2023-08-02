@@ -351,18 +351,11 @@ iframe {
   height: 36px !important;
   min-height: 36px !important;
   padding: 0 8px !important;
-  margin-right: 10px !important;
   border-radius: 10px !important;
   color: var(--color-secondary-text) !important;
   text-transform: none !important;
   font-size: 15px !important;
   line-height: 20px !important;
-  &:first-child {
-    margin-left: 15px;
-  }
-  &:last-child {
-    margin-right: 15px;
-  }
 }
 
 .MuiTabPanel-root {

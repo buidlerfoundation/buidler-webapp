@@ -9,7 +9,7 @@ export const normalizeMessage = (messages: MessageData[]) => {
       : null;
     if (
       msg.sender_id !== messages?.[index + 1]?.sender_id ||
-      !!messages?.[index + 1]?.post
+      !!messages?.[index + 1]?.topic
     ) {
       msg.isHead = true;
     }

@@ -58,6 +58,7 @@ export interface Channel {
   total_channel_messages?: number;
   display_channel_url?: string;
   is_default_channel?: boolean;
+  total_online_members?: number;
 }
 
 export interface Space {
@@ -99,7 +100,7 @@ export type CreateChannelData = {
 
 export interface CreatePostBody {
   content?: string;
-  post_id?: string;
+  topic_id?: string;
   channel_ids?: string[];
 }
 

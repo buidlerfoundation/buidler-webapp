@@ -8,14 +8,13 @@ interface PostReducerData {
   posts: PostData[];
   canMore: boolean;
   count: number;
+  loading?: boolean;
+  loadMore?: boolean;
 }
 
 interface PinPostState {
   pinPostData: {
-    [key: string]: {
-      active?: PostReducerData;
-      archived?: PostReducerData;
-    };
+    [key: string]: PostReducerData;
   };
   topicData: {
     [key: string]: {
@@ -27,16 +26,13 @@ interface PinPostState {
       loadMore?: boolean;
     };
   };
-  loading?: boolean;
-  loadMore?: boolean;
   selectedStoryId?: string | null;
+  selectedTopicId?: string | null;
 }
 
 const initialState: PinPostState = {
   pinPostData: {},
   topicData: {},
-  loading: false,
-  loadMore: false,
 };
 
 export const getPinPosts = createAsyncThunk(
@@ -69,6 +65,22 @@ const pinPostSlice = createSlice({
     updateSelectedStoryId: (state, action: PayloadAction<string | null>) => {
       state.selectedStoryId = action.payload;
     },
+    updateSelectedTopicId: (state, action: PayloadAction<string | null>) => {
+      state.selectedTopicId = action.payload;
+    },
+    addNewTopic: (state, action: PayloadAction<PostData>) => {
+      const currentData =
+        state.pinPostData?.[action.payload.root_channel_id]?.posts || [];
+      currentData.push(action.payload);
+      state.pinPostData[action.payload.root_channel_id] = {
+        posts: currentData,
+        canMore: state.pinPostData[action.payload.root_channel_id]?.canMore,
+        count:
+          (state.pinPostData[action.payload.root_channel_id]?.count || 0) + 1,
+        loading: false,
+        loadMore: false,
+      };
+    },
   },
   extraReducers: (builder) =>
     builder
@@ -76,38 +88,47 @@ const pinPostSlice = createSlice({
         state.selectedStoryId = null;
       })
       .addCase(getPinPosts.pending, (state, action) => {
-        if (action.meta.arg.before_id) {
-          state.loadMore = true;
-        } else {
-          state.loading = true;
-        }
+        const { channel_id, before_id } = action.meta.arg;
+        state.pinPostData = {
+          ...state.pinPostData,
+          [channel_id]: {
+            ...(state.pinPostData[channel_id] || {}),
+            loading: !before_id,
+            loadMore: !!before_id,
+          },
+        };
       })
       .addCase(getPinPosts.rejected, (state, action) => {
         if (action.error.name !== "AbortError") {
-          state.loadMore = false;
-          state.loading = false;
+          const { channel_id } = action.meta.arg;
+          state.pinPostData = {
+            ...state.pinPostData,
+            [channel_id]: {
+              ...(state.pinPostData[channel_id] || {}),
+              loading: false,
+              loadMore: false,
+            },
+          };
         }
       })
       .addCase(getPinPosts.fulfilled, (state, action) => {
         if (action.payload) {
           const { res, request } = action.payload;
           const currentData =
-            state.pinPostData?.[request.channel_id]?.active?.posts || [];
+            state.pinPostData?.[request.channel_id]?.posts || [];
           const data = res.data || [];
           let posts = data;
           if (request.before_id) {
             posts = [...currentData, ...data];
           }
           state.pinPostData[request.channel_id] = {
-            active: {
-              posts,
-              canMore: data.length !== 0,
-              count: res.metadata?.total || 0,
-            },
+            posts,
+            canMore: data.length !== 0,
+            count: res.metadata?.total || 0,
+            loading: false,
+            loadMore: false,
           };
         }
-        state.loadMore = false;
-        state.loading = false;
       })
       .addCase(getStories.pending, (state, action) => {
         const { url, page = 1 } = action.meta.arg;
