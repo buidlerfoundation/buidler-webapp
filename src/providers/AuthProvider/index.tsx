@@ -135,21 +135,27 @@ const AuthProvider = ({ children }: IAuthProps) => {
     setOpenLogin(false);
     isQuickLogin.current = false;
   }, []);
-  const handleDataFromExternalUrl = useCallback(async () => {
-    if (isExternalUrl) {
-      const res = await dispatch(
-        getDataFromExternalUrl({ url: externalUrl })
-      ).unwrap();
-      if (res) {
-        const { community, channel } = res;
-        const path = `${window.location.pathname}/${community.community_id}/${channel.channel_id}`;
-        navigate(path, { replace: true });
-      } else {
-        // handle retry or something
+  const handleDataFromExternalUrl = useCallback(
+    async (connectSocket?: boolean) => {
+      if (isExternalUrl) {
+        const res = await dispatch(
+          getDataFromExternalUrl({ url: externalUrl })
+        ).unwrap();
+        if (res) {
+          const { community, channel } = res;
+          const path = `${window.location.pathname}/${community.community_id}/${channel.channel_id}`;
+          if (connectSocket && channel.channel_id) {
+            socket.initSocket(onSocketConnected, channel.channel_id);
+          }
+          navigate(path, { replace: true });
+        } else {
+          // handle retry or something
+        }
       }
-    }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, externalUrl, isExternalUrl]);
+    [dispatch, externalUrl, isExternalUrl]
+  );
   const getInitial = useCallback(async () => {
     const res = await api.getInitial();
     if (res.statusCode === 200) {
@@ -278,8 +284,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     }
     if (!accessToken) {
       if (canViewOnly) {
-        await handleDataFromExternalUrl();
-        socket.initSocket(onSocketConnected, match_channel_id);
+        await handleDataFromExternalUrl(true);
       } else if (window.location.pathname !== AppConfig.loginPath) {
         if (!match_channel_id || !match_community_id) {
           dispatch(logoutAction());
