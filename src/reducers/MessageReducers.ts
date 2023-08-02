@@ -1,5 +1,4 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { channelChanged } from "./actions";
 import { normalizeMessage } from "helpers/MessageHelper";
 import { GeneratedPrivateKey } from "common/Cookie";
 import api from "api";
@@ -16,13 +15,13 @@ interface MessageState {
       canMore: boolean;
       data: MessageData[];
       canMoreAfter: boolean;
+      loading?: boolean;
+      loadMore?: boolean;
+      loadMoreAfter?: boolean;
     };
   };
   apiController?: AbortController | null;
   highlightMessageId?: string;
-  loadMoreAfterMessage?: boolean;
-  loadMoreMessage?: boolean;
-  loadingMessage?: boolean;
   chatBoxActiveTab: ActiveTab;
 }
 
@@ -250,23 +249,30 @@ const messageSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(channelChanged, (state) => {
-        state.chatBoxActiveTab = "chat";
-      })
       .addCase(getMessages.pending, (state, action) => {
-        if (action.meta.arg.before) {
-          state.loadMoreMessage = true;
-        } else if (action.meta.arg.after) {
-          state.loadMoreAfterMessage = true;
-        } else {
-          state.loadingMessage = true;
-        }
+        const { channelId, before, after } = action.meta.arg;
+        state.messageData = {
+          ...state.messageData,
+          [channelId]: {
+            ...(state.messageData[channelId] || {}),
+            loading: !before && !after,
+            loadMore: !!before && !after,
+            loadMoreAfter: !!after && !before,
+          },
+        };
       })
       .addCase(getMessages.rejected, (state, action) => {
         if (action.error.name !== "AbortError") {
-          state.loadMoreAfterMessage = false;
-          state.loadingMessage = false;
-          state.loadMoreAfterMessage = false;
+          const { channelId } = action.meta.arg;
+          state.messageData = {
+            ...state.messageData,
+            [channelId]: {
+              ...(state.messageData[channelId] || {}),
+              loading: false,
+              loadMore: false,
+              loadMoreAfter: false,
+            },
+          };
         }
       })
       .addCase(getMessages.fulfilled, (state: MessageState, action: any) => {
@@ -287,11 +293,11 @@ const messageSlice = createSlice({
         } else if (after || data.length === 0) {
           msg = [...data, ...currentData];
         }
-        state.loadMoreAfterMessage = false;
-        state.loadingMessage = false;
-        state.loadMoreMessage = false;
         state.messageData[channelId] = {
           data: normalizeMessage(msg),
+          loading: false,
+          loadMore: false,
+          loadMoreAfter: false,
           canMore:
             canMoreBefore !== undefined
               ? canMoreBefore
