@@ -6,8 +6,9 @@ import React, {
   useMemo,
   forwardRef,
   useImperativeHandle,
+  useEffect,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import IconPlus from "shared/SVG/IconPlus";
 import styles from "./index.module.scss";
 import useCurrentCommunity from "hooks/useCurrentCommunity";
@@ -44,6 +45,7 @@ type AppTitleBarProps = {
 const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
   // const toastData = useAppSelector((state) => state.transaction.toastData);
   const dispatch = useAppDispatch();
+  const location = useLocation();
   const openingNewTab = useAppSelector((state) => state.user.openingNewTab);
   const userData = useUser();
   const auth = useAuth();
@@ -143,6 +145,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
   const [isOpenModalTeam, setOpenModalTeam] = useState(false);
   const [isOpenModalUser, setOpenModalUser] = useState(false);
   const [isOpenTransaction, setOpenTransaction] = useState(false);
+  const [isOpenUpdateUser, setOpenUpdateUser] = useState(false);
   const [selectedMenuTeam, setSelectedMenuTeam] = useState<Community | null>(
     null
   );
@@ -308,6 +311,13 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
     };
   });
 
+  useEffect(() => {
+    if (location.hash === "#update-profile") {
+      setOpenUpdateUser(true);
+      setOpenModalUser(true);
+    }
+  }, [location.hash]);
+
   return (
     <div id="title-bar">
       <div className={`${styles["list-team"]} hide-scroll-bar`}>
@@ -371,6 +381,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
         onLogout={handleLogout}
         onViewTxDetail={onViewTxDetail}
         isOpenTransaction={isOpenTransaction}
+        isOpenUpdateUser={isOpenUpdateUser}
       />
       <PopoverButton
         popupOnly

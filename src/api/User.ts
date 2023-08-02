@@ -1,6 +1,7 @@
 import {
   BalanceApiData,
   Contract,
+  IUserAsset,
   InitialApiData,
   LoginApiData,
   ProfileApiData,
@@ -127,3 +128,14 @@ export const modifyRole = (
 
 export const getUsersByName = (q: string) =>
   Caller.get<UserData[]>(`user/search?user_name=${q}`);
+
+export const getUserAssets = (req: { userId: string; queryType?: string }) =>
+  Caller.get<IUserAsset[]>(
+    `user/${req.userId}/assets?${
+      req.queryType
+        ? new URLSearchParams({
+            type: req.queryType || "",
+          })
+        : ""
+    }`
+  );

@@ -167,18 +167,20 @@ export const updateUser = createAsyncThunk(
   async (userData: any) => {
     const dataUpdate: any = {};
     if (userData.isUpdateENS && userData?.ensAsset) {
-      dataUpdate.ens_asset = {
-        contract_address: userData?.ensAsset?.contract_address,
+      dataUpdate.user_name_asset = {
+        user_name: userData?.ensAsset?.value,
         token_id: userData?.ensAsset?.token_id,
         network: userData?.ensAsset?.network,
       };
     }
     if (!userData?.ensAsset && userData?.userName) {
-      dataUpdate.username = userData?.userName;
+      dataUpdate.user_name_asset = {
+        user_name: userData?.userName,
+      };
     }
     if (userData?.nftAsset) {
-      dataUpdate.nft_asset = {
-        contract_address: userData?.nftAsset?.contract_address,
+      dataUpdate.avatar_asset = {
+        contract_address: userData?.nftAsset?.contract?.address,
         token_id: userData?.nftAsset?.token_id,
         network: userData?.nftAsset?.network,
       };
@@ -200,3 +202,22 @@ export const acceptInvitation = createAsyncThunk(
 export const pinCommunity = createAction<Community>("user/pin-community");
 
 export const unPinCommunity = createAction<string>("user/un-pin-community");
+
+export const getUserAssets = createAsyncThunk(
+  "user/get-user-assets",
+  async (payload: { userId: string }) => {
+    const [resENS, resNFT] = await Promise.all([
+      api.getUserAssets({
+        userId: payload.userId,
+        queryType: "namespace",
+      }),
+      api.getUserAssets({
+        userId: payload.userId,
+      }),
+    ]);
+    return {
+      resENS,
+      resNFT,
+    };
+  }
+);

@@ -123,6 +123,7 @@ export const DeletedUser: UserData = {
   user_name: "User no longer in community",
   avatar_url: "",
   user_addresses: [],
+  user_assets: [],
 };
 
 export const DirectCommunity: Community = {

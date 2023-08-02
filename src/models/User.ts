@@ -236,6 +236,17 @@ export interface UserData {
   created_at?: string;
   updated_at?: string;
   user_addresses: UserAddress[];
+  user_assets: {
+    contract_address: string;
+    created_at: string;
+    is_active: boolean;
+    network: string;
+    token_id: string;
+    updated_at: string;
+    user_asset_type: "user_name" | "avatar";
+    user_id: string;
+    value: string;
+  }[];
 }
 
 export interface InitialApiData {
@@ -274,4 +285,40 @@ export interface LoginApiData {
   token_expire_at: number;
   refresh_token: string;
   refresh_token_expire_at: number;
+}
+
+export interface IUserAsset {
+  balance?: number;
+  contract?: {
+    address: string;
+    contract_deployer: string;
+    name?: string;
+    symbol?: string;
+    token_type: string;
+    total_supply?: string;
+  };
+  description?: string;
+  media?: {
+    bytes: number;
+    format: string;
+    gateway: string;
+    raw: string;
+    thumbnail: string;
+  }[];
+  metadata?: {
+    attributes: {
+      trait_type: string;
+      value: string;
+    }[];
+    description: string;
+    external_url: string;
+    image: string;
+    name: string;
+  };
+  network: string;
+  title?: string;
+  token_id: string;
+  token_type?: string;
+  contract_address?: string;
+  value?: string;
 }

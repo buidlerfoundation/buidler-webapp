@@ -1,12 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Channel, Community, Space } from "models/Community";
-import { BalanceApiData, InitialApiData, UserData } from "models/User";
+import {
+  BalanceApiData,
+  InitialApiData,
+  IUserAsset,
+  UserData,
+} from "models/User";
 import {
   getCommunities,
   getDataFromExternalUrl,
   getExternalCommunityByChannelId,
   getPinnedCommunities,
   getUserAction,
+  getUserAssets,
   getWalletBalance,
   openNewTabFromIframe,
   pinCommunity,
@@ -44,6 +50,7 @@ interface UserState {
     channel: Channel;
   };
   openingNewTab?: IOpeningNewTab;
+  userAssets: IUserAsset[];
 }
 
 const initialState: UserState = {
@@ -52,6 +59,7 @@ const initialState: UserState = {
     user_id: "",
     user_name: "",
     user_addresses: [],
+    user_assets: [],
   },
   imgDomain: "",
   imgBucket: "",
@@ -59,6 +67,7 @@ const initialState: UserState = {
   teamUserMap: {},
   loadingCommunityData: false,
   currentToken: "",
+  userAssets: [],
 };
 
 const userSlice = createSlice({
@@ -205,6 +214,12 @@ const userSlice = createSlice({
       .addCase(logoutAction, (state: UserState) => {
         state.data = initialState.data;
         state.currentToken = "";
+      })
+      .addCase(getUserAssets.fulfilled, (state, action) => {
+        state.userAssets = [
+          ...(action.payload.resNFT.data || []),
+          ...(action.payload.resENS.data || []),
+        ];
       })
       .addCase(channelChanged, (state) => {
         state.openingNewTab = undefined;
