@@ -51,6 +51,9 @@ const MyCommunity = () => {
     [onClick]
   );
   useEffect(() => {
+    document.title = "Community | Buidler";
+  }, []);
+  useEffect(() => {
     dispatch(getCommunities());
   }, [dispatch]);
   return (
