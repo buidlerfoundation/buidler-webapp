@@ -37,8 +37,14 @@ const HomeWrapper = () => {
   const [leavingChannel, setLeavingChannel] = useState(false);
   const initialCommunityData = useCallback(async () => {
     if (pinnedCommunities?.length === 0) {
-      navigate("/communities", { replace: true });
-      return;
+      if (matchChannelId) {
+        dispatch(
+          getExternalCommunityByChannelId({ channelId: matchChannelId })
+        );
+      } else {
+        navigate("/communities", { replace: true });
+        return;
+      }
     }
     const community = pinnedCommunities?.find(
       (el) => el.community_id === matchCommunityId
