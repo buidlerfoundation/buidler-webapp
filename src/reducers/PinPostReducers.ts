@@ -71,7 +71,7 @@ const pinPostSlice = createSlice({
     addNewTopic: (state, action: PayloadAction<PostData>) => {
       const currentData =
         state.pinPostData?.[action.payload.root_channel_id]?.posts || [];
-      currentData.push(action.payload);
+      currentData.unshift(action.payload);
       state.pinPostData[action.payload.root_channel_id] = {
         posts: currentData,
         canMore: state.pinPostData[action.payload.root_channel_id]?.canMore,

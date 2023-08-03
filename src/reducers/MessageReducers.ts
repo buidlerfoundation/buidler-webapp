@@ -9,6 +9,7 @@ import {
   PayloadMessageListAction,
 } from "models/Message";
 import { UserData } from "models/User";
+import { channelChanged } from "./actions";
 
 interface MessageState {
   messageData: {
@@ -280,6 +281,9 @@ const messageSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(channelChanged, (state) => {
+        state.chatBoxActiveTab = "";
+      })
       .addCase(getMessages.pending, (state, action) => {
         const { channelId, before, after } = action.meta.arg;
         state.messageData = {
