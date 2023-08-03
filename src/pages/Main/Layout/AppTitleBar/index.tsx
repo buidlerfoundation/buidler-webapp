@@ -315,6 +315,11 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
     if (location.hash === "#update-profile") {
       setOpenUpdateUser(true);
       setOpenModalUser(true);
+      window.history.replaceState(
+        null,
+        "",
+        window.location.href.replace("#update-profile", "")
+      );
     }
   }, [location.hash]);
 

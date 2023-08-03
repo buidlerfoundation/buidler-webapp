@@ -8,6 +8,7 @@ import {
   MessageData,
   PayloadMessageListAction,
 } from "models/Message";
+import { UserData } from "models/User";
 
 interface MessageState {
   messageData: {
@@ -65,6 +66,36 @@ const messageSlice = createSlice({
   name: "message",
   initialState,
   reducers: {
+    updateUser: (
+      state,
+      action: PayloadAction<{ user: UserData; channelId: string }>
+    ) => {
+      const { user, channelId } = action.payload;
+      state.messageData = {
+        ...state.messageData,
+        [channelId]: {
+          ...state.messageData?.[channelId],
+          data: state.messageData?.[channelId]?.data?.map((el) => {
+            if (el.conversation_data?.sender?.user_id === user.user_id) {
+              return {
+                ...el,
+                conversation_data: {
+                  ...el.conversation_data,
+                  sender: user,
+                },
+              };
+            }
+            if (el.sender?.user_id === user.user_id) {
+              return {
+                ...el,
+                sender: user,
+              };
+            }
+            return el;
+          }),
+        },
+      };
+    },
     updateList: (
       state: MessageState,
       action: PayloadAction<PayloadMessageListAction>

@@ -66,6 +66,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.off(EventName.ON_USER_JOIN_CHANNEL);
     socket.current?.off(EventName.ON_USER_LEAVE_CHANNEL);
     socket.current?.off(EventName.ON_NEW_TOPIC);
+    socket.current?.off(EventName.ON_USER_UPDATE_PROFILE);
     socket.current?.off("disconnect");
   }, []);
   const onNewMessage = useCallback(
@@ -185,6 +186,24 @@ const SocketProvider = ({ children }: ISocketProps) => {
     },
     [dispatch]
   );
+  const onUserUpdateProfile = useCallback(
+    (data: UserData) => {
+      if (data.user_id === user.user_id) {
+        dispatch(USER_ACTIONS.updateCurrentUser({ user: data }));
+      }
+      const matchParams = getParamsFromPath();
+      const { match_channel_id } = matchParams || {};
+      if (match_channel_id) {
+        dispatch(
+          MESSAGE_ACTIONS.updateUser({
+            user: data,
+            channelId: match_channel_id,
+          })
+        );
+      }
+    },
+    [dispatch, user.user_id]
+  );
   const listener = useCallback(() => {
     socket.current?.on(EventName.ON_NEW_MESSAGE, onNewMessage);
     socket.current?.on(EventName.ON_DELETE_MESSAGE, onDeleteMessage);
@@ -196,6 +215,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.on(EventName.ON_USER_JOIN_CHANNEL, onUserJoinChannel);
     socket.current?.on(EventName.ON_USER_LEAVE_CHANNEL, onUserLeaveChannel);
     socket.current?.on(EventName.ON_NEW_TOPIC, onNewTopic);
+    socket.current?.on(EventName.ON_USER_UPDATE_PROFILE, onUserUpdateProfile);
   }, [
     onAddReact,
     onCreateCommunity,
@@ -207,6 +227,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     onUserJoinChannel,
     onUserJoinCommunity,
     onUserLeaveChannel,
+    onUserUpdateProfile,
   ]);
   const initSocket = useCallback(
     async (onConnected?: () => void, channelId?: string) => {
