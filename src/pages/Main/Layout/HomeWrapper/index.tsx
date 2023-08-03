@@ -113,6 +113,7 @@ const HomeWrapper = () => {
       validateUUID(matchCommunityId)
     ) {
       setLastChannelIdByCommunityId(matchCommunityId, matchChannelId);
+      setLeavingChannel(false);
     }
   }, [matchChannelId, matchCommunityId]);
 
@@ -167,7 +168,6 @@ const HomeWrapper = () => {
           navigate(`/channels/${matchCommunityId}`, { replace: true });
         }
       }
-      setLeavingChannel(false);
     },
     [dispatch, matchChannelId, matchCommunityId, navigate]
   );

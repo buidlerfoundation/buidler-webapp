@@ -128,6 +128,7 @@ const Home = () => {
         if (
           channel?.dapp_integration_url &&
           e.data?.frame?.url !== channel?.dapp_integration_url &&
+          e.data?.frame?.documentLifecycle === "active" &&
           !openNewChannel
         ) {
           const url = new URL(channel?.dapp_integration_url);
