@@ -119,6 +119,9 @@ export interface IHNStory {
   points?: number;
   created_at: string | number;
   total_comments: number;
+  source?: {
+    image_url?: string;
+  };
 }
 
 export interface IHNComment {
@@ -145,4 +148,7 @@ export interface IHNStoryDetail {
   total_comments: number;
   comments: IHNStoryComment[];
   time: number;
+  source?: {
+    image_url?: string;
+  };
 }
