@@ -86,6 +86,7 @@ const pinPostSlice = createSlice({
     builder
       .addCase(channelChanged, (state) => {
         state.selectedStoryId = null;
+        state.selectedTopicId = null;
       })
       .addCase(getPinPosts.pending, (state, action) => {
         const { channel_id, before_id } = action.meta.arg;
