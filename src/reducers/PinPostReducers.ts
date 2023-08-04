@@ -1,7 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { channelChanged } from "./actions";
 import { ITopicComment, PostData } from "models/Message";
-import { IHNStory, RequestPostList } from "models/Community";
+import { IHNStory, IHNStoryComment, RequestPostList } from "models/Community";
 import api from "api";
 
 interface PostReducerData {
@@ -40,6 +40,12 @@ interface PinPostState {
       loading: boolean;
     };
   };
+  storyCommentData: {
+    [key: string]: {
+      comments?: IHNStoryComment[] | null;
+      loading: boolean;
+    };
+  };
 }
 
 const initialState: PinPostState = {
@@ -47,7 +53,16 @@ const initialState: PinPostState = {
   topicData: {},
   topicDetail: {},
   commentData: {},
+  storyCommentData: {},
 };
+
+export const getStoryReply = createAsyncThunk(
+  "pinPost/get-story-reply",
+  async (payload: { id: string | number }) => {
+    const res = await api.getCommentsById(payload.id);
+    return res;
+  }
+);
 
 export const getReplyTopic = createAsyncThunk(
   "pinPost/get-buidler-reply",
@@ -327,6 +342,27 @@ const pinPostSlice = createSlice({
       .addCase(getReplyTopic.fulfilled, (state, action) => {
         const { parentId } = action.meta.arg;
         state.commentData[parentId] = {
+          loading: false,
+          comments: action.payload.data,
+        };
+      })
+      .addCase(getStoryReply.pending, (state, action) => {
+        const { id } = action.meta.arg;
+        state.storyCommentData[id] = {
+          loading: true,
+          comments: null,
+        };
+      })
+      .addCase(getStoryReply.rejected, (state, action) => {
+        const { id } = action.meta.arg;
+        state.storyCommentData[id] = {
+          loading: false,
+          comments: null,
+        };
+      })
+      .addCase(getStoryReply.fulfilled, (state, action) => {
+        const { id } = action.meta.arg;
+        state.storyCommentData[id] = {
           loading: false,
           comments: action.payload.data,
         };

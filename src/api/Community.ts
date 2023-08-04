@@ -90,7 +90,7 @@ export const getCommentFromStory = (payload: { id: string; page?: number }) =>
 export const getStoryById = (id: string) =>
   Caller.get<IHNStoryDetail>(`external/hacker-new/story/${id}`);
 
-export const getCommentsById = (id: number) =>
+export const getCommentsById = (id: string | number) =>
   Caller.get<IHNStoryComment[]>(`external/hacker-new/${id}/comments`);
 
 export const getTopicById = (id: string) => Caller.get<PostData>(`topic/${id}`);
@@ -106,3 +106,11 @@ export const getTopicCommentsById = (req: {
       root_parent_id: req.rootParentId || "",
     })}`
   );
+
+export const createCommentStory = (req: {
+  parentId: string | number;
+  content: string;
+}) =>
+  Caller.post(`external/hacker-new/${req.parentId}/comments`, {
+    text: req.content,
+  });
