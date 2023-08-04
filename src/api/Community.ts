@@ -95,5 +95,14 @@ export const getCommentsById = (id: number) =>
 
 export const getTopicById = (id: string) => Caller.get<PostData>(`topic/${id}`);
 
-export const getTopicCommentsById = (id: string) =>
-  Caller.get<ITopicComment[]>(`topic/${id}/comments`);
+export const getTopicCommentsById = (req: {
+  topicId: string;
+  parentId?: string;
+  rootParentId?: string;
+}) =>
+  Caller.get<ITopicComment[]>(
+    `topic/${req.topicId}/comments?${new URLSearchParams({
+      parent_id: req.parentId || "",
+      root_parent_id: req.rootParentId || "",
+    })}`
+  );

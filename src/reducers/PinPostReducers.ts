@@ -1,6 +1,6 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { channelChanged } from "./actions";
-import { PostData } from "models/Message";
+import { ITopicComment, PostData } from "models/Message";
 import { IHNStory, RequestPostList } from "models/Community";
 import api from "api";
 
@@ -28,12 +28,42 @@ interface PinPostState {
   };
   selectedStoryId?: string | null;
   selectedTopicId?: string | null;
+  topicDetail: {
+    [key: string]: {
+      topic?: PostData | null;
+      loading: boolean;
+    };
+  };
+  commentData: {
+    [key: string]: {
+      comments?: ITopicComment[] | null;
+      loading: boolean;
+    };
+  };
 }
 
 const initialState: PinPostState = {
   pinPostData: {},
   topicData: {},
+  topicDetail: {},
+  commentData: {},
 };
+
+export const getReplyTopic = createAsyncThunk(
+  "pinPost/get-buidler-reply",
+  async (payload: { topicId: string; parentId: string }) => {
+    const res = await api.getTopicCommentsById(payload);
+    return res;
+  }
+);
+
+export const getTopicDetail = createAsyncThunk(
+  "pinPost/get-buidler-topic",
+  async (payload: { topicId: string }) => {
+    const res = await api.getTopicById(payload.topicId);
+    return res;
+  }
+);
 
 export const getPinPosts = createAsyncThunk(
   "pinPost/list",
@@ -80,6 +110,91 @@ const pinPostSlice = createSlice({
         loading: false,
         loadMore: false,
       };
+    },
+    addNewComment: (
+      state,
+      action: PayloadAction<{ comment: ITopicComment; channelId: string }>
+    ) => {
+      const { topic_id, parent_id, root_parent_id } = action.payload.comment;
+      if (topic_id) {
+        if (topic_id === parent_id) {
+          if (state.pinPostData?.[action.payload.channelId]) {
+            state.pinPostData[action.payload.channelId] = {
+              ...state.pinPostData[action.payload.channelId],
+              posts: state.pinPostData[action.payload.channelId]?.posts?.map(
+                (el) => {
+                  if (el.topic_id === topic_id) {
+                    return {
+                      ...el,
+                      total_comments: (el.total_comments || 0) + 1,
+                    };
+                  }
+                  return el;
+                }
+              ),
+            };
+          }
+          if (state.topicDetail[topic_id]?.topic) {
+            const currentTopic = state.topicDetail[topic_id].topic;
+            currentTopic?.comments?.push(action.payload.comment);
+            state.topicDetail[topic_id] = {
+              loading: false,
+              topic: currentTopic,
+            };
+          }
+        } else {
+          if ((state.commentData[parent_id]?.comments?.length || 0) > 0) {
+            state.commentData[parent_id] = {
+              loading: false,
+              comments: [
+                ...(state.commentData[parent_id]?.comments || []),
+                action.payload.comment,
+              ],
+            };
+          } else if (root_parent_id) {
+            if (
+              root_parent_id === topic_id &&
+              state.topicDetail[topic_id]?.topic
+            ) {
+              const currentTopic = state.topicDetail[topic_id].topic;
+              if (currentTopic) {
+                state.topicDetail[topic_id] = {
+                  loading: false,
+                  topic: {
+                    ...currentTopic,
+                    comments: currentTopic?.comments?.map((el) => {
+                      if (el.comment_id === parent_id) {
+                        return {
+                          ...el,
+                          total_comments: (el.total_comments || 0) + 1,
+                        };
+                      }
+                      return el;
+                    }),
+                  },
+                };
+              }
+            } else if (
+              (state.commentData[root_parent_id]?.comments?.length || 0) > 0
+            ) {
+              state.commentData[root_parent_id] = {
+                loading: false,
+                comments: (
+                  state.commentData[root_parent_id]?.comments || []
+                ).map((el) => {
+                  if (el.comment_id === parent_id) {
+                    return {
+                      ...el,
+                      total_comments: (el.total_comments || 0) + 1,
+                    };
+                  }
+                  return el;
+                }),
+              };
+            }
+          }
+        }
+      }
     },
   },
   extraReducers: (builder) =>
@@ -173,6 +288,48 @@ const pinPostSlice = createSlice({
             },
           };
         }
+      })
+      .addCase(getTopicDetail.pending, (state, action) => {
+        const { topicId } = action.meta.arg;
+        state.topicDetail[topicId] = {
+          loading: true,
+          topic: null,
+        };
+      })
+      .addCase(getTopicDetail.rejected, (state, action) => {
+        const { topicId } = action.meta.arg;
+        state.topicDetail[topicId] = {
+          loading: false,
+          topic: null,
+        };
+      })
+      .addCase(getTopicDetail.fulfilled, (state, action) => {
+        const { topicId } = action.meta.arg;
+        state.topicDetail[topicId] = {
+          loading: false,
+          topic: action.payload.data,
+        };
+      })
+      .addCase(getReplyTopic.pending, (state, action) => {
+        const { parentId } = action.meta.arg;
+        state.commentData[parentId] = {
+          loading: true,
+          comments: null,
+        };
+      })
+      .addCase(getReplyTopic.rejected, (state, action) => {
+        const { parentId } = action.meta.arg;
+        state.commentData[parentId] = {
+          loading: false,
+          comments: null,
+        };
+      })
+      .addCase(getReplyTopic.fulfilled, (state, action) => {
+        const { parentId } = action.meta.arg;
+        state.commentData[parentId] = {
+          loading: false,
+          comments: action.payload.data,
+        };
       }),
 });
 

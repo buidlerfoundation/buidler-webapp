@@ -76,3 +76,15 @@ export const upVoteScamMessage = (id: string) =>
 
 export const downVoteScamMessage = (id: string) =>
   Caller.post(`scam-alert/${id}/downvote`);
+
+export const createComment = (req: {
+  topicId: string;
+  parentId?: string;
+  content: string;
+  rootParentId?: string;
+}) =>
+  Caller.post(`topic/${req.topicId}/comments`, {
+    content: req.content,
+    parent_id: req.parentId,
+    root_parent_id: req.rootParentId,
+  });

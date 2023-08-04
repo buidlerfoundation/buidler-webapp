@@ -55,6 +55,7 @@ export interface ITopicComment {
   updated_at: string;
   author: UserData;
   total_comments: number;
+  root_parent_id?: string;
 }
 
 export interface PostData {

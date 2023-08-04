@@ -4,7 +4,12 @@ import { getCookie } from "common/Cookie";
 import useAppDispatch from "hooks/useAppDispatch";
 import useUser from "hooks/useUser";
 import { Channel, Community, Space } from "models/Community";
-import { EmitMessageData, MessageData, PostData } from "models/Message";
+import {
+  EmitMessageData,
+  ITopicComment,
+  MessageData,
+  PostData,
+} from "models/Message";
 import {
   createContext,
   ReactNode,
@@ -67,6 +72,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.off(EventName.ON_USER_LEAVE_CHANNEL);
     socket.current?.off(EventName.ON_NEW_TOPIC);
     socket.current?.off(EventName.ON_USER_UPDATE_PROFILE);
+    socket.current?.off(EventName.ON_NEW_COMMENT);
     socket.current?.off("disconnect");
   }, []);
   const onNewMessage = useCallback(
@@ -204,6 +210,17 @@ const SocketProvider = ({ children }: ISocketProps) => {
     },
     [dispatch, user.user_id]
   );
+  const onNewComment = useCallback(
+    (data: { comment: ITopicComment; topic: PostData }) => {
+      dispatch(
+        PIN_POST_ACTIONS.addNewComment({
+          comment: data.comment,
+          channelId: data.topic.root_channel_id,
+        })
+      );
+    },
+    [dispatch]
+  );
   const listener = useCallback(() => {
     socket.current?.on(EventName.ON_NEW_MESSAGE, onNewMessage);
     socket.current?.on(EventName.ON_DELETE_MESSAGE, onDeleteMessage);
@@ -216,11 +233,13 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.on(EventName.ON_USER_LEAVE_CHANNEL, onUserLeaveChannel);
     socket.current?.on(EventName.ON_NEW_TOPIC, onNewTopic);
     socket.current?.on(EventName.ON_USER_UPDATE_PROFILE, onUserUpdateProfile);
+    socket.current?.on(EventName.ON_NEW_COMMENT, onNewComment);
   }, [
     onAddReact,
     onCreateCommunity,
     onDeleteMessage,
     onEditMessage,
+    onNewComment,
     onNewMessage,
     onNewTopic,
     onRemoveReact,
