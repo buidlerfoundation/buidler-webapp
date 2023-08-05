@@ -322,3 +322,10 @@ export interface IUserAsset {
   contract_address?: string;
   value?: string;
 }
+
+export interface ITotalOnlineUsers {
+  channel_ids: string[];
+  increase?: number;
+  decrease?: number;
+  total_online_users?: number;
+}

@@ -6,6 +6,9 @@ import { DragDropContext } from "react-beautiful-dnd";
 import useChannel from "hooks/useChannel";
 import useCurrentCommunity from "hooks/useCurrentCommunity";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
+import { useSocket } from "providers/SocketProvider";
+import useChannelId from "hooks/useChannelId";
+import { validateUUID } from "helpers/ChannelHelper";
 
 const rootStyles: { [name: string]: React.CSSProperties } = {
   row: {
@@ -22,6 +25,8 @@ const rootStyles: { [name: string]: React.CSSProperties } = {
 };
 
 const MainWrapper = () => {
+  const socket = useSocket();
+  const matchChannelId = useChannelId();
   const location = useLocation();
   const channel = useChannel();
   const community = useCurrentCommunity();
@@ -32,6 +37,16 @@ const MainWrapper = () => {
     [location.pathname]
   );
   const onDragEnd = useCallback(() => {}, []);
+  useEffect(() => {
+    if (
+      matchChannelId &&
+      validateUUID(matchChannelId) &&
+      socket.socketState === "connected"
+    ) {
+      socket.getTotalOnlineUsers(matchChannelId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchChannelId, socket.socketState]);
   useEffect(() => {
     if (location && channel?.channel_url && community?.community_url) {
       const query = new URLSearchParams(location.search);

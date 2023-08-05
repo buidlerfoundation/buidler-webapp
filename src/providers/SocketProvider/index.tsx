@@ -25,7 +25,7 @@ import { REACT_ACTIONS } from "reducers/ReactReducers";
 import { USER_ACTIONS } from "reducers/UserReducers";
 import { Socket, io } from "socket.io-client";
 import EventName from "./EventName";
-import { UserData } from "models/User";
+import { ITotalOnlineUsers, UserData } from "models/User";
 import { getParamsFromPath } from "helpers/LinkHelper";
 import { PIN_POST_ACTIONS } from "reducers/PinPostReducers";
 import useIsPlugin from "hooks/useIsPlugin";
@@ -34,6 +34,7 @@ type SocketState = "connecting" | "connected" | "disconnected";
 
 export interface ISocketContext {
   emitMessage: (payload: EmitMessageData) => void;
+  getTotalOnlineUsers: (channelId: string) => void;
   disconnect: () => void;
   initSocket: (onConnected?: () => void, channelId?: string) => void;
   socketState: SocketState;
@@ -44,6 +45,7 @@ export const SocketContext = createContext<ISocketContext>({
   disconnect: () => {},
   initSocket: () => {},
   socketState: "disconnected",
+  getTotalOnlineUsers: () => {},
 });
 
 export function useSocket(): ISocketContext {
@@ -73,6 +75,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.off(EventName.ON_NEW_TOPIC);
     socket.current?.off(EventName.ON_USER_UPDATE_PROFILE);
     socket.current?.off(EventName.ON_NEW_COMMENT);
+    socket.current?.off(EventName.ON_UPDATE_TOTAL_ONLINE_USERS);
     socket.current?.off("disconnect");
   }, []);
   const onNewMessage = useCallback(
@@ -221,6 +224,12 @@ const SocketProvider = ({ children }: ISocketProps) => {
     },
     [dispatch]
   );
+  const onUpdateTotalOnlineUsers = useCallback(
+    (data: ITotalOnlineUsers) => {
+      dispatch(USER_ACTIONS.updateTotalOnlineUsers(data));
+    },
+    [dispatch]
+  );
   const listener = useCallback(() => {
     socket.current?.on(EventName.ON_NEW_MESSAGE, onNewMessage);
     socket.current?.on(EventName.ON_DELETE_MESSAGE, onDeleteMessage);
@@ -234,6 +243,10 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.on(EventName.ON_NEW_TOPIC, onNewTopic);
     socket.current?.on(EventName.ON_USER_UPDATE_PROFILE, onUserUpdateProfile);
     socket.current?.on(EventName.ON_NEW_COMMENT, onNewComment);
+    socket.current?.on(
+      EventName.ON_UPDATE_TOTAL_ONLINE_USERS,
+      onUpdateTotalOnlineUsers
+    );
   }, [
     onAddReact,
     onCreateCommunity,
@@ -243,6 +256,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     onNewMessage,
     onNewTopic,
     onRemoveReact,
+    onUpdateTotalOnlineUsers,
     onUserJoinChannel,
     onUserJoinCommunity,
     onUserLeaveChannel,
@@ -286,6 +300,11 @@ const SocketProvider = ({ children }: ISocketProps) => {
       listener();
     }
   }, [listener, removeListener, socketState, user.user_id]);
+  const getTotalOnlineUsers = useCallback((channelId: string) => {
+    socket.current?.emit(EventName.GET_TOTAL_ONLINE_USERS, {
+      channel_id: channelId,
+    });
+  }, []);
   const emitMessage = useCallback(
     (payload: EmitMessageData) => {
       const message: any = {
@@ -311,6 +330,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
         emitMessage,
         disconnect,
         initSocket,
+        getTotalOnlineUsers,
         socketState,
       }}
     >

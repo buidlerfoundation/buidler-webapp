@@ -3,6 +3,7 @@ import { Channel, Community, Space } from "models/Community";
 import {
   BalanceApiData,
   InitialApiData,
+  ITotalOnlineUsers,
   IUserAsset,
   UserData,
 } from "models/User";
@@ -51,6 +52,9 @@ interface UserState {
   };
   openingNewTab?: IOpeningNewTab;
   userAssets: IUserAsset[];
+  totalOnlineUsers: {
+    [key: string]: number;
+  };
 }
 
 const initialState: UserState = {
@@ -68,6 +72,7 @@ const initialState: UserState = {
   loadingCommunityData: false,
   currentToken: "",
   userAssets: [],
+  totalOnlineUsers: {},
 };
 
 const userSlice = createSlice({
@@ -80,6 +85,22 @@ const userSlice = createSlice({
     ) => {
       state.imgBucket = action.payload?.imgproxy.bucket_name;
       state.imgDomain = action.payload?.imgproxy.domain;
+    },
+    updateTotalOnlineUsers: (
+      state,
+      action: PayloadAction<ITotalOnlineUsers>
+    ) => {
+      const { decrease, increase, channel_ids, total_online_users } =
+        action.payload;
+      channel_ids.forEach((id) => {
+        if (total_online_users) {
+          state.totalOnlineUsers[id] = total_online_users;
+        } else if (increase && state.totalOnlineUsers[id]) {
+          state.totalOnlineUsers[id] = (state.totalOnlineUsers[id] || 0) + 1;
+        } else if (decrease && state.totalOnlineUsers[id]) {
+          state.totalOnlineUsers[id] = (state.totalOnlineUsers[id] || 1) - 1;
+        }
+      });
     },
     updateCurrentToken: (state: UserState, action: PayloadAction<string>) => {
       state.currentToken = action.payload;
