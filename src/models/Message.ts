@@ -56,6 +56,8 @@ export interface ITopicComment {
   author: UserData;
   total_comments: number;
   root_parent_id?: string;
+  reaction_data: { [key: string]: number };
+  user_reaction_data: { [key: string]: number };
 }
 
 export interface PostData {
@@ -69,6 +71,8 @@ export interface PostData {
   topic_id: string;
   total_comments?: number;
   updated_at: string;
+  reaction_data: { [key: string]: number };
+  user_reaction_data: { [key: string]: number };
 }
 
 export interface ConversationData {

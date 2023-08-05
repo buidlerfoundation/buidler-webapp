@@ -8,6 +8,7 @@ import { logoutAction } from "./actions";
 import { ReactReducerData } from "models/Message";
 import { getMessages } from "./MessageReducers";
 import api from "api";
+import { getPinPosts, getReplyTopic, getTopicDetail } from "./PinPostReducers";
 
 type ReactDataType = { [key: string]: ReactReducerData[] };
 
@@ -95,6 +96,60 @@ const reactSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(logoutAction, () => initialState)
+      .addCase(getReplyTopic.fulfilled, (state, action) => {
+        const currentReact: ReactDataType = {};
+        action.payload?.data?.map((dt) => {
+          currentReact[dt.comment_id] = Object.keys(dt.reaction_data || {}).map(
+            (key) => ({
+              reactName: key,
+              count: dt.reaction_data?.[key] || 0,
+              skin: 1,
+              isReacted: !!dt?.user_reaction_data?.[key],
+            })
+          );
+          return dt;
+        });
+        state.reactData = {
+          ...state.reactData,
+          ...currentReact,
+        };
+      })
+      .addCase(getTopicDetail.fulfilled, (state, action) => {
+        const currentReact: ReactDataType = {};
+        action.payload?.data?.comments?.map((dt) => {
+          currentReact[dt.comment_id] = Object.keys(dt.reaction_data || {}).map(
+            (key) => ({
+              reactName: key,
+              count: dt.reaction_data?.[key] || 0,
+              skin: 1,
+              isReacted: !!dt?.user_reaction_data?.[key],
+            })
+          );
+          return dt;
+        });
+        state.reactData = {
+          ...state.reactData,
+          ...currentReact,
+        };
+      })
+      .addCase(getPinPosts.fulfilled, (state, action) => {
+        const currentReact: ReactDataType = {};
+        action.payload?.res?.data?.map((dt) => {
+          currentReact[dt.topic_id] = Object.keys(dt.reaction_data || {}).map(
+            (key) => ({
+              reactName: key,
+              count: dt.reaction_data?.[key] || 0,
+              skin: 1,
+              isReacted: !!dt?.user_reaction_data?.[key],
+            })
+          );
+          return dt;
+        });
+        state.reactData = {
+          ...state.reactData,
+          ...currentReact,
+        };
+      })
       .addCase(getMessages.fulfilled, (state: ReactState, action) => {
         const currentReact: ReactDataType = {};
         action.payload?.data?.map((dt) => {
