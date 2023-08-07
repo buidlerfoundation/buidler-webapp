@@ -128,7 +128,10 @@ const userSlice = createSlice({
       state.communities = communities;
       state.pinnedCommunities = state.pinnedCommunities?.map((el) => {
         if (el.community_id === action.payload.community_id) {
-          return action.payload;
+          return {
+            ...el,
+            total_community_members: (el.total_community_members || 0) + 1,
+          };
         }
         return el;
       });

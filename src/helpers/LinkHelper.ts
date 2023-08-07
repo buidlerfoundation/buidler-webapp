@@ -81,6 +81,14 @@ export const getParamsFromPath = () => {
   return match?.params;
 };
 
+export const getShareIdFromPath = () => {
+  const match = matchPath(
+    "/:share_id",
+    window.location.pathname
+  );
+  return match?.params?.share_id;
+};
+
 export const getLogoFromUrl = (url: string) => {
   const obj = getURLObject(url);
   return `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${obj.domain}&size=256`;

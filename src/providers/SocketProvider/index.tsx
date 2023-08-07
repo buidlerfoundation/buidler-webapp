@@ -295,7 +295,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     []
   );
   useEffect(() => {
-    if (socketState === "connected" && user.user_id) {
+    if (socketState === "connected") {
       removeListener();
       listener();
     }

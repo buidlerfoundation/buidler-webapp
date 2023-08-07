@@ -177,3 +177,5 @@ export const signTypeData = {
     ],
   },
 };
+
+export const pageNames = ["communities", "channels", "panel", "plugin"];

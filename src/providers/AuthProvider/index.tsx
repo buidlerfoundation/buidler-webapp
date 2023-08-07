@@ -1,5 +1,10 @@
 import api from "api";
-import AppConfig, { AsyncKey, LoginType, signTypeData } from "common/AppConfig";
+import AppConfig, {
+  AsyncKey,
+  LoginType,
+  pageNames,
+  signTypeData,
+} from "common/AppConfig";
 import {
   GeneratedPrivateKey,
   clearData,
@@ -44,7 +49,7 @@ import { getDeviceToken } from "services/firebase";
 import { useWalletConnectClient } from "providers/WalletConnectProvider";
 import useUser from "hooks/useUser";
 import { OUTSIDE_ACTIONS } from "reducers/OutsideReducers";
-import { getParamsFromPath } from "helpers/LinkHelper";
+import { getParamsFromPath, getShareIdFromPath } from "helpers/LinkHelper";
 
 export interface IAuthContext {
   loginWithMetaMask: () => Promise<void>;
@@ -286,6 +291,19 @@ const AuthProvider = ({ children }: IAuthProps) => {
       if (canViewOnly) {
         await handleDataFromExternalUrl(true);
       } else if (window.location.pathname !== AppConfig.loginPath) {
+        const shareId = getShareIdFromPath();
+        if (shareId && !pageNames.includes(shareId)) {
+          const shareInformation = await api.getCommunityDataFromShareId(
+            shareId
+          );
+          if (shareInformation.success) {
+            navigate(
+              `/channels/${shareInformation.data?.community?.community_id}/${shareInformation.data?.channel?.channel_id}`
+            );
+          }
+          setLoading(false);
+          return;
+        }
         if (!match_channel_id || !match_community_id) {
           dispatch(logoutAction());
           navigate(loginPath, { replace: true, state: { from: location } });
