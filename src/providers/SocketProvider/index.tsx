@@ -203,6 +203,12 @@ const SocketProvider = ({ children }: ISocketProps) => {
             channelId: match_channel_id,
           })
         );
+        dispatch(
+          PIN_POST_ACTIONS.updateUser({
+            user: data,
+            channelId: match_channel_id,
+          })
+        );
       }
     },
     [dispatch, user.user_id]

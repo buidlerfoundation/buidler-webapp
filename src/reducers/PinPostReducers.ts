@@ -3,6 +3,7 @@ import { channelChanged } from "./actions";
 import { ITopicComment, PostData } from "models/Message";
 import { IHNStory, IHNStoryComment, RequestPostList } from "models/Community";
 import api from "api";
+import { UserData } from "models/User";
 
 interface PostReducerData {
   posts: PostData[];
@@ -107,6 +108,27 @@ const pinPostSlice = createSlice({
   name: "pinPost",
   initialState,
   reducers: {
+    updateUser: (
+      state,
+      action: PayloadAction<{ user: UserData; channelId: string }>
+    ) => {
+      const { user, channelId } = action.payload;
+      state.pinPostData = {
+        ...state.pinPostData,
+        [channelId]: {
+          ...state.pinPostData?.[channelId],
+          posts: state.pinPostData?.[channelId]?.posts?.map((el) => {
+            if (el.author_id === user.user_id) {
+              return {
+                ...el,
+                author: user,
+              };
+            }
+            return el;
+          }),
+        },
+      };
+    },
     updateSelectedStoryId: (state, action: PayloadAction<string | null>) => {
       state.selectedStoryId = action.payload;
     },

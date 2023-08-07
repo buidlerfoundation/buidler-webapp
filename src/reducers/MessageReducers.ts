@@ -77,6 +77,16 @@ const messageSlice = createSlice({
         [channelId]: {
           ...state.messageData?.[channelId],
           data: state.messageData?.[channelId]?.data?.map((el) => {
+            if (el.topic?.author_id === user.user_id) {
+              return {
+                ...el,
+                sender: user,
+                topic: {
+                  ...el.topic,
+                  author: user,
+                },
+              };
+            }
             if (el.conversation_data?.sender?.user_id === user.user_id) {
               return {
                 ...el,
