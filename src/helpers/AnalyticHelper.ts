@@ -16,6 +16,9 @@ export const getEventNameByApi = (
     if (/user\/balance\/?.*/.test(api)) {
       return "Import Token Failed";
     }
+    if (/channel\/?.*\/members/.test(api)) {
+      return "Join Channel Failed";
+    }
   }
   if (method === "delete") {
     if (/space\/?.*/.test(api)) {

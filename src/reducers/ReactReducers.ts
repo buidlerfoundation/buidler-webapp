@@ -9,6 +9,7 @@ import { ReactReducerData } from "models/Message";
 import { getMessages } from "./MessageReducers";
 import api from "api";
 import { getPinPosts, getReplyTopic, getTopicDetail } from "./PinPostReducers";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 type ReactDataType = { [key: string]: ReactReducerData[] };
 
@@ -30,6 +31,10 @@ const initialState: ReactState = {
 export const handleAddReact = (payload: ReactActionPayload) => {
   const { id, reactName } = payload;
   api.addReaction(id, { emoji_id: reactName, skin: 1 });
+  GoogleAnalytics.tracking("Message Reacted", {
+    category: "Channel Message",
+    message_id: id,
+  });
 };
 
 export const handleRemoveReact = (payload: ReactActionPayload) => {
