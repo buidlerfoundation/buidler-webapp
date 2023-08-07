@@ -369,7 +369,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
             <span className={`${styles["user-name"]} text-ellipsis`}>
               {userData.user_name}
             </span>
-            <AvatarView user={userData} />
+            <AvatarView user={userData} withoutStatus />
           </div>
         </div>
       )}

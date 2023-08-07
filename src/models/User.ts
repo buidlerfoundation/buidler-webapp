@@ -329,3 +329,10 @@ export interface ITotalOnlineUsers {
   decrease?: number;
   total_online_users?: number;
 }
+
+export interface IOnlineUsers {
+  channel_ids: string[];
+  user_ids?: string[];
+  remove_user_id?: string;
+  add_user_id?: string;
+}

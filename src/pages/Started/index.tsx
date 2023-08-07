@@ -1,7 +1,6 @@
 import React, { memo, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
-import IconWeb3Auth from "shared/SVG/IconWeb3Auth";
 import images from "common/images";
 import { useAuth } from "providers/AuthProvider";
 import { useWalletConnectClient } from "providers/WalletConnectProvider";
@@ -17,6 +16,9 @@ const Started = ({ embedded }: IStarted) => {
   const location = useLocation();
   const auth = useAuth();
   const { isInitializing, client } = useWalletConnectClient();
+  useEffect(() => {
+    document.title = "Community | Buidler";
+  }, []);
   useEffect(() => {
     GoogleAnalytics.tracking("Login Started", { category: "Login" });
   }, []);

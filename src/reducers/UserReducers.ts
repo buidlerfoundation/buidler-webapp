@@ -3,7 +3,7 @@ import { Channel, Community, Space } from "models/Community";
 import {
   BalanceApiData,
   InitialApiData,
-  ITotalOnlineUsers,
+  IOnlineUsers,
   IUserAsset,
   UserData,
 } from "models/User";
@@ -52,8 +52,8 @@ interface UserState {
   };
   openingNewTab?: IOpeningNewTab;
   userAssets: IUserAsset[];
-  totalOnlineUsers: {
-    [key: string]: number;
+  onlineUsers: {
+    [key: string]: string[];
   };
 }
 
@@ -72,7 +72,7 @@ const initialState: UserState = {
   loadingCommunityData: false,
   currentToken: "",
   userAssets: [],
-  totalOnlineUsers: {},
+  onlineUsers: {},
 };
 
 const userSlice = createSlice({
@@ -86,19 +86,19 @@ const userSlice = createSlice({
       state.imgBucket = action.payload?.imgproxy.bucket_name;
       state.imgDomain = action.payload?.imgproxy.domain;
     },
-    updateTotalOnlineUsers: (
-      state,
-      action: PayloadAction<ITotalOnlineUsers>
-    ) => {
-      const { decrease, increase, channel_ids, total_online_users } =
+    updateOnlineUsers: (state, action: PayloadAction<IOnlineUsers>) => {
+      const { user_ids, add_user_id, channel_ids, remove_user_id } =
         action.payload;
       channel_ids.forEach((id) => {
-        if (total_online_users) {
-          state.totalOnlineUsers[id] = total_online_users;
-        } else if (increase && state.totalOnlineUsers[id]) {
-          state.totalOnlineUsers[id] = (state.totalOnlineUsers[id] || 0) + 1;
-        } else if (decrease && state.totalOnlineUsers[id]) {
-          state.totalOnlineUsers[id] = (state.totalOnlineUsers[id] || 1) - 1;
+        if (user_ids) {
+          state.onlineUsers[id] = user_ids;
+        } else if (add_user_id && state.onlineUsers[id]) {
+          state.onlineUsers[id]?.push?.(add_user_id);
+        } else if (remove_user_id && state.onlineUsers[id]) {
+          const idx = state.onlineUsers[id]?.indexOf?.(remove_user_id);
+          if (idx >= 0) {
+            state.onlineUsers[id]?.splice?.(idx, 1);
+          }
         }
       });
     },

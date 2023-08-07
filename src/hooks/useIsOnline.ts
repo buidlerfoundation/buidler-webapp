@@ -2,13 +2,13 @@ import { useMemo } from "react";
 import useAppSelector from "./useAppSelector";
 import useChannelId from "./useChannelId";
 
-function useTotalOnlineUsers() {
+function useIsOnline(userId?: string) {
   const channelId = useChannelId();
   const onlineUsers = useAppSelector((state) => state.user.onlineUsers);
   return useMemo(
-    () => onlineUsers?.[channelId]?.length || 0,
-    [channelId, onlineUsers]
+    () => (!userId ? false : onlineUsers?.[channelId]?.includes(userId)),
+    [channelId, onlineUsers, userId]
   );
 }
 
-export default useTotalOnlineUsers;
+export default useIsOnline;

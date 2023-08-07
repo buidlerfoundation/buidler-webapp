@@ -25,7 +25,7 @@ import { REACT_ACTIONS } from "reducers/ReactReducers";
 import { USER_ACTIONS } from "reducers/UserReducers";
 import { Socket, io } from "socket.io-client";
 import EventName from "./EventName";
-import { ITotalOnlineUsers, UserData } from "models/User";
+import { IOnlineUsers, UserData } from "models/User";
 import { getParamsFromPath } from "helpers/LinkHelper";
 import { PIN_POST_ACTIONS } from "reducers/PinPostReducers";
 
@@ -73,7 +73,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.off(EventName.ON_NEW_TOPIC);
     socket.current?.off(EventName.ON_USER_UPDATE_PROFILE);
     socket.current?.off(EventName.ON_NEW_COMMENT);
-    socket.current?.off(EventName.ON_UPDATE_TOTAL_ONLINE_USERS);
+    socket.current?.off(EventName.ON_UPDATE_ONLINE_USERS);
     socket.current?.off("disconnect");
   }, []);
   const onNewMessage = useCallback(
@@ -218,9 +218,9 @@ const SocketProvider = ({ children }: ISocketProps) => {
     },
     [dispatch]
   );
-  const onUpdateTotalOnlineUsers = useCallback(
-    (data: ITotalOnlineUsers) => {
-      dispatch(USER_ACTIONS.updateTotalOnlineUsers(data));
+  const onUpdateOnlineUsers = useCallback(
+    (data: IOnlineUsers) => {
+      dispatch(USER_ACTIONS.updateOnlineUsers(data));
     },
     [dispatch]
   );
@@ -237,10 +237,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     socket.current?.on(EventName.ON_NEW_TOPIC, onNewTopic);
     socket.current?.on(EventName.ON_USER_UPDATE_PROFILE, onUserUpdateProfile);
     socket.current?.on(EventName.ON_NEW_COMMENT, onNewComment);
-    socket.current?.on(
-      EventName.ON_UPDATE_TOTAL_ONLINE_USERS,
-      onUpdateTotalOnlineUsers
-    );
+    socket.current?.on(EventName.ON_UPDATE_ONLINE_USERS, onUpdateOnlineUsers);
   }, [
     onAddReact,
     onCreateCommunity,
@@ -250,7 +247,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     onNewMessage,
     onNewTopic,
     onRemoveReact,
-    onUpdateTotalOnlineUsers,
+    onUpdateOnlineUsers,
     onUserJoinChannel,
     onUserJoinCommunity,
     onUserLeaveChannel,
@@ -295,7 +292,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
     }
   }, [listener, removeListener, socketState, user.user_id]);
   const getTotalOnlineUsers = useCallback((channelId: string) => {
-    socket.current?.emit(EventName.GET_TOTAL_ONLINE_USERS, {
+    socket.current?.emit(EventName.GET_ONLINE_USERS, {
       channel_id: channelId,
     });
   }, []);
