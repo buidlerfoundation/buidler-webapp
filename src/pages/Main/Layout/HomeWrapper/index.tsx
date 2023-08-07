@@ -24,9 +24,11 @@ import { Channel } from "models/Community";
 import api from "api";
 import { USER_ACTIONS } from "reducers/UserReducers";
 import useUser from "hooks/useUser";
+import ModalInviteMember from "shared/ModalInviteMember";
 
 const HomeWrapper = () => {
   const dispatch = useAppDispatch();
+  const [openInvite, setOpenInvite] = useState(false);
   const getMessageActionRef = useRef<any>();
   const navigate = useNavigate();
   const matchCommunityId = useCommunityId();
@@ -142,7 +144,10 @@ const HomeWrapper = () => {
   const handleOpenEditChannelMember = useCallback(() => {}, []);
   const handleOpenEditChannelName = useCallback(() => {}, []);
   const handleOpenChannelNotification = useCallback(() => {}, []);
-  const handleOpenInviteMember = useCallback(() => {}, []);
+  const toggleInviteMember = useCallback(
+    () => setOpenInvite((current) => !current),
+    []
+  );
   const toggleOpenMembers = useCallback(() => {}, []);
   const onOpenChannelSetting = useCallback(() => {}, []);
   const onLeaveChannel = useCallback(
@@ -188,12 +193,13 @@ const HomeWrapper = () => {
         onEditChannelMember={handleOpenEditChannelMember}
         onEditChannelName={handleOpenEditChannelName}
         onUpdateNotification={handleOpenChannelNotification}
-        onInviteMember={handleOpenInviteMember}
+        onInviteMember={toggleInviteMember}
         onViewMembers={toggleOpenMembers}
         onOpenChannelSetting={onOpenChannelSetting}
         onLeaveChannel={onLeaveChannel}
       />
       <Outlet />
+      <ModalInviteMember open={openInvite} handleClose={toggleInviteMember} />
     </>
   );
 };

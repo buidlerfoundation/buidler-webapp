@@ -45,6 +45,10 @@ export const getCommunityDataFromChannel = (channelId: string) =>
   Caller.get<{ community: Community; space: Space | null; channel: Channel }>(
     `external/information?channel_id=${channelId}`
   );
+export const getCommunityDataFromShareId = (shareId: string) =>
+  Caller.get<{ community: Community; space: Space | null; channel: Channel }>(
+    `external/information?share_id=${shareId}`
+  );
 
 export const joinChannel = (channelId: string) =>
   Caller.post(`channel/${channelId}/members`);
@@ -114,3 +118,9 @@ export const createCommentStory = (req: {
   Caller.post(`external/hacker-new/${req.parentId}/comments`, {
     text: req.content,
   });
+
+export const getLinkShare = (req: {
+  community_id: string;
+  entity_id: string;
+  entity_type: string;
+}) => Caller.post<{ share_id: string }>("share", req);

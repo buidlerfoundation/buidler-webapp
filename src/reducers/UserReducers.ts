@@ -126,6 +126,12 @@ const userSlice = createSlice({
         communities.push({ ...action.payload, seen: true });
       }
       state.communities = communities;
+      state.pinnedCommunities = state.pinnedCommunities?.map((el) => {
+        if (el.community_id === action.payload.community_id) {
+          return action.payload;
+        }
+        return el;
+      });
     },
     joinNewChannel: (
       state,
