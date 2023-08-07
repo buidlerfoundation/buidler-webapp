@@ -190,9 +190,20 @@ const userSlice = createSlice({
           if (el.space_id === channel.space_id) {
             return {
               ...el,
-              channels: el.channels?.filter(
-                (c) => c.channel_id !== channel.channel_id
-              ),
+              channels:
+                (el.channels?.length || 0) > 1
+                  ? el.channels?.filter(
+                      (c) => c.channel_id !== channel.channel_id
+                    )
+                  : el.channels?.map((el) => {
+                      if (el.channel_id === channel.channel_id) {
+                        return {
+                          ...el,
+                          is_channel_member: false,
+                        };
+                      }
+                      return el;
+                    }),
             };
           }
           return el;

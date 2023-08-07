@@ -174,13 +174,14 @@ const HomeWrapper = () => {
         );
         if (
           channel.channel_id === matchChannelId &&
-          !channel.is_default_channel
+          !channel.is_default_channel &&
+          channels?.length > 1
         ) {
           navigate(`/channels/${matchCommunityId}`, { replace: true });
         }
       }
     },
-    [dispatch, matchChannelId, matchCommunityId, navigate]
+    [channels?.length, dispatch, matchChannelId, matchCommunityId, navigate]
   );
   return (
     <>

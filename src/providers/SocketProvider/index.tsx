@@ -28,7 +28,6 @@ import EventName from "./EventName";
 import { ITotalOnlineUsers, UserData } from "models/User";
 import { getParamsFromPath } from "helpers/LinkHelper";
 import { PIN_POST_ACTIONS } from "reducers/PinPostReducers";
-import useIsPlugin from "hooks/useIsPlugin";
 
 type SocketState = "connecting" | "connected" | "disconnected";
 
@@ -59,7 +58,6 @@ interface ISocketProps {
 const SocketProvider = ({ children }: ISocketProps) => {
   const socket = useRef<Socket | null>(null);
   const user = useUser();
-  const isPlugin = useIsPlugin();
   const dispatch = useAppDispatch();
   const [socketState, setSocketState] = useState<SocketState>("disconnected");
   const removeListener = useCallback(() => {
@@ -143,7 +141,6 @@ const SocketProvider = ({ children }: ISocketProps) => {
   );
   const onUserJoinChannel = useCallback(
     (data: { channel: Channel; space: Space; user: UserData }) => {
-      if (isPlugin) return;
       if (user.user_id === data.user.user_id) {
         const matchParams = getParamsFromPath();
         if (data.channel.community_id === matchParams?.match_community_id) {
@@ -159,11 +156,10 @@ const SocketProvider = ({ children }: ISocketProps) => {
         }
       }
     },
-    [dispatch, isPlugin, user.user_id]
+    [dispatch, user.user_id]
   );
   const onUserLeaveChannel = useCallback(
     (data: { channel: Channel; user: UserData }) => {
-      if (isPlugin) return;
       if (user.user_id === data.user.user_id) {
         if (data.channel.is_default_channel) {
           dispatch(
@@ -173,8 +169,6 @@ const SocketProvider = ({ children }: ISocketProps) => {
               communityId: data.channel.community_id || "",
               data: {
                 is_channel_member: false,
-                total_channel_members:
-                  (data.channel?.total_channel_members || 1) - 1,
               },
             })
           );
@@ -187,7 +181,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
         }
       }
     },
-    [dispatch, isPlugin, user.user_id]
+    [dispatch, user.user_id]
   );
   const onNewTopic = useCallback(
     (data: PostData) => {
