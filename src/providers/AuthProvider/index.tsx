@@ -131,6 +131,24 @@ const AuthProvider = ({ children }: IAuthProps) => {
     const path = window.location.pathname;
     return externalUrl && (path === "/panel" || path === "/plugin");
   }, [externalUrl]);
+  const gaLoginSuccess = useCallback((label: string) => {
+    GoogleAnalytics.tracking("Login Successful", {
+      category: "Login",
+      method: label,
+    });
+  }, []);
+  const gaLoginSubmit = useCallback((label: string) => {
+    GoogleAnalytics.tracking("Login Submitted", {
+      category: "Login",
+      method: label,
+    });
+  }, []);
+  const gaLoginClick = useCallback((label: string) => {
+    GoogleAnalytics.tracking("Login Method Selected", {
+      category: "Login",
+      method: label,
+    });
+  }, []);
   const dispatch = useAppDispatch();
   const toggleLogin = useCallback(
     () => setOpenLogin((current) => !current),
@@ -254,6 +272,11 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const handleResponseVerify = useCallback(
     async (res?: LoginApiData, loginType?: string, previousState?: any) => {
       if (!res) return;
+      if (loginType) {
+        gaLoginSuccess(
+          loginType === LoginType.Metamask ? "MetaMask" : loginType
+        );
+      }
       await setCookie(AsyncKey.accessTokenKey, res?.token);
       await setCookie(AsyncKey.loginType, loginType);
       await setCookie(AsyncKey.refreshTokenKey, res?.refresh_token);
@@ -267,7 +290,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
       await handleInvitation();
       await initialUserData(previousState);
     },
-    [dispatch, handleInvitation, initialUserData]
+    [dispatch, gaLoginSuccess, handleInvitation, initialUserData]
   );
   const checkingAuth = useCallback(async () => {
     setLoading(true);
@@ -333,6 +356,11 @@ const AuthProvider = ({ children }: IAuthProps) => {
     GoogleAnalytics.init();
   }, []);
   useEffect(() => {
+    if (user.user_id) {
+      GoogleAnalytics.identify(user);
+    }
+  }, [user]);
+  useEffect(() => {
     checkingAuth();
   }, [checkingAuth]);
 
@@ -381,6 +409,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
           signTypeData.types,
           message
         );
+        gaLoginSubmit("MetaMask");
         const res = await api.verifyNonce(
           {
             domain: signTypeData.domain,
@@ -402,7 +431,12 @@ const AuthProvider = ({ children }: IAuthProps) => {
         return false;
       }
     },
-    [getMessageSignTypedData, handleResponseVerify, location.state]
+    [
+      gaLoginSubmit,
+      getMessageSignTypedData,
+      handleResponseVerify,
+      location.state,
+    ]
   );
   const metamaskDisconnect = useCallback(() => {}, []);
   const onMetamaskUpdate = useCallback(
@@ -432,6 +466,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     if (!window.ethereum) {
       toast.error("Please install MetaMask extension!");
     } else {
+      gaLoginClick("MetaMask");
       try {
         const res: any = await window.ethereum.request({
           method: "eth_requestAccounts",
@@ -450,6 +485,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     }
   }, [
     doingMetamaskLogin,
+    gaLoginClick,
     metamaskConnected,
     metamaskDisconnect,
     onMetamaskUpdate,
@@ -465,6 +501,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
         signTypeData.types,
         message
       );
+      gaLoginSubmit("WalletConnect");
       const res = await api.verifyNonce(
         {
           domain: signTypeData.domain,
@@ -489,6 +526,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   }, [
     accounts,
     disconnect,
+    gaLoginSubmit,
     getMessageSignTypedData,
     handleResponseVerify,
     location.state,
@@ -503,14 +541,16 @@ const AuthProvider = ({ children }: IAuthProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
   const loginWithWalletConnect = useCallback(async () => {
+    gaLoginClick("WalletConnect");
     connect();
-  }, [connect]);
+  }, [connect, gaLoginClick]);
   useEffect(() => {
     if (accounts?.length > 0 && !loading && !user.user_id) {
       doingWCLogin();
     }
   }, [accounts, doingWCLogin, loading, user.user_id]);
   const loginWithWeb3Auth = useCallback(async () => {
+    gaLoginClick("Web3Auth");
     setLoadingWeb3Auth(true);
     try {
       await Web3AuthUtils.init();
@@ -529,6 +569,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
         signTypeData.types,
         message
       );
+      gaLoginSubmit("Web3Auth");
       const res = await api.verifyNonce(
         {
           domain: signTypeData.domain,
@@ -547,7 +588,13 @@ const AuthProvider = ({ children }: IAuthProps) => {
     } catch (error: any) {
       console.log(error);
     }
-  }, [getMessageSignTypedData, handleResponseVerify, location.state]);
+  }, [
+    gaLoginClick,
+    gaLoginSubmit,
+    getMessageSignTypedData,
+    handleResponseVerify,
+    location.state,
+  ]);
   const quickLogin = useCallback(async () => {
     isQuickLogin.current = true;
     toggleLogin();
