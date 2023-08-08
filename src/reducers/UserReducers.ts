@@ -93,7 +93,9 @@ const userSlice = createSlice({
         if (user_ids) {
           state.onlineUsers[id] = user_ids;
         } else if (add_user_id && state.onlineUsers[id]) {
-          state.onlineUsers[id]?.push?.(add_user_id);
+          if (!state.onlineUsers[id]?.includes?.(add_user_id)) {
+            state.onlineUsers[id]?.push?.(add_user_id);
+          }
         } else if (remove_user_id && state.onlineUsers[id]) {
           const idx = state.onlineUsers[id]?.indexOf?.(remove_user_id);
           if (idx >= 0) {
