@@ -219,6 +219,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
         PIN_POST_ACTIONS.addNewComment({
           comment: data.comment,
           channelId: data.topic.root_channel_id,
+          userId: user.user_id,
         })
       );
       dispatch(
@@ -228,7 +229,7 @@ const SocketProvider = ({ children }: ISocketProps) => {
         })
       );
     },
-    [dispatch]
+    [dispatch, user.user_id]
   );
   const onUpdateOnlineUsers = useCallback(
     (data: IOnlineUsers) => {

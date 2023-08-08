@@ -150,9 +150,14 @@ const pinPostSlice = createSlice({
     },
     addNewComment: (
       state,
-      action: PayloadAction<{ comment: ITopicComment; channelId: string }>
+      action: PayloadAction<{
+        comment: ITopicComment;
+        channelId: string;
+        userId: string;
+      }>
     ) => {
-      const { topic_id, parent_id, root_parent_id } = action.payload.comment;
+      const { topic_id, parent_id, root_parent_id, author_id } =
+        action.payload.comment;
       if (topic_id) {
         if (topic_id === parent_id) {
           if (state.pinPostData?.[action.payload.channelId]) {
@@ -188,7 +193,7 @@ const pinPostSlice = createSlice({
                 action.payload.comment,
               ],
             };
-          } else if (root_parent_id) {
+          } else if (root_parent_id && author_id !== action.payload.userId) {
             if (
               root_parent_id === topic_id &&
               state.topicDetail[topic_id]?.topic
