@@ -11,6 +11,7 @@ import HomeWrapper from "./Layout/HomeWrapper";
 import MyCommunity from "pages/MyCommunity";
 import OutsideWrapper from "./Layout/OutsideWrapper";
 import ErrorPluginPage from "shared/ErrorBoundary/ErrorPluginPage";
+import ShortShare from "pages/ShortShare";
 
 const Main = () => {
   return (
@@ -38,6 +39,7 @@ const Main = () => {
         </Route>
         <Route path="/started" element={<Started />} />
         <Route path="/plugin/*" element={<ErrorPluginPage />} />
+        <Route path="/:share_id" element={<ShortShare />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </div>
