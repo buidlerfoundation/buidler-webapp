@@ -272,7 +272,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const handleResponseVerify = useCallback(
     async (res?: LoginApiData, loginType?: string, previousState?: any) => {
       if (!res) return;
-      if (loginType) {
+      if (loginType && loginType !== LoginType.OTT) {
         gaLoginSuccess(
           loginType === LoginType.Metamask ? "MetaMask" : loginType
         );
