@@ -5,6 +5,7 @@ import api from "api";
 import { normalizePublicMessageData } from "helpers/ChannelHelper";
 import {
   ActiveTab,
+  ITopicComment,
   MessageData,
   PayloadMessageListAction,
 } from "models/Message";
@@ -183,6 +184,34 @@ const messageSlice = createSlice({
         };
       }
       state.messageData = newMessageData;
+    },
+    addNewComment: (
+      state,
+      action: PayloadAction<{ comment: ITopicComment; channelId: string }>
+    ) => {
+      const { channelId, comment } = action.payload;
+      const { topic_id, parent_id } = comment;
+      if (topic_id === parent_id) {
+        const newMessageData = { ...state.messageData };
+        if (newMessageData[channelId]) {
+          newMessageData[channelId] = {
+            ...newMessageData[channelId],
+            data: newMessageData[channelId]?.data?.map?.((msg) => {
+              if (msg.message_id === topic_id && msg.topic) {
+                return {
+                  ...msg,
+                  topic: {
+                    ...msg.topic,
+                    total_comments: (msg.topic.total_comments || 0) + 1,
+                  },
+                };
+              }
+              return msg;
+            }),
+          };
+        }
+        state.messageData = newMessageData;
+      }
     },
     editMessage: (state: MessageState, action: PayloadAction<MessageData>) => {
       const {

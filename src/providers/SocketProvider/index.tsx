@@ -221,6 +221,12 @@ const SocketProvider = ({ children }: ISocketProps) => {
           channelId: data.topic.root_channel_id,
         })
       );
+      dispatch(
+        MESSAGE_ACTIONS.addNewComment({
+          comment: data.comment,
+          channelId: data.topic.root_channel_id,
+        })
+      );
     },
     [dispatch]
   );
