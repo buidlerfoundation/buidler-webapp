@@ -199,6 +199,8 @@ code {
   height: calc(100vh - 50px);
   width: 275px;
   background-color: var(--color-darkest-background);
+  display: flex;
+  flex-direction: column;
 }
 
 .row__space-between {

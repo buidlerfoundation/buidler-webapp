@@ -394,6 +394,7 @@ code {
 
 :root {
   --color-accent: #092555;
+  --color-accent-2: #D8D0BD;
   --color-darkest-background: #121212;
   --color-darkest-background80: #121212cc;
   --color-backdrop: rgba(0, 0, 0, 0.75);
@@ -412,6 +413,7 @@ code {
   --color-highlight-action: #1e1e1e;
   --color-highlight-action-high: #363636;
   --color-light-text: #acacac;
+  --color-muted-text: #616164;
 }
 
 @media only screen and (max-height: 900px) {
