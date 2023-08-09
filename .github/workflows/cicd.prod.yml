@@ -1,5 +1,5 @@
 name: Buidler CI/CD
-run-name: ${{ github.actor }} is trigger run GitHub Actions. 🚀
+run-name: ${{ github.actor }} is trigger run GitHub Actions 🚀
 on:
   push:
     branches:
