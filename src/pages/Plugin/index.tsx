@@ -16,11 +16,11 @@ import useOutsideLoading from "hooks/useOutsideLoading";
 import useChannel from "hooks/useChannel";
 import { getPinPosts, getStories } from "reducers/PinPostReducers";
 import useShowPlugin from "hooks/useShowPlugin";
-import { MESSAGE_ACTIONS } from "reducers/MessageReducers";
 
 const Plugin = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [pluginPosition, setPluginPosition] = useState("bottom");
   const { isShow } = useShowPlugin();
   const pluginOpen = usePluginOpen();
   const loading = useOutsideLoading();
@@ -68,6 +68,10 @@ const Plugin = () => {
       if (type === "toggle-plugin") {
         toggle();
       }
+      if (type === "update-plugin-position") {
+        const { lastVerticalPosition } = payload;
+        setPluginPosition(lastVerticalPosition);
+      }
       if (type === "update-external" && payload) {
         dispatch(getDataFromExternalUrl({ url: payload }))
           .unwrap()
@@ -87,7 +91,12 @@ const Plugin = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, toggle]);
   return (
-    <div className={styles.container} style={style}>
+    <div
+      className={`${styles.container} ${
+        styles[`plugin-position-${pluginPosition}`]
+      }`}
+      style={style}
+    >
       <div
         className={`${styles["b-root-chat"]} ${
           pluginOpen ? styles["b-root-chat-on"] : styles["b-root-chat-off"]
