@@ -1,12 +1,13 @@
 import images from "common/images";
 import React, { memo } from "react";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
   return (
     <div id="my-navbar" className="center" style={{ top: 0 }}>
       <div className="container">
         <nav className="navbar navbar-expand-lg">
-          <div className="navbar-brand">
+          <Link to="#" className="navbar-brand">
             <img
               src={images.logoDark}
               className="nav-logo-dark"
@@ -17,7 +18,7 @@ const NavBar = () => {
               className="nav-logo-light"
               alt="logo-light"
             />
-          </div>
+          </Link>
 
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav ml-auto"></ul>

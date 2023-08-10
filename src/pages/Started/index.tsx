@@ -20,14 +20,16 @@ const Started = ({ embedded }: IStarted) => {
     document.title = "Community | Buidler";
   }, []);
   useEffect(() => {
-    GoogleAnalytics.tracking("Login Started", { category: "Login" });
-  }, []);
+    if (!embedded) {
+      GoogleAnalytics.tracking("Login Started", { category: "Login" });
+    }
+  }, [embedded]);
   const hideMetaMask = useMemo(() => {
     const userAgent = window.navigator.userAgent;
     return !/Chrome/.test(userAgent);
   }, []);
   useEffect(() => {
-    if (location) {
+    if (location.pathname) {
       const query = new URLSearchParams(location.search);
       GoogleAnalytics.tracking("Page Viewed", {
         category: "Traffic",
@@ -37,7 +39,7 @@ const Started = ({ embedded }: IStarted) => {
         type: "web-app",
       });
     }
-  }, [location]);
+  }, [location.pathname]);
   return (
     <div
       className={`${styles.container} ${

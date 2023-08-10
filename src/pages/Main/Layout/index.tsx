@@ -48,7 +48,7 @@ const MainWrapper = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchChannelId, socket.socketState]);
   useEffect(() => {
-    if (location && channel?.channel_url && community?.community_url) {
+    if (location.pathname && channel?.channel_url && community?.community_url) {
       const query = new URLSearchParams(location.search);
       GoogleAnalytics.tracking("Page Viewed", {
         category: "Traffic",
@@ -60,7 +60,7 @@ const MainWrapper = () => {
         channel_url: channel?.channel_url,
       });
     }
-  }, [channel?.channel_url, community?.community_url, location]);
+  }, [location.pathname]);
   if (hideLayoutElement) {
     return (
       <main>

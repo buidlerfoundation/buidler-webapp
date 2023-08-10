@@ -15,14 +15,17 @@ import ShortShare from "pages/ShortShare";
 import Website from "pages/Website";
 import Terms from "pages/Website/Terms";
 import Privacy from "pages/Website/Privacy";
+import WebsiteWrapper from "./Layout/WebsiteWrapper";
 
 const Main = () => {
   return (
     <div className={styles.container}>
       <Routes>
-        <Route path="/" element={<Website />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/privacy" element={<Privacy />} />
+        <Route element={<WebsiteWrapper />}>
+          <Route path="/" element={<Website />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+        </Route>
         <Route element={<MainWrapper />}>
           <Route path="/communities" element={<MyCommunity />} />
           <Route element={<HomeWrapper />}>
