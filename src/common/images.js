@@ -102,6 +102,16 @@ import MetaMaskLogo2 from "../assets/images/metamask_logo_2.svg";
 import IconCircleCheck from "../assets/images/ic_circle_check.svg";
 import iconVideoPlay from "../assets/images/ic_video_play.svg";
 
+// website
+import logoDark from "../assets/website/nav_logo.svg";
+import logoLight from "../assets/website/nav_logo_light.svg";
+import videoPromo from "../assets/website/img_frame_video.mp4";
+import icPlay from "../assets/website/ic_play_dark.svg";
+import icFAQExpand from "../assets/website/ic_expand.svg";
+import icGH from "../assets/website/ic_gh.svg";
+import icTW from "../assets/website/ic_tw.svg";
+import icYTB from "../assets/website/ic_ytb.svg";
+
 const images = {
   icTeamDefault,
   notableLogo,
@@ -206,6 +216,14 @@ const images = {
   MetaMaskLogo2,
   IconCircleCheck,
   iconVideoPlay,
+  logoDark,
+  logoLight,
+  videoPromo,
+  icPlay,
+  icFAQExpand,
+  icGH,
+  icTW,
+  icYTB,
 };
 
 export default images;

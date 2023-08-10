@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 import styles from "./index.module.scss";
 import MainWrapper from "./Layout";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import PageNotFound from "shared/PageNotFound";
 import Started from "pages/Started";
 import Home from "pages/Home";
@@ -12,13 +12,18 @@ import MyCommunity from "pages/MyCommunity";
 import OutsideWrapper from "./Layout/OutsideWrapper";
 import ErrorPluginPage from "shared/ErrorBoundary/ErrorPluginPage";
 import ShortShare from "pages/ShortShare";
+import Website from "pages/Website";
+import Terms from "pages/Website/Terms";
+import Privacy from "pages/Website/Privacy";
 
 const Main = () => {
   return (
     <div className={styles.container}>
       <Routes>
+        <Route path="/" element={<Website />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route element={<MainWrapper />}>
-          <Route path="/" element={<Navigate to="/communities" replace />} />
           <Route path="/communities" element={<MyCommunity />} />
           <Route element={<HomeWrapper />}>
             <Route

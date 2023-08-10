@@ -1,0 +1,437 @@
+@media only screen and (min-width: 768px) {
+  .page-4 {
+    .mockup-collaborate__wrap {
+      max-width: calc(50% - 0.625rem);
+    }
+    .mockup-chat__wrap {
+      max-width: calc(50% - 0.625rem);
+    }
+  }
+  .row {
+    .item-highlight + .item-highlight {
+      margin-left: 1.25rem;
+    }
+  }
+}
+
+@media only screen and (max-width: 1919px) {
+  .page-3 {
+    .mockup-desktop {
+      display: flex;
+      margin-top: 5rem;
+    }
+    .mockup-mobile {
+      display: none;
+    }
+    .mockup-desktop-large {
+      display: none;
+    }
+  }
+}
+
+@media only screen and (max-width: 1199px) {
+  .page-5 .feature-content__wrap {
+    font-size: 0.95rem;
+  }
+  .page-4 {
+    .btn-add-to-site__wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      left: 0;
+      right: 0;
+    }
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  .page-3 {
+    .mockup-desktop {
+      display: none;
+    }
+    .mockup-mobile {
+      display: flex;
+      margin-top: 3.75rem;
+    }
+    .mockup-desktop-large {
+      display: none;
+    }
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .page-1 {
+    margin-top: 11.563rem;
+    margin-bottom: 4.375rem;
+    padding-left: 20px;
+    padding-right: 20px;
+    .page-content {
+      font-size: 2rem;
+      line-height: 2.375rem;
+      padding: 0 10px;
+    }
+    .page-description {
+      padding: 0 10px;
+    }
+    .page-actions {
+      padding: 0 10px;
+    }
+    .btn-join-community {
+      margin-top: 3.125rem;
+      .btn {
+        font-weight: 600;
+        font-size: 1rem;
+        line-height: 22px;
+      }
+      .btn-large {
+        height: 50px;
+        width: fit-content;
+        min-width: fit-content;
+        padding: 0 20px;
+      }
+    }
+    .video__wrap {
+      margin-top: 70px;
+      border-radius: 10px;
+      padding: 8px;
+      .video-element {
+        border-radius: 5px;
+      }
+      .video-overlay {
+        .btn-play-video {
+          height: 42px;
+          padding: 0 15px;
+          font-weight: 600;
+          font-size: 16px;
+          line-height: 22px;
+          .icon-play-dark {
+            height: 15px;
+            margin-right: 10px;
+          }
+        }
+      }
+    }
+  }
+  .page-content {
+    font-size: 2rem;
+    line-height: 2.313rem;
+  }
+  .page-description {
+    font-size: 1.063rem;
+    line-height: 1.563rem;
+    margin-top: 1.25rem;
+  }
+  .page-title {
+    font-size: 1.563rem;
+    line-height: 1.875rem;
+    padding: 0 15px;
+  }
+  .page-2 {
+    margin-bottom: 50px;
+    .page-content {
+      font-size: 26px;
+    }
+    .page-2-body {
+      .faq-item {
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        .faq-head {
+          font-size: 16px;
+          line-height: 26px;
+          padding: 15px;
+          margin: -15px;
+          .ic-expand {
+            width: 20px;
+            height: 20px;
+          }
+        }
+        .faq-content {
+          font-size: 16px;
+          line-height: 24px;
+          font-weight: 500;
+          margin-top: 10px;
+          .para-content-1 {
+            margin-left: 20px;
+          }
+        }
+        &:first-child {
+          margin-top: 30px;
+        }
+      }
+    }
+  }
+  .space-dark {
+    height: 5.938rem;
+  }
+  .page-3 {
+    padding-top: 4.375rem;
+    padding-bottom: 9.688rem;
+    .col-md-6 {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+    .page-title {
+      font-size: 1.625rem;
+      line-height: 2.25rem;
+      padding-bottom: 50px;
+      text-align: center;
+      br {
+        display: none;
+      }
+    }
+    .page-3-card {
+      padding: 30px 20px;
+      margin-bottom: 20px;
+      .img-addition-bottom {
+        margin-bottom: 15px;
+      }
+      .img-multi-chain {
+        margin-bottom: 30px;
+      }
+      .img-everything {
+        margin-bottom: 30px;
+      }
+      .img-web3-profile {
+        width: calc(106% + 40px);
+        margin-top: -8px;
+        margin-left: calc(-3% - 36px);
+      }
+      .img-exclusive {
+        margin-top: -8px;
+        width: 104%;
+        margin-left: -1px;
+      }
+      .card-image {
+        margin-top: -8px;
+      }
+      .card-title {
+        font-size: 1.375rem;
+        line-height: 32px;
+      }
+      .card-description {
+        font-size: 0.875rem;
+        line-height: 1.438rem;
+        margin-top: 15px;
+      }
+    }
+    .page-3-footer {
+      margin-top: 9.375rem;
+      .footer-title {
+        font-size: 1.375rem;
+        line-height: 2rem;
+      }
+      .footer-description {
+        font-size: 1.063rem;
+        line-height: 1.5rem;
+      }
+      .btn-large {
+        min-width: 232px;
+        height: 48px;
+      }
+    }
+  }
+  .page-4 {
+    padding-top: 5.625rem;
+    padding-bottom: 3.75rem;
+    .mockup-exclusive__wrap {
+      margin-top: 2.188rem;
+    }
+    .mockup-2 {
+      margin-top: 0.938rem;
+      .content-mockup {
+        text-align: start;
+      }
+    }
+    .badge-list {
+      margin-bottom: 1rem;
+    }
+    .item-highlight {
+      padding: 2.5rem 0.938rem;
+      overflow: hidden;
+    }
+    .row {
+      .item-highlight + .item-highlight {
+        margin-top: 0.938rem;
+      }
+    }
+    .mockup-exclusive-content {
+      align-items: center;
+    }
+    .main-mockup {
+      margin-top: 3rem;
+      margin-right: -1.875rem;
+    }
+    .content-mockup {
+      font-size: 1.063rem;
+      line-height: 1.375rem;
+      padding: 0 0.313rem;
+    }
+    .mockup-collaborate {
+      margin-bottom: 2.375rem;
+      .tag-ipfs {
+        width: 80px;
+        top: 8px;
+        right: -20px;
+      }
+    }
+    .mockup-chat {
+      max-width: 100%;
+      margin-top: 2.375rem;
+    }
+  }
+  .page-5 {
+    padding-top: 3.75rem;
+    padding-bottom: 3.281rem;
+    .features__wrap {
+      margin-top: 1.719rem;
+    }
+    .item-feature__wrap {
+      padding: 0.469rem 0.75rem;
+    }
+    .item-feature {
+      height: fit-content;
+      padding: 0.938rem 0.938rem 0 0.938rem;
+      height: 150px;
+      border: 1px solid #efe9da;
+    }
+    .feature-content__wrap {
+      margin-top: 1.25rem;
+      font-size: 0.875rem;
+    }
+    .feature-title {
+      line-height: 1.25rem;
+    }
+    .page-title {
+      margin-left: 0;
+    }
+    .icon-feature {
+      height: 30px;
+      width: auto;
+    }
+  }
+  .page-6 {
+    padding-top: 5.938rem;
+    padding-bottom: 9.688rem;
+    .page-title {
+      padding: 0;
+      font-size: 1.375rem;
+      text-align: center;
+    }
+    .page-description {
+      font-size: 1.063rem;
+      line-height: 1.375rem;
+    }
+    .button-desktop {
+      display: none;
+    }
+    .button-mobile {
+      display: flex;
+    }
+  }
+  .buidler-modal-video {
+    button.close {
+      top: -125px;
+      right: 0;
+    }
+    .modal {
+      padding: 1rem !important;
+    }
+    .modal-content {
+      height: 340px;
+    }
+    .modal-body {
+      padding: 0;
+    }
+    .modal-dialog.modal-dialog-centered {
+      max-width: 100%;
+    }
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .btn {
+    height: 38px;
+    width: 218px;
+    line-height: 22px;
+    font-size: 0.875rem;
+  }
+  .row .btn + .btn {
+    margin-top: 20px;
+    margin-left: 0;
+  }
+  .page-actions {
+    flex-direction: column;
+  }
+  .home-cta {
+    width: fit-content;
+    min-width: 0;
+    height: 42px;
+    padding: 0 15px;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+    & + .home-cta {
+      margin-top: 20px;
+      margin-left: 0;
+    }
+  }
+  .page-1 {
+    .page-description {
+      max-width: 345px;
+    }
+    .main-buttons {
+      padding: 0 1rem;
+    }
+  }
+  .page-content {
+    font-size: 1.875rem;
+    line-height: 2.313rem;
+  }
+  .page-2 {
+    .page-title {
+      font-size: 1.625rem;
+      line-height: 2.25rem;
+      text-align: start;
+      margin-left: 30px;
+      margin-right: 0;
+      width: 300px;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+  .page-3 {
+    .page-3-card {
+      .btn-card {
+        height: 45px;
+        margin-top: 30px;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 300px) {
+  .page-4 .badge-item + .badge-item {
+    margin-left: 5px;
+  }
+}
+
+@media only screen and (max-width: 2232px) {
+  #token-gating .tab-item-container,
+  #member-profile .tab-item-container {
+    justify-content: flex-start;
+  }
+}
+
+@media only screen and (max-width: 1336px) {
+  #direct-message .tab-item-container,
+  #scammer .tab-item-container {
+    justify-content: flex-start;
+  }
+}
+
+@media only screen and (max-width: 2540px) {
+  #dapp-browser .tab-item-container {
+    justify-content: flex-start;
+  }
+}

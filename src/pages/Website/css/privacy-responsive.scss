@@ -1,0 +1,25 @@
+@media only screen and (max-width: 767px) {
+  .privacy {
+    #btn-nav-download {
+      display: flex;
+    }
+    .page-title {
+      margin-bottom: 3.75rem;
+      font-size: 2.125rem;
+      line-height: 2.313rem;
+      padding: 0;
+    }
+    .page-1 {
+      .page-content-terms {
+        font-size: 0.938rem;
+        line-height: 1.375rem;
+      }
+
+      .page-content-head {
+        font-size: 1.25rem;
+        line-height: 1.5rem;
+        margin-top: 5.938rem;
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@ import AppConfig, {
   LoginType,
   pageNames,
   signTypeData,
+  websitePath,
 } from "common/AppConfig";
 import {
   GeneratedPrivateKey,
@@ -638,6 +639,9 @@ const AuthProvider = ({ children }: IAuthProps) => {
   //   metamaskDisconnect,
   //   onMetamaskUpdate,
   // ]);
+  if (websitePath.includes(location.pathname)) {
+    return <>{children}</>;
+  }
   return (
     <AuthContext.Provider
       value={{

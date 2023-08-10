@@ -394,7 +394,7 @@ code {
 
 :root {
   --color-accent: #092555;
-  --color-accent-2: #D8D0BD;
+  --color-accent-2: #d8d0bd;
   --color-darkest-background: #121212;
   --color-darkest-background80: #121212cc;
   --color-backdrop: rgba(0, 0, 0, 0.75);
@@ -414,6 +414,24 @@ code {
   --color-highlight-action-high: #363636;
   --color-light-text: #acacac;
   --color-muted-text: #616164;
+
+  // Website
+  --color-background-light: #fffbf2;
+  --color-background-black: #000000;
+  --color-background-dark: #191919;
+  --color-background-lighter: #efe9da;
+  --content-primary: #e8e8e8;
+  --color-accent-1: #c9b074;
+  --color-accent-2: #d8d0bd;
+  --color-branding-accent-2: #fffefd;
+  --color-branding-secondary: #d2aa6d;
+  --color-highlight: #363636;
+  --color-stroke: #242424;
+  --color-background-medium: #1e1e1e;
+  --content-muted: #616164;
+  --content-muted-dark: #86868b;
+  --content-dark: #121212;
+  --content-muted-2: #727272;
 }
 
 @media only screen and (max-height: 900px) {

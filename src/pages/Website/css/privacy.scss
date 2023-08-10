@@ -1,0 +1,41 @@
+#btn-nav-download {
+  display: none;
+}
+
+.page-title {
+  font-weight: 700;
+  font-size: 4.375rem;
+  line-height: 4.75rem;
+  color: var(--content-dark);
+  display: block;
+  margin-bottom: 5.625rem;
+  text-align: start;
+}
+
+.btn-launch {
+  display: flex;
+  min-width: 180px;
+  height: 48px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.page-1 {
+  .page-content-terms {
+    font-weight: 600;
+    font-size: 1.25rem;
+    line-height: 1.813rem;
+    color: var(--content-muted);
+    display: block;
+  }
+
+  .page-content-head {
+    font-size: 1.625rem;
+    color: var(--content-dark);
+    line-height: 2rem;
+    display: block;
+    margin-top: 6.25rem;
+    margin-bottom: 0.625rem;
+  }
+}
