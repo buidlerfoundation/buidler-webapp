@@ -6,6 +6,7 @@ class GoogleAnalytics {
   init() {
     mixpanel.init(process.env.REACT_APP_MIXPANEL_TOKEN, {
       debug: process.env.NODE_ENV === "development",
+      opt_out_tracking_by_default: false,
     });
   }
 
