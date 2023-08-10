@@ -6,6 +6,7 @@ import "./css/home-responsive.scss";
 import images from "common/images";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 const Website = () => {
   const [showVideo, setShowVideo] = useState(false);
@@ -54,6 +55,22 @@ const Website = () => {
     },
     []
   );
+  const onCTAClick = useCallback(() => {
+    GoogleAnalytics.tracking("Home CTA Install Extension Clicked", {
+      category: "Home CTA",
+    });
+  }, []);
+  const onAddPluginClick = useCallback(() => {
+    GoogleAnalytics.tracking("Home CTA Add Plugin Clicked", {
+      category: "Home CTA",
+    });
+  }, []);
+  const onVideoClick = useCallback(() => {
+    toggleVideo();
+    GoogleAnalytics.tracking("Video Played", {
+      category: "Home",
+    });
+  }, [toggleVideo]);
   return (
     <div className="home" onScroll={onScroll}>
       <NavBar />
@@ -76,6 +93,7 @@ const Website = () => {
             target="_blank"
             id="main-cta"
             rel="noreferrer"
+            onClick={onCTAClick}
           >
             {ctaText}
           </a>
@@ -84,11 +102,12 @@ const Website = () => {
             className="btn btn-light home-cta"
             target="_blank"
             rel="noreferrer"
+            onClick={onAddPluginClick}
           >
             Add to Your Website
           </a>
         </div>
-        <div className="video__wrap" id="video-wrapper" onClick={toggleVideo}>
+        <div className="video__wrap" id="video-wrapper" onClick={onVideoClick}>
           <video
             className="video-element"
             muted

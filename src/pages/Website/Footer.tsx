@@ -1,6 +1,7 @@
 import images from "common/images";
 import React, { memo, useCallback } from "react";
 import { Link } from "react-router-dom";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 const Footer = () => {
   const logBadgeClick = useCallback(() => {
@@ -18,6 +19,57 @@ const Footer = () => {
     });
     window.open(ALCHEMY_URL, "_blank");
   }, []);
+  const onTWClick = useCallback(() => {
+    GoogleAnalytics.tracking("Footer Social Links Clicked", {
+      category: "Footer",
+      socials: "twitter",
+      url: "https://twitter.com/buidler_app",
+    });
+  }, []);
+  const onGHClick = useCallback(() => {
+    GoogleAnalytics.tracking("Footer Social Links Clicked", {
+      category: "Footer",
+      socials: "github",
+      url: "https://github.com/buidlerfoundation",
+    });
+  }, []);
+  const onYTBClick = useCallback(() => {
+    GoogleAnalytics.tracking("Footer Social Links Clicked", {
+      category: "Footer",
+      socials: "youtube",
+      url: "https://www.youtube.com/channel/UCIkFTkBdbVgzQgw6braFaeg",
+    });
+  }, []);
+  const onWebAppClick = useCallback(() => {
+    GoogleAnalytics.tracking("Footer Launch App On Browser Clicked", {
+      category: "Footer",
+    });
+  }, []);
+  const onExtensionClick = useCallback(() => {
+    GoogleAnalytics.tracking("Footer Extension Clicked", {
+      category: "Footer",
+    });
+  }, []);
+  const onPluginClick = useCallback(() => {
+    GoogleAnalytics.tracking("Footer Web Plugin Clicked", {
+      category: "Footer",
+    });
+  }, []);
+  const onAboutClick = useCallback(() => {
+    GoogleAnalytics.tracking("Footer About Clicked", {
+      category: "Footer",
+    });
+  }, []);
+  const onTermsClick = useCallback(() => {
+    GoogleAnalytics.tracking("Footer Terms Clicked", {
+      category: "Footer",
+    });
+  }, []);
+  const onPrivacyClick = useCallback(() => {
+    GoogleAnalytics.tracking("Footer Privacy Clicked", {
+      category: "Footer",
+    });
+  }, []);
   return (
     <>
       <div className="page-footer">
@@ -33,6 +85,7 @@ const Footer = () => {
                   href="https://twitter.com/buidler_app"
                   target="_blank"
                   rel="noreferrer"
+                  onClick={onTWClick}
                 >
                   <img
                     loading="lazy"
@@ -46,6 +99,7 @@ const Footer = () => {
                   href="https://www.youtube.com/@buidler_app"
                   target="_blank"
                   rel="noreferrer"
+                  onClick={onYTBClick}
                 >
                   <img
                     loading="lazy"
@@ -59,6 +113,7 @@ const Footer = () => {
                   href="https://github.com/buidlerfoundation"
                   target="_blank"
                   rel="noreferrer"
+                  onClick={onGHClick}
                 >
                   <img
                     loading="lazy"
@@ -83,7 +138,11 @@ const Footer = () => {
             <div className="col-6 col-md-2">
               <h5 className="footer-title">Product</h5>
               <div className="menu__wrap">
-                <Link className="footer-menu-item" to="/communities">
+                <Link
+                  className="footer-menu-item"
+                  to="/communities"
+                  onClick={onWebAppClick}
+                >
                   Web App
                 </Link>
                 <a
@@ -91,6 +150,7 @@ const Footer = () => {
                   href="https://chrome.google.com/webstore/detail/omhbdacaeafhladkifficmjmpeaijlfc"
                   target="_blank"
                   rel="noreferrer"
+                  onClick={onExtensionClick}
                 >
                   Extension
                 </a>
@@ -99,6 +159,7 @@ const Footer = () => {
                   href="https://docs.buidler.app/add-community-chat-plugin"
                   target="_blank"
                   rel="noreferrer"
+                  onClick={onPluginClick}
                 >
                   Web Plugin
                 </a>
@@ -112,13 +173,22 @@ const Footer = () => {
                   href="https://docs.buidler.app/about"
                   target="_blank"
                   rel="noreferrer"
+                  onClick={onAboutClick}
                 >
                   About
                 </a>
-                <Link className="footer-menu-item" to="/terms">
+                <Link
+                  className="footer-menu-item"
+                  to="/terms"
+                  onClick={onTermsClick}
+                >
                   Terms
                 </Link>
-                <Link className="footer-menu-item" to="/privacy">
+                <Link
+                  className="footer-menu-item"
+                  to="/privacy"
+                  onClick={onPrivacyClick}
+                >
                   Privacy
                 </Link>
               </div>

@@ -1,13 +1,24 @@
 import images from "common/images";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { Link } from "react-router-dom";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 const NavBar = () => {
+  const onLogoClick = useCallback(() => {
+    GoogleAnalytics.tracking("Header Logo Clicked", {
+      category: "Header",
+    });
+  }, []);
+  const onInstallClick = useCallback(() => {
+    GoogleAnalytics.tracking("Header Install Extension Clicked", {
+      category: "Header",
+    });
+  }, []);
   return (
     <div id="my-navbar" className="center" style={{ top: 0 }}>
       <div className="container">
         <nav className="navbar navbar-expand-lg">
-          <Link to="#" className="navbar-brand">
+          <Link to="#" className="navbar-brand" onClick={onLogoClick}>
             <img
               src={images.logoDark}
               className="nav-logo-dark"
@@ -28,6 +39,7 @@ const NavBar = () => {
               style={{ marginLeft: 25 }}
               target="_blank"
               rel="noreferrer"
+              onClick={onInstallClick}
             >
               Install Extension
             </a>
