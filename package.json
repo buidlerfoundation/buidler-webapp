@@ -54,7 +54,7 @@
   },
   "scripts": {
     "start": "react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts build",
+    "build": "BUILD_PATH='./build/community' react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
