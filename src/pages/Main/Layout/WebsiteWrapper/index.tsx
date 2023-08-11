@@ -59,19 +59,21 @@ const WebsiteWrapper = () => {
   return (
     <>
       <Outlet />
-      <div
-        id="buidler-plugin"
-        className={styles["iframe__wrapper"]}
-        style={{ opacity: loaded ? 1 : 0, height: getBubbleHeight() }}
-      >
-        <iframe
-          title="buidler-plugin"
-          id="buidler-plugin-frame"
-          src={`/plugin?external_url=${window.location.origin}${location.pathname}`}
-          className={styles["iframe-buidler"]}
-          onLoad={onFrameLoaded}
-        />
-      </div>
+      {!window.self.frameElement && (
+        <div
+          id="buidler-plugin"
+          className={styles["iframe__wrapper"]}
+          style={{ opacity: loaded ? 1 : 0, height: getBubbleHeight() }}
+        >
+          <iframe
+            title="buidler-plugin"
+            id="buidler-plugin-frame"
+            src={`/plugin?external_url=${window.location.origin}${location.pathname}`}
+            className={styles["iframe-buidler"]}
+            onLoad={onFrameLoaded}
+          />
+        </div>
+      )}
     </>
   );
 };
