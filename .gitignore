@@ -24,3 +24,6 @@ yarn-debug.log*
 yarn-error.log*
 
 /public/firebase-messaging-sw.js
+
+# plugin
+buidler-plugin.js
