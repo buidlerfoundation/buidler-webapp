@@ -41,6 +41,7 @@ const Footer = () => {
     });
   }, []);
   const onWebAppClick = useCallback(() => {
+    window.open(`${window.location.origin}/communities`, "_blank");
     GoogleAnalytics.tracking("Footer Launch App On Browser Clicked", {
       category: "Footer",
     });
@@ -138,13 +139,9 @@ const Footer = () => {
             <div className="col-6 col-md-2">
               <h5 className="footer-title">Product</h5>
               <div className="menu__wrap">
-                <Link
-                  className="footer-menu-item"
-                  to="/communities"
-                  onClick={onWebAppClick}
-                >
+                <div className="footer-menu-item" onClick={onWebAppClick}>
                   Web App
-                </Link>
+                </div>
                 <a
                   className="footer-menu-item"
                   href="https://chrome.google.com/webstore/detail/omhbdacaeafhladkifficmjmpeaijlfc"

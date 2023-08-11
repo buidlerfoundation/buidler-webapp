@@ -328,6 +328,7 @@ button[aria-expanded="true"] {
     display: inline-block;
     &:hover {
       color: var(--color-branding-secondary) !important;
+      cursor: pointer;
     }
   }
 }

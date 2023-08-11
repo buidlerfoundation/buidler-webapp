@@ -294,6 +294,10 @@ const AuthProvider = ({ children }: IAuthProps) => {
     [dispatch, gaLoginSuccess, handleInvitation, initialUserData]
   );
   const checkingAuth = useCallback(async () => {
+    if (websitePath.includes(location.pathname)) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     await getInitial();
     const matchParams = getParamsFromPath();
@@ -639,9 +643,6 @@ const AuthProvider = ({ children }: IAuthProps) => {
   //   metamaskDisconnect,
   //   onMetamaskUpdate,
   // ]);
-  if (websitePath.includes(location.pathname)) {
-    return <>{children}</>;
-  }
   return (
     <AuthContext.Provider
       value={{
