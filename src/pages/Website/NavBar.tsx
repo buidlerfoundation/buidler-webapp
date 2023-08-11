@@ -18,7 +18,7 @@ const NavBar = () => {
     <div id="my-navbar" className="center" style={{ top: 0 }}>
       <div className="container">
         <nav className="navbar navbar-expand-lg">
-          <Link to="#" className="navbar-brand" onClick={onLogoClick}>
+          <Link to="/" className="navbar-brand" onClick={onLogoClick}>
             <img
               src={images.logoDark}
               className="nav-logo-dark"

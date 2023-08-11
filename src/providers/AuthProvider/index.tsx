@@ -294,9 +294,6 @@ const AuthProvider = ({ children }: IAuthProps) => {
     [dispatch, gaLoginSuccess, handleInvitation, initialUserData]
   );
   const checkingAuth = useCallback(async () => {
-    if (websitePath.includes(location.pathname)) {
-      return;
-    }
     setLoading(true);
     await getInitial();
     const matchParams = getParamsFromPath();
