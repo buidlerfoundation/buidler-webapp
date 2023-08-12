@@ -2,6 +2,11 @@ import { SendData } from "models/User";
 import { Web3Auth } from "@web3auth/modal";
 import { ethers, utils } from "ethers";
 import MinABI from "./MinABI";
+import {
+  WalletConnectV2Adapter,
+  getWalletConnectV2Settings,
+} from "@web3auth/wallet-connect-v2-adapter";
+import AppConfig from "common/AppConfig";
 
 class Web3AuthUtils {
   web3auth: Web3Auth | null = null;
@@ -17,6 +22,17 @@ class Web3AuthUtils {
         ).toString(16)}`,
       },
     });
+    const defaultWcSettings = await getWalletConnectV2Settings(
+      "eip155",
+      [1],
+      AppConfig.walletConnectProjectId
+    );
+    const walletConnectV2Adapter = new WalletConnectV2Adapter({
+      adapterSettings: { ...defaultWcSettings.adapterSettings },
+      loginSettings: { ...defaultWcSettings.loginSettings },
+    });
+
+    this.web3auth.configureAdapter(walletConnectV2Adapter);
     await this.web3auth?.initModal();
   }
 

@@ -65,9 +65,8 @@ export const editMessage = (
 };
 
 export const getAroundMessageById = async (messageId: string, limit = 20) => {
-  const deviceCode = await getDeviceCode();
   return Caller.get<Array<MessageData>>(
-    `messages/${messageId}/jump?device_code=${deviceCode}&limit=${limit}`
+    `messages/${messageId}/jump?limit=${limit}`
   );
 };
 

@@ -215,7 +215,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
                 );
               }
             } else if (window.location.pathname.includes(AppConfig.loginPath)) {
-              const path = previousState?.from?.pathname || "/";
+              const path = previousState?.from?.pathname || "/communities";
               navigate(path, { replace: true });
             }
           }
@@ -614,6 +614,9 @@ const AuthProvider = ({ children }: IAuthProps) => {
       }
     }
     onDisconnected();
+    GoogleAnalytics.tracking("Logout Successful", {
+      category: "User Profile",
+    });
   }, [disconnect, onDisconnected]);
   // useEffect(() => {
   //   getCookie(AsyncKey.loginType)

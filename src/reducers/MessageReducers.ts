@@ -24,7 +24,7 @@ interface MessageState {
     };
   };
   apiController?: AbortController | null;
-  highlightMessageId?: string;
+  highlightMessageId?: string | null;
   chatBoxActiveTab: ActiveTab;
 }
 
@@ -33,6 +33,30 @@ const initialState: MessageState = {
   apiController: null,
   chatBoxActiveTab: "",
 };
+
+export const getAroundMessages = createAsyncThunk(
+  "message/get-around",
+  async (payload: { messageId: string; channelId: string }) => {
+    const res = await api.getAroundMessageById(payload.messageId);
+    if (res.statusCode === 200) {
+      let messageData = res.data;
+      if (res.metadata?.encrypt_message_key) {
+        const privateKey = await GeneratedPrivateKey();
+        messageData = normalizePublicMessageData(
+          res.data,
+          privateKey,
+          res.metadata?.encrypt_message_key
+        );
+      }
+      return {
+        channelId: payload.channelId,
+        data: messageData,
+        canMoreAfter: res.metadata?.can_loadmore_message_after,
+        canMoreBefore: res.metadata?.can_loadmore_message_before,
+      };
+    }
+  }
+);
 
 export const getMessages = createAsyncThunk(
   "message/get",
@@ -68,6 +92,9 @@ const messageSlice = createSlice({
   name: "message",
   initialState,
   reducers: {
+    highlightMessage: (state, action: PayloadAction<string | null>) => {
+      state.highlightMessageId = action.payload;
+    },
     updateUser: (
       state,
       action: PayloadAction<{ user: UserData; channelId: string }>
@@ -346,6 +373,20 @@ const messageSlice = createSlice({
               loadMore: false,
               loadMoreAfter: false,
             },
+          };
+        }
+      })
+      .addCase(getAroundMessages.fulfilled, (state, action) => {
+        if (action.payload) {
+          const { channelId, canMoreAfter, canMoreBefore, data } =
+            action.payload;
+          state.messageData[channelId] = {
+            data: normalizeMessage(data || []),
+            loading: false,
+            loadMore: false,
+            loadMoreAfter: false,
+            canMore: !!canMoreBefore,
+            canMoreAfter: !!canMoreAfter,
           };
         }
       })
