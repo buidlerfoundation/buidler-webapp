@@ -21,6 +21,9 @@ export const clearData = (callback = () => {}) => {
   Cookies.remove(AsyncKey.socketConnectKey);
   Cookies.remove(AsyncKey.draftMessageKey);
   Cookies.remove(AsyncKey.autoOffPlugin);
+  Cookies.remove(AsyncKey.tokenExpire);
+  Cookies.remove(AsyncKey.refreshTokenExpire);
+  Cookies.remove(AsyncKey.refreshTokenKey);
   window.top?.postMessage(
     { type: "buidler-plugin-clear-cookie" },
     { targetOrigin: "*" }
