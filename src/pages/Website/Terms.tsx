@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useRef } from "react";
+import React, { memo, useCallback, useEffect, useRef } from "react";
 import NavBar from "./NavBar";
 import "./css/index.scss";
 import "./css/responsive.scss";
@@ -22,6 +22,9 @@ const Terms = () => {
       navBar.style.top = "0px";
     }
     previousScrollTop.current = scrollTop;
+  }, []);
+  useEffect(() => {
+    document.title = "Terms of Service | Buidler";
   }, []);
   return (
     <div className="home privacy" onScroll={onScroll}>
