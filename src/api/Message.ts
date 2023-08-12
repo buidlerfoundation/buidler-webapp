@@ -66,7 +66,7 @@ export const editMessage = (
 
 export const getAroundMessageById = async (messageId: string, limit = 20) => {
   return Caller.get<Array<MessageData>>(
-    `messages/${messageId}/jump?limit=${limit}`
+    `message/${messageId}/jump?pagination[size]=${limit}`
   );
 };
 

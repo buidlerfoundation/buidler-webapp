@@ -11,6 +11,7 @@ import { clearData, getCookie } from "../common/Cookie";
 import { refreshTokenAction } from "reducers/UserActions";
 import { BaseDataApi } from "models/User";
 import { logoutAction } from "reducers/actions";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 const METHOD_GET = "get";
 const METHOD_POST = "post";
@@ -128,13 +129,13 @@ const fetchWithRetry: any = (
           );
         }
       }
-      // GoogleAnalytics.trackingError(
-      //   uri,
-      //   fetchOptions.method.toLowerCase(),
-      //   msg,
-      //   err.statusCode,
-      //   getRequestBody(fetchOptions.body)
-      // );
+      GoogleAnalytics.trackingError(
+        uri,
+        fetchOptions.method.toLowerCase(),
+        msg,
+        err.statusCode,
+        getRequestBody(fetchOptions.body)
+      );
       if (!msg.includes("aborted")) {
         handleError(msg, { uri, fetchOptions }, withoutError);
       }
