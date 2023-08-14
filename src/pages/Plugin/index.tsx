@@ -16,11 +16,16 @@ import useOutsideLoading from "hooks/useOutsideLoading";
 import useChannel from "hooks/useChannel";
 import { getPinPosts, getStories } from "reducers/PinPostReducers";
 import useShowPlugin from "hooks/useShowPlugin";
+import useAppSelector from "hooks/useAppSelector";
+import { getCookie } from "common/Cookie";
+import { AsyncKey } from "common/AppConfig";
+import { CONFIG_ACTIONS } from "reducers/ConfigReducers";
 
 const Plugin = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [pluginPosition, setPluginPosition] = useState("bottom");
+  const currentToken = useAppSelector((state) => state.configs.currentToken);
   const { isShow } = useShowPlugin();
   const pluginOpen = usePluginOpen();
   const loading = useOutsideLoading();
@@ -59,12 +64,20 @@ const Plugin = () => {
     }
   }, [pluginOpen]);
   useEffect(() => {
-    const messageListener = (
+    const messageListener = async (
       e: MessageEvent<{ type: string; payload: any }>
     ) => {
       if (typeof e.data !== "object") return;
       if (!e.data.type) return;
       const { type, payload } = e.data;
+      if (type === "frame-focus") {
+        const token = await getCookie(AsyncKey.accessTokenKey);
+        console.log("Frame focus: ", token, currentToken);
+        if (token !== currentToken) {
+          window.location.href = `/plugin?external_url=${payload.url}`;
+          dispatch(CONFIG_ACTIONS.updateCurrentToken(token));
+        }
+      }
       if (type === "toggle-plugin") {
         toggle();
       }
@@ -89,7 +102,7 @@ const Plugin = () => {
       window.removeEventListener("message", messageListener);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, toggle]);
+  }, [currentToken, dispatch, toggle]);
   return (
     <div
       className={`${styles.container} ${

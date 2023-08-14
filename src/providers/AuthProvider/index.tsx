@@ -375,7 +375,11 @@ const AuthProvider = ({ children }: IAuthProps) => {
   //   const eventFocus = async (e: FocusEvent) => {
   //     const token = await getCookie(AsyncKey.accessTokenKey);
   //     if (token !== currentToken) {
-  //       window.location.reload();
+  //       if (externalUrlStore) {
+  //         window.location.href = `/plugin?external_url=${externalUrlStore}`;
+  //       } else {
+  //         window.location.reload();
+  //       }
   //     }
   //     dispatch(CONFIG_ACTIONS.updateCurrentToken(token));
   //   };
@@ -383,7 +387,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   //   return () => {
   //     window.removeEventListener("focus", eventFocus);
   //   };
-  // }, [currentToken, dispatch]);
+  // }, [currentToken, dispatch, externalUrlStore]);
 
   const getMessageSignTypedData = useCallback(async (address: string) => {
     const deviceCode = await getDeviceCode();
