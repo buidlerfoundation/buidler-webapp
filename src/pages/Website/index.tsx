@@ -298,7 +298,7 @@ const Website = () => {
                 Website owners can increase user engagement by integrating our
                 plugin. Seamlessly offer real-time support and connect with your
                 audience. Strengthen user loyalty, attract new visitors, and
-                grow your community organically.
+                grow your community organically.{" "}
                 <a
                   href="https://docs.buidler.app/add-community-chat-plugin"
                   target="_blank"
