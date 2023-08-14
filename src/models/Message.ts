@@ -1,7 +1,7 @@
 import { LocalAttachment } from "./Community";
 import { UserData } from "./User";
 
-export type ActiveTab = "chat" | "pin" | "review" | "hacker-new" | "";
+export type ActiveTab = "chat" | "pin" | "review" | "hacker-new" | "analytic" | "";
 
 export type EmitMessageData = {
   entity_id: string;
