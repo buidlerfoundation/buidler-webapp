@@ -72,7 +72,6 @@ const Plugin = () => {
       const { type, payload } = e.data;
       if (type === "frame-focus") {
         const token = await getCookie(AsyncKey.accessTokenKey);
-        console.log("Frame focus: ", token, currentToken);
         if (token !== currentToken) {
           window.location.href = `/plugin?external_url=${payload.url}`;
           dispatch(CONFIG_ACTIONS.updateCurrentToken(token));
