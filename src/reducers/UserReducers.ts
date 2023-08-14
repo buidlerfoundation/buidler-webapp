@@ -115,6 +115,20 @@ const userSlice = createSlice({
         state.data = action.payload.user;
       }
     },
+    userJoinCommunity: (state, action: PayloadAction<Community>) => {
+      state.communities = state.communities?.map((el) => {
+        if (el.community_id === action.payload.community_id) {
+          return action.payload;
+        }
+        return el;
+      });
+      state.pinnedCommunities = state.pinnedCommunities?.map((el) => {
+        if (el.community_id === action.payload.community_id) {
+          return action.payload;
+        }
+        return el;
+      });
+    },
     createNewCommunity: (
       state: UserState,
       action: PayloadAction<Community>
@@ -126,14 +140,17 @@ const userSlice = createSlice({
         )
       ) {
         communities.push({ ...action.payload, seen: true });
+        state.communities = communities;
       }
-      state.communities = communities;
+      state.communities = state.communities?.map((el) => {
+        if (el.community_id === action.payload.community_id) {
+          return action.payload;
+        }
+        return el;
+      });
       state.pinnedCommunities = state.pinnedCommunities?.map((el) => {
         if (el.community_id === action.payload.community_id) {
-          return {
-            ...el,
-            total_community_members: (el.total_community_members || 0) + 1,
-          };
+          return action.payload;
         }
         return el;
       });

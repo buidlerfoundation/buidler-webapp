@@ -316,6 +316,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
       }
     }
     if (!accessToken) {
+      GoogleAnalytics.identifyByDeviceCode();
       if (canViewOnly) {
         await handleDataFromExternalUrl(true);
       } else if (window.location.pathname !== AppConfig.loginPath) {

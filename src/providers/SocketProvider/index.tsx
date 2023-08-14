@@ -135,6 +135,8 @@ const SocketProvider = ({ children }: ISocketProps) => {
     (data: { community: Community; user: UserData }) => {
       if (user.user_id === data.user.user_id) {
         dispatch(USER_ACTIONS.createNewCommunity(data.community));
+      } else {
+        dispatch(USER_ACTIONS.userJoinCommunity(data.community));
       }
     },
     [dispatch, user.user_id]
