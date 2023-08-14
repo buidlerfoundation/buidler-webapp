@@ -1,5 +1,12 @@
 @media only screen and (max-width: 767px) {
   .privacy {
+    span {
+      user-select: unset; /* standard syntax */
+      -webkit-user-select: unset; /* webkit (safari, chrome) browsers */
+      -moz-user-select: unset; /* mozilla browsers */
+      -khtml-user-select: unset; /* webkit (konqueror) browsers */
+      -ms-user-select: unset; /* IE10+ */
+    }
     #btn-nav-download {
       display: flex;
     }
