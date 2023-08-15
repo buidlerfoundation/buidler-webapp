@@ -51,6 +51,7 @@ import { useWalletConnectClient } from "providers/WalletConnectProvider";
 import useUser from "hooks/useUser";
 import { OUTSIDE_ACTIONS } from "reducers/OutsideReducers";
 import { getParamsFromPath, getShareIdFromPath } from "helpers/LinkHelper";
+import useAppSelector from "hooks/useAppSelector";
 
 export interface IAuthContext {
   loginWithMetaMask: () => Promise<void>;
@@ -94,6 +95,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const pinnedCommunities = usePinnedCommunities();
+  const currentToken = useAppSelector((state) => state.configs.currentToken);
   const channels = useChannels();
   const user = useUser();
   const [loading, setLoading] = useState(true);
@@ -389,23 +391,20 @@ const AuthProvider = ({ children }: IAuthProps) => {
   }, [checkingAuth]);
 
   // Temporary comment out event check difference token
-  // useEffect(() => {
-  //   const eventFocus = async (e: FocusEvent) => {
-  //     const token = await getCookie(AsyncKey.accessTokenKey);
-  //     if (token !== currentToken) {
-  //       if (externalUrlStore) {
-  //         window.location.href = `/plugin?external_url=${externalUrlStore}`;
-  //       } else {
-  //         window.location.reload();
-  //       }
-  //     }
-  //     dispatch(CONFIG_ACTIONS.updateCurrentToken(token));
-  //   };
-  //   window.addEventListener("focus", eventFocus);
-  //   return () => {
-  //     window.removeEventListener("focus", eventFocus);
-  //   };
-  // }, [currentToken, dispatch, externalUrlStore]);
+  useEffect(() => {
+    const eventFocus = async (e: FocusEvent) => {
+      const token = await getCookie(AsyncKey.accessTokenKey);
+      const matchParams = getParamsFromPath();
+      if (!!token !== !!currentToken && matchParams?.page_name !== "plugin") {
+        window.location.reload();
+        dispatch(CONFIG_ACTIONS.updateCurrentToken(token));
+      }
+    };
+    window.addEventListener("focus", eventFocus);
+    return () => {
+      window.removeEventListener("focus", eventFocus);
+    };
+  }, [currentToken, dispatch]);
 
   const getMessageSignTypedData = useCallback(async (address: string) => {
     const deviceCode = await getDeviceCode();
