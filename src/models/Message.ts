@@ -1,7 +1,13 @@
 import { LocalAttachment } from "./Community";
 import { UserData } from "./User";
 
-export type ActiveTab = "chat" | "pin" | "review" | "hacker-new" | "analytic" | "";
+export type ActiveTab =
+  | "chat"
+  | "pin"
+  | "review"
+  | "hacker-new"
+  | "analytic"
+  | "";
 
 export type EmitMessageData = {
   entity_id: string;
@@ -140,4 +146,28 @@ export interface ReactUserApiData {
   skin: number;
   user_id: string;
   user?: UserData;
+}
+
+export interface ISimilarWeb {
+  monthly_visits?: {
+    [key: string]: number;
+  } | null;
+  source: {
+    image_url: string;
+  };
+}
+
+export interface IScamAlert {
+  content: string;
+  content_type: string;
+  created_at: string;
+  scam_alert_id: string;
+  total_downvotes: number;
+  total_upvotes: number;
+  updated_at: string;
+}
+
+export interface IAnalyticData {
+  similarweb?: ISimilarWeb;
+  scam_alert?: IScamAlert | null;
 }

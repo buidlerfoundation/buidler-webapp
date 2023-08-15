@@ -11,7 +11,7 @@ import {
 } from "models/Community";
 import Caller from "./Caller";
 import { UserData } from "models/User";
-import { ITopicComment, PostData } from "models/Message";
+import { IAnalyticData, ITopicComment, PostData } from "models/Message";
 
 export const getPinnedCommunities = () =>
   Caller.get<Community[]>("community?type=pin");
@@ -124,3 +124,12 @@ export const getLinkShare = (req: {
   entity_id: string;
   entity_type: string;
 }) => Caller.post<{ share_id: string }>("share", req);
+
+export const getAnalytics = (url: string) =>
+  Caller.get<IAnalyticData>(`external/analytics?community_url=${url}`);
+
+export const upVoteScam = (id: string) =>
+  Caller.post(`scam-alert/${id}/upvote`);
+
+export const downVoteScam = (id: string) =>
+  Caller.post(`scam-alert/${id}/downvote`);
