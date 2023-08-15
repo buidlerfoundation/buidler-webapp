@@ -2,7 +2,6 @@ import mixpanel from "mixpanel-browser";
 import { getCategoryByApi, getEventNameByApi } from "helpers/AnalyticHelper";
 import { UserData } from "models/User";
 import CryptoJS from "crypto-js";
-import { getDeviceCode } from "common/Cookie";
 
 class GoogleAnalytics {
   init() {
@@ -13,12 +12,12 @@ class GoogleAnalytics {
   }
 
   identify(user: UserData) {
-    mixpanel.identify();
+    mixpanel.identify(CryptoJS.SHA1(user.user_id).toString());
     mixpanel.people.set({ name: CryptoJS.SHA1(user.user_id).toString() });
   }
 
   async identifyByExtensionId(id: string) {
-    mixpanel.identify();
+    mixpanel.identify(id);
     mixpanel.people.set({ name: id });
   }
 
