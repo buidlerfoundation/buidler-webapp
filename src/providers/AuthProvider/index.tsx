@@ -62,6 +62,7 @@ export interface IAuthContext {
   openLogin: boolean;
   toggleLogin: () => void;
   onCloseLogin: () => void;
+  quickLoginWithOtt: (ott: string) => void;
 }
 
 export const AuthContext = createContext<IAuthContext>({
@@ -74,6 +75,7 @@ export const AuthContext = createContext<IAuthContext>({
   openLogin: false,
   toggleLogin: () => {},
   onCloseLogin: () => {},
+  quickLoginWithOtt: () => {},
 });
 
 export function useAuth(): IAuthContext {
@@ -292,6 +294,18 @@ const AuthProvider = ({ children }: IAuthProps) => {
       await initialUserData(previousState);
     },
     [dispatch, gaLoginSuccess, handleInvitation, initialUserData]
+  );
+  const quickLoginWithOtt = useCallback(
+    async (ott: string) => {
+      if (ott) {
+        isQuickLogin.current = true;
+        const res = await api.generateTokenFromOTT(ott);
+        if (res.success) {
+          await handleResponseVerify(res.data, LoginType.OTT);
+        }
+      }
+    },
+    [handleResponseVerify]
   );
   const checkingAuth = useCallback(async () => {
     if (websitePath.includes(location.pathname)) {
@@ -661,6 +675,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
         logout,
         toggleLogin,
         onCloseLogin,
+        quickLoginWithOtt,
         loadingWeb3Auth,
         openLogin,
       }}

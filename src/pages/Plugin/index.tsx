@@ -17,13 +17,17 @@ import useChannel from "hooks/useChannel";
 import { getPinPosts, getStories } from "reducers/PinPostReducers";
 import useShowPlugin from "hooks/useShowPlugin";
 import useAppSelector from "hooks/useAppSelector";
-import { getCookie } from "common/Cookie";
-import { AsyncKey } from "common/AppConfig";
-import { CONFIG_ACTIONS } from "reducers/ConfigReducers";
+import { useAuth } from "providers/AuthProvider";
+import api from "api";
+import { clearData } from "common/Cookie";
+import { useSocket } from "providers/SocketProvider";
+import { logoutAction } from "reducers/actions";
 
 const Plugin = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const auth = useAuth();
+  const socket = useSocket();
   const [pluginPosition, setPluginPosition] = useState("bottom");
   const currentToken = useAppSelector((state) => state.configs.currentToken);
   const { isShow } = useShowPlugin();
@@ -63,6 +67,17 @@ const Plugin = () => {
       }, 290);
     }
   }, [pluginOpen]);
+  const onLogout = useCallback(() => {
+    api.logout();
+    clearData(() => {
+      socket.disconnect();
+      setTimeout(() => {
+        socket.initSocket(undefined, channel?.channel_id);
+      }, 200);
+    });
+    dispatch(logoutAction());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channel?.channel_id, dispatch]);
   useEffect(() => {
     const messageListener = async (
       e: MessageEvent<{ type: string; payload: any }>
@@ -70,11 +85,12 @@ const Plugin = () => {
       if (typeof e.data !== "object") return;
       if (!e.data.type) return;
       const { type, payload } = e.data;
-      if (type === "frame-focus") {
-        const token = await getCookie(AsyncKey.accessTokenKey);
-        if (token !== currentToken) {
-          window.location.href = `/plugin?external_url=${payload.url}`;
-          dispatch(CONFIG_ACTIONS.updateCurrentToken(token));
+      if (type === "update-authenticate") {
+        const ott = payload.ott;
+        if (ott) {
+          auth.quickLoginWithOtt(ott);
+        } else {
+          onLogout();
         }
       }
       if (type === "toggle-plugin") {
@@ -101,7 +117,7 @@ const Plugin = () => {
       window.removeEventListener("message", messageListener);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentToken, dispatch, toggle]);
+  }, [currentToken, onLogout, dispatch, toggle]);
   return (
     <div
       className={`${styles.container} ${
