@@ -101,6 +101,7 @@ import WalletConnectLogo2 from "../assets/images/wallet_connect_logo_2.svg";
 import MetaMaskLogo2 from "../assets/images/metamask_logo_2.svg";
 import IconCircleCheck from "../assets/images/ic_circle_check.svg";
 import iconVideoPlay from "../assets/images/ic_video_play.svg";
+import icExplore from "../assets/images/ic_explore.png";
 
 // website
 import logoDark from "../assets/website/nav_logo.svg";
@@ -224,6 +225,7 @@ const images = {
   icGH,
   icTW,
   icYTB,
+  icExplore,
 };
 
 export default images;
