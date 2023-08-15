@@ -17,10 +17,9 @@ class GoogleAnalytics {
     mixpanel.people.set({ name: CryptoJS.SHA1(user.user_id).toString() });
   }
 
-  async identifyByDeviceCode() {
-    const deviceCode = await getDeviceCode();
+  async identifyByExtensionId(id: string) {
     mixpanel.identify();
-    mixpanel.people.set({ name: deviceCode });
+    mixpanel.people.set({ name: id });
   }
 
   tracking(eventName: string, props: { [key: string]: string }) {

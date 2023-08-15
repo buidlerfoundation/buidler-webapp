@@ -101,6 +101,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
   const ott = useMemo(() => query.get("ott"), [query]);
+  const extensionId = useMemo(() => query.get("extension_id"), [query]);
   const autoOff = useMemo(() => query.get("auto_off"), [query]);
   const openAtFirst = useMemo(() => query.get("open_at_first"), [query]);
   const externalUrl = useMemo(
@@ -330,7 +331,9 @@ const AuthProvider = ({ children }: IAuthProps) => {
       }
     }
     if (!accessToken) {
-      GoogleAnalytics.identifyByDeviceCode();
+      if (extensionId) {
+        GoogleAnalytics.identifyByExtensionId(extensionId);
+      }
       if (canViewOnly) {
         await handleDataFromExternalUrl(true);
       } else if (window.location.pathname !== AppConfig.loginPath) {
