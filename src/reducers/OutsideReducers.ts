@@ -7,6 +7,7 @@ interface OutsideState {
   loading?: boolean;
   autoOff?: boolean;
   externalUrl?: string;
+  extensionId?: string;
 }
 
 const initialState: OutsideState = {
@@ -19,6 +20,9 @@ const outsideSlice = createSlice({
   name: "outside",
   initialState,
   reducers: {
+    updateExtensionId: (state, action: PayloadAction<string>) => {
+      state.extensionId = action.payload;
+    },
     updateAutoOff: (state, action: PayloadAction<boolean>) => {
       state.autoOff = action.payload;
     },

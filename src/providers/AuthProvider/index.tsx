@@ -332,6 +332,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     }
     if (!accessToken) {
       if (extensionId) {
+        dispatch(OUTSIDE_ACTIONS.updateExtensionId(extensionId));
         GoogleAnalytics.identifyByExtensionId(extensionId);
       }
       if (canViewOnly) {

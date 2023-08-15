@@ -22,6 +22,7 @@ import api from "api";
 import { clearData } from "common/Cookie";
 import { useSocket } from "providers/SocketProvider";
 import { logoutAction } from "reducers/actions";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 const Plugin = () => {
   const dispatch = useAppDispatch();
@@ -34,6 +35,7 @@ const Plugin = () => {
   const pluginOpen = usePluginOpen();
   const loading = useOutsideLoading();
   const channel = useChannel();
+  const extensionId = useAppSelector((state) => state.outside.extensionId);
   const [style, setStyle] = useState<CSSProperties>({ height: "auto" });
   const toggle = useCallback(
     () => dispatch(OUTSIDE_ACTIONS.toggle()),
@@ -76,8 +78,11 @@ const Plugin = () => {
       }, 200);
     });
     dispatch(logoutAction());
+    if (extensionId) {
+      GoogleAnalytics.identifyByExtensionId(extensionId);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channel?.channel_id, dispatch]);
+  }, [channel?.channel_id, extensionId, dispatch]);
   useEffect(() => {
     const messageListener = async (
       e: MessageEvent<{ type: string; payload: any }>
