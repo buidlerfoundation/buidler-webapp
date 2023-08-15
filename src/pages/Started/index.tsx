@@ -29,7 +29,7 @@ const Started = ({ embedded }: IStarted) => {
     return !/Chrome/.test(userAgent);
   }, []);
   useEffect(() => {
-    if (location.pathname) {
+    if (location.pathname && !embedded) {
       const query = new URLSearchParams(location.search);
       GoogleAnalytics.tracking("Page Viewed", {
         category: "Traffic",
@@ -39,7 +39,7 @@ const Started = ({ embedded }: IStarted) => {
         type: "web-app",
       });
     }
-  }, [location.pathname]);
+  }, [embedded, location.pathname]);
   return (
     <div
       className={`${styles.container} ${
