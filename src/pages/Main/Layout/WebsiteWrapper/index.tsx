@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import styles from "./index.module.scss";
@@ -25,8 +25,11 @@ const WebsiteWrapper = () => {
   }, []);
   const getBubbleHeight = useCallback(() => {
     const isMainUrl = location.pathname === "/";
-    return isMainUrl ? "130px" : "165px";
+    return isMainUrl ? "90px" : "137px";
   }, [location.pathname]);
+  const getFullHeight = useCallback(() => {
+    return "calc(100vh - 40px)";
+  }, []);
   useEffect(() => {
     const messageListener = (e: any) => {
       const plugin = document.getElementById("buidler-plugin");
@@ -38,9 +41,11 @@ const WebsiteWrapper = () => {
           plugin.style.display = "none";
         }
         if (e.data === "open-plugin") {
-          plugin.style.height = "100vh";
+          plugin.style.height = getFullHeight();
+          plugin.style.maxHeight = "1080px";
         }
         if (e.data === "close-plugin") {
+          plugin.style.maxHeight = "245px";
           plugin.style.height = getBubbleHeight();
         }
         if (e.data === "open-plugin-menu") {
@@ -55,7 +60,7 @@ const WebsiteWrapper = () => {
     return () => {
       window.removeEventListener("message", messageListener);
     };
-  }, [getBubbleHeight]);
+  }, [getBubbleHeight, getFullHeight]);
   return (
     <>
       <Outlet />

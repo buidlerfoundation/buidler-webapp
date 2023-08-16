@@ -1,11 +1,15 @@
 .iframe__wrapper {
-  max-height: 1080px;
-  width: 430px;
+  max-height: 245px;
+  width: 390px;
   position: fixed;
-  bottom: 0;
-  right: 0;
+  bottom: 20px;
+  right: 20px;
   z-index: 900000;
   color-scheme: auto;
+  box-shadow: 8px 8px 20px 0 #00000040;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: max-height 300ms ease-in;
 }
 
 .iframe-buidler {

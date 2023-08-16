@@ -71,7 +71,7 @@ const Plugin = () => {
       closeTimeout.current = setTimeout(() => {
         setStyle({ height: "auto" });
         window.parent.postMessage("close-plugin", "*");
-      }, 290);
+      }, 0);
     }
   }, [pluginOpen]);
   const onLogout = useCallback(() => {
