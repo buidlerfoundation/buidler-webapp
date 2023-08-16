@@ -395,7 +395,11 @@ const AuthProvider = ({ children }: IAuthProps) => {
     const eventFocus = async (e: FocusEvent) => {
       const token = await getCookie(AsyncKey.accessTokenKey);
       const matchParams = getParamsFromPath();
-      if (!!token !== !!currentToken && matchParams?.page_name !== "plugin") {
+      if (
+        !!token !== !!currentToken &&
+        matchParams?.page_name !== "plugin" &&
+        !websitePath.includes(window.location.pathname)
+      ) {
         window.location.reload();
         dispatch(CONFIG_ACTIONS.updateCurrentToken(token));
       }
