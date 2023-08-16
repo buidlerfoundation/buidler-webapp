@@ -4,6 +4,7 @@ import React, {
   useEffect,
   CSSProperties,
   memo,
+  useRef,
 } from "react";
 import MessageChatBox from "shared/MessageChatBox";
 import styles from "./index.module.scss";
@@ -27,6 +28,7 @@ import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 const Plugin = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const closeTimeout = useRef<any>();
   const auth = useAuth();
   const socket = useSocket();
   const [pluginPosition, setPluginPosition] = useState("bottom");
@@ -58,12 +60,15 @@ const Plugin = () => {
   }, [channel?.display_channel_url, dispatch]);
   useEffect(() => {
     if (pluginOpen) {
+      if (closeTimeout.current) {
+        clearTimeout(closeTimeout.current);
+      }
       setStyle({
         height: "100%",
       });
       window.parent.postMessage("open-plugin", "*");
     } else {
-      setTimeout(() => {
+      closeTimeout.current = setTimeout(() => {
         setStyle({ height: "auto" });
         window.parent.postMessage("close-plugin", "*");
       }, 290);
