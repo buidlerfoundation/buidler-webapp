@@ -10,7 +10,7 @@ const TeamItemLoading = ({ url }: ITeamItemLoading) => {
   const logo = useMemo(() => getLogoFromUrl(url), [url]);
   const communityDisplayName = useMemo(() => {
     const parsed = new URL(url);
-    return parsed.host;
+    return parsed.host.replace("www.", "");
   }, [url]);
   return (
     <div className={`${styles["team-item"]} ${styles["team-selected"]}`}>
