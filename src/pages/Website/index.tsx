@@ -198,13 +198,13 @@ const Website = () => {
                 </span>
                 <span className="para-content-1" style={{ marginBottom: 0 }}>
                   Join the community on your favorite websites or check out our
-                  community here:
+                  community here:{" "}
                   <a
-                    href="https://beta.buidler.app/communities"
+                    href="https://buidler.app/communities"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    beta.buidler.app/communities
+                    buidler.app/communities
                   </a>
                 </span>
               </p>
