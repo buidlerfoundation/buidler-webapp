@@ -1,3 +1,4 @@
+import AnalyticReducers from "./AnalyticReducers";
 import CollectibleReducers from "./CollectibleReducers";
 import ConfigReducers from "./ConfigReducers";
 import MessageReducers from "./MessageReducers";
@@ -25,6 +26,7 @@ const reducers = combineReducers({
   pinPost: PinPostReducers,
   outside: OutsideReducers,
   story: StoryReducers,
+  analytic: AnalyticReducers,
 });
 
 export default reducers;

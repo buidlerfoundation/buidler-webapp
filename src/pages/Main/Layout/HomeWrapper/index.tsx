@@ -25,6 +25,8 @@ import api from "api";
 import { USER_ACTIONS } from "reducers/UserReducers";
 import useUser from "hooks/useUser";
 import ModalInviteMember from "shared/ModalInviteMember";
+import useCurrentCommunity from "hooks/useCurrentCommunity";
+import { getAnalytic } from "reducers/AnalyticReducers";
 
 const HomeWrapper = () => {
   const dispatch = useAppDispatch();
@@ -33,6 +35,7 @@ const HomeWrapper = () => {
   const navigate = useNavigate();
   const matchCommunityId = useCommunityId();
   const matchChannelId = useChannelId();
+  const community = useCurrentCommunity();
   const pinnedCommunities = usePinnedCommunities();
   const channels = useChannels();
   const user = useUser();
@@ -136,6 +139,11 @@ const HomeWrapper = () => {
       );
     }
   }, [dispatch, matchChannelId]);
+  useEffect(() => {
+    if (community.community_url) {
+      dispatch(getAnalytic({ communityUrl: community.community_url }));
+    }
+  }, [community.community_url, dispatch]);
   const handleOpenCreateChannel = useCallback(() => {}, []);
   const handleOpenCreateSpace = useCallback(() => {}, []);
   const handleOpenEditSpace = useCallback(() => {}, []);
