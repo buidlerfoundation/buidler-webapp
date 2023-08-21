@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import Providers from "providers";
+import ErrorBoundary from "shared/ErrorBoundary";
 
 if (process.env.NODE_ENV === "production") {
   console.log = () => {};
@@ -16,9 +17,11 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <BrowserRouter>
-    <Providers>
-      <App />
-    </Providers>
+    <ErrorBoundary>
+      <Providers>
+        <App />
+      </Providers>
+    </ErrorBoundary>
   </BrowserRouter>
 );
 

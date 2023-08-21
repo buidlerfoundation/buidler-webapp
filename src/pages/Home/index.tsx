@@ -20,6 +20,7 @@ import { USER_ACTIONS } from "reducers/UserReducers";
 import useAppSelector from "hooks/useAppSelector";
 import usePinnedCommunities from "hooks/usePinnedCommunities";
 import { getLastChannelIdByCommunityId } from "common/Cookie";
+import useWebsiteUrl from "hooks/useWebsiteUrl";
 
 const Home = () => {
   const dispatch = useAppDispatch();
@@ -30,6 +31,7 @@ const Home = () => {
   const channels = useChannels();
   const spaces = useSpaces();
   const community = useCurrentCommunity();
+  const websiteUrl = useWebsiteUrl();
   const iframeRef =
     useRef<HTMLIFrameElement>() as React.MutableRefObject<HTMLIFrameElement>;
   const [loadingIframe, setLoadingIframe] = useState(false);
@@ -53,12 +55,18 @@ const Home = () => {
           (el) => el.channel_url === channel_url
         );
         if (existedChannel) {
-          navigate(
-            `/channels/${community.community_id}/${existedChannel.channel_id}`,
-            {
+          if (websiteUrl) {
+            navigate(`/url/${url}`, {
               replace: true,
-            }
-          );
+            });
+          } else {
+            navigate(
+              `/channels/${community.community_id}/${existedChannel.channel_id}`,
+              {
+                replace: true,
+              }
+            );
+          }
           return;
         } else {
           const existedSpace = spaces.find((el) => el.space_url === space_url);
@@ -85,12 +93,20 @@ const Home = () => {
           const lastChannelId = await getLastChannelIdByCommunityId(
             existedCommunity.community_id
           );
-          navigate(
-            `/channels/${existedCommunity.community_id}/${lastChannelId || ""}`,
-            {
+          if (websiteUrl) {
+            navigate(`/url/${url}`, {
               replace: true,
-            }
-          );
+            });
+          } else {
+            navigate(
+              `/channels/${existedCommunity.community_id}/${
+                lastChannelId || ""
+              }`,
+              {
+                replace: true,
+              }
+            );
+          }
         } else {
           dispatch(
             USER_ACTIONS.updateOpeningNewTab({
@@ -104,12 +120,19 @@ const Home = () => {
       setLoadingIframe(true);
       const res = await dispatch(openNewTabFromIframe({ url })).unwrap();
       if (res) {
-        navigate(
-          `/channels/${res.community.community_id}/${res.channel.channel_id}`,
-          {
+        if (websiteUrl) {
+          navigate(`/url/${url}`, {
             replace: true,
-          }
-        );
+          });
+          dispatch(USER_ACTIONS.updateOpeningNewTab());
+        } else {
+          navigate(
+            `/channels/${res.community.community_id}/${res.channel.channel_id}`,
+            {
+              replace: true,
+            }
+          );
+        }
       }
     },
     [
@@ -119,6 +142,7 @@ const Home = () => {
       dispatch,
       navigate,
       pinnedCommunities,
+      websiteUrl,
       spaces,
     ]
   );

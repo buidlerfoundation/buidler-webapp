@@ -52,6 +52,7 @@ import useUser from "hooks/useUser";
 import { OUTSIDE_ACTIONS } from "reducers/OutsideReducers";
 import { getParamsFromPath, getShareIdFromPath } from "helpers/LinkHelper";
 import useAppSelector from "hooks/useAppSelector";
+import useWebsiteUrl from "hooks/useWebsiteUrl";
 
 export interface IAuthContext {
   loginWithMetaMask: () => Promise<void>;
@@ -110,6 +111,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
     () => window.location.href.split("external_url=")?.[1]?.split("&ott")?.[0],
     []
   );
+  const websiteUrl = useWebsiteUrl();
   const invitationId = useMemo(() => query.get("invitation"), [query]);
   const invitationRef = useMemo(() => query.get("ref"), [query]);
   const loginPath = useMemo(() => {
@@ -207,17 +209,14 @@ const AuthProvider = ({ children }: IAuthProps) => {
           } else {
             const actionRes = await dispatch(
               getPinnedCommunities({
-                externalUrl: externalUrl || previousState?.externalUrl,
+                externalUrl:
+                  externalUrl || websiteUrl || previousState?.externalUrl,
               })
             ).unwrap();
             if (actionRes?.externalUrlRes?.data) {
               const { community, channel } = actionRes?.externalUrlRes?.data;
               if (community && channel) {
                 await dispatch(setUserCommunityData(community.community_id));
-                navigate(
-                  `/channels/${community.community_id}/${channel.channel_id}`,
-                  { replace: true }
-                );
               }
             } else if (window.location.pathname.includes(AppConfig.loginPath)) {
               const path = previousState?.from?.pathname || "/communities";

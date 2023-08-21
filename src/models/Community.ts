@@ -31,6 +31,7 @@ export interface Community {
   total_online_members?: number;
   total_community_members?: number;
   fromExternal?: boolean;
+  default_channel?: Channel;
 }
 
 export interface Channel {

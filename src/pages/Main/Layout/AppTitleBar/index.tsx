@@ -37,6 +37,7 @@ import { unPinCommunity } from "reducers/UserActions";
 import { getLastChannelIdByCommunityId } from "common/Cookie";
 import TeamItemLoading from "./TeamItemLoading";
 import useAppSelector from "hooks/useAppSelector";
+import useWebsiteUrl from "hooks/useWebsiteUrl";
 
 type AppTitleBarProps = {
   onJumpToMessage?: (messageId: string) => void;
@@ -46,6 +47,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
   // const toastData = useAppSelector((state) => state.transaction.toastData);
   const dispatch = useAppDispatch();
   const location = useLocation();
+  const websiteUrl = useWebsiteUrl();
   const openingNewTab = useAppSelector((state) => state.user.openingNewTab);
   const userData = useUser();
   const auth = useAuth();
@@ -154,7 +156,11 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
   }, [pinnedCommunities]);
   const setTeam = useCallback(
     async (t?: Community) => {
-      if (t?.community_id) {
+      if (websiteUrl && t?.default_channel?.dapp_integration_url) {
+        navigate(`/url/${t?.default_channel?.dapp_integration_url}`, {
+          replace: true,
+        });
+      } else if (t?.community_id) {
         const lastChannelIdByCommunityId = await getLastChannelIdByCommunityId(
           t?.community_id
         );
@@ -166,7 +172,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
         );
       }
     },
-    [navigate]
+    [navigate, websiteUrl]
   );
   const handleCloseTeamSetting = useCallback(() => {
     setSelectedMenuTeam(null);

@@ -3,7 +3,6 @@ import "./index.scss";
 import "./App.scss";
 import "styles/spacing.scss";
 import "styles/emoji.scss";
-import ErrorBoundary from "shared/ErrorBoundary";
 import Main from "pages/Main";
 import { useNavigate } from "react-router-dom";
 import { CustomEventName } from "services/events/WindowEvent";
@@ -70,10 +69,10 @@ function App() {
     };
   }, []);
   return (
-    <ErrorBoundary>
+    <>
       <Main />
       <AppToastNotification />
-    </ErrorBoundary>
+    </>
   );
 }
 

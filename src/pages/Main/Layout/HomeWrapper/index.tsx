@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import SideBar from "shared/SideBar";
 import useAppDispatch from "hooks/useAppDispatch";
@@ -27,11 +33,13 @@ import useUser from "hooks/useUser";
 import ModalInviteMember from "shared/ModalInviteMember";
 import useCurrentCommunity from "hooks/useCurrentCommunity";
 import { getAnalytic } from "reducers/AnalyticReducers";
+import useWebsiteUrl from "hooks/useWebsiteUrl";
 
 const HomeWrapper = () => {
   const dispatch = useAppDispatch();
   const [openInvite, setOpenInvite] = useState(false);
   const getMessageActionRef = useRef<any>();
+  const websiteUrl = useWebsiteUrl();
   const navigate = useNavigate();
   const matchCommunityId = useCommunityId();
   const matchChannelId = useChannelId();
@@ -80,10 +88,11 @@ const HomeWrapper = () => {
           channel?.channel_id || channels?.[0]?.channel_id || "";
       }
       if (
-        !matchCommunityId ||
-        !community ||
-        !matchChannelId ||
-        matchChannelId !== initialChannelId
+        !websiteUrl &&
+        (!matchCommunityId ||
+          !community ||
+          !matchChannelId ||
+          matchChannelId !== initialChannelId)
       ) {
         if (matchCommunityId && matchChannelId && !leavingChannel) {
           const res = await dispatch(
@@ -106,9 +115,10 @@ const HomeWrapper = () => {
     user.user_id,
     matchCommunityId,
     matchChannelId,
+    dispatch,
     navigate,
     channels,
-    dispatch,
+    websiteUrl,
     leavingChannel,
   ]);
 

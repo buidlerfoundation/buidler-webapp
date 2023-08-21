@@ -30,7 +30,7 @@ const handleClearDataAndReload = () => {
     GlobalVariable.sessionExpired = true;
     clearData(() => {
       const path = window.location.pathname;
-      if (path.includes("/channels")) {
+      if (path.includes("/channels") || path.includes("/url")) {
         toast.error("Session expired");
         window.location.reload();
       } else {
