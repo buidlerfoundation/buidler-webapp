@@ -372,7 +372,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
             className={styles["user-setting__wrap"]}
             onClick={handleOpenModalUser}
           >
-            <span className={`${styles["user-name"]} text-ellipsis`}>
+            <span className={`${styles["user-name"]} text-ellipsis hide-xs`}>
               {userData.user_name}
             </span>
             <AvatarView user={userData} withoutStatus />

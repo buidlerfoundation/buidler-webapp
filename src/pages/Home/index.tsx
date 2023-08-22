@@ -191,7 +191,7 @@ const Home = () => {
   }, [channel?.channel_name, community?.community_name]);
   return (
     <>
-      <div className={`${styles["content-side"]} hide-scroll-bar`}>
+      <div className={`${styles["content-side"]} hide-scroll-bar hide-xs`}>
         {channel?.dapp_integration_url && (
           <iframe
             id="buidler-iframe"
