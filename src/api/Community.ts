@@ -51,7 +51,7 @@ export const getCommunityDataFromShareId = (shareId: string) =>
   );
 
 export const joinChannel = (channelId: string) =>
-  Caller.post(`channel/${channelId}/members`);
+  Caller.post<{ community: Community }>(`channel/${channelId}/members`);
 
 export const leaveChannel = (channelId: string) =>
   Caller.delete(`channel/${channelId}/members`);

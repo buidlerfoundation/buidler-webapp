@@ -341,14 +341,6 @@ const AuthProvider = ({ children }: IAuthProps) => {
       } else if (window.location.pathname !== AppConfig.loginPath) {
         const shareId = getShareIdFromPath();
         if (shareId && !pageNames.includes(shareId)) {
-          const shareInformation = await api.getCommunityDataFromShareId(
-            shareId
-          );
-          if (shareInformation.success) {
-            navigate(
-              `/channels/${shareInformation.data?.community?.community_id}/${shareInformation.data?.channel?.channel_id}`
-            );
-          }
           setLoading(false);
           return;
         }

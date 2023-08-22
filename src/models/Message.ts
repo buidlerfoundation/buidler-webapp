@@ -69,6 +69,7 @@ export interface ITopicComment {
 export interface PostData {
   author_id: string;
   author?: UserData;
+  attachments?: AttachmentData[];
   comments?: ITopicComment[];
   content: string;
   created_at: string;
