@@ -114,6 +114,7 @@
 .container-embedded {
   height: 100%;
   border-radius: 10px;
+  max-width: calc(100vw - 20px);
   .body {
     height: 100%;
     justify-content: flex-start;
