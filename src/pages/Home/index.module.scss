@@ -49,3 +49,10 @@
   display: flex;
   background-color: var(--color-darkest-background);
 }
+
+@media only screen and (max-width: 576px) {
+  .chat-box__container {
+    position: absolute;
+    right: -410px;
+  }
+}
