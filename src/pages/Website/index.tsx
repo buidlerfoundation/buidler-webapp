@@ -71,6 +71,9 @@ const Website = () => {
       category: "Home",
     });
   }, [toggleVideo]);
+  const onCommunityClick = useCallback(() => {
+    window.open("/communities", "_blank");
+  }, []);
   return (
     <div className="home" onScroll={onScroll}>
       <NavBar />
@@ -200,9 +203,10 @@ const Website = () => {
                   Join the community on your favorite websites or check out our
                   community here:{" "}
                   <a
-                    href="https://buidler.app/communities"
+                    href="/communities"
                     target="_blank"
                     rel="noreferrer"
+                    onClick={onCommunityClick}
                   >
                     buidler.app/communities
                   </a>
