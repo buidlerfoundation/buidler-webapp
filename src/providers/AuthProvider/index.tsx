@@ -276,6 +276,12 @@ const AuthProvider = ({ children }: IAuthProps) => {
       }
     }
   }, [dispatch, invitationId, invitationRef]);
+  const sendRequestToRN = useCallback(() => {
+    const w: any = window;
+    w.ReactNativeWebView?.postMessage(
+      JSON.stringify({ type: "buidler-get-device-token" })
+    );
+  }, []);
   const handleResponseVerify = useCallback(
     async (res?: LoginApiData, loginType?: string, previousState?: any) => {
       if (!res) return;
@@ -296,8 +302,15 @@ const AuthProvider = ({ children }: IAuthProps) => {
       dispatch(CONFIG_ACTIONS.updateLoginType(loginType));
       await handleInvitation();
       await initialUserData(previousState);
+      sendRequestToRN();
     },
-    [dispatch, gaLoginSuccess, handleInvitation, initialUserData]
+    [
+      dispatch,
+      gaLoginSuccess,
+      handleInvitation,
+      initialUserData,
+      sendRequestToRN,
+    ]
   );
   const quickLoginWithOtt = useCallback(
     async (ott: string) => {
@@ -311,12 +324,6 @@ const AuthProvider = ({ children }: IAuthProps) => {
     },
     [handleResponseVerify]
   );
-  const sendReadyToRN = useCallback(() => {
-    const w: any = window;
-    w.ReactNativeWebView?.postMessage(
-      JSON.stringify({ type: "buidler-ready" })
-    );
-  }, []);
   const checkingAuth = useCallback(async () => {
     if (websitePath.includes(location.pathname)) {
       setLoading(false);
@@ -336,7 +343,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
           socket.initSocket(onSocketConnected, match_channel_id);
         }
         setLoading(false);
-        sendReadyToRN();
+        sendRequestToRN();
         return;
       }
     }
@@ -351,7 +358,6 @@ const AuthProvider = ({ children }: IAuthProps) => {
         const shareId = getShareIdFromPath();
         if (shareId && !pageNames.includes(shareId)) {
           setLoading(false);
-          sendReadyToRN();
           return;
         }
         if (!match_channel_id || !match_community_id) {
@@ -365,9 +371,9 @@ const AuthProvider = ({ children }: IAuthProps) => {
       dispatch(CONFIG_ACTIONS.updateCurrentToken(accessToken));
       await handleInvitation();
       await initialUserData();
+      sendRequestToRN();
     }
     setLoading(false);
-    sendReadyToRN();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
