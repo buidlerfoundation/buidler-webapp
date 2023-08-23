@@ -21,10 +21,13 @@ import useAppSelector from "hooks/useAppSelector";
 import usePinnedCommunities from "hooks/usePinnedCommunities";
 import { getLastChannelIdByCommunityId } from "common/Cookie";
 import useWebsiteUrl from "hooks/useWebsiteUrl";
+import api from "api";
+import useUser from "hooks/useUser";
 
 const Home = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const user = useUser();
   const openingNewTab = useAppSelector((state) => state.user.openingNewTab);
   const pinnedCommunities = usePinnedCommunities();
   const channel = useChannel();
@@ -151,9 +154,14 @@ const Home = () => {
       const w: any = window;
       if (w.ReactNativeWebView) {
         // handle update device token from rn
+        w.ReactNativeWebView.postMessage(e.data);
         try {
           const data = JSON.parse(e.data);
-          const deviceToken = data?.deviceToken;
+          w.ReactNativeWebView.postMessage(e.data);
+          const { type, payload } = data;
+          if (type === "update-device-token" && payload && user.user_id) {
+            api.updateMobileDeviceToken(payload.deviceToken, payload.platform);
+          }
         } catch (error) {}
       }
       if (e.data.type === "frame-update") {
@@ -179,7 +187,12 @@ const Home = () => {
     return () => {
       window.removeEventListener("message", messageListener);
     };
-  }, [channel?.dapp_integration_url, handleOpenNewTab, openNewChannel]);
+  }, [
+    channel?.dapp_integration_url,
+    handleOpenNewTab,
+    openNewChannel,
+    user.user_id,
+  ]);
   useEffect(() => {
     if (channel?.channel_id) {
       dispatch(getPinPosts({ channel_id: channel?.channel_id }));

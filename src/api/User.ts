@@ -139,3 +139,8 @@ export const getUserAssets = (req: { userId: string; queryType?: string }) =>
         : ""
     }`
   );
+
+export const updateMobileDeviceToken = (
+  deviceToken: string,
+  platform: string
+) => Caller.put("user/devices", { device_token: deviceToken, platform });
