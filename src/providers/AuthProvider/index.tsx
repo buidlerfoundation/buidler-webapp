@@ -311,6 +311,12 @@ const AuthProvider = ({ children }: IAuthProps) => {
     },
     [handleResponseVerify]
   );
+  const sendReadyToRN = useCallback(() => {
+    const w: any = window;
+    w.ReactNativeWebView?.postMessage(
+      JSON.stringify({ type: "buidler-ready" })
+    );
+  }, []);
   const checkingAuth = useCallback(async () => {
     if (websitePath.includes(location.pathname)) {
       setLoading(false);
@@ -330,6 +336,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
           socket.initSocket(onSocketConnected, match_channel_id);
         }
         setLoading(false);
+        sendReadyToRN();
         return;
       }
     }
@@ -344,6 +351,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
         const shareId = getShareIdFromPath();
         if (shareId && !pageNames.includes(shareId)) {
           setLoading(false);
+          sendReadyToRN();
           return;
         }
         if (!match_channel_id || !match_community_id) {
@@ -359,6 +367,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
       await initialUserData();
     }
     setLoading(false);
+    sendReadyToRN();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
@@ -570,7 +579,11 @@ const AuthProvider = ({ children }: IAuthProps) => {
   }, [connect, gaLoginClick]);
   useEffect(() => {
     if (accounts?.length > 0 && !loading && !user.user_id) {
-      doingWCLogin();
+      getCookie(AsyncKey.accessTokenKey).then((res) => {
+        if (!res) {
+          doingWCLogin();
+        }
+      });
     }
   }, [accounts, doingWCLogin, loading, user.user_id]);
   const loginWithWeb3Auth = useCallback(async () => {
