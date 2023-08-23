@@ -153,11 +153,9 @@ const Home = () => {
     const messageListener = (e: any) => {
       const w: any = window;
       if (w.ReactNativeWebView) {
-        // handle update device token from rn
-        w.ReactNativeWebView.postMessage(e.data);
+        // handle message from rn
         try {
           const data = JSON.parse(e.data);
-          w.ReactNativeWebView.postMessage(e.data);
           const { type, payload } = data;
           if (type === "update-device-token" && payload && user.user_id) {
             api.updateMobileDeviceToken(payload.deviceToken, payload.platform);
