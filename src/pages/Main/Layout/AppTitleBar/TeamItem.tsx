@@ -6,6 +6,7 @@ import IconCommunityDirect from "shared/SVG/IconCommunityDirect";
 import DefaultSpaceIcon from "shared/DefaultSpaceIcon";
 import ImageView from "shared/ImageView";
 import IconMenuClose from "shared/SVG/IconMenuClose";
+import useUser from "hooks/useUser";
 
 type TeamItemProps = {
   t: Community;
@@ -25,6 +26,7 @@ const TeamItem = ({
   onContextMenu,
   onRemove,
 }: TeamItemProps) => {
+  const userData = useUser();
   const imageHelper = useImage();
   const handleClick = useCallback(() => {
     if (!isSelected) onChangeTeam(t);
@@ -92,9 +94,11 @@ const TeamItem = ({
         {isUnseen && <div className={styles["badge-unseen"]} />}
       </div>
       <span className={styles["team-name"]}>{communityDisplayName}</span>
-      <div className={styles["btn-close"]} onClick={handleRemove}>
-        <IconMenuClose size={20} background="var(--color-secondary-text)" />
-      </div>
+      {!!userData.user_id && (
+        <div className={styles["btn-close"]} onClick={handleRemove}>
+          <IconMenuClose size={20} background="var(--color-secondary-text)" />
+        </div>
+      )}
     </div>
   );
 };
