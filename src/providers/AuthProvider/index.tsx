@@ -168,9 +168,9 @@ const AuthProvider = ({ children }: IAuthProps) => {
   }, []);
   const handleDataFromExternalUrl = useCallback(
     async (connectSocket?: boolean) => {
-      if (isExternalUrl) {
+      if (isExternalUrl || websiteUrl) {
         const res = await dispatch(
-          getDataFromExternalUrl({ url: externalUrl })
+          getDataFromExternalUrl({ url: externalUrl || websiteUrl })
         ).unwrap();
         if (res) {
           const { community, channel } = res;
@@ -178,14 +178,16 @@ const AuthProvider = ({ children }: IAuthProps) => {
           if (connectSocket && channel.channel_id) {
             socket.initSocket(onSocketConnected, channel.channel_id);
           }
-          navigate(path, { replace: true });
+          if (!websiteUrl) {
+            navigate(path, { replace: true });
+          }
         } else {
           // handle retry or something
         }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch, externalUrl, isExternalUrl]
+    [dispatch, websiteUrl, externalUrl, isExternalUrl]
   );
   const getInitial = useCallback(async () => {
     const res = await api.getInitial();
@@ -336,7 +338,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
         dispatch(OUTSIDE_ACTIONS.updateExtensionId(extensionId));
         GoogleAnalytics.identifyByExtensionId(extensionId);
       }
-      if (canViewOnly) {
+      if (canViewOnly || websiteUrl) {
         await handleDataFromExternalUrl(true);
       } else if (window.location.pathname !== AppConfig.loginPath) {
         const shareId = getShareIdFromPath();
