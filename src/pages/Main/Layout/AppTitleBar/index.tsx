@@ -38,6 +38,7 @@ import { getLastChannelIdByCommunityId } from "common/Cookie";
 import TeamItemLoading from "./TeamItemLoading";
 import useAppSelector from "hooks/useAppSelector";
 import useWebsiteUrl from "hooks/useWebsiteUrl";
+import { normalizeName } from "helpers/StringHelper";
 
 type AppTitleBarProps = {
   onJumpToMessage?: (messageId: string) => void;
@@ -373,7 +374,7 @@ const AppTitleBar = forwardRef(({ onJumpToMessage }: AppTitleBarProps, ref) => {
             onClick={handleOpenModalUser}
           >
             <span className={`${styles["user-name"]} text-ellipsis hide-xs`}>
-              {userData.user_name}
+              {normalizeName(userData.user_name)}
             </span>
             <AvatarView user={userData} withoutStatus />
           </div>

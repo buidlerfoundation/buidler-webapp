@@ -148,6 +148,12 @@ const Home = () => {
   );
   useEffect(() => {
     const messageListener = (e: any) => {
+      const w: any = window;
+      if (w.ReactNativeWebView) {
+        // handle update device token from rn
+        const data = JSON.parse(e.data);
+        const deviceToken = data?.deviceToken;
+      }
       if (e.data.type === "frame-update") {
         if (
           channel?.dapp_integration_url &&

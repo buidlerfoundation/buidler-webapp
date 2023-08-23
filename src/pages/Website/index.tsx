@@ -79,8 +79,7 @@ const Website = () => {
       <NavBar />
       <div className="container page-1">
         <h1 className="page-content">
-          One extension.
-          <br className="hide-desktop" />
+          One extension. <br className="hide-desktop" />
           <span style={{ color: "var(--color-branding-secondary)" }}>
             Any communities.
           </span>
