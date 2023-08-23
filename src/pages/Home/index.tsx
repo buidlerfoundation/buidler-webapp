@@ -151,8 +151,10 @@ const Home = () => {
       const w: any = window;
       if (w.ReactNativeWebView) {
         // handle update device token from rn
-        const data = JSON.parse(e.data);
-        const deviceToken = data?.deviceToken;
+        try {
+          const data = JSON.parse(e.data);
+          const deviceToken = data?.deviceToken;
+        } catch (error) {}
       }
       if (e.data.type === "frame-update") {
         if (

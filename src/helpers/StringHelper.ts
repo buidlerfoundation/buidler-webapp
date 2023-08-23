@@ -66,7 +66,7 @@ export const humanFormatNumber = (num?: number) => {
 export const normalizeName = (userName?: string) => {
   if (!userName) return "";
   if (userName.length === 42) {
-    return userName.slice(37);
+    return `0x${userName.slice(37)}`;
   }
   return userName;
 };
