@@ -215,7 +215,7 @@ const Home = () => {
           <iframe
             id="buidler-iframe"
             ref={iframeRef}
-            src={channel?.dapp_integration_url?.replace("www.", "")}
+            src={channel?.dapp_integration_url}
             className={styles["dapp-iframe-full"]}
             title="dapp-browser"
             onLoad={onLoad}

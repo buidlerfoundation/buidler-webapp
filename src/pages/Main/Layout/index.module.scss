@@ -7,3 +7,11 @@
     height: calc(100vh - 50px);
   }
 }
+
+@media only screen and (max-width: 576px) {
+  .container {
+    .body {
+      height: 100vh;
+    }
+  }
+}
