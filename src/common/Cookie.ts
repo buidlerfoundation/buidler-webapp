@@ -49,9 +49,10 @@ export const setCookie = (key: string, val: any) => {
   });
 };
 
-export const getCookie = async (key: string) => {
+export const getCookie = async (key: string, ignoreSession?: boolean) => {
   return new Promise<any>((resolve, reject) => {
     const data = Cookies.get(key);
+    if (ignoreSession) return resolve(data);
     return resolve(data || store.getState().session?.[key]);
   });
 };

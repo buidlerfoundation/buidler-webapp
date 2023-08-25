@@ -404,7 +404,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   // Temporary comment out event check difference token
   useEffect(() => {
     const eventFocus = async (e: FocusEvent) => {
-      const token = await getCookie(AsyncKey.accessTokenKey);
+      const token = await getCookie(AsyncKey.accessTokenKey, true);
       const matchParams = getParamsFromPath();
       if (
         !!token !== !!currentToken &&
