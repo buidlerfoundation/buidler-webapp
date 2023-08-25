@@ -23,10 +23,12 @@ import { getLastChannelIdByCommunityId } from "common/Cookie";
 import useWebsiteUrl from "hooks/useWebsiteUrl";
 import api from "api";
 import useUser from "hooks/useUser";
+import { useAuth } from "providers/AuthProvider";
 
 const Home = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const auth = useAuth();
   const user = useUser();
   const openingNewTab = useAppSelector((state) => state.user.openingNewTab);
   const pinnedCommunities = usePinnedCommunities();
@@ -157,8 +159,14 @@ const Home = () => {
         try {
           const data = JSON.parse(e.data);
           const { type, payload } = data;
-          if (type === "update-device-token" && payload && user.user_id) {
+          if (type === "on-update-device-token" && payload && user.user_id) {
             api.updateMobileDeviceToken(payload.deviceToken, payload.platform);
+          }
+          if (type === "on-login-social-failed") {
+            auth.onLoginWeb3AuthFailedFromRN();
+          }
+          if (type === "on-login-social-success") {
+            auth.onLoginWeb3AuthSuccessFromRN(payload);
           }
         } catch (error) {}
       }
@@ -185,6 +193,7 @@ const Home = () => {
     return () => {
       window.removeEventListener("message", messageListener);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     channel?.dapp_integration_url,
     handleOpenNewTab,

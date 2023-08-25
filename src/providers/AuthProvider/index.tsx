@@ -13,7 +13,7 @@ import {
   getDeviceCode,
   setCookie,
 } from "common/Cookie";
-import { ethers, utils } from "ethers";
+import { Wallet, ethers, utils } from "ethers";
 import useAppDispatch from "hooks/useAppDispatch";
 import useChannels from "hooks/useChannels";
 import usePinnedCommunities from "hooks/usePinnedCommunities";
@@ -65,6 +65,8 @@ export interface IAuthContext {
   toggleLogin: () => void;
   onCloseLogin: () => void;
   quickLoginWithOtt: (ott: string) => void;
+  onLoginWeb3AuthFailedFromRN: () => void;
+  onLoginWeb3AuthSuccessFromRN: (payload: any) => void;
 }
 
 export const AuthContext = createContext<IAuthContext>({
@@ -78,6 +80,8 @@ export const AuthContext = createContext<IAuthContext>({
   toggleLogin: () => {},
   onCloseLogin: () => {},
   quickLoginWithOtt: () => {},
+  onLoginWeb3AuthFailedFromRN: () => {},
+  onLoginWeb3AuthSuccessFromRN: () => {},
 });
 
 export function useAuth(): IAuthContext {
@@ -279,7 +283,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const sendRequestToRN = useCallback(() => {
     const w: any = window;
     w.ReactNativeWebView?.postMessage(
-      JSON.stringify({ type: "buidler-get-device-token" })
+      JSON.stringify({ type: "on-get-device-token" })
     );
   }, []);
   const handleResponseVerify = useCallback(
@@ -343,7 +347,6 @@ const AuthProvider = ({ children }: IAuthProps) => {
           socket.initSocket(onSocketConnected, match_channel_id);
         }
         setLoading(false);
-        sendRequestToRN();
         return;
       }
     }
@@ -418,23 +421,26 @@ const AuthProvider = ({ children }: IAuthProps) => {
     };
   }, [currentToken, dispatch]);
 
-  const getMessageSignTypedData = useCallback(async (address: string) => {
-    const deviceCode = await getDeviceCode();
-    const deviceToken = await getDeviceToken();
-    const generatedPrivateKey = await GeneratedPrivateKey();
-    const publicKey = utils.computePublicKey(generatedPrivateKey, true);
-    return {
-      device: {
-        platform: "web",
-        user_agent: navigator.userAgent,
-        device_name: "",
-        device_code: deviceCode,
-        device_token: deviceToken || "",
-        encrypt_message_key: publicKey,
-      },
-      address,
-    };
-  }, []);
+  const getMessageSignTypedData = useCallback(
+    async (address: string, platform = "web") => {
+      const deviceCode = await getDeviceCode();
+      const deviceToken = await getDeviceToken();
+      const generatedPrivateKey = await GeneratedPrivateKey();
+      const publicKey = utils.computePublicKey(generatedPrivateKey, true);
+      return {
+        device: {
+          platform,
+          user_agent: navigator.userAgent,
+          device_name: "",
+          device_code: deviceCode,
+          device_token: deviceToken || "",
+          encrypt_message_key: publicKey,
+        },
+        address,
+      };
+    },
+    []
+  );
 
   const doingMetamaskLogin = useCallback(
     async (address: string) => {
@@ -581,6 +587,13 @@ const AuthProvider = ({ children }: IAuthProps) => {
   }, [dispatch]);
   const loginWithWalletConnect = useCallback(async () => {
     gaLoginClick("WalletConnect");
+    const w: any = window;
+    if (w.ReactNativeWebView) {
+      w.ReactNativeWebView?.postMessage(
+        JSON.stringify({ type: "on-login-with-wallet-connect" })
+      );
+      return;
+    }
     connect();
   }, [connect, gaLoginClick]);
   useEffect(() => {
@@ -592,9 +605,55 @@ const AuthProvider = ({ children }: IAuthProps) => {
       });
     }
   }, [accounts, doingWCLogin, loading, user.user_id]);
+  const onLoginWeb3AuthFailedFromRN = useCallback(() => {
+    setLoadingWeb3Auth(false);
+  }, []);
+  const onLoginWeb3AuthSuccessFromRN = useCallback(
+    async (payload: any) => {
+      const { privateKey, platform } = payload;
+      const signer = new Wallet(`0x${privateKey}`);
+      const address = await signer.getAddress();
+      const message = await getMessageSignTypedData(address, platform);
+      const signature = await signer._signTypedData(
+        signTypeData.domain,
+        signTypeData.types,
+        message
+      );
+      gaLoginSubmit("Web3Auth");
+      const res = await api.verifyNonce(
+        {
+          domain: signTypeData.domain,
+          types: signTypeData.types,
+          value: message,
+        },
+        signature
+      );
+      if (res.statusCode === 200) {
+        await handleResponseVerify(
+          res.data,
+          LoginType.Web3Auth,
+          location.state
+        );
+      }
+      setLoadingWeb3Auth(false);
+    },
+    [
+      gaLoginSubmit,
+      getMessageSignTypedData,
+      handleResponseVerify,
+      location.state,
+    ]
+  );
   const loginWithWeb3Auth = useCallback(async () => {
-    gaLoginClick("Web3Auth");
     setLoadingWeb3Auth(true);
+    gaLoginClick("Web3Auth");
+    const w: any = window;
+    if (w.ReactNativeWebView) {
+      w.ReactNativeWebView?.postMessage(
+        JSON.stringify({ type: "on-login-with-social" })
+      );
+      return;
+    }
     try {
       await Web3AuthUtils.init();
       setLoadingWeb3Auth(false);
@@ -695,6 +754,8 @@ const AuthProvider = ({ children }: IAuthProps) => {
         toggleLogin,
         onCloseLogin,
         quickLoginWithOtt,
+        onLoginWeb3AuthFailedFromRN,
+        onLoginWeb3AuthSuccessFromRN,
         loadingWeb3Auth,
         openLogin,
       }}
