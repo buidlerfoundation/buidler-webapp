@@ -33,6 +33,12 @@ export const clearData = (callback = () => {}) => {
 
 export const setCookie = (key: string, val: any) => {
   return new Promise<void>((resolve, reject) => {
+    const w: any = window;
+    if (w.ReactNativeWebView) {
+      w.ReactNativeWebView?.postMessage(
+        JSON.stringify({ type: "on-set-cookie", payload: { key, value: val } })
+      );
+    }
     window.top?.postMessage(
       { type: "buidler-plugin-set-cookie", key, value: val },
       { targetOrigin: "*" }
