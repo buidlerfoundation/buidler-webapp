@@ -51,12 +51,13 @@ const HomeWrapper = () => {
   const initialCommunityData = useCallback(async () => {
     if (pinnedCommunities?.length === 0) {
       if (matchChannelId) {
-        dispatch(
-          getExternalCommunityByChannelId({ channelId: matchChannelId })
-        );
-        if (matchCommunityId) {
-          dispatch(setUserCommunityData(matchCommunityId));
-        }
+        const res = await dispatch(
+          getExternalCommunityByChannelId({
+            channelId: matchChannelId,
+            communityId: matchCommunityId,
+          })
+        ).unwrap();
+        if (res.externalUrlRes.success) return;
       } else {
         navigate("/communities", { replace: true });
         return;
@@ -101,18 +102,22 @@ const HomeWrapper = () => {
           const res = await dispatch(
             getExternalCommunityByChannelId({
               channelId: matchChannelId,
+              communityId: matchCommunityId,
               fromExternal: true,
             })
           ).unwrap();
-          await dispatch(setUserCommunityData(matchCommunityId)).unwrap();
-          if (res.success) return;
+          if (res.externalUrlRes.success) return;
         }
         navigate(`/channels/${initialCommunityId}/${initialChannelId}`, {
           replace: true,
         });
       }
     } else if (!user.user_id && matchCommunityId && matchChannelId) {
-      dispatch(getExternalCommunityByChannelId({ channelId: matchChannelId }));
+      dispatch(
+        getExternalCommunityByChannelId({
+          channelId: matchChannelId,
+        })
+      );
     }
   }, [
     pinnedCommunities,

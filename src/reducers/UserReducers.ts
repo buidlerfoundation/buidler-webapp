@@ -303,11 +303,27 @@ const userSlice = createSlice({
         }
       })
       .addCase(getExternalCommunityByChannelId.fulfilled, (state, action) => {
-        const externalUrlRes = action.payload;
+        const { externalUrlRes, spaceRes } = action.payload;
         const { community, space, channel } = externalUrlRes.data || {};
         if (community && space && channel) {
           const communities = state.pinnedCommunities || [];
-          let spaces = state.spaceMap?.[community.community_id] || [];
+          let spaces = spaceRes?.data || [];
+          if (!spaces.find((el) => el.space_id === space?.space_id)) {
+            spaces.push({ ...space, channels: [channel] });
+          } else {
+            spaces = spaces.map((el) => {
+              if (el.space_id === space.space_id) {
+                return {
+                  ...el,
+                  channels: uniqBy(
+                    [...(el.channels || []), channel],
+                    "channel_id"
+                  ),
+                };
+              }
+              return el;
+            });
+          }
           if (
             !communities.find(
               (el) => el.community_id === community.community_id
@@ -320,27 +336,11 @@ const userSlice = createSlice({
             if (space && channel) {
               state.spaceMap = {
                 ...state.spaceMap,
-                [community.community_id]: [{ ...space, channels: [channel] }],
+                [community.community_id]: spaces,
               };
             }
             state.pinnedCommunities = communities;
           } else {
-            if (!spaces.find((el) => el.space_id === space?.space_id)) {
-              spaces.push({ ...space, channels: [channel] });
-            } else {
-              spaces = spaces.map((el) => {
-                if (el.space_id === space.space_id) {
-                  return {
-                    ...el,
-                    channels: uniqBy(
-                      [...(el.channels || []), channel],
-                      "channel_id"
-                    ),
-                  };
-                }
-                return el;
-              });
-            }
             state.spaceMap[community.community_id] = spaces;
           }
         }
