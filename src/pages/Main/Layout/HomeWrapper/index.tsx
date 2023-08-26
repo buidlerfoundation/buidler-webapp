@@ -54,6 +54,9 @@ const HomeWrapper = () => {
         dispatch(
           getExternalCommunityByChannelId({ channelId: matchChannelId })
         );
+        if (matchCommunityId) {
+          dispatch(setUserCommunityData(matchCommunityId));
+        }
       } else {
         navigate("/communities", { replace: true });
         return;
@@ -101,6 +104,7 @@ const HomeWrapper = () => {
               fromExternal: true,
             })
           ).unwrap();
+          await dispatch(setUserCommunityData(matchCommunityId)).unwrap();
           if (res.success) return;
         }
         navigate(`/channels/${initialCommunityId}/${initialChannelId}`, {
