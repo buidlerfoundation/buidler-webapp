@@ -589,8 +589,14 @@ const AuthProvider = ({ children }: IAuthProps) => {
     gaLoginClick("WalletConnect");
     const w: any = window;
     if (w.ReactNativeWebView) {
+      const deviceCode = await getDeviceCode();
+      const generatedPrivateKey = await GeneratedPrivateKey();
+      const publicKey = utils.computePublicKey(generatedPrivateKey, true);
       w.ReactNativeWebView?.postMessage(
-        JSON.stringify({ type: "on-login-with-wallet-connect" })
+        JSON.stringify({
+          type: "on-login-with-wallet-connect",
+          payload: { deviceCode, publicKey, userAgent: navigator.userAgent },
+        })
       );
       return;
     }

@@ -39,7 +39,10 @@ const outsideSlice = createSlice({
         const { url } = action.meta.arg;
         if (url) {
           const uri = new URL(url);
-          state.urlType = uri.pathname === "/" ? "main" : "detail";
+          state.urlType =
+            uri.pathname === "/" && !uri.search && !uri.hash
+              ? "main"
+              : "detail";
           state.externalUrl = url;
         }
         state.loading = true;
