@@ -67,6 +67,7 @@ export interface IAuthContext {
   quickLoginWithOtt: (ott: string) => void;
   onLoginWeb3AuthFailedFromRN: () => void;
   onLoginWeb3AuthSuccessFromRN: (payload: any) => void;
+  onLoginWalletConnectSuccessFromRN: (payload: any) => void;
 }
 
 export const AuthContext = createContext<IAuthContext>({
@@ -82,6 +83,7 @@ export const AuthContext = createContext<IAuthContext>({
   quickLoginWithOtt: () => {},
   onLoginWeb3AuthFailedFromRN: () => {},
   onLoginWeb3AuthSuccessFromRN: () => {},
+  onLoginWalletConnectSuccessFromRN: () => {},
 });
 
 export function useAuth(): IAuthContext {
@@ -614,6 +616,27 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const onLoginWeb3AuthFailedFromRN = useCallback(() => {
     setLoadingWeb3Auth(false);
   }, []);
+  const onLoginWalletConnectSuccessFromRN = useCallback(
+    async (payload: any) => {
+      gaLoginSubmit("WalletConnect");
+      const res = await api.verifyNonce(
+        {
+          domain: signTypeData.domain,
+          types: signTypeData.types,
+          value: payload.message,
+        },
+        payload.signature || ""
+      );
+      if (res.statusCode === 200) {
+        await handleResponseVerify(
+          res.data,
+          LoginType.WalletConnect,
+          location.state
+        );
+      }
+    },
+    [gaLoginSubmit, handleResponseVerify, location.state]
+  );
   const onLoginWeb3AuthSuccessFromRN = useCallback(
     async (payload: any) => {
       const { privateKey, platform } = payload;
@@ -762,6 +785,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
         quickLoginWithOtt,
         onLoginWeb3AuthFailedFromRN,
         onLoginWeb3AuthSuccessFromRN,
+        onLoginWalletConnectSuccessFromRN,
         loadingWeb3Auth,
         openLogin,
       }}

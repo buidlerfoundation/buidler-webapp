@@ -168,6 +168,9 @@ const Home = () => {
           if (type === "on-login-social-success") {
             auth.onLoginWeb3AuthSuccessFromRN(payload);
           }
+          if (type === "on-login-wallet-connect-success") {
+            auth.onLoginWalletConnectSuccessFromRN(payload);
+          }
         } catch (error) {}
       }
       if (e.data.type === "frame-update") {
