@@ -36,9 +36,8 @@ export const getTeamUsers = (
 };
 
 export const getCommunityDataFromUrl = (url: string) =>
-  Caller.post<{ community: Community; space: Space | null; channel: Channel }>(
-    "external",
-    { url }
+  Caller.get<{ community: Community; space: Space | null; channel: Channel }>(
+    `external?${new URLSearchParams({ url })}`
   );
 
 export const getCommunityDataFromChannel = (channelId: string) =>
