@@ -90,11 +90,11 @@ const Plugin = () => {
   }, [channel?.channel_id, extensionId, dispatch]);
   useEffect(() => {
     const messageListener = async (
-      e: MessageEvent<{ type: string; payload: any }>
+      e: MessageEvent<{ type: string; payload: any; metadata?: any }>
     ) => {
       if (typeof e.data !== "object") return;
       if (!e.data.type) return;
-      const { type, payload } = e.data;
+      const { type, payload, metadata } = e.data;
       if (type === "update-authenticate") {
         const ott = payload.ott;
         if (ott) {
@@ -111,7 +111,7 @@ const Plugin = () => {
         setPluginPosition(lastVerticalPosition);
       }
       if (type === "update-external" && payload) {
-        dispatch(getDataFromExternalUrl({ url: payload }))
+        dispatch(getDataFromExternalUrl({ url: payload, metadata }))
           .unwrap()
           .then((res) => {
             if (res) {

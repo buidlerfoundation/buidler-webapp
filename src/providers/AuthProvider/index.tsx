@@ -113,6 +113,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const extensionId = useMemo(() => query.get("extension_id"), [query]);
   const autoOff = useMemo(() => query.get("auto_off"), [query]);
   const openAtFirst = useMemo(() => query.get("open_at_first"), [query]);
+  const metadata = useMemo(() => query.get("metadata"), [query]);
   const externalUrl = useMemo(
     () => window.location.href.split("external_url=")?.[1]?.split("&ott")?.[0],
     []
@@ -176,7 +177,10 @@ const AuthProvider = ({ children }: IAuthProps) => {
     async (connectSocket?: boolean) => {
       if (isExternalUrl || websiteUrl) {
         const res = await dispatch(
-          getDataFromExternalUrl({ url: externalUrl || websiteUrl })
+          getDataFromExternalUrl({
+            url: externalUrl || websiteUrl,
+            metadata: metadata ? JSON.parse(metadata) : null,
+          })
         ).unwrap();
         if (res) {
           const { community, channel } = res;

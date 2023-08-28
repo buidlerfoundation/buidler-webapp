@@ -108,9 +108,12 @@ export const setUserCommunityData = createAsyncThunk(
 
 export const getDataFromExternalUrl = createAsyncThunk(
   "user/external_url",
-  async (payload: { url?: string | null }) => {
+  async (payload: { url?: string | null; metadata?: any }) => {
     if (!payload.url) return null;
-    const res = await api.getCommunityDataFromUrl(payload.url);
+    const res = await api.getCommunityDataFromUrl(
+      payload.url,
+      payload.metadata
+    );
     if (res.success) {
       return res.data;
     }

@@ -35,10 +35,36 @@ export const getTeamUsers = (
   );
 };
 
-export const getCommunityDataFromUrl = (url: string) =>
-  Caller.get<{ community: Community; space: Space | null; channel: Channel }>(
-    `external?${new URLSearchParams({ url })}`
-  );
+export const getCommunityDataFromUrl = (url: string, metadata?: any) => {
+  const body: any = {
+    url,
+  };
+  if (metadata) {
+    const uri = new URL(url);
+    if (uri.pathname === "/" && !uri.search && !uri.hash) {
+      body.community = {
+        community_name: metadata.title,
+        community_description: metadata.description,
+        community_image: metadata.icon,
+        community_background: metadata.cover,
+      };
+    } else {
+      body.community = {
+        community_image: metadata.icon,
+        community_background: metadata.cover,
+      };
+      body.channel = {
+        channel_name: metadata.title,
+        channel_description: metadata.description,
+      };
+    }
+  }
+  return Caller.post<{
+    community: Community;
+    space: Space | null;
+    channel: Channel;
+  }>(`external`, body);
+};
 
 export const getCommunityDataFromChannel = (channelId: string) =>
   Caller.get<{ community: Community; space: Space | null; channel: Channel }>(
