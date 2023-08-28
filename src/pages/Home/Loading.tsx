@@ -3,14 +3,12 @@ import styles from "./index.module.scss";
 import Spinner from "shared/Spinner";
 import { Skeleton, Stack } from "@mui/material";
 import SpaceItemLoading from "shared/SpaceItem/SpaceItemLoading";
-import { getLogoFromUrl } from "helpers/LinkHelper";
 
 interface ILoading {
   url: string;
 }
 
 const Loading = ({ url }: ILoading) => {
-  const logo = useMemo(() => getLogoFromUrl(url), [url]);
   const communityDisplayName = useMemo(() => {
     const parsed = new URL(url);
     return parsed.host;
@@ -37,10 +35,13 @@ const Loading = ({ url }: ILoading) => {
             direction="row"
             alignItems="center"
           >
-            <img
-              alt=""
-              src={logo}
-              style={{ width: 50, height: 50, borderRadius: 8 }}
+            <div
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: 7.5,
+                backgroundColor: "var(--color-stroke)",
+              }}
             />
             <Stack marginLeft="15px">
               <span
