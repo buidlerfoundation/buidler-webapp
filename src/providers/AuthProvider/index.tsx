@@ -114,10 +114,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const autoOff = useMemo(() => query.get("auto_off"), [query]);
   const openAtFirst = useMemo(() => query.get("open_at_first"), [query]);
   const metadata = useMemo(() => query.get("metadata"), [query]);
-  const externalUrl = useMemo(
-    () => window.location.href.split("external_url=")?.[1]?.split("&ott")?.[0],
-    []
-  );
+  const externalUrl = useMemo(() => query.get("external_url"), [query]);
   const websiteUrl = useWebsiteUrl();
   const invitationId = useMemo(() => query.get("invitation"), [query]);
   const invitationRef = useMemo(() => query.get("ref"), [query]);
