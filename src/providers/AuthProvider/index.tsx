@@ -53,6 +53,8 @@ import { OUTSIDE_ACTIONS } from "reducers/OutsideReducers";
 import { getParamsFromPath, getShareIdFromPath } from "helpers/LinkHelper";
 import useAppSelector from "hooks/useAppSelector";
 import useWebsiteUrl from "hooks/useWebsiteUrl";
+import ModalUpdateEmail from "shared/ModalUpdateEmail";
+import { validateEmail } from "helpers/StringHelper";
 
 export interface IAuthContext {
   loginWithMetaMask: () => Promise<void>;
@@ -109,6 +111,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const isQuickLogin = useRef(false);
   const [loadingWeb3Auth, setLoadingWeb3Auth] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
+  const [openUpdateEmail, setOpenUpdateEmail] = useState(false);
   const ott = useMemo(() => query.get("ott"), [query]);
   const extensionId = useMemo(() => query.get("extension_id"), [query]);
   const autoOff = useMemo(() => query.get("auto_off"), [query]);
@@ -143,6 +146,21 @@ const AuthProvider = ({ children }: IAuthProps) => {
     const path = window.location.pathname;
     return externalUrl && (path === "/panel" || path === "/plugin");
   }, [externalUrl]);
+  const toggleUpdateEmail = useCallback(
+    () => setOpenUpdateEmail((current) => !current),
+    []
+  );
+  const onUpdateEmail = useCallback(
+    (email: string) => {
+      if (validateEmail(email)) {
+        api.updateUser({ email });
+        toggleUpdateEmail();
+      } else {
+        toast.error("Invalid email");
+      }
+    },
+    [toggleUpdateEmail]
+  );
   const gaLoginSuccess = useCallback((label: string) => {
     GoogleAnalytics.tracking("Login Successful", {
       category: "Login",
@@ -307,6 +325,17 @@ const AuthProvider = ({ children }: IAuthProps) => {
       );
       dispatch(CONFIG_ACTIONS.updateCurrentToken(res?.token));
       dispatch(CONFIG_ACTIONS.updateLoginType(loginType));
+      if (!res?.user?.email) {
+        let web3AuthUser = null;
+        if (loginType === LoginType.Web3Auth && Web3AuthUtils.web3auth) {
+          web3AuthUser = await Web3AuthUtils.web3auth.getUserInfo();
+        }
+        if (!web3AuthUser?.email) {
+          toggleUpdateEmail();
+        } else {
+          api.updateUser({ email: web3AuthUser?.email });
+        }
+      }
       await handleInvitation();
       await initialUserData(previousState);
       sendRequestToRN();
@@ -317,6 +346,7 @@ const AuthProvider = ({ children }: IAuthProps) => {
       handleInvitation,
       initialUserData,
       sendRequestToRN,
+      toggleUpdateEmail,
     ]
   );
   const quickLoginWithOtt = useCallback(
@@ -800,6 +830,11 @@ const AuthProvider = ({ children }: IAuthProps) => {
         />
       )}
       {!loading && children}
+      <ModalUpdateEmail
+        open={openUpdateEmail}
+        handleClose={toggleUpdateEmail}
+        onConfirm={onUpdateEmail}
+      />
     </AuthContext.Provider>
   );
 };

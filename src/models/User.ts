@@ -247,6 +247,7 @@ export interface UserData {
     user_id: string;
     value: string;
   }[];
+  email?: string;
 }
 
 export interface InitialApiData {
@@ -285,6 +286,7 @@ export interface LoginApiData {
   token_expire_at: number;
   refresh_token: string;
   refresh_token_expire_at: number;
+  user?: UserData;
 }
 
 export interface IUserAsset {
