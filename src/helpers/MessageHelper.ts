@@ -58,6 +58,7 @@ export const extractContent = (s: string) => {
 export const extractContentMessage = (s: string) => {
   const span = document.createElement("span");
   span.innerHTML = s
+    .replace(/<div><br><\/div>/gim, "\n")
     .replace(/<div>(.*?)<\/div>/gim, "<br>$1")
     .replace(/(<a )(.*?)( class="mention-string">)(.*?)(<\/a>)/gim, `<$4-$2>`)
     .replace(/<br>/gim, "\n");
@@ -169,9 +170,7 @@ export const getMentionData = (s: string) => {
   const mentionMatches = s.replace(/'/g, '"').match(mentionRegex);
   return mentionMatches?.map((el) => {
     const match =
-      /(<a href=".*\/user\/\?*)(.*?)(" class="mention-string">)/.exec(
-        el
-      );
+      /(<a href=".*\/user\/\?*)(.*?)(" class="mention-string">)/.exec(el);
     return {
       mention_id: match?.[2],
       tag_type: "User",
