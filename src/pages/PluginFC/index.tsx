@@ -37,12 +37,14 @@ const PluginFC = () => {
       if (res.success) {
         setRandomId(Math.random());
         if (fcUser?.username) {
-          window.open(
-            `https://warpcast.com/${fcUser?.username}/0x${res.data?.slice(
-              0,
-              6
-            )}`,
-            "_blank"
+          window.top?.postMessage(
+            {
+              type: "b-fc-plugin-open-tab",
+              url: `https://warpcast.com/${
+                fcUser?.username
+              }/0x${res.data?.slice(0, 6)}`,
+            },
+            { targetOrigin: "*" }
           );
         }
       }
