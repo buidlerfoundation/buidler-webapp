@@ -149,7 +149,9 @@ function isWhiteList(method: string, uri: string) {
   return (
     whiteListRefreshTokenApis.includes(`${method}-${uri}`) ||
     /authentication\/ott\/.*/.test(`${method}-${uri}`) ||
-    /get-external\?url=.*/.test(`${method}-${uri}`)
+    /get-external\?url=.*/.test(`${method}-${uri}`) ||
+    /signers/.test(`${method}-${uri}`) ||
+    /users/.test(`${method}-${uri}`)
   );
 }
 
@@ -206,6 +208,10 @@ async function requestAPI<T = any>(
   // Get access token and attach it to API request's header
   try {
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
+    const signerId = await getCookie(AsyncKey.signerIdKey);
+    if (signerId != null) {
+      headers["Signer-Id"] = signerId;
+    }
     if (accessToken != null) {
       headers.Authorization = `Bearer ${accessToken}`;
     } else {

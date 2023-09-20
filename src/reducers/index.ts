@@ -11,6 +11,7 @@ import SessionReducers from "./SessionReducers";
 import StoryReducers from "./StoryReducers";
 import TransactionReducers from "./TransactionReducers";
 import UserReducers from "./UserReducers";
+import FCUserReducers from "./FCUserReducers";
 import { combineReducers } from "redux";
 
 const reducers = combineReducers({
@@ -27,6 +28,7 @@ const reducers = combineReducers({
   outside: OutsideReducers,
   story: StoryReducers,
   analytic: AnalyticReducers,
+  fcUser: FCUserReducers,
 });
 
 export default reducers;

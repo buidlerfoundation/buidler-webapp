@@ -332,7 +332,10 @@ const AuthProvider = ({ children }: IAuthProps) => {
     [handleResponseVerify]
   );
   const checkingAuth = useCallback(async () => {
-    if (websitePath.includes(location.pathname)) {
+    if (
+      websitePath.includes(location.pathname) ||
+      location.pathname.includes("/plugin-fc")
+    ) {
       setLoading(false);
       return;
     }
