@@ -94,9 +94,18 @@ const PluginFC = () => {
     }
   }, [storeSignerId]);
   useEffect(() => {
+    let timeout: any = null;
     if (fcUser?.username && castQueue) {
-      castToFC(castQueue);
+      // timeout to cast to fc after login
+      timeout = setTimeout(() => {
+        castToFC(castQueue);
+      }, 1000);
     }
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
   }, [castQueue, castToFC, fcUser?.username]);
   const onClosePlugin = useCallback(() => {
     window.top?.postMessage(
