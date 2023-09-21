@@ -416,7 +416,8 @@ const AuthProvider = ({ children }: IAuthProps) => {
       if (
         !!token !== !!currentToken &&
         matchParams?.page_name !== "plugin" &&
-        !websitePath.includes(window.location.pathname)
+        !websitePath.includes(window.location.pathname) &&
+        !window.location.pathname.includes("plugin-fc")
       ) {
         window.location.reload();
         dispatch(CONFIG_ACTIONS.updateCurrentToken(token));

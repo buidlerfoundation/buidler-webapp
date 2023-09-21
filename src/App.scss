@@ -478,3 +478,19 @@ code {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-highlight-action-high);
 }
+
+.buidler-plugin-theme-light {
+  --color-primary-text: #202020;
+  --color-background-1: #ffffff;
+  --color-background-2: #f8f8f8;
+}
+.buidler-plugin-theme-dark {
+  --color-primary-text: #e8e8e8;
+  --color-background-1: #000000;
+  --color-background-2: #121212;
+}
+.buidler-plugin-theme-dim {
+  --color-primary-text: #e8e8e8;
+  --color-background-1: rgb(21, 32, 43);
+  --color-background-2: rgb(39, 51, 64);
+}

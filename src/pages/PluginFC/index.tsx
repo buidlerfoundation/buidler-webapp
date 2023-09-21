@@ -14,10 +14,14 @@ import { AsyncKey } from "common/AppConfig";
 import { toast } from "react-hot-toast";
 import useAppSelector from "hooks/useAppSelector";
 import { extractContentMessage } from "helpers/MessageHelper";
+import useQuery from "hooks/useQuery";
 
 const PluginFC = () => {
   const dispatch = useAppDispatch();
   const [randomId, setRandomId] = useState(Math.random());
+  const [theme, setTheme] = useState("");
+  const query = useQuery();
+  const initialTheme = useMemo(() => query.get("theme"), [query]);
   const [loading, setLoading] = useState(false);
   const [polling, setPolling] = useState(false);
   const [castQueue, setCastQueue] = useState<any>(null);
@@ -114,9 +118,17 @@ const PluginFC = () => {
     );
   }, []);
   useEffect(() => {
+    if (initialTheme) {
+      setTheme(initialTheme);
+    }
+  }, [initialTheme]);
+  useEffect(() => {
     const messageListener = async (
       e: MessageEvent<{ type: string; payload: any; metadata?: any }>
     ) => {
+      if (e?.data?.type === "b-fc-update-tw-theme") {
+        setTheme(e.data.payload);
+      }
       if (e?.data?.type === "b-fc-reload-iframe") {
         setRandomId(Math.random());
       }
@@ -133,7 +145,9 @@ const PluginFC = () => {
     };
   }, [castToFC]);
   return (
-    <div className={styles.container}>
+    <div
+      className={`buidler-plugin-theme-${theme || "light"} ${styles.container}`}
+    >
       <div className={styles.header}>
         <div className={styles["btn-jump-out"]} onClick={onClosePlugin}>
           <IconJumpOut />
