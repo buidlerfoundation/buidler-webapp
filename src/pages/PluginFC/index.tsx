@@ -34,6 +34,11 @@ const PluginFC = () => {
     signer_id?: string;
   }>();
   const signerId = useMemo(() => params?.signer_id, [params?.signer_id]);
+  const logout = useCallback(() => {
+    // clearData();
+    // dispatch(logoutAction());
+    // navigate("/plugin-fc", { replace: true });
+  }, []);
   const castToFC = useCallback(
     async (payload: any) => {
       payload.text = extractContentMessage(payload.text);
@@ -51,10 +56,12 @@ const PluginFC = () => {
             { targetOrigin: "*" }
           );
         }
+      } else {
+        logout();
       }
       setCastQueue(null);
     },
-    [fcUser?.username]
+    [fcUser?.username, logout]
   );
   const requestSignerId = useCallback(async () => {
     setLoading(true);
@@ -67,8 +74,14 @@ const PluginFC = () => {
         const resPolling = await api.pollingSignedKey(res.data?.token);
         if (resPolling?.data?.signer_id) {
           await setCookie(AsyncKey.signerIdKey, resPolling?.data?.signer_id);
-          dispatch(FC_USER_ACTIONS.updateSignerId(resPolling?.data?.signer_id));
-          dispatch(getCurrentFCUser()).unwrap();
+          const fcUser = await dispatch(getCurrentFCUser()).unwrap();
+          if (fcUser) {
+            dispatch(
+              FC_USER_ACTIONS.updateSignerId(resPolling?.data?.signer_id)
+            );
+          } else {
+            logout();
+          }
         }
       } catch (error: any) {
         toast.error(error.message);
@@ -76,16 +89,20 @@ const PluginFC = () => {
       }
       setPolling(false);
     }
-  }, [dispatch]);
+  }, [dispatch, logout]);
   const checkingSignerId = useCallback(async () => {
     if (signerId) {
       await setCookie(AsyncKey.signerIdKey, signerId);
-      dispatch(FC_USER_ACTIONS.updateSignerId(signerId));
-      dispatch(getCurrentFCUser());
+      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
+      if (fcUser) {
+        dispatch(FC_USER_ACTIONS.updateSignerId(signerId));
+      } else {
+        logout();
+      }
     } else {
       requestSignerId();
     }
-  }, [dispatch, requestSignerId, signerId]);
+  }, [dispatch, logout, requestSignerId, signerId]);
   useEffect(() => {
     checkingSignerId();
   }, [checkingSignerId]);
