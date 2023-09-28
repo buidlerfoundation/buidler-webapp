@@ -1,0 +1,27 @@
+.container {
+  flex: 1;
+  background-color: var(--color-background-1);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  .header {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    .back__wrap {
+      display: flex;
+      padding: 0 15px;
+      align-items: center;
+      height: 50px;
+      font-weight: 700;
+      color: var(--color-primary-text);
+      font-size: 20px;
+      line-height: 22px;
+      cursor: pointer;
+    }
+  }
+  .cast-detail__wrap {
+    flex: 1;
+    overflow: auto;
+  }
+}

@@ -13,6 +13,7 @@ import TransactionReducers from "./TransactionReducers";
 import UserReducers from "./UserReducers";
 import FCUserReducers from "./FCUserReducers";
 import { combineReducers } from "redux";
+import FCCastReducers from "./FCCastReducers";
 
 const reducers = combineReducers({
   user: UserReducers,
@@ -29,6 +30,7 @@ const reducers = combineReducers({
   story: StoryReducers,
   analytic: AnalyticReducers,
   fcUser: FCUserReducers,
+  fcCast: FCCastReducers,
 });
 
 export default reducers;

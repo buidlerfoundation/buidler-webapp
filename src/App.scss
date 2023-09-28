@@ -480,17 +480,32 @@ code {
 }
 
 .buidler-plugin-theme-light {
+  --color-bright-text: #ffffff;
   --color-primary-text: #202020;
+  --color-secondary-text: #536471;
   --color-background-1: #ffffff;
   --color-background-2: #f8f8f8;
+  --color-warpcast: #c848ff;
+  --color-fc-accent: #7c65c1;
+  --color-stroke: #f3f3f3;
 }
 .buidler-plugin-theme-dark {
+  --color-bright-text: #000000;
   --color-primary-text: #e8e8e8;
+  --color-secondary-text: #a0a3ad;
   --color-background-1: #000000;
   --color-background-2: #121212;
+  --color-warpcast: #c848ff;
+  --color-fc-accent: #7c65c1;
+  --color-stroke: #242424;
 }
 .buidler-plugin-theme-dim {
+  --color-bright-text: #000000;
   --color-primary-text: #e8e8e8;
+  --color-secondary-text: #a0a3ad;
   --color-background-1: rgb(21, 32, 43);
   --color-background-2: rgb(39, 51, 64);
+  --color-warpcast: #c848ff;
+  --color-fc-accent: #7c65c1;
+  --color-stroke: rgb(66, 83, 100);
 }

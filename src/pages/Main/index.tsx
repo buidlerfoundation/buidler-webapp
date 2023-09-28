@@ -17,6 +17,8 @@ import Terms from "pages/Website/Terms";
 import Privacy from "pages/Website/Privacy";
 import WebsiteWrapper from "./Layout/WebsiteWrapper";
 import PluginFC from "pages/PluginFC";
+import FCWrapper from "./Layout/FCWrapper";
+import FCDetail from "pages/FCDetail";
 
 const Main = () => {
   return (
@@ -47,7 +49,13 @@ const Main = () => {
             />
           </Route>
         </Route>
-        <Route path="/plugin-fc/:signer_id?" element={<PluginFC />} />
+        <Route element={<FCWrapper />}>
+          <Route path="/plugin-fc" element={<PluginFC />} />
+          <Route
+            path="/plugin-fc/:cast_hash"
+            element={<FCDetail />}
+          />
+        </Route>
         <Route path="/started" element={<Started />} />
         <Route path="/plugin/*" element={<ErrorPluginPage />} />
         <Route path="/:share_id" element={<ShortShare />} />

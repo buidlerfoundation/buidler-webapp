@@ -35,3 +35,31 @@ export interface IFCUser {
     hasUploadedInboxKeys?: boolean;
   };
 }
+
+export interface ICast {
+  id: string;
+  hash: string;
+  fid: string;
+  author?: IFCUser;
+  text: string;
+  parent_hash?: string;
+  parent_fid?: string;
+  parent_url?: string;
+  embeds?: {
+    url: string;
+  }[];
+  mentions: IFCUser[];
+  mentions_positions: number[];
+  timestamp: string;
+  reactions?: {
+    count?: number;
+  };
+  recasts?: {
+    count?: number;
+    recasters?: IFCUser[];
+  };
+  replies?: {
+    count?: number;
+    casts?: ICast[];
+  };
+}

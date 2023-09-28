@@ -1,14 +1,25 @@
-import { IFCUser, ISignedKeyRequest } from "models/FC";
+import { ICast, IFCUser, ISignedKeyRequest } from "models/FC";
 import Caller from "./Caller";
 
-export const requestSignedKey = () => Caller.post<ISignedKeyRequest>("xcaster/signers");
+export const requestSignedKey = () =>
+  Caller.post<ISignedKeyRequest>("xcaster/signers");
 
-export const pollingSignedKey = async (token: string) => {
+export const pollingSignedKey = async (
+  token: string,
+  controller?: AbortController
+) => {
   while (true) {
     await new Promise((r) => setTimeout(r, 4000));
-    const res = await Caller.get<ISignedKeyRequest>(`xcaster/signers?token=${token}`);
+    const res = await Caller.get<ISignedKeyRequest>(
+      `xcaster/signers?token=${token}`,
+      undefined,
+      controller
+    );
     if (res.data?.state === "completed") {
       return res;
+    }
+    if (res.message?.includes("aborted")) {
+      break;
     }
   }
 };
@@ -16,3 +27,19 @@ export const pollingSignedKey = async (token: string) => {
 export const getCurrentFCUser = () => Caller.get<IFCUser>("xcaster/users/me");
 
 export const cast = (data: any) => Caller.post<string>("xcaster/casts", data);
+
+export const listCasts = (params: {
+  text: string;
+  page: number;
+  limit: number;
+}) =>
+  Caller.get<ICast[]>(
+    `xcaster/casts?${new URLSearchParams({
+      text: params.text,
+      page: `${params.page}`,
+      limit: `${params.limit}`,
+    })}`
+  );
+
+export const getCastDetail = (hash: string) =>
+  Caller.get<ICast>(`xcaster/casts/${hash}`);

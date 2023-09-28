@@ -7,6 +7,26 @@ import Main from "pages/Main";
 import { useNavigate } from "react-router-dom";
 import { CustomEventName } from "services/events/WindowEvent";
 import AppToastNotification from "shared/AppToastNotification";
+import moment from "moment";
+
+moment.locale("en", {
+  relativeTime: {
+    future: "in %s",
+    past: "%s ago",
+    s: "seconds",
+    ss: "%ss",
+    m: "a minute",
+    mm: "%dm",
+    h: "an hour",
+    hh: "%dh",
+    d: "a day",
+    dd: "%dd",
+    M: "a month",
+    MM: "%dM",
+    y: "a year",
+    yy: "%dY",
+  },
+});
 
 function App() {
   const navigate = useNavigate();
@@ -53,21 +73,21 @@ function App() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  useEffect(() => {
-    const eventClick = async (e: any) => {
-      if (!e.target.download) {
-        const href = e?.target?.href || e?.target?.parentElement?.href;
-        if (href && !href?.includes(window.location.origin)) {
-          window.open(href, "_blank");
-        }
-        e.preventDefault();
-      }
-    };
-    window.addEventListener("click", eventClick);
-    return () => {
-      window.removeEventListener("click", eventClick);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const eventClick = async (e: any) => {
+  //     if (!e.target.download) {
+  //       const href = e?.target?.href || e?.target?.parentElement?.href;
+  //       if (href && !href?.includes(window.location.origin)) {
+  //         window.open(href, "_blank");
+  //       }
+  //       e.preventDefault();
+  //     }
+  //   };
+  //   window.addEventListener("click", eventClick);
+  //   return () => {
+  //     window.removeEventListener("click", eventClick);
+  //   };
+  // }, []);
   return (
     <>
       <Main />
