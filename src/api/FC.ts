@@ -43,3 +43,15 @@ export const listCasts = (params: {
 
 export const getCastDetail = (hash: string) =>
   Caller.get<ICast>(`xcaster/casts/${hash}`);
+
+export const recast = (hash: string) =>
+  Caller.post(`xcaster/reactions/${hash}/recast`);
+
+export const like = (hash: string) =>
+  Caller.post(`xcaster/reactions/${hash}/like`);
+
+export const removeRecast = (hash: string) =>
+  Caller.delete(`xcaster/reactions/${hash}/recast`);
+
+export const removeLike = (hash: string) =>
+  Caller.delete(`xcaster/reactions/${hash}/like`);

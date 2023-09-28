@@ -11,6 +11,7 @@ interface FCCastState {
   loading: boolean;
   loadMore: boolean;
   queryUrl: string;
+  replyCast?: ICast;
 }
 
 const initialState: FCCastState = {
@@ -36,6 +37,9 @@ const fcCastSlice = createSlice({
   reducers: {
     updateQueryUrl: (state, action: PayloadAction<string>) => {
       state.queryUrl = action.payload;
+    },
+    updateReplyCast: (state, action: PayloadAction<ICast | undefined>) => {
+      state.replyCast = action.payload;
     },
   },
   extraReducers: (builder) => {

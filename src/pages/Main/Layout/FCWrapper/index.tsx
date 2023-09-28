@@ -22,6 +22,7 @@ import IconJumpOut from "shared/SVG/IconJumpOut";
 import LogoFC from "shared/SVG/LogoFC";
 import LoginFC from "shared/LoginFC";
 import { FC_CAST_ACTIONS, getCastsByUrl } from "reducers/FCCastReducers";
+import ModalFCReply from "shared/ModalFCReply";
 
 const FCWrapper = () => {
   const dispatch = useAppDispatch();
@@ -42,6 +43,7 @@ const FCWrapper = () => {
   const storeSignerId = useAppSelector((state) => state.fcUser?.signer_id);
   const queryUrl = useAppSelector((state) => state.fcCast.queryUrl);
   const fcUser = useAppSelector((state) => state.fcUser?.data);
+  const replyCast = useAppSelector((state) => state.fcCast.replyCast);
   const signerId = useMemo(() => query.get("signer_id"), [query]);
   const logout = useCallback(() => {
     // clearData();
@@ -196,6 +198,9 @@ const FCWrapper = () => {
     if (signedKeyRequest) return;
     requestSignerId();
   }, [requestSignerId, signedKeyRequest]);
+  const onCloseModalReply = useCallback(() => {
+    dispatch(FC_CAST_ACTIONS.updateReplyCast());
+  }, [dispatch]);
   return (
     <div
       className={`buidler-plugin-theme-${theme || "light"} ${styles.container}`}
@@ -232,6 +237,12 @@ const FCWrapper = () => {
           />
         </div>
       )}
+      <ModalFCReply
+        cast={replyCast}
+        open={!!replyCast}
+        handleClose={onCloseModalReply}
+        theme={theme}
+      />
     </div>
   );
 };

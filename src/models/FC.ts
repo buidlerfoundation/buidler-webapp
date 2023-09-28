@@ -42,6 +42,8 @@ export interface ICast {
   fid: string;
   author?: IFCUser;
   text: string;
+  is_liked: boolean;
+  is_recast: boolean;
   parent_hash?: string;
   parent_fid?: string;
   parent_url?: string;
