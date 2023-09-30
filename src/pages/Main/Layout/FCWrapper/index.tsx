@@ -67,12 +67,15 @@ const FCWrapper = () => {
             { targetOrigin: "*" }
           );
         }
+        if (queryUrl) {
+          dispatch(getCastsByUrl({ text: queryUrl, page: 1, limit: 20 }));
+        }
       } else {
         logout();
       }
       setCastQueue(null);
     },
-    [fcUser?.username, logout]
+    [dispatch, fcUser?.username, logout, queryUrl]
   );
   const requestSignerId = useCallback(async () => {
     setLoading(true);
