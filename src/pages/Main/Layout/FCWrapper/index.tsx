@@ -51,6 +51,10 @@ const FCWrapper = () => {
   const replyCast = useAppSelector((state) => state.fcCast.replyCast);
   const signerId = useMemo(() => query.get("signer_id"), [query]);
   const logout = useCallback(() => {
+    window.top?.postMessage(
+      { type: "b-fc-plugin-logout" },
+      { targetOrigin: "*" }
+    );
     clearData();
     dispatch(logoutAction());
   }, [dispatch]);
