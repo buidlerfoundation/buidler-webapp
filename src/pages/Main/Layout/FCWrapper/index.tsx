@@ -1,6 +1,6 @@
 import api from "api";
 import { AsyncKey } from "common/AppConfig";
-import { setCookie } from "common/Cookie";
+import { clearData, setCookie } from "common/Cookie";
 import { extractContentMessage } from "helpers/MessageHelper";
 import useAppDispatch from "hooks/useAppDispatch";
 import useAppSelector from "hooks/useAppSelector";
@@ -23,10 +23,15 @@ import LogoFC from "shared/SVG/LogoFC";
 import LoginFC from "shared/LoginFC";
 import { FC_CAST_ACTIONS, getCastsByUrl } from "reducers/FCCastReducers";
 import ModalFCReply from "shared/ModalFCReply";
+import PopoverButton from "shared/PopoverButton";
+import PopupUserFCMenu from "shared/PopupUserFCMenu";
+import ImageView from "shared/ImageView";
+import { logoutAction } from "reducers/actions";
 
 const FCWrapper = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const popupMenuRef = useRef<any>();
   const [theme, setTheme] = useState("");
   const query = useQuery();
   const params = useParams<{ cast_hash: string }>();
@@ -46,10 +51,16 @@ const FCWrapper = () => {
   const replyCast = useAppSelector((state) => state.fcCast.replyCast);
   const signerId = useMemo(() => query.get("signer_id"), [query]);
   const logout = useCallback(() => {
-    // clearData();
-    // dispatch(logoutAction());
-    // navigate("/plugin-fc", { replace: true });
+    clearData();
+    dispatch(logoutAction());
+  }, [dispatch]);
+  const onCloseMenu = useCallback(() => {
+    popupMenuRef.current?.hide();
   }, []);
+  const onLogoutClick = useCallback(() => {
+    logout();
+    onCloseMenu();
+  }, [logout, onCloseMenu]);
   const castToFC = useCallback(
     async (payload: any) => {
       payload.text = extractContentMessage(payload.text);
@@ -204,6 +215,14 @@ const FCWrapper = () => {
   const onCloseModalReply = useCallback(() => {
     dispatch(FC_CAST_ACTIONS.updateReplyCast());
   }, [dispatch]);
+  const onMenuClick = useCallback(
+    async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      e.stopPropagation();
+      const target = e.currentTarget;
+      popupMenuRef.current.show(target);
+    },
+    []
+  );
   return (
     <div
       className={`buidler-plugin-theme-${theme || "light"} ${styles.container}`}
@@ -215,10 +234,10 @@ const FCWrapper = () => {
           <LogoFC />
         </div>
         {fcUser ? (
-          <div className={styles["user-info"]}>
+          <div className={styles["user-info"]} onClick={onMenuClick}>
             <span>{fcUser.display_name}</span>
             {fcUser.pfp?.url && (
-              <img
+              <ImageView
                 src={fcUser.pfp?.url}
                 alt="fc-user-avatar"
                 className={styles.avatar}
@@ -245,6 +264,18 @@ const FCWrapper = () => {
         open={!!replyCast}
         handleClose={onCloseModalReply}
         theme={theme}
+      />
+      <PopoverButton
+        ref={popupMenuRef}
+        popupOnly
+        style={{ top: 10 }}
+        componentPopup={
+          <PopupUserFCMenu
+            onCloseMenu={onCloseMenu}
+            theme={theme}
+            onLogoutClick={onLogoutClick}
+          />
+        }
       />
     </div>
   );

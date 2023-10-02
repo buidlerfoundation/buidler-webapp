@@ -1,5 +1,4 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { logoutAction } from "./actions";
 import { ICast } from "models/FC";
 import api from "api";
 
@@ -74,9 +73,6 @@ const fcCastSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(logoutAction, (state) => {
-        state.data = initialState.data;
-      })
       .addCase(getCastsByUrl.pending, (state, action) => {
         if (action.meta.arg.page === 1) {
           state.loading = true;

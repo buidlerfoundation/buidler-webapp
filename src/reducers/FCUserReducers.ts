@@ -29,9 +29,7 @@ const fcUserSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(logoutAction, (state) => {
-        state.data = initialState.data;
-      })
+      .addCase(logoutAction, () => initialState)
       .addCase(getCurrentFCUser.fulfilled, (state, action) => {
         state.data = action.payload;
       });
