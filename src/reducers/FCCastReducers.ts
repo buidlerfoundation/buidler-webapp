@@ -136,8 +136,23 @@ const fcCastSlice = createSlice({
           data: action.payload.data?.replies?.casts || [],
         };
         if (action.payload.success) {
+          if (
+            state.castRepliesMap &&
+            action.payload.data?.parent_hash &&
+            state.castRepliesMap[action.payload.data?.parent_hash]
+          ) {
+            state.castRepliesMap[action.payload.data.parent_hash].data =
+              state.castRepliesMap[action.payload.data.parent_hash].data.map(
+                (el) => {
+                  if (el.hash === action.payload.data?.hash) {
+                    return action.payload.data || el;
+                  }
+                  return el;
+                }
+              );
+          }
           state.data = state.data.map((el) => {
-            if (el.hash) {
+            if (el.hash === action.meta.arg.hash) {
               return action.payload.data || el;
             }
             return el;

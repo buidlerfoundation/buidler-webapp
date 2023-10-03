@@ -35,7 +35,7 @@ export const listCasts = (params: {
 }) =>
   Caller.get<ICast[]>(
     `xcaster/casts?${new URLSearchParams({
-      text: params.text,
+      url: params.text,
       page: `${params.page}`,
       limit: `${params.limit}`,
     })}`
