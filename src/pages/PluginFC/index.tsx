@@ -5,6 +5,7 @@ import useAppSelector from "hooks/useAppSelector";
 import { getCastsByUrl } from "reducers/FCCastReducers";
 import CastItem from "shared/CastItem";
 import LoadingItem from "shared/LoadingItem";
+import Empty from "./Empty";
 
 const PluginFC = () => {
   const dispatch = useAppDispatch();
@@ -37,6 +38,9 @@ const PluginFC = () => {
   );
   if (loadingCast) {
     return <LoadingItem fullScreen />;
+  }
+  if (casts.length === 0) {
+    return <Empty />;
   }
   return (
     <ol className={styles["list-cast"]} onScroll={onScroll}>

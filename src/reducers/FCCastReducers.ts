@@ -21,6 +21,7 @@ interface FCCastState {
       data: ICast[];
     };
   };
+  openNewCast: boolean;
 }
 
 const initialState: FCCastState = {
@@ -34,6 +35,7 @@ const initialState: FCCastState = {
     loading: false,
   },
   castRepliesMap: {},
+  openNewCast: false,
 };
 
 export const getCastDetail = createAsyncThunk(
@@ -60,6 +62,14 @@ export const getCastsByUrl = createAsyncThunk(
   }
 );
 
+export const deleteCast = createAsyncThunk(
+  "fc_cast/delete",
+  async (payload: ICast) => {
+    const res = await api.deleteCast(payload.hash);
+    return res;
+  }
+);
+
 const fcCastSlice = createSlice({
   name: "fc_cast",
   initialState,
@@ -69,6 +79,9 @@ const fcCastSlice = createSlice({
     },
     updateReplyCast: (state, action: PayloadAction<ICast | undefined>) => {
       state.replyCast = action.payload;
+    },
+    toggleNewCast: (state) => {
+      state.openNewCast = !state.openNewCast;
     },
   },
   extraReducers: (builder) => {
@@ -157,6 +170,17 @@ const fcCastSlice = createSlice({
             }
             return el;
           });
+        }
+      })
+      .addCase(deleteCast.fulfilled, (state, action) => {
+        if (action.payload.success) {
+          const cast = action.meta.arg;
+          if (cast.parent_hash && state.castRepliesMap?.[cast.parent_hash]) {
+            state.castRepliesMap[cast.parent_hash].data = state.castRepliesMap[
+              cast.parent_hash
+            ].data.filter((el) => el.hash !== cast.hash);
+          }
+          state.data = state.data.filter((el) => el.hash !== cast.hash);
         }
       });
   },

@@ -2,3 +2,31 @@
   flex: 1;
   overflow: auto;
 }
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  color: var(--color-secondary-text);
+  .btn-cast {
+    width: 100px;
+    height: 36px;
+    border-radius: 10px;
+    color: white;
+    background-color: var(--color-fc-accent);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+}

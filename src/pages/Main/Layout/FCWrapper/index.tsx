@@ -27,6 +27,7 @@ import PopoverButton from "shared/PopoverButton";
 import PopupUserFCMenu from "shared/PopupUserFCMenu";
 import ImageView from "shared/ImageView";
 import { logoutAction } from "reducers/actions";
+import ModalFCCast from "shared/ModalFCCast";
 
 const FCWrapper = () => {
   const dispatch = useAppDispatch();
@@ -49,7 +50,11 @@ const FCWrapper = () => {
   const queryUrl = useAppSelector((state) => state.fcCast.queryUrl);
   const fcUser = useAppSelector((state) => state.fcUser?.data);
   const replyCast = useAppSelector((state) => state.fcCast.replyCast);
+  const openNewCast = useAppSelector((state) => state.fcCast.openNewCast);
   const signerId = useMemo(() => query.get("signer_id"), [query]);
+  const handleCloseNewCast = useCallback(() => {
+    dispatch(FC_CAST_ACTIONS.toggleNewCast());
+  }, [dispatch]);
   const logout = useCallback(() => {
     window.top?.postMessage(
       { type: "b-fc-plugin-logout" },
@@ -267,6 +272,11 @@ const FCWrapper = () => {
         cast={replyCast}
         open={!!replyCast}
         handleClose={onCloseModalReply}
+        theme={theme}
+      />
+      <ModalFCCast
+        open={openNewCast}
+        handleClose={handleCloseNewCast}
         theme={theme}
       />
       <PopoverButton

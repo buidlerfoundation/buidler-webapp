@@ -324,6 +324,10 @@ a {
   &::-webkit-scrollbar-track {
     display: none;
   }
+  .normal-button:hover {
+    border-radius: 10px;
+    background-color: var(--color-highlight-action);
+  }
   &::-webkit-scrollbar {
     display: none;
   }
@@ -490,6 +494,10 @@ code {
   --color-stroke: #f3f3f3;
   --color-recast: rgb(66, 183, 72);
   --color-like: rgb(213, 19, 56);
+  .normal-button:hover {
+    border-radius: 10px;
+    background-color: unset;
+  }
 }
 .buidler-plugin-theme-dark {
   --color-bright-text: #000000;
