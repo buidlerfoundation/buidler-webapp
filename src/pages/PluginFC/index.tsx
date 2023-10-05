@@ -36,7 +36,7 @@ const PluginFC = () => {
     [canMoreCast, loadMoreCast, onMoreCast]
   );
   if (loadingCast) {
-    return <LoadingItem />;
+    return <LoadingItem fullScreen />;
   }
   return (
     <ol className={styles["list-cast"]} onScroll={onScroll}>

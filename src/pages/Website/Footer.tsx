@@ -4,21 +4,6 @@ import { Link } from "react-router-dom";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 const Footer = () => {
-  const logBadgeClick = useCallback(() => {
-    const BADGE_ID = "34f68d0d12e8b756";
-    const ALCHEMY_URL = `https://alchemyapi.io/?r=badge:${BADGE_ID}`;
-    const ALCHEMY_ANALYTICS_URL = `https://analytics.alchemyapi.io/analytics`;
-    fetch(`${ALCHEMY_ANALYTICS_URL}/badge-click`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        badge_id: BADGE_ID,
-      }),
-    });
-    window.open(ALCHEMY_URL, "_blank");
-  }, []);
   const onTWClick = useCallback(() => {
     GoogleAnalytics.tracking("Footer Social Links Clicked", {
       category: "Footer",
@@ -40,19 +25,8 @@ const Footer = () => {
       url: "https://www.youtube.com/channel/UCIkFTkBdbVgzQgw6braFaeg",
     });
   }, []);
-  const onWebAppClick = useCallback(() => {
-    window.open(`${window.location.origin}/communities`, "_blank");
-    GoogleAnalytics.tracking("Footer Launch App On Browser Clicked", {
-      category: "Footer",
-    });
-  }, []);
   const onExtensionClick = useCallback(() => {
     GoogleAnalytics.tracking("Footer Extension Clicked", {
-      category: "Footer",
-    });
-  }, []);
-  const onPluginClick = useCallback(() => {
-    GoogleAnalytics.tracking("Footer Web Plugin Clicked", {
       category: "Footer",
     });
   }, []);
@@ -78,7 +52,7 @@ const Footer = () => {
           <div className="row">
             <div className="col-12 col-md-8">
               <span className="content-footer">
-                Buidler - One extension. Any communities.
+                A Farcaster web annotation.
               </span>
               <div className="footer-icons">
                 <a
@@ -124,24 +98,10 @@ const Footer = () => {
                   />
                 </a>
               </div>
-              <div className="embed-ph__wrap">
-                <div>
-                  <img
-                    id="badge-button"
-                    style={{ width: 240, height: 53 }}
-                    src="https://static.alchemyapi.io/images/marketing/badge.png"
-                    alt="Alchemy Supercharged"
-                    onClick={logBadgeClick}
-                  />
-                </div>
-              </div>
             </div>
             <div className="col-6 col-md-2">
               <h5 className="footer-title">Product</h5>
               <div className="menu__wrap">
-                <div className="footer-menu-item" onClick={onWebAppClick}>
-                  Web App
-                </div>
                 <a
                   className="footer-menu-item"
                   href="https://chrome.google.com/webstore/detail/omhbdacaeafhladkifficmjmpeaijlfc"
@@ -150,15 +110,6 @@ const Footer = () => {
                   onClick={onExtensionClick}
                 >
                   Extension
-                </a>
-                <a
-                  className="footer-menu-item"
-                  href="https://docs.buidler.app/add-community-chat-plugin"
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={onPluginClick}
-                >
-                  Web Plugin
                 </a>
               </div>
             </div>
