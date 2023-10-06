@@ -1,4 +1,4 @@
-import { ICast, IFCUser, ISignedKeyRequest } from "models/FC";
+import { ICast, IFCUser, IMetadataUrl, ISignedKeyRequest } from "models/FC";
 import Caller from "./Caller";
 
 export const requestSignedKey = () =>
@@ -58,3 +58,11 @@ export const removeRecast = (hash: string) =>
 
 export const removeLike = (hash: string) =>
   Caller.delete(`xcaster/reactions/${hash}/like`);
+
+export const getEmbeddedMetadata = (url: string) =>
+  Caller.get<IMetadataUrl>(
+    `external/metadata?${new URLSearchParams({ url })}`,
+    undefined,
+    undefined,
+    true
+  );

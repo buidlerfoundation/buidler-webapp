@@ -65,3 +65,10 @@ export interface ICast {
     casts?: ICast[];
   };
 }
+
+export interface IMetadataUrl {
+  image?: string;
+  title?: string;
+  card?: string;
+  description?: string;
+}
