@@ -127,6 +127,18 @@ const FCWrapper = () => {
       setPolling(false);
     }
   }, [dispatch, logout]);
+  const initialSignerId = useCallback(
+    async (id: string) => {
+      await setCookie(AsyncKey.signerIdKey, id);
+      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
+      if (fcUser) {
+        dispatch(FC_USER_ACTIONS.updateSignerId(id));
+      } else {
+        logout();
+      }
+    },
+    [dispatch, logout]
+  );
   const checkingSignerId = useCallback(async () => {
     if (signerId) {
       await setCookie(AsyncKey.signerIdKey, signerId);
@@ -206,13 +218,25 @@ const FCWrapper = () => {
           navigate(-1);
         }
       }
+      if (e?.data?.type === "b-fc-initial-data") {
+        const { signerId, q, theme } = e?.data?.payload || {};
+        if (signerId) {
+          initialSignerId(signerId);
+        }
+        if (q) {
+          dispatch(FC_CAST_ACTIONS.updateQueryUrl(q));
+        }
+        if (theme) {
+          setTheme(theme);
+        }
+      }
     };
     window.addEventListener("message", messageListener);
     return () => {
       window.removeEventListener("message", messageListener);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [castHash, castToFC, dispatch]);
+  }, [castHash, castToFC, dispatch, initialSignerId]);
   const onWithoutLoginClick = useCallback(() => {
     pollingController.current.abort();
     setSignedKeyRequest(null);
