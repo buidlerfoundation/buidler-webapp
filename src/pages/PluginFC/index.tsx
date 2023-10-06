@@ -6,6 +6,7 @@ import { getCastsByUrl } from "reducers/FCCastReducers";
 import CastItem from "shared/CastItem";
 import LoadingItem from "shared/LoadingItem";
 import Empty from "./Empty";
+import EmbeddedMain from "shared/EmbeddedMain";
 
 const PluginFC = () => {
   const dispatch = useAppDispatch();
@@ -43,12 +44,15 @@ const PluginFC = () => {
     return <Empty />;
   }
   return (
-    <ol className={styles["list-cast"]} onScroll={onScroll}>
-      {casts.map((el) => (
-        <CastItem key={el.hash} cast={el} />
-      ))}
-      {loadMoreCast && <LoadingItem />}
-    </ol>
+    <div className={styles.container}>
+      <ol className={styles["list-cast"]} onScroll={onScroll}>
+        <EmbeddedMain />
+        {casts.map((el) => (
+          <CastItem key={el.hash} cast={el} />
+        ))}
+        {loadMoreCast && <LoadingItem />}
+      </ol>
+    </div>
   );
 };
 

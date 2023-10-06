@@ -486,7 +486,7 @@ code {
 .buidler-plugin-theme-light {
   --color-bright-text: #ffffff;
   --color-primary-text: #202020;
-  --color-secondary-text: #536471;
+  --color-secondary-text: #666666;
   --color-background-1: #ffffff;
   --color-background-2: #f8f8f8;
   --color-warpcast: #c848ff;
@@ -494,6 +494,7 @@ code {
   --color-stroke: #f3f3f3;
   --color-recast: rgb(66, 183, 72);
   --color-like: rgb(213, 19, 56);
+  --color-highlight-action-high: #f3f3f3;
   .normal-button:hover {
     border-radius: 10px;
     background-color: unset;
@@ -510,6 +511,7 @@ code {
   --color-stroke: #242424;
   --color-recast: rgb(66, 183, 72);
   --color-like: rgb(213, 19, 56);
+  --color-highlight-action-high: #363636;
 }
 .buidler-plugin-theme-dim {
   --color-bright-text: #000000;
@@ -522,4 +524,5 @@ code {
   --color-stroke: rgb(66, 83, 100);
   --color-recast: rgb(66, 183, 72);
   --color-like: rgb(213, 19, 56);
+  --color-highlight-action-high: #363636;
 }
