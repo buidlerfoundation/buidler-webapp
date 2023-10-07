@@ -28,6 +28,7 @@ import PopupUserFCMenu from "shared/PopupUserFCMenu";
 import ImageView from "shared/ImageView";
 import { logoutAction } from "reducers/actions";
 import ModalFCCast from "shared/ModalFCCast";
+import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
 
 const FCWrapper = () => {
   const dispatch = useAppDispatch();
@@ -213,13 +214,14 @@ const FCWrapper = () => {
         setCastQueue(e.data.payload);
       }
       if (e?.data?.type === "b-fc-update-tw-url") {
-        dispatch(FC_CAST_ACTIONS.updateQueryUrl(e?.data?.payload || ""));
+        dispatch(FC_CAST_ACTIONS.updateQueryUrl(e?.data?.payload?.url || ""));
+        dispatch(FC_CAST_ACTIONS.updateTitleUrl(e?.data?.payload?.title || ""));
         if (castHash) {
           navigate(-1);
         }
       }
       if (e?.data?.type === "b-fc-initial-data") {
-        const { signerId, q, theme } = e?.data?.payload || {};
+        const { signerId, q, theme, title } = e?.data?.payload || {};
         if (signerId) {
           initialSignerId(signerId);
         }
@@ -229,6 +231,12 @@ const FCWrapper = () => {
         if (theme) {
           setTheme(theme);
         }
+        if (title) {
+          dispatch(FC_CAST_ACTIONS.updateTitleUrl(title));
+        }
+      }
+      if (e?.data?.type === "b-fc-new-cast") {
+        dispatch(FC_CAST_ACTIONS.openNewCast());
       }
     };
     window.addEventListener("message", messageListener);
@@ -261,14 +269,12 @@ const FCWrapper = () => {
       className={`buidler-plugin-theme-${theme || "light"} ${styles.container}`}
     >
       <div className={styles.header}>
-        <div className={styles["btn-jump-out"]} onClick={onClosePlugin}>
-          <IconJumpOut />
-          <span style={{ margin: "0 10px" }}>Farcaster</span>
-          <LogoFC />
+        <div className={styles["btn-jump-out"]}>
+          <IconBuidlerLogo />
+          <span style={{ margin: "0 10px" }}>Buidler</span>
         </div>
         {fcUser ? (
           <div className={styles["user-info"]} onClick={onMenuClick}>
-            <span>{fcUser.display_name}</span>
             {fcUser.pfp?.url && (
               <ImageView
                 src={fcUser.pfp?.url}

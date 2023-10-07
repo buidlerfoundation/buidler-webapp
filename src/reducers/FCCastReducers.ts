@@ -10,6 +10,7 @@ interface FCCastState {
   loading: boolean;
   loadMore: boolean;
   queryUrl: string;
+  titleUrl: string;
   replyCast?: ICast;
   castDetail: {
     data?: ICast;
@@ -31,6 +32,7 @@ const initialState: FCCastState = {
   loading: false,
   loadMore: false,
   queryUrl: "",
+  titleUrl: "",
   castDetail: {
     loading: false,
   },
@@ -77,11 +79,17 @@ const fcCastSlice = createSlice({
     updateQueryUrl: (state, action: PayloadAction<string>) => {
       state.queryUrl = action.payload;
     },
+    updateTitleUrl: (state, action: PayloadAction<string>) => {
+      state.titleUrl = action.payload;
+    },
     updateReplyCast: (state, action: PayloadAction<ICast | undefined>) => {
       state.replyCast = action.payload;
     },
     toggleNewCast: (state) => {
       state.openNewCast = !state.openNewCast;
+    },
+    openNewCast: (state) => {
+      state.openNewCast = true;
     },
   },
   extraReducers: (builder) => {

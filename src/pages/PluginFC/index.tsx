@@ -7,6 +7,7 @@ import CastItem from "shared/CastItem";
 import LoadingItem from "shared/LoadingItem";
 import Empty from "./Empty";
 import EmbeddedMain from "shared/EmbeddedMain";
+import CopyRight from "./CopyRight";
 
 const PluginFC = () => {
   const dispatch = useAppDispatch();
@@ -52,6 +53,7 @@ const PluginFC = () => {
         ))}
         {loadMoreCast && <LoadingItem />}
       </ol>
+      <CopyRight />
     </div>
   );
 };
