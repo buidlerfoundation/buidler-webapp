@@ -38,20 +38,26 @@ const PluginFC = () => {
     },
     [canMoreCast, loadMoreCast, onMoreCast]
   );
+  const renderBody = useCallback(() => {
+    if (loadingCast) {
+      return <Spinner size={30} />;
+    }
+    if (!loadingCast && casts.length === 0) {
+      return <Empty />;
+    }
+    return (
+      <ol className={styles["list-cast"]} onScroll={onScroll}>
+        {casts.map((el) => (
+          <CastItem key={el.hash} cast={el} />
+        ))}
+        {loadMoreCast && <LoadingItem />}
+      </ol>
+    );
+  }, [casts, loadMoreCast, loadingCast, onScroll]);
   return (
     <div className={styles.container}>
       <EmbeddedMain />
-      {!loadingCast && casts.length === 0 ? (
-        <Empty />
-      ) : (
-        <ol className={styles["list-cast"]} onScroll={onScroll}>
-          {casts.map((el) => (
-            <CastItem key={el.hash} cast={el} />
-          ))}
-          {loadMoreCast && <LoadingItem />}
-        </ol>
-      )}
-      {loadingCast && <Spinner size={30} />}
+      {renderBody()}
     </div>
   );
 };
