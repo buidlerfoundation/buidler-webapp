@@ -18,10 +18,12 @@ import { toast } from "react-hot-toast";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { FC_USER_ACTIONS, getCurrentFCUser } from "reducers/FCUserReducers";
 import styles from "./index.module.scss";
-import IconJumpOut from "shared/SVG/IconJumpOut";
-import LogoFC from "shared/SVG/LogoFC";
 import LoginFC from "shared/LoginFC";
-import { FC_CAST_ACTIONS, getCastsByUrl } from "reducers/FCCastReducers";
+import {
+  FC_CAST_ACTIONS,
+  getCastsByUrl,
+  getMainMetadata,
+} from "reducers/FCCastReducers";
 import ModalFCReply from "shared/ModalFCReply";
 import PopoverButton from "shared/PopoverButton";
 import PopupUserFCMenu from "shared/PopupUserFCMenu";
@@ -29,6 +31,7 @@ import ImageView from "shared/ImageView";
 import { logoutAction } from "reducers/actions";
 import ModalFCCast from "shared/ModalFCCast";
 import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
+import CopyRight from "pages/PluginFC/CopyRight";
 
 const FCWrapper = () => {
   const dispatch = useAppDispatch();
@@ -159,6 +162,7 @@ const FCWrapper = () => {
   useEffect(() => {
     if (queryUrl) {
       dispatch(getCastsByUrl({ text: queryUrl, page: 1, limit: 20 }));
+      dispatch(getMainMetadata(queryUrl));
     }
   }, [dispatch, queryUrl]);
   useEffect(() => {
@@ -269,10 +273,10 @@ const FCWrapper = () => {
       className={`buidler-plugin-theme-${theme || "light"} ${styles.container}`}
     >
       <div className={styles.header}>
-        <div className={styles["btn-jump-out"]}>
+        <a className={styles["btn-jump-out"]} href="/" target="_blank">
           <IconBuidlerLogo />
           <span style={{ margin: "0 10px" }}>Buidler</span>
-        </div>
+        </a>
         {fcUser ? (
           <div className={styles["user-info"]} onClick={onMenuClick}>
             {fcUser.pfp?.url && (
@@ -290,6 +294,7 @@ const FCWrapper = () => {
         )}
       </div>
       <Outlet />
+      <CopyRight />
       {!storeSignerId && signedKeyRequest?.deeplinkUrl && (
         <div className={styles["login__wrap"]}>
           <LoginFC

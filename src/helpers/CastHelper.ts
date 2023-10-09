@@ -56,3 +56,21 @@ export const normalizeContentCast = (cast: ICast) => {
   });
   return res;
 };
+
+const removeProtocol = (url: string) => {
+  try {
+    const urlObj = new URL(url);
+    return url.replace(`${urlObj.protocol}//`, "");
+  } catch (error) {
+    return url;
+  }
+};
+
+export const compareEmbeddedUrl = (embeddedUrl: string, queryUrl: string) => {
+  const eWithoutProtocol = removeProtocol(embeddedUrl);
+  const qWithoutProtocol = removeProtocol(queryUrl);
+  return (
+    eWithoutProtocol.includes(qWithoutProtocol) ||
+    qWithoutProtocol.includes(eWithoutProtocol)
+  );
+};

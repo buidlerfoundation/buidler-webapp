@@ -3,7 +3,6 @@ import styles from "./index.module.scss";
 import useAppSelector from "hooks/useAppSelector";
 import useAppDispatch from "hooks/useAppDispatch";
 import { FC_CAST_ACTIONS } from "reducers/FCCastReducers";
-import EmbeddedMain from "shared/EmbeddedMain";
 import IconPlus from "shared/SVG/IconPlus";
 
 const Empty = () => {
@@ -14,7 +13,6 @@ const Empty = () => {
   }, [dispatch]);
   return (
     <div className={styles["empty-state"]}>
-      <EmbeddedMain />
       <div className={styles["empty-body"]}>
         <span>No discussion has been created yet.</span>
         {fcUser && (

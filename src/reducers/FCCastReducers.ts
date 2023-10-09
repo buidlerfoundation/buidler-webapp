@@ -10,7 +10,10 @@ interface FCCastState {
   loading: boolean;
   loadMore: boolean;
   queryUrl: string;
-  titleUrl: string;
+  metadata: {
+    loading: boolean;
+    titleUrl: string;
+  };
   replyCast?: ICast;
   castDetail: {
     data?: ICast;
@@ -29,15 +32,18 @@ const initialState: FCCastState = {
   data: [],
   currentPage: 1,
   canMore: false,
-  loading: false,
+  loading: true,
   loadMore: false,
   queryUrl: "",
-  titleUrl: "",
   castDetail: {
     loading: false,
   },
   castRepliesMap: {},
   openNewCast: false,
+  metadata: {
+    loading: false,
+    titleUrl: "",
+  },
 };
 
 export const getCastDetail = createAsyncThunk(
@@ -72,15 +78,25 @@ export const deleteCast = createAsyncThunk(
   }
 );
 
+export const getMainMetadata = createAsyncThunk(
+  "fc_cast/get-metadata",
+  async (payload: string) => {
+    const res = await api.getEmbeddedMetadata(payload);
+    return res;
+  }
+);
+
 const fcCastSlice = createSlice({
   name: "fc_cast",
   initialState,
   reducers: {
     updateQueryUrl: (state, action: PayloadAction<string>) => {
-      state.queryUrl = action.payload;
+      if (state.queryUrl !== action.payload) {
+        state.queryUrl = action.payload;
+      }
     },
     updateTitleUrl: (state, action: PayloadAction<string>) => {
-      state.titleUrl = action.payload;
+      state.metadata = { loading: false, titleUrl: action.payload };
     },
     updateReplyCast: (state, action: PayloadAction<ICast | undefined>) => {
       state.replyCast = action.payload;
@@ -190,6 +206,24 @@ const fcCastSlice = createSlice({
           }
           state.data = state.data.filter((el) => el.hash !== cast.hash);
         }
+      })
+      .addCase(getMainMetadata.pending, (state) => {
+        state.metadata = {
+          loading: true,
+          titleUrl: state.metadata.titleUrl,
+        };
+      })
+      .addCase(getMainMetadata.rejected, (state) => {
+        state.metadata = {
+          loading: false,
+          titleUrl: state.metadata.titleUrl,
+        };
+      })
+      .addCase(getMainMetadata.fulfilled, (state, action) => {
+        state.metadata = {
+          loading: false,
+          titleUrl: action.payload?.data?.title || state.metadata.titleUrl,
+        };
       });
   },
 });

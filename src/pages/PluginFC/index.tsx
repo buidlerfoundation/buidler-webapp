@@ -7,7 +7,7 @@ import CastItem from "shared/CastItem";
 import LoadingItem from "shared/LoadingItem";
 import Empty from "./Empty";
 import EmbeddedMain from "shared/EmbeddedMain";
-import CopyRight from "./CopyRight";
+import Spinner from "shared/Spinner";
 
 const PluginFC = () => {
   const dispatch = useAppDispatch();
@@ -38,22 +38,20 @@ const PluginFC = () => {
     },
     [canMoreCast, loadMoreCast, onMoreCast]
   );
-  if (loadingCast) {
-    return <LoadingItem fullScreen />;
-  }
-  if (casts.length === 0) {
-    return <Empty />;
-  }
   return (
     <div className={styles.container}>
-      <ol className={styles["list-cast"]} onScroll={onScroll}>
-        <EmbeddedMain />
-        {casts.map((el) => (
-          <CastItem key={el.hash} cast={el} />
-        ))}
-        {loadMoreCast && <LoadingItem />}
-      </ol>
-      <CopyRight />
+      <EmbeddedMain />
+      {!loadingCast && casts.length === 0 ? (
+        <Empty />
+      ) : (
+        <ol className={styles["list-cast"]} onScroll={onScroll}>
+          {casts.map((el) => (
+            <CastItem key={el.hash} cast={el} />
+          ))}
+          {loadMoreCast && <LoadingItem />}
+        </ol>
+      )}
+      {loadingCast && <Spinner size={30} />}
     </div>
   );
 };

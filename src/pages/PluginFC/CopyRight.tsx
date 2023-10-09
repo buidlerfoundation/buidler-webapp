@@ -4,11 +4,16 @@ import LogoFC from "shared/SVG/LogoFC";
 
 const CopyRight = () => {
   return (
-    <div className={styles["copy-right"]}>
+    <a
+      className={styles["copy-right"]}
+      href="https://www.farcaster.xyz/"
+      target="_blank"
+      rel="noreferrer"
+    >
       <span className={styles["sub-text"]}>Powered by</span>
-      <LogoFC />
+      <LogoFC size={15} />
       <span className={styles["main-text"]}>Farcaster</span>
-    </div>
+    </a>
   );
 };
 
