@@ -14,12 +14,12 @@ const Empty = () => {
   return (
     <div className={styles["empty-state"]}>
       <div className={styles["empty-body"]}>
-        <span>No discussion has been created yet.</span>
+        <span>No post has been created yet.</span>
         {fcUser && (
           <div className={styles.actions}>
             <div className={styles["btn-cast"]} onClick={onCreateCastClick}>
               <IconPlus fill="white" style={{ marginRight: 10 }} />
-              <span>New discussion</span>
+              <span>New post</span>
             </div>
           </div>
         )}

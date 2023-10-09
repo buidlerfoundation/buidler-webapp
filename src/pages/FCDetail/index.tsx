@@ -32,7 +32,7 @@ const FCDetail = () => {
       <div className={styles.header}>
         <div className={styles["back__wrap"]} onClick={onBack}>
           <IconArrowBack style={{ marginRight: 10 }} />
-          <span>Conversation</span>
+          <span>Post</span>
         </div>
       </div>
       {loading && <LoadingItem />}
