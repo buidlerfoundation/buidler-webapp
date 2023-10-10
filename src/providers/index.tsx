@@ -33,11 +33,11 @@ const Providers = ({ children }: ProvidersProps) => {
     <Provider store={store}>
       <ThemeProvider theme={materialTheme}>
         <SocketProvider>
-          <WalletConnectProvider>
-            <AuthProvider>
-              <ImageProvider>{children}</ImageProvider>
-            </AuthProvider>
-          </WalletConnectProvider>
+          {/* <WalletConnectProvider> */}
+          <AuthProvider>
+            <ImageProvider>{children}</ImageProvider>
+          </AuthProvider>
+          {/* </WalletConnectProvider> */}
         </SocketProvider>
         <CssBaseline />
       </ThemeProvider>
