@@ -1,18 +1,15 @@
 import React, { memo, useCallback } from "react";
 import styles from "./index.module.scss";
-import useAppDispatch from "hooks/useAppDispatch";
-import { FC_CAST_ACTIONS } from "reducers/FCCastReducers";
 import IconPlus from "shared/SVG/IconPlus";
 
 const Empty = () => {
-  const dispatch = useAppDispatch();
   const onCreateCastClick = useCallback(() => {
-    dispatch(FC_CAST_ACTIONS.toggleNewCast());
-    // window.top?.postMessage(
-    //   { type: "b-fc-plugin-open-compose" },
-    //   { targetOrigin: "*" }
-    // );
-  }, [dispatch]);
+    // dispatch(FC_CAST_ACTIONS.toggleNewCast());
+    window.top?.postMessage(
+      { type: "b-fc-plugin-open-compose" },
+      { targetOrigin: "*" }
+    );
+  }, []);
   return (
     <div className={styles["empty-state"]}>
       <div className={styles["empty-body"]}>
