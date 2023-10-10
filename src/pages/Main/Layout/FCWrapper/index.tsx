@@ -249,11 +249,19 @@ const FCWrapper = () => {
   const onWithoutLoginClick = useCallback(() => {
     pollingController.current.abort();
     setSignedKeyRequest(null);
-  }, []);
+    if (openNewCast) {
+      handleCloseNewCast();
+    }
+  }, [handleCloseNewCast, openNewCast]);
   const onLoginClick = useCallback(() => {
     if (signedKeyRequest) return;
     requestSignerId();
   }, [requestSignerId, signedKeyRequest]);
+  useEffect(() => {
+    if (openNewCast && !fcUser) {
+      onLoginClick();
+    }
+  }, [fcUser, onLoginClick, openNewCast]);
   const onCloseModalReply = useCallback(() => {
     dispatch(FC_CAST_ACTIONS.updateReplyCast());
   }, [dispatch]);
