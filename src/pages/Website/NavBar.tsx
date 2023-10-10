@@ -63,7 +63,7 @@ const NavBar = () => {
               <li className="nav-item">
                 <a
                   className="nav-link"
-                  href="https://xcaster.notion.site/xcaster/XCaster-Roadmap-761e03885290404e875a6dca5282121b"
+                  href="https://buidler-extension.notion.site/Buidler-Roadmap-https-buidler-app-761e03885290404e875a6dca5282121b"
                   target="_blank"
                   rel="noreferrer"
                 >

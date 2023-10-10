@@ -36,9 +36,6 @@ textarea {
 a {
   color: var(--color-mention);
   text-decoration: none;
-  &:focus {
-    color: var(--color-mention);
-  }
   &:hover {
     text-decoration: underline;
   }
