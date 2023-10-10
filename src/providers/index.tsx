@@ -5,7 +5,6 @@ import store from "store";
 import SocketProvider from "./SocketProvider";
 import AuthProvider from "./AuthProvider";
 import ImageProvider from "./ImageProvider";
-import { WalletConnectProvider } from "./WalletConnectProvider";
 
 type ProvidersProps = {
   children: React.ReactNode;
