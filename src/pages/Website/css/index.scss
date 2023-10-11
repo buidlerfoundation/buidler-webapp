@@ -120,12 +120,6 @@ button[aria-expanded="true"] {
       color: var(--color-branding-secondary);
     }
   }
-  .btn-primary {
-    background-color: var(--color-stroke);
-    &:hover {
-      background-color: var(--color-stroke);
-    }
-  }
 }
 
 .download {
@@ -176,13 +170,13 @@ button[aria-expanded="true"] {
 
 .btn-primary {
   color: var(--color-branding-accent-2) !important;
-  background-color: var(--color-stroke);
+  background-color: var(--color-background-btn-primary);
   &:hover {
     color: var(--color-branding-accent-2) !important;
-    background-color: var(--color-stroke);
+    background-color: var(--color-background-btn-primary);
   }
   &:active {
-    background-color: var(--color-stroke) !important;
+    background-color: var(--color-background-btn-primary) !important;
     border: none;
   }
   &:focus {
