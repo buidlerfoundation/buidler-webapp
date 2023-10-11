@@ -11,7 +11,6 @@ import { clearData, getCookie } from "../common/Cookie";
 import { refreshTokenAction } from "reducers/UserActions";
 import { BaseDataApi } from "models/User";
 import { logoutAction } from "reducers/actions";
-import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 const METHOD_GET = "get";
 const METHOD_POST = "post";
@@ -60,15 +59,6 @@ const handleError = (message: string, apiData: any, withoutError?: boolean) => {
     throw new Error("Something wrong");
   } else if (!ignoreMessageErrorApis.includes(compareUri) && !withoutError) {
     toast.error(message);
-  }
-};
-
-const getRequestBody = (data: any) => {
-  try {
-    const body = JSON.parse(data);
-    return body;
-  } catch (error) {
-    return {};
   }
 };
 
@@ -129,13 +119,6 @@ const fetchWithRetry: any = (
           );
         }
       }
-      GoogleAnalytics.trackingError(
-        uri,
-        fetchOptions.method.toLowerCase(),
-        msg,
-        err.statusCode,
-        getRequestBody(fetchOptions.body)
-      );
       if (!msg.includes("aborted")) {
         handleError(msg, { uri, fetchOptions }, withoutError);
       }
