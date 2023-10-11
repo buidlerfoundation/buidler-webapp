@@ -102,6 +102,7 @@ import MetaMaskLogo2 from "../assets/images/metamask_logo_2.svg";
 import IconCircleCheck from "../assets/images/ic_circle_check.svg";
 import iconVideoPlay from "../assets/images/ic_video_play.svg";
 import icExplore from "../assets/images/ic_explore.png";
+import icDefaultAvatar from "../assets/images/ic_default_avatar.svg";
 
 // website
 import logoDark from "../assets/website/nav_logo.svg";
@@ -226,6 +227,7 @@ const images = {
   icTW,
   icYTB,
   icExplore,
+  icDefaultAvatar,
 };
 
 export default images;
