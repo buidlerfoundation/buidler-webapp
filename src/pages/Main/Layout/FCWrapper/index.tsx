@@ -301,7 +301,7 @@ const FCWrapper = () => {
       <Outlet />
       <CopyRight />
       {!storeSignerId && signedKeyRequest?.deeplinkUrl && (
-        <div className={styles["login__wrap"]}>
+        <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>
           <LoginFC
             deepLink={signedKeyRequest.deeplinkUrl}
             onWithoutLoginClick={onWithoutLoginClick}
