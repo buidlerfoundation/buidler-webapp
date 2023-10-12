@@ -21,10 +21,10 @@ import styles from "./index.module.scss";
 import LoginFC from "shared/LoginFC";
 import {
   FC_CAST_ACTIONS,
+  getCastReplies,
   getCastsByUrl,
   getMainMetadata,
 } from "reducers/FCCastReducers";
-import ModalFCReply from "shared/ModalFCReply";
 import PopoverButton from "shared/PopoverButton";
 import PopupUserFCMenu from "shared/PopupUserFCMenu";
 import ImageView from "shared/ImageView";
@@ -91,7 +91,9 @@ const FCWrapper = () => {
             { targetOrigin: "*" }
           );
         }
-        if (queryUrl) {
+        if (payload?.parent_cast_id?.hash) {
+          dispatch(getCastReplies({ hash: payload?.parent_cast_id?.hash }));
+        } else if (queryUrl) {
           dispatch(getCastsByUrl({ text: queryUrl, page: 1, limit: 20 }));
         }
       } else {
@@ -154,6 +156,9 @@ const FCWrapper = () => {
       }
     }
   }, [dispatch, logout, signerId]);
+  const onCloseModalReply = useCallback(() => {
+    dispatch(FC_CAST_ACTIONS.updateReplyCast());
+  }, [dispatch]);
   useEffect(() => {
     if (q) {
       dispatch(FC_CAST_ACTIONS.updateQueryUrl(q));
@@ -239,13 +244,16 @@ const FCWrapper = () => {
       if (e?.data?.type === "b-fc-new-cast") {
         dispatch(FC_CAST_ACTIONS.openNewCast());
       }
+      if (e?.data?.type === "b-fc-close-reply") {
+        onCloseModalReply();
+      }
     };
     window.addEventListener("message", messageListener);
     return () => {
       window.removeEventListener("message", messageListener);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [castHash, castToFC, dispatch, initialSignerId]);
+  }, [castHash, onCloseModalReply, castToFC, dispatch, initialSignerId]);
   const onWithoutLoginClick = useCallback(() => {
     pollingController.current.abort();
     setSignedKeyRequest(null);
@@ -262,9 +270,6 @@ const FCWrapper = () => {
       onLoginClick();
     }
   }, [fcUser, onLoginClick, openNewCast]);
-  const onCloseModalReply = useCallback(() => {
-    dispatch(FC_CAST_ACTIONS.updateReplyCast());
-  }, [dispatch]);
   const onMenuClick = useCallback(
     async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       e.stopPropagation();
@@ -273,6 +278,14 @@ const FCWrapper = () => {
     },
     []
   );
+  useEffect(() => {
+    if (replyCast) {
+      window.top?.postMessage(
+        { type: "b-fc-plugin-open-reply", payload: replyCast },
+        { targetOrigin: "*" }
+      );
+    }
+  }, [replyCast]);
   return (
     <div
       className={`buidler-plugin-theme-${theme || "light"} ${styles.container}`}
@@ -308,12 +321,6 @@ const FCWrapper = () => {
           />
         </div>
       )}
-      <ModalFCReply
-        cast={replyCast}
-        open={!!replyCast}
-        handleClose={onCloseModalReply}
-        theme={theme}
-      />
       <ModalFCCast
         open={openNewCast}
         handleClose={handleCloseNewCast}
