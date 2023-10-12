@@ -122,6 +122,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noreferrer"
                   onClick={onAboutClick}
+                  style={{ display: "none" }}
                 >
                   About
                 </a>
