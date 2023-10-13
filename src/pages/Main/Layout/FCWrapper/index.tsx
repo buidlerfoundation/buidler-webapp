@@ -22,6 +22,8 @@ import LoginFC from "shared/LoginFC";
 import { ISignedKeyRequest } from "models/FC";
 import api from "api";
 import toast from "react-hot-toast";
+import IconDownload from "shared/SVG/FC/IconDownload";
+import useExtensionInstalled from "hooks/useExtensionInstalled";
 
 interface IMenuItem {
   active?: boolean;
@@ -59,6 +61,7 @@ const FCWrapper = () => {
   const [signedKeyRequest, setSignedKeyRequest] = useState<
     ISignedKeyRequest | undefined | null
   >(null);
+  const isExtensionInstalled = useExtensionInstalled();
   const fcUser = useAppSelector((state) => state.fcUser?.data);
   const storeSignerId = useAppSelector((state) => state.fcUser?.signer_id);
   const pollingController = useRef(new AbortController());
@@ -158,36 +161,57 @@ const FCWrapper = () => {
           <IconBuidlerLogo size={30} />
           <span style={{ margin: "0 10px" }}>Buidler</span>
         </Link>
-        <MenuItemMemo
-          title="Home"
-          to="/"
-          icon={
-            <IconMenuHome
-              fill={location.pathname === "/" ? activeColor : inactiveColor}
-            />
-          }
-          active={location.pathname === "/"}
-        />
-        <MenuItemMemo
-          title="Explore"
-          to="/explore"
-          icon={
-            <IconMenuExplore
-              fill={
-                location.pathname === "/explore" ? activeColor : inactiveColor
-              }
-            />
-          }
-          active={location.pathname === "/explore"}
-        />
-        {fcUser && (
-          <div className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}>
-            <ImageView
-              src={fcUser?.pfp.url}
-              className={styles.avatar}
-              alt="avatar"
-            />
-          </div>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <MenuItemMemo
+            title="Home"
+            to="/"
+            icon={
+              <IconMenuHome
+                fill={location.pathname === "/" ? activeColor : inactiveColor}
+              />
+            }
+            active={location.pathname === "/"}
+          />
+          <MenuItemMemo
+            title="Explore"
+            to="/explore"
+            icon={
+              <IconMenuExplore
+                fill={
+                  location.pathname === "/explore" ? activeColor : inactiveColor
+                }
+              />
+            }
+            active={location.pathname === "/explore"}
+          />
+          {fcUser && (
+            <div className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}>
+              <ImageView
+                src={fcUser?.pfp.url}
+                className={styles.avatar}
+                alt="avatar"
+              />
+            </div>
+          )}
+        </div>
+        {!isExtensionInstalled && (
+          <a
+            className={styles["extension-description-container"]}
+            href="https://chrome.google.com/webstore/detail/buidler-one-extension-any/omhbdacaeafhladkifficmjmpeaijlfc"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span className={styles["extension-description"]}>
+              Please install extension for the full experience with Buidler!
+            </span>
+            <div className={styles.cta}>
+              <IconDownload
+                fill="var(--color-mention)"
+                style={{ marginRight: 10 }}
+              />
+              <span>Download Extension</span>
+            </div>
+          </a>
         )}
       </div>
       <div className={styles["page-container"]}>
