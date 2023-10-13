@@ -17,15 +17,18 @@ import Terms from "pages/Website/Terms";
 import Privacy from "pages/Website/Privacy";
 import WebsiteWrapper from "./Layout/WebsiteWrapper";
 import PluginFC from "pages/PluginFC";
-import FCWrapper from "./Layout/FCWrapper";
 import FCDetail from "pages/FCDetail";
+import FCPluginWrapper from "./Layout/FCPluginWrapper";
+import FCWrapper from "./Layout/FCWrapper";
+import HomeFeed from "pages/HomeFeed";
+import Explore from "pages/Explore";
 
 const Main = () => {
   return (
     <div className={styles.container}>
       <Routes>
         <Route element={<WebsiteWrapper />}>
-          <Route path="/" element={<Website />} />
+          <Route path="/landing-page" element={<Website />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
         </Route>
@@ -50,11 +53,12 @@ const Main = () => {
           </Route>
         </Route>
         <Route element={<FCWrapper />}>
+          <Route path="/" element={<HomeFeed />} />
+          <Route path="/explore" element={<Explore />} />
+        </Route>
+        <Route element={<FCPluginWrapper />}>
           <Route path="/plugin-fc" element={<PluginFC />} />
-          <Route
-            path="/plugin-fc/:cast_hash"
-            element={<FCDetail />}
-          />
+          <Route path="/plugin-fc/:cast_hash" element={<FCDetail />} />
         </Route>
         <Route path="/started" element={<Started />} />
         <Route path="/plugin/*" element={<ErrorPluginPage />} />
