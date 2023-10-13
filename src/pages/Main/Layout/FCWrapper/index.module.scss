@@ -36,7 +36,25 @@
     height: 100%;
     border-left: 1px solid var(--color-stroke);
     border-right: 1px solid var(--color-stroke);
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
+    .nav-mobile {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      .mobile-brand-wrap {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 22px;
+        color: var(--color-primary-text);
+        padding: 0 20px;
+        height: 60px;
+      }
+    }
   }
 
   .right-side {
@@ -55,18 +73,19 @@
       padding: 0 20px;
       white-space: nowrap;
     }
-    .btn-login {
-      display: flex;
-      align-items: center;
-      color: var(--color-primary-text);
-      font-size: 16px;
-      font-weight: 600;
-      line-height: 22px;
-      height: 60px;
-      padding: 0 20px;
-      white-space: nowrap;
-      cursor: pointer;
-    }
+  }
+
+  .btn-login {
+    display: flex;
+    align-items: center;
+    color: var(--color-primary-text);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 22px;
+    height: 60px;
+    padding: 0 20px;
+    white-space: nowrap;
+    cursor: pointer;
   }
 
   .avatar {
@@ -120,11 +139,15 @@
   .container {
     .left-side,
     .right-side {
-      display: none;
+      width: 0;
+      overflow: hidden;
     }
     .page-container {
       width: 100vw;
       border: none;
+      .nav-mobile {
+        display: flex;
+      }
     }
   }
 }

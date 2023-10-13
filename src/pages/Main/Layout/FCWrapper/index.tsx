@@ -191,6 +191,24 @@ const FCWrapper = () => {
         )}
       </div>
       <div className={styles["page-container"]}>
+        <div className={styles["nav-mobile"]}>
+          <Link className={styles["mobile-brand-wrap"]} to="/">
+            <IconBuidlerLogo size={30} />
+            <span style={{ margin: "0 10px" }}>Buidler</span>
+          </Link>
+          {fcUser ? (
+            <ImageView
+              src={fcUser.pfp.url}
+              alt="avatar"
+              className={styles.avatar}
+              style={{ marginRight: 15 }}
+            />
+          ) : (
+            <div className={styles["btn-login"]} onClick={onLoginClick}>
+              Login
+            </div>
+          )}
+        </div>
         <Outlet />
       </div>
       <div className={styles["right-side"]}>{renderRight()}</div>
