@@ -26,7 +26,7 @@ export const pollingSignedKey = async (
 
 export const getCurrentFCUser = () => Caller.get<IFCUser>("xcaster/users/me");
 
-export const cast = (data: any) => Caller.post<string>("xcaster/casts", data);
+export const cast = (data: any) => Caller.post<string>("casts", data);
 
 export const listCasts = (params: {
   text: string;
@@ -34,7 +34,7 @@ export const listCasts = (params: {
   limit: number;
 }) =>
   Caller.get<ICast[]>(
-    `xcaster/casts?${new URLSearchParams({
+    `casts?${new URLSearchParams({
       url: params.text,
       page: `${params.page}`,
       limit: `${params.limit}`,
@@ -42,10 +42,9 @@ export const listCasts = (params: {
   );
 
 export const getCastDetail = (hash: string) =>
-  Caller.get<ICast>(`xcaster/casts/${hash}`);
+  Caller.get<ICast>(`casts/${hash}`);
 
-export const deleteCast = (hash: string) =>
-  Caller.delete(`xcaster/casts/${hash}`);
+export const deleteCast = (hash: string) => Caller.delete(`casts/${hash}`);
 
 export const recast = (hash: string) =>
   Caller.post(`xcaster/reactions/${hash}/recast`);
