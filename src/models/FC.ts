@@ -72,3 +72,8 @@ export interface IMetadataUrl {
   card?: string;
   description?: string;
 }
+
+export interface IFCFilterType {
+  label: "trending" | "newest" | "by domain";
+  id: string;
+}
