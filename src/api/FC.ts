@@ -65,3 +65,16 @@ export const getEmbeddedMetadata = (url: string) =>
     undefined,
     true
   );
+
+export const getHomeFeed = (params: {
+  type: string;
+  page: number;
+  limit: number;
+}) =>
+  Caller.get<ICast[]>(
+    `home/?${new URLSearchParams({
+      type: params.type,
+      page: `${params.page}`,
+      limit: `${params.limit}`,
+    })}`
+  );

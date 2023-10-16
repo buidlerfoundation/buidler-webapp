@@ -22,6 +22,7 @@ import FCPluginWrapper from "./Layout/FCPluginWrapper";
 import FCWrapper from "./Layout/FCWrapper";
 import HomeFeed from "pages/HomeFeed";
 import Explore from "pages/Explore";
+import HomeFeedDetail from "pages/HomeFeedDetail";
 
 const Main = () => {
   return (
@@ -54,6 +55,7 @@ const Main = () => {
         </Route>
         <Route element={<FCWrapper />}>
           <Route path="/" element={<HomeFeed />} />
+          <Route path="/:fc_username/:hash" element={<HomeFeedDetail />} />
           <Route path="/explore" element={<Explore />} />
         </Route>
         <Route element={<FCPluginWrapper />}>

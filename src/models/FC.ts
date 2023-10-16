@@ -64,6 +64,7 @@ export interface ICast {
     count?: number;
     casts?: ICast[];
   };
+  metadata?: IMetadataUrl;
 }
 
 export interface IMetadataUrl {
@@ -71,6 +72,7 @@ export interface IMetadataUrl {
   title?: string;
   card?: string;
   description?: string;
+  logo?: string;
 }
 
 export interface IFCFilterType {

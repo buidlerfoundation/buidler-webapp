@@ -24,6 +24,8 @@ import api from "api";
 import toast from "react-hot-toast";
 import IconDownload from "shared/SVG/FC/IconDownload";
 import useExtensionInstalled from "hooks/useExtensionInstalled";
+import { getFeed } from "reducers/HomeFeedReducers";
+import useFeedFilter from "hooks/useFeedFilter";
 
 interface IMenuItem {
   active?: boolean;
@@ -55,6 +57,7 @@ const MenuItemMemo = memo(MenuItem);
 
 const FCWrapper = () => {
   const dispatch = useAppDispatch();
+  const filter = useFeedFilter();
   const [loading, setLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [polling, setPolling] = useState(false);
@@ -92,6 +95,11 @@ const FCWrapper = () => {
   useEffect(() => {
     checkingAuth();
   }, [checkingAuth]);
+  useEffect(() => {
+    if (filter.label) {
+      dispatch(getFeed({ type: filter.label, page: 1, limit: 20 }));
+    }
+  }, [dispatch, filter.label]);
   const onWithoutLoginClick = useCallback(() => {
     pollingController.current.abort();
     setSignedKeyRequest(null);
@@ -136,7 +144,9 @@ const FCWrapper = () => {
     if (fcUser) {
       return (
         <div className={styles["user-info"]}>
-          <span style={{ marginRight: 10 }}>{fcUser.display_name}</span>
+          <span className="truncate" style={{ marginRight: 10, maxWidth: 170 }}>
+            {fcUser.display_name}
+          </span>
           <ImageView
             src={fcUser.pfp.url}
             className={styles.avatar}

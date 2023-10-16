@@ -6,7 +6,7 @@
   position: relative;
   margin: auto;
   .left-side {
-    flex: 1;
+    width: 275px;
     display: flex;
     flex-direction: column;
     .menu-item {
@@ -141,8 +141,10 @@
 @media only screen and (max-width: 1120px) {
   .container {
     width: 100%;
-    .left-side .extension-description-container {
-      display: none;
+    .right-side {
+      .user-info span {
+        display: none;
+      }
     }
   }
 }
@@ -151,6 +153,11 @@
   .container {
     width: fit-content;
     .left-side {
+      flex: 1;
+      width: unset;
+      .extension-description-container {
+        display: none;
+      }
       .avatar-wrap {
         display: flex;
       }
