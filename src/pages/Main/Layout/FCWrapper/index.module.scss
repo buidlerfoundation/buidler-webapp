@@ -29,6 +29,9 @@
       font-weight: 600;
       line-height: 22px;
       color: var(--color-primary-text);
+      &:hover {
+        background-color: unset;
+      }
     }
     .avatar-wrap {
       display: none;
