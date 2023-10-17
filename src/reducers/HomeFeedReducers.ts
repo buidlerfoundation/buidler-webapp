@@ -2,16 +2,18 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ICast, IFCFilterType } from "models/FC";
 import api from "api";
 
+interface IFeedData {
+  data: ICast[];
+  total?: number;
+  currentPage?: number;
+  canMore?: boolean;
+  loading?: boolean;
+  loadMore?: boolean;
+}
+
 interface HomeFeedState {
   feedMap: {
-    [key: string]: {
-      data: ICast[];
-      total?: number;
-      currentPage?: number;
-      canMore?: boolean;
-      loading?: boolean;
-      loadMore?: boolean;
-    };
+    [key: string]: IFeedData;
   };
   replyCast?: ICast;
   castDetail: {
@@ -27,6 +29,7 @@ interface HomeFeedState {
   openNewCast: boolean;
   filters: IFCFilterType[];
   currentFilter: IFCFilterType;
+  explore: IFeedData;
 }
 
 const initialState: HomeFeedState = {
@@ -41,7 +44,18 @@ const initialState: HomeFeedState = {
     { label: "newest", id: "2" },
   ],
   currentFilter: { label: "trending", id: "1" },
+  explore: {
+    data: [],
+  },
 };
+
+export const getFeedByUrl = createAsyncThunk(
+  "home-feed/get-by-url",
+  async (payload: { text: string; page: number; limit: number }) => {
+    const res = await api.listCasts(payload);
+    return res;
+  }
+);
 
 export const getCastDetail = createAsyncThunk(
   "home-feed/get-by-hash",
@@ -205,6 +219,41 @@ const homeFeedSlice = createSlice({
             ].data.filter((el) => el.hash !== cast.hash);
           }
         }
+      })
+      .addCase(getFeedByUrl.pending, (state, action) => {
+        if (action.meta.arg.page === 1) {
+          state.explore = {
+            loading: true,
+            data: [],
+          };
+        } else {
+          state.explore = {
+            ...state.explore,
+            loadMore: true,
+          };
+        }
+      })
+      .addCase(getFeedByUrl.rejected, (state) => {
+        state.explore = {
+          ...state.explore,
+          loadMore: false,
+          loading: false,
+        };
+      })
+      .addCase(getFeedByUrl.fulfilled, (state, action) => {
+        const total = action.payload.metadata?.total || 0;
+        const limit = action.meta.arg.limit;
+        const totalPage = Math.ceil(total / limit);
+        const currentPage = action.meta.arg.page;
+        const data = action.payload?.data || [];
+        state.explore = {
+          data: currentPage === 1 ? data : [...state.explore.data, ...data],
+          loadMore: false,
+          loading: false,
+          total,
+          canMore: totalPage > currentPage,
+          currentPage,
+        };
       });
   },
 });

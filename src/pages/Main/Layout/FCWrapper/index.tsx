@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 import styles from "./index.module.scss";
 import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
 import IconMenuHome from "shared/SVG/FC/IconMenuHome";
@@ -24,7 +24,11 @@ import api from "api";
 import toast from "react-hot-toast";
 import IconDownload from "shared/SVG/FC/IconDownload";
 import useExtensionInstalled from "hooks/useExtensionInstalled";
-import { HOME_FEED_ACTIONS, getFeed } from "reducers/HomeFeedReducers";
+import {
+  HOME_FEED_ACTIONS,
+  getFeed,
+  getFeedByUrl,
+} from "reducers/HomeFeedReducers";
 import useFeedFilter from "hooks/useFeedFilter";
 import ModalFCReply from "shared/ModalFCReply";
 import useFeedData from "hooks/useFeedData";
@@ -63,6 +67,9 @@ const FCWrapper = () => {
   const [loading, setLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [polling, setPolling] = useState(false);
+  const params = useParams<{ url: string }>();
+  const exploreUrl = useMemo(() => params?.url, [params?.url]);
+  const explore = useAppSelector((state) => state.homeFeed.explore);
   const [signedKeyRequest, setSignedKeyRequest] = useState<
     ISignedKeyRequest | undefined | null
   >(null);
@@ -107,6 +114,11 @@ const FCWrapper = () => {
       dispatch(getFeed({ type: filter.label, page: 1, limit: 20 }));
     }
   }, [dispatch, filter.label]);
+  useEffect(() => {
+    if (exploreUrl) {
+      dispatch(getFeedByUrl({ text: exploreUrl, page: 1, limit: 20 }));
+    }
+  }, [dispatch, exploreUrl]);
   const onWithoutLoginClick = useCallback(() => {
     pollingController.current.abort();
     setSignedKeyRequest(null);
@@ -185,11 +197,24 @@ const FCWrapper = () => {
     feedData?.loadMore,
     filter.label,
   ]);
+  const onFeedByUrlEndReach = useCallback(() => {
+    if (exploreUrl) {
+      dispatch(
+        getFeedByUrl({
+          text: exploreUrl,
+          page: (explore.currentPage || 1) + 1,
+          limit: 20,
+        })
+      );
+    }
+  }, [dispatch, explore.currentPage, exploreUrl]);
   const onPageEndReach = useCallback(() => {
     if (location.pathname === "/") {
       onHomeEndReach();
+    } else if (exploreUrl) {
+      onFeedByUrlEndReach();
     }
-  }, [location.pathname, onHomeEndReach]);
+  }, [exploreUrl, location.pathname, onFeedByUrlEndReach, onHomeEndReach]);
   const onPageScroll = useCallback(
     (e: any) => {
       const { scrollTop, scrollHeight, clientHeight } = e.target;

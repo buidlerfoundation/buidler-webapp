@@ -1,7 +1,7 @@
-import React, { memo, useEffect, useMemo } from "react";
+import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import IconArrowBack from "shared/SVG/IconArrowBack";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import MetadataFeed from "shared/MetadataFeed";
 import useAppSelector from "hooks/useAppSelector";
 import useFeedRepliesData from "hooks/useFeedRepliesData";
@@ -13,11 +13,15 @@ import CastItem from "shared/CastItem";
 
 const HomeFeedDetail = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const loading = useAppSelector((state) => state.homeFeed.castDetail.loading);
   const params = useParams<{ hash: string }>();
   const hash = useMemo(() => params?.hash, [params?.hash]);
   const castDetail = useAppSelector((state) => state.homeFeed.castDetail.data);
   const castRepliesData = useFeedRepliesData(hash);
+  const goBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
   useEffect(() => {
     if (hash) {
       dispatch(getCastDetail({ hash }));
@@ -26,10 +30,13 @@ const HomeFeedDetail = () => {
   return (
     <div className={styles.container}>
       <nav className={styles.head}>
-        <Link className={styles["btn-back"]} to="..">
+        <div
+          className={`${styles["btn-back"]} normal-button-clear`}
+          onClick={goBack}
+        >
           <IconArrowBack />
           <span>Post</span>
-        </Link>
+        </div>
       </nav>
       {loading && <Spinner size={30} />}
       {!loading && castDetail && (

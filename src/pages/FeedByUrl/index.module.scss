@@ -1,2 +1,21 @@
 .container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  .head {
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    height: 70px;
+    border-bottom: 1px solid var(--color-stroke);
+    background-color: var(--color-background-1);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .list {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
 }

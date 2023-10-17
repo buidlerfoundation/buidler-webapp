@@ -1,17 +1,42 @@
-import React, { memo, useEffect, useMemo, useState } from "react";
+import React, { memo, useCallback } from "react";
 import styles from "./index.module.scss";
-import { useParams } from "react-router-dom";
+import useAppSelector from "hooks/useAppSelector";
+import IconArrowBack from "shared/SVG/IconArrowBack";
+import { Link, useNavigate } from "react-router-dom";
+import Spinner from "shared/Spinner";
+import LoadingItem from "shared/LoadingItem";
+import CastItem from "shared/CastItem";
+import { ICast } from "models/FC";
 
 const FeedByUrl = () => {
-  const [loading, setLoading] = useState(false);
-  const params = useParams<{ url: string }>();
-  const url = useMemo(() => params?.url, [params?.url]);
-  useEffect(() => {
-    if (url) {
-      console.log("XXX: ", url);
-    }
-  }, [url]);
-  return <div className={styles.container}></div>;
+  const navigate = useNavigate();
+  const explore = useAppSelector((state) => state.homeFeed.explore);
+  const renderFeed = useCallback(
+    (cast: ICast) => <CastItem cast={cast} key={cast.hash} homeFeed />,
+    []
+  );
+  const renderBody = useCallback(() => {
+    if (explore.loading) return <Spinner size={30} />;
+    return (
+      <ol className={styles.list}>
+        {explore?.data?.map(renderFeed)}
+        {explore?.loadMore && <LoadingItem />}
+      </ol>
+    );
+  }, [explore?.data, explore?.loadMore, explore.loading, renderFeed]);
+  const goBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+  return (
+    <div className={styles.container}>
+      <nav className={styles.head}>
+        <div className="normal-button-clear" onClick={goBack}>
+          <IconArrowBack />
+        </div>
+      </nav>
+      {renderBody()}
+    </div>
+  );
 };
 
 export default memo(FeedByUrl);
