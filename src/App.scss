@@ -389,6 +389,43 @@ iframe {
   }
 }
 
+.popup-menu-container {
+  width: 295px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: var(--color-background-1);
+  .group {
+    display: flex;
+    flex-direction: column;
+    padding: 5px 0;
+    background-color: var(--color-background-2);
+    border-radius: 10px;
+    margin-top: 10px;
+    .menu-item {
+      display: flex;
+      align-items: center;
+      height: 45px;
+      padding: 0 15px;
+      .name {
+        flex: 1;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 22px;
+        color: var(--color-primary-text);
+        margin-left: 15px;
+      }
+      &:hover {
+        cursor: pointer;
+      }
+    }
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
+
 code {
   white-space: pre-line;
 }
