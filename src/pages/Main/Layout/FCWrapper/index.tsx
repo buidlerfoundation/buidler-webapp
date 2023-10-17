@@ -24,8 +24,10 @@ import api from "api";
 import toast from "react-hot-toast";
 import IconDownload from "shared/SVG/FC/IconDownload";
 import useExtensionInstalled from "hooks/useExtensionInstalled";
-import { getFeed } from "reducers/HomeFeedReducers";
+import { HOME_FEED_ACTIONS, getFeed } from "reducers/HomeFeedReducers";
 import useFeedFilter from "hooks/useFeedFilter";
+import ModalFCReply from "shared/ModalFCReply";
+import useFeedData from "hooks/useFeedData";
 
 interface IMenuItem {
   active?: boolean;
@@ -66,9 +68,11 @@ const FCWrapper = () => {
   >(null);
   const isExtensionInstalled = useExtensionInstalled();
   const fcUser = useAppSelector((state) => state.fcUser?.data);
+  const replyCast = useAppSelector((state) => state.homeFeed.replyCast);
   const storeSignerId = useAppSelector((state) => state.fcUser?.signer_id);
   const pollingController = useRef(new AbortController());
   const location = useLocation();
+  const feedData = useFeedData();
   const activeColor = useMemo(() => "var(--color-primary-text)", []);
   const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
   const logout = useCallback(() => {
@@ -78,6 +82,9 @@ const FCWrapper = () => {
     );
     clearData();
     dispatch(logoutAction());
+  }, [dispatch]);
+  const onCloseReply = useCallback(() => {
+    dispatch(HOME_FEED_ACTIONS.updateReplyCast());
   }, [dispatch]);
   const checkingAuth = useCallback(async () => {
     setLoading(true);
@@ -161,9 +168,44 @@ const FCWrapper = () => {
       </div>
     );
   }, [fcUser, loading, onLoginClick]);
+  const onHomeEndReach = useCallback(() => {
+    if (feedData?.canMore && !feedData?.loadMore) {
+      dispatch(
+        getFeed({
+          type: filter.label,
+          page: (feedData?.currentPage || 1) + 1,
+          limit: 20,
+        })
+      );
+    }
+  }, [
+    dispatch,
+    feedData?.canMore,
+    feedData?.currentPage,
+    feedData?.loadMore,
+    filter.label,
+  ]);
+  const onPageEndReach = useCallback(() => {
+    if (location.pathname === "/") {
+      onHomeEndReach();
+    }
+  }, [location.pathname, onHomeEndReach]);
+  const onPageScroll = useCallback(
+    (e: any) => {
+      const { scrollTop, scrollHeight, clientHeight } = e.target;
+      const compare = Math.round(scrollTop + clientHeight);
+      if (compare === scrollHeight + 1 || compare === scrollHeight) {
+        onPageEndReach();
+      }
+    },
+    [onPageEndReach]
+  );
   return (
-    <div className={`buidler-plugin-theme-light ${styles.container}`}>
-      <div className={styles["left-side"]}>
+    <div
+      className={`buidler-plugin-theme-light ${styles.container}`}
+      onScroll={onPageScroll}
+    >
+      <aside className={styles["left-side"]}>
         <Link
           className={`${styles["menu-item"]} ${styles["brand-wrap"]}`}
           to="/"
@@ -223,8 +265,8 @@ const FCWrapper = () => {
             </div>
           </a>
         )}
-      </div>
-      <div className={styles["page-container"]}>
+      </aside>
+      <main className={styles["page-container"]}>
         <div className={styles["nav-mobile"]}>
           <Link className={styles["mobile-brand-wrap"]} to="/">
             <IconBuidlerLogo size={30} />
@@ -244,8 +286,8 @@ const FCWrapper = () => {
           )}
         </div>
         <Outlet />
-      </div>
-      <div className={styles["right-side"]}>{renderRight()}</div>
+      </main>
+      <aside className={styles["right-side"]}>{renderRight()}</aside>
       {!storeSignerId && signedKeyRequest?.deeplinkUrl && (
         <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>
           <LoginFC
@@ -253,6 +295,13 @@ const FCWrapper = () => {
             onWithoutLoginClick={onWithoutLoginClick}
           />
         </div>
+      )}
+      {fcUser && (
+        <ModalFCReply
+          open={!!replyCast}
+          handleClose={onCloseReply}
+          cast={replyCast}
+        />
       )}
     </div>
   );

@@ -56,16 +56,23 @@ function App() {
       } = e;
       navigate(path, { replace: !push });
     };
+    const eventKeyDown = (e: any) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+      }
+    };
     window.addEventListener("offline", eventOffline);
     window.addEventListener("online", eventOnline);
     window.addEventListener("paste", eventPaste);
     window.addEventListener("contextmenu", eventContextMenu);
+    window.addEventListener("keydown", eventKeyDown);
     window.addEventListener(CustomEventName.CHANGE_ROUTE, changeRouteListener);
     return () => {
       window.removeEventListener("offline", eventOffline);
       window.removeEventListener("online", eventOnline);
       window.removeEventListener("paste", eventPaste);
       window.removeEventListener("contextmenu", eventContextMenu);
+      window.removeEventListener("keydown", eventKeyDown);
       window.removeEventListener(
         CustomEventName.CHANGE_ROUTE,
         changeRouteListener

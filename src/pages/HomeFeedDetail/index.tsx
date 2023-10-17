@@ -25,12 +25,12 @@ const HomeFeedDetail = () => {
   }, [dispatch, hash]);
   return (
     <div className={styles.container}>
-      <div className={styles.head}>
+      <nav className={styles.head}>
         <Link className={styles["btn-back"]} to="..">
           <IconArrowBack />
           <span>Post</span>
         </Link>
-      </div>
+      </nav>
       {loading && <Spinner size={30} />}
       {!loading && castDetail && (
         <div className={styles.body}>
@@ -42,9 +42,10 @@ const HomeFeedDetail = () => {
             replyCount={
               castRepliesData?.data?.length || castDetail?.replies?.count || 0
             }
+            homeFeed
           />
           {castRepliesData?.data?.map((el) => (
-            <CastItem cast={el} key={el.hash} comment />
+            <CastItem cast={el} key={el.hash} comment homeFeed />
           ))}
         </div>
       )}

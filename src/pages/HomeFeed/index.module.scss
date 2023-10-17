@@ -2,13 +2,15 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
   .filter-head {
     height: 70px;
     padding: 0 20px;
     display: flex;
     align-items: center;
     column-gap: 15px;
+    background-color: var(--color-background-1);
+    position: sticky;
+    top: 0;
     .filter-item {
       display: flex;
       align-items: center;
