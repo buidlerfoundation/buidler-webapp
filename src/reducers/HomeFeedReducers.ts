@@ -39,7 +39,6 @@ const initialState: HomeFeedState = {
   filters: [
     { label: "trending", id: "1" },
     { label: "newest", id: "2" },
-    { label: "by domain", id: "3" },
   ],
   currentFilter: { label: "trending", id: "1" },
 };
