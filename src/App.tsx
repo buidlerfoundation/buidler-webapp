@@ -4,7 +4,7 @@ import "./App.scss";
 import "styles/spacing.scss";
 import "styles/emoji.scss";
 import Main from "pages/Main";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CustomEventName } from "services/events/WindowEvent";
 import AppToastNotification from "shared/AppToastNotification";
 import moment from "moment";
@@ -95,6 +95,12 @@ function App() {
   //     window.removeEventListener("click", eventClick);
   //   };
   // }, []);
+  useEffect(() => {
+    if (Link.defaultProps == null) Link.defaultProps = {};
+    Link.defaultProps.onClick = (e) => {
+      e.stopPropagation();
+    };
+  }, []);
   return (
     <>
       <Main />

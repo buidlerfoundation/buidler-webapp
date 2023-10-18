@@ -73,6 +73,7 @@ export interface IMetadataUrl {
   card?: string;
   description?: string;
   logo?: string;
+  url?: string;
 }
 
 export interface IFCFilterType {

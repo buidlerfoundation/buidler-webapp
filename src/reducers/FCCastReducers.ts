@@ -101,12 +101,6 @@ const fcCastSlice = createSlice({
     updateReplyCast: (state, action: PayloadAction<ICast | undefined>) => {
       state.replyCast = action.payload;
     },
-    toggleNewCast: (state) => {
-      state.openNewCast = !state.openNewCast;
-    },
-    openNewCast: (state) => {
-      state.openNewCast = true;
-    },
   },
   extraReducers: (builder) => {
     builder

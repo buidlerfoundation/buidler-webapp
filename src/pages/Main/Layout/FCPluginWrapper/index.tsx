@@ -29,7 +29,6 @@ import PopoverButton from "shared/PopoverButton";
 import PopupUserFCMenu from "shared/PopupUserFCMenu";
 import ImageView from "shared/ImageView";
 import { logoutAction } from "reducers/actions";
-import ModalFCCast from "shared/ModalFCCast";
 import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
 import CopyRight from "pages/PluginFC/CopyRight";
 
@@ -56,9 +55,6 @@ const FCPluginWrapper = () => {
   const replyCast = useAppSelector((state) => state.fcCast.replyCast);
   const openNewCast = useAppSelector((state) => state.fcCast.openNewCast);
   const signerId = useMemo(() => query.get("signer_id"), [query]);
-  const handleCloseNewCast = useCallback(() => {
-    dispatch(FC_CAST_ACTIONS.toggleNewCast());
-  }, [dispatch]);
   const logout = useCallback(() => {
     window.top?.postMessage(
       { type: "b-fc-plugin-logout" },
@@ -242,9 +238,6 @@ const FCPluginWrapper = () => {
           dispatch(FC_CAST_ACTIONS.updateTitleUrl(title));
         }
       }
-      if (e?.data?.type === "b-fc-new-cast") {
-        dispatch(FC_CAST_ACTIONS.openNewCast());
-      }
       if (e?.data?.type === "b-fc-close-reply") {
         onCloseModalReply();
       }
@@ -258,10 +251,7 @@ const FCPluginWrapper = () => {
   const onWithoutLoginClick = useCallback(() => {
     pollingController.current.abort();
     setSignedKeyRequest(null);
-    if (openNewCast) {
-      handleCloseNewCast();
-    }
-  }, [handleCloseNewCast, openNewCast]);
+  }, []);
   const onLoginClick = useCallback(() => {
     if (signedKeyRequest) return;
     requestSignerId();
@@ -322,11 +312,6 @@ const FCPluginWrapper = () => {
           />
         </div>
       )}
-      <ModalFCCast
-        open={openNewCast}
-        handleClose={handleCloseNewCast}
-        theme={theme}
-      />
       <PopoverButton
         ref={popupMenuRef}
         popupOnly

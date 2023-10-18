@@ -42,7 +42,7 @@ const HomeFeedDetail = () => {
       {!loading && castDetail && (
         <div className={styles.body}>
           <div className={styles.metadata}>
-            <MetadataFeed />
+            <MetadataFeed metadata={castDetail.metadata} />
           </div>
           <CastDetailItem
             cast={castDetail}

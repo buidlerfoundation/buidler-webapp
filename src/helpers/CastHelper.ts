@@ -21,7 +21,7 @@ export const normalizeContentUrl = (string: string) => {
         regexUrl,
         `<a href='${insertHttpIfNeed(
           str.match(regexUrl)?.[0]
-        )}' class='mention-string' target='_blank'>$1</a>`
+        )}' class='mention-string' target='_blank' onclick='event.stopPropagation();'>$1</a>`
       );
     })
     .join(" ");
@@ -51,7 +51,7 @@ export const normalizeContentCast = (cast: ICast) => {
     const regex = new RegExp(`@${el.username}`, "gim");
     res = res.replace(
       regex,
-      `<a href='https://warpcast.com/${el.username}' class="mention-string" target='_blank'>@${el.username}</a>`
+      `<a href='https://warpcast.com/${el.username}' class="mention-string" target='_blank' onclick='event.stopPropagation();'>@${el.username}</a>`
     );
   });
   return res;
