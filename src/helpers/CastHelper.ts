@@ -3,7 +3,7 @@ import { ICast } from "models/FC";
 const regexUrl =
   /((https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,256}\b([-a-zA-Z0-9@:%_+.~#(?&//=]*))/gim;
 
-const insertHttpIfNeed = (str?: string) => {
+export const insertHttpIfNeed = (str?: string) => {
   if (!str) return "";
   if (str.includes("http")) {
     return str;
@@ -79,7 +79,7 @@ export const getURLObject = (url?: string) => {
   if (!url) return null;
   try {
     const pattern = /\/+$/;
-    const modifiedUrl = url.replace(pattern, "");
+    const modifiedUrl = insertHttpIfNeed(url).replace(pattern, "");
     const urlParser = new URL(modifiedUrl);
     const hostnameSplit = urlParser.hostname.split(".");
     const siteName = hostnameSplit[hostnameSplit.length - 2];

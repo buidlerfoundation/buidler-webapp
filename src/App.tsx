@@ -100,6 +100,7 @@ function App() {
     Link.defaultProps.onClick = (e) => {
       e.stopPropagation();
     };
+    Link.defaultProps.preventScrollReset = true;
   }, []);
   return (
     <>

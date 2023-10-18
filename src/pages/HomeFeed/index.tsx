@@ -61,10 +61,10 @@ const HomeFeed = () => {
   const renderBody = useCallback(() => {
     if (feedData?.data?.length > 0) {
       return (
-        <div className={styles.list}>
+        <ol className={styles.list}>
           {feedData?.data?.map(renderFeed)}
           {feedData?.loadMore && <LoadingItem />}
-        </div>
+        </ol>
       );
     }
     if (feedData?.loading) {
@@ -76,7 +76,11 @@ const HomeFeed = () => {
   return (
     <div className={styles.container}>
       <nav className={styles["filter-head"]}>{filters.map(renderFilter)}</nav>
-      {renderBody()}
+      {/* {renderBody()} */}
+      <ol className={styles.list}>
+        {feedData?.data?.map(renderFeed)}
+        {feedData?.loadMore && <LoadingItem />}
+      </ol>
     </div>
   );
 };

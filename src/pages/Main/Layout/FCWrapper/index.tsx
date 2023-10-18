@@ -63,6 +63,7 @@ const MenuItemMemo = memo(MenuItem);
 
 const FCWrapper = () => {
   const dispatch = useAppDispatch();
+  const rootRef = useRef<any>();
   const filter = useFeedFilter();
   const [loading, setLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
@@ -229,6 +230,7 @@ const FCWrapper = () => {
     <div
       className={`buidler-plugin-theme-light ${styles.container}`}
       onScroll={onPageScroll}
+      ref={rootRef}
     >
       <aside className={styles["left-side"]}>
         <Link
