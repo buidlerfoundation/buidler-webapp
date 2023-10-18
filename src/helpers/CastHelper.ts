@@ -74,3 +74,55 @@ export const compareEmbeddedUrl = (embeddedUrl: string, queryUrl: string) => {
     qWithoutProtocol.includes(eWithoutProtocol)
   );
 };
+
+export const getURLObject = (url?: string) => {
+  if (!url) return null;
+  try {
+    const pattern = /\/+$/;
+    const modifiedUrl = url.replace(pattern, "");
+    const urlParser = new URL(modifiedUrl);
+    const hostnameSplit = urlParser.hostname.split(".");
+    const siteName = hostnameSplit[hostnameSplit.length - 2];
+    const pathSplit = urlParser.pathname.split("/");
+
+    const protocol = urlParser.protocol;
+    let subdomain = "";
+    let domain = "";
+    if (urlParser.hostname.includes("com.vn")) {
+      subdomain = hostnameSplit.length > 3 ? hostnameSplit[0] : "www";
+      domain =
+        hostnameSplit.length > 3
+          ? hostnameSplit.slice(1, hostnameSplit.length).join(".")
+          : hostnameSplit.join(".");
+    } else {
+      subdomain = hostnameSplit.length > 2 ? hostnameSplit[0] : "www";
+      domain =
+        hostnameSplit.length > 2
+          ? hostnameSplit.slice(1, hostnameSplit.length).join(".")
+          : hostnameSplit.join(".");
+    }
+    let modifiedPath = `${pathSplit.slice(0, -1).join("/")}`;
+    const filename = pathSplit.slice(-1).join("/");
+    if (!filename.includes("index.")) {
+      modifiedPath = `${modifiedPath}/${filename}`;
+    }
+    const search = urlParser.search;
+    const hash = urlParser.hash;
+    const origin = urlParser.origin;
+    const host = urlParser.host;
+
+    return {
+      protocol,
+      subdomain,
+      domain,
+      path: modifiedPath,
+      search,
+      hash,
+      siteName,
+      origin,
+      host,
+    };
+  } catch (error) {
+    return null;
+  }
+};
