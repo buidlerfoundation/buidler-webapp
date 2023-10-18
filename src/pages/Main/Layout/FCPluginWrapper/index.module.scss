@@ -54,7 +54,7 @@
     }
   }
   .login__wrap {
-    position: absolute;
+    position: fixed;
     top: 0px;
     left: 0;
     right: 0;
@@ -64,5 +64,13 @@
     align-items: center;
     justify-content: center;
     padding: 0 40px;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .container {
+    .login__wrap {
+      padding: 0;
+    }
   }
 }

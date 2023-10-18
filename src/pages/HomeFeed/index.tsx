@@ -76,11 +76,7 @@ const HomeFeed = () => {
   return (
     <div className={styles.container}>
       <nav className={styles["filter-head"]}>{filters.map(renderFilter)}</nav>
-      {/* {renderBody()} */}
-      <ol className={styles.list}>
-        {feedData?.data?.map(renderFeed)}
-        {feedData?.loadMore && <LoadingItem />}
-      </ol>
+      {renderBody()}
     </div>
   );
 };

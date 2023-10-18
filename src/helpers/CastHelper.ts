@@ -75,6 +75,11 @@ export const compareEmbeddedUrl = (embeddedUrl: string, queryUrl: string) => {
   );
 };
 
+const capitalize = (str?: string) => {
+  if (!str) return "";
+  return str[0].toUpperCase() + str.slice(1);
+};
+
 export const getURLObject = (url?: string) => {
   if (!url) return null;
   try {
@@ -82,7 +87,7 @@ export const getURLObject = (url?: string) => {
     const modifiedUrl = insertHttpIfNeed(url).replace(pattern, "");
     const urlParser = new URL(modifiedUrl);
     const hostnameSplit = urlParser.hostname.split(".");
-    const siteName = hostnameSplit[hostnameSplit.length - 2];
+    const siteName = capitalize(hostnameSplit[hostnameSplit.length - 2]);
     const pathSplit = urlParser.pathname.split("/");
 
     const protocol = urlParser.protocol;
