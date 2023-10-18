@@ -32,6 +32,7 @@ import {
 import useFeedFilter from "hooks/useFeedFilter";
 import ModalFCReply from "shared/ModalFCReply";
 import useFeedData from "hooks/useFeedData";
+import ScrollRestoration from "../ScrollRestoration";
 
 interface IMenuItem {
   active?: boolean;
@@ -330,6 +331,7 @@ const FCWrapper = () => {
           cast={replyCast}
         />
       )}
+      <ScrollRestoration scrollElement={rootRef.current} />
     </div>
   );
 };
