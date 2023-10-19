@@ -96,12 +96,10 @@ const FCWrapper = () => {
         } else if (queryUrl) {
           dispatch(getCastsByUrl({ text: queryUrl, page: 1, limit: 20 }));
         }
-      } else {
-        logout();
       }
       setCastQueue(null);
     },
-    [dispatch, fcUser?.username, logout, queryUrl]
+    [dispatch, fcUser?.username, queryUrl]
   );
   const requestSignerId = useCallback(async () => {
     setLoading(true);
