@@ -51,11 +51,6 @@ h4 {
   color: var(--color-primary-text);
 }
 
-html {
-  overflow-x: hidden;
-  overflow-y: hidden;
-}
-
 body {
   margin: 0;
   font-family: SF-UI-Text, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -268,8 +263,11 @@ code {
   #title-bar {
     display: none;
   }
+}
+
+@media only screen and (min-width: 577px) {
   html {
-    overflow-x: auto;
-    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-y: hidden;
   }
 }
