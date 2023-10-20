@@ -36,3 +36,16 @@
     flex-direction: column;
   }
 }
+
+@media only screen and (max-width: 659px) {
+  .container {
+    padding-top: 60px;
+    .filter-head {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      height: 60px;
+    }
+  }
+}

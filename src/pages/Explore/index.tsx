@@ -3,6 +3,7 @@ import styles from "./index.module.scss";
 import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
 import { useNavigate } from "react-router-dom";
 import { isUrlValid } from "helpers/LinkHelper";
+import ExploreItem from "shared/ExploreItem";
 
 const Explore = () => {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ const Explore = () => {
           </div>
         )}
       </nav>
+      <ExploreItem />
     </div>
   );
 };

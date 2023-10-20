@@ -200,16 +200,22 @@ const FCWrapper = () => {
     filter.label,
   ]);
   const onFeedByUrlEndReach = useCallback(() => {
-    if (exploreUrl) {
+    if (exploreUrl && explore?.canMore && !explore?.loadMore) {
       dispatch(
         getFeedByUrl({
           text: exploreUrl,
-          page: (explore.currentPage || 1) + 1,
+          page: (explore?.currentPage || 1) + 1,
           limit: 20,
         })
       );
     }
-  }, [dispatch, explore.currentPage, exploreUrl]);
+  }, [
+    dispatch,
+    explore?.canMore,
+    explore?.currentPage,
+    explore?.loadMore,
+    exploreUrl,
+  ]);
   const onPageEndReach = useCallback(() => {
     if (location.pathname === "/") {
       onHomeEndReach();

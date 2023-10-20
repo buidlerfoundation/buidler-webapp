@@ -57,7 +57,10 @@ export const normalizeContentCast = (cast: ICast) => {
   return res;
 };
 
-const removeProtocol = (url: string) => {
+export const removeProtocol = (url?: string) => {
+  if (!url) {
+    return "";
+  }
   try {
     const urlObj = new URL(url);
     return url.replace(`${urlObj.protocol}//`, "");

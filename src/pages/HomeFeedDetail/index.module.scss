@@ -11,6 +11,7 @@
     background-color: var(--color-background-1);
     position: sticky;
     top: 0;
+    z-index: 1;
     .btn-back {
       display: flex;
       align-items: center;
@@ -32,6 +33,19 @@
       padding: 20px;
       width: 100%;
       border-bottom: 1px solid var(--color-stroke);
+    }
+  }
+}
+
+@media only screen and (max-width: 659px) {
+  .container {
+    padding-top: 60px;
+    .head {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      height: 60px;
     }
   }
 }
