@@ -119,6 +119,7 @@ span {
     pointer-events: all;
     &:hover {
       text-decoration: underline;
+      color: var(--color-mention);
     }
   }
 }

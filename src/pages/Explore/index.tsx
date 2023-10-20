@@ -25,15 +25,17 @@ const Explore = () => {
   return (
     <div className={styles.container}>
       <nav className={styles.head}>
-        <form onSubmit={onSubmit}>
-          <input className={styles.input} value={value} onChange={onChange} />
-        </form>
-        {!value && (
-          <div className={styles.placeholder}>
-            <IconMenuExplore size={18} fill="var(--color-mute-text)" />
-            <span style={{ marginLeft: 10 }}>Enter any url</span>
-          </div>
-        )}
+        <div className={styles.search}>
+          <form onSubmit={onSubmit}>
+            <input className={styles.input} value={value} onChange={onChange} />
+          </form>
+          {!value && (
+            <div className={styles.placeholder}>
+              <IconMenuExplore size={18} fill="var(--color-mute-text)" />
+              <span style={{ marginLeft: 10 }}>Enter any url</span>
+            </div>
+          )}
+        </div>
       </nav>
       <ExploreItem />
     </div>
