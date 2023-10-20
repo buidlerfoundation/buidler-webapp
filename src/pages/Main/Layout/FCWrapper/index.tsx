@@ -314,7 +314,11 @@ const FCWrapper = () => {
               style={{ marginRight: 15 }}
             />
           ) : (
-            <div className={styles["btn-login"]} onClick={onLoginClick}>
+            <div
+              id="btn-login"
+              className={styles["btn-login"]}
+              onClick={onLoginClick}
+            >
               Login
             </div>
           )}

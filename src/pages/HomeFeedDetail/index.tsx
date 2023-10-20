@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import IconArrowBack from "shared/SVG/IconArrowBack";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import MetadataFeed from "shared/MetadataFeed";
 import useAppSelector from "hooks/useAppSelector";
 import useFeedRepliesData from "hooks/useFeedRepliesData";
@@ -27,6 +27,10 @@ const HomeFeedDetail = () => {
       dispatch(getCastDetail({ hash }));
     }
   }, [dispatch, hash]);
+  const onLogin = useCallback(() => {
+    const loginElement = document.getElementById("btn-login");
+    loginElement?.click();
+  }, []);
   return (
     <div className={styles.container}>
       <nav className={styles.head}>
@@ -50,9 +54,16 @@ const HomeFeedDetail = () => {
               castRepliesData?.data?.length || castDetail?.replies?.count || 0
             }
             homeFeed
+            onLogin={onLogin}
           />
           {castRepliesData?.data?.map((el) => (
-            <CastItem cast={el} key={el.hash} comment homeFeed />
+            <CastItem
+              cast={el}
+              key={el.hash}
+              comment
+              homeFeed
+              onLogin={onLogin}
+            />
           ))}
         </div>
       )}

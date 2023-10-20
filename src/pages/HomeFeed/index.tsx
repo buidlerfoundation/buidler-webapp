@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import styles from "./index.module.scss";
 import { ICast, IFCFilterType } from "models/FC";
 import FeedItem from "shared/FeedItem";
@@ -58,11 +58,15 @@ const HomeFeed = () => {
     (cast: ICast) => <FeedItem key={cast.hash} cast={cast} />,
     []
   );
+  const feedDataFiltered = useMemo(
+    () => feedData?.data?.filter?.((el) => !!el.metadata?.url) || [],
+    [feedData?.data]
+  );
   const renderBody = useCallback(() => {
-    if (feedData?.data?.length > 0) {
+    if (feedDataFiltered.length > 0) {
       return (
         <ol className={styles.list}>
-          {feedData?.data?.map(renderFeed)}
+          {feedDataFiltered.map(renderFeed)}
           {feedData?.loadMore && <LoadingItem />}
         </ol>
       );
@@ -72,7 +76,7 @@ const HomeFeed = () => {
     }
     // empty
     return null;
-  }, [feedData?.data, feedData?.loadMore, feedData?.loading, renderFeed]);
+  }, [feedDataFiltered, feedData?.loadMore, feedData?.loading, renderFeed]);
   return (
     <div className={styles.container}>
       <nav className={styles["filter-head"]}>{filters.map(renderFilter)}</nav>
