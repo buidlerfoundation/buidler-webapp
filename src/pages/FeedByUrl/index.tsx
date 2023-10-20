@@ -27,14 +27,20 @@ const FeedByUrl = () => {
     if (isDomain) return `All post from ${urlObject?.siteName}`;
     return "What people say about this link";
   }, [isDomain, urlObject?.siteName]);
+  const onLogin = useCallback(() => {
+    const loginElement = document.getElementById("btn-login");
+    loginElement?.click();
+  }, []);
   const renderFeed = useCallback(
     (cast: ICast) => {
       if (isDomain) {
-        return <FeedItem cast={cast} key={cast.hash} explore />;
+        return (
+          <FeedItem cast={cast} key={cast.hash} explore onLogin={onLogin} />
+        );
       }
       return <CastItem cast={cast} key={cast.hash} homeFeed />;
     },
-    [isDomain]
+    [isDomain, onLogin]
   );
   const renderBody = useCallback(() => {
     if (explore.loading) return <Spinner size={30} />;

@@ -37,6 +37,10 @@ const HomeFeed = () => {
   const filters = useFeedFilters();
   const filter = useFeedFilter();
   const feedData = useFeedData();
+  const onLogin = useCallback(() => {
+    const loginElement = document.getElementById("btn-login");
+    loginElement?.click();
+  }, []);
   const onUpdateFilter = useCallback(
     (item: IFCFilterType) => {
       dispatch(HOME_FEED_ACTIONS.updateFilter(item));
@@ -55,8 +59,8 @@ const HomeFeed = () => {
     [filter.id, onUpdateFilter]
   );
   const renderFeed = useCallback(
-    (cast: ICast) => <FeedItem key={cast.hash} cast={cast} />,
-    []
+    (cast: ICast) => <FeedItem key={cast.hash} cast={cast} onLogin={onLogin} />,
+    [onLogin]
   );
   const feedDataFiltered = useMemo(
     () => feedData?.data?.filter?.((el) => !!el.metadata?.url) || [],
