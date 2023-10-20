@@ -33,6 +33,8 @@ import useFeedFilter from "hooks/useFeedFilter";
 import ModalFCReply from "shared/ModalFCReply";
 import useFeedData from "hooks/useFeedData";
 import ScrollRestoration from "../ScrollRestoration";
+import PopoverButton from "shared/PopoverButton";
+import PopupUserFCMenu from "shared/PopupUserFCMenu";
 
 interface IMenuItem {
   active?: boolean;
@@ -65,6 +67,7 @@ const MenuItemMemo = memo(MenuItem);
 const FCWrapper = () => {
   const dispatch = useAppDispatch();
   const rootRef = useRef<any>();
+  const popupMenuRef = useRef<any>();
   const filter = useFeedFilter();
   const [loading, setLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
@@ -164,7 +167,7 @@ const FCWrapper = () => {
     if (loading) return null;
     if (fcUser) {
       return (
-        <div className={styles["user-info"]}>
+        <div className={styles["user-info"]} onClick={onMenuClick}>
           <span className="truncate" style={{ marginRight: 10, maxWidth: 170 }}>
             {fcUser.display_name}
           </span>
@@ -233,6 +236,21 @@ const FCWrapper = () => {
     },
     [onPageEndReach]
   );
+  const onMenuClick = useCallback(
+    async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      e.stopPropagation();
+      const target = e.currentTarget;
+      popupMenuRef.current.show(target);
+    },
+    []
+  );
+  const onCloseMenu = useCallback(() => {
+    popupMenuRef.current?.hide();
+  }, []);
+  const onLogoutClick = useCallback(() => {
+    logout();
+    onCloseMenu();
+  }, [logout, onCloseMenu]);
   return (
     <div
       className={`buidler-plugin-theme-light ${styles.container}`}
@@ -307,12 +325,14 @@ const FCWrapper = () => {
             <span style={{ margin: "0 10px" }}>Buidler</span>
           </Link>
           {fcUser ? (
-            <ImageView
-              src={fcUser.pfp.url}
-              alt="avatar"
-              className={styles.avatar}
-              style={{ marginRight: 15 }}
-            />
+            <div onClick={onMenuClick}>
+              <ImageView
+                src={fcUser.pfp.url}
+                alt="avatar"
+                className={styles.avatar}
+                style={{ marginRight: 15 }}
+              />
+            </div>
           ) : (
             <div
               id="btn-login"
@@ -341,6 +361,16 @@ const FCWrapper = () => {
           cast={replyCast}
         />
       )}
+      <PopoverButton
+        ref={popupMenuRef}
+        popupOnly
+        componentPopup={
+          <PopupUserFCMenu
+            onCloseMenu={onCloseMenu}
+            onLogoutClick={onLogoutClick}
+          />
+        }
+      />
       <ScrollRestoration scrollElement={rootRef.current} />
     </div>
   );
