@@ -236,6 +236,14 @@ const FCWrapper = () => {
     },
     [onPageEndReach]
   );
+  const windowScrollListener = useCallback(() => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop ===
+      document.documentElement.offsetHeight
+    ) {
+      onPageEndReach();
+    }
+  }, [onPageEndReach]);
   const onMenuClick = useCallback(
     async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       e.stopPropagation();
@@ -251,6 +259,12 @@ const FCWrapper = () => {
     logout();
     onCloseMenu();
   }, [logout, onCloseMenu]);
+  useEffect(() => {
+    window.addEventListener("scroll", windowScrollListener);
+    return () => {
+      window.removeEventListener("scroll", windowScrollListener);
+    };
+  }, [windowScrollListener]);
   return (
     <div
       className={`buidler-plugin-theme-light ${styles.container}`}
