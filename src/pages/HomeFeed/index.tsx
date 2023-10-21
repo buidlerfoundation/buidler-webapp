@@ -59,7 +59,9 @@ const HomeFeed = () => {
     [filter.id, onUpdateFilter]
   );
   const renderFeed = useCallback(
-    (cast: ICast) => <FeedItem key={cast.hash} cast={cast} onLogin={onLogin} />,
+    (cast: ICast) => (
+      <FeedItem key={cast.hash} cast={cast} onLogin={onLogin} hideImage />
+    ),
     [onLogin]
   );
   const feedDataFiltered = useMemo(
