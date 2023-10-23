@@ -37,7 +37,6 @@ const Explore = () => {
           )}
         </div>
       </nav>
-      <ExploreItem />
     </div>
   );
 };

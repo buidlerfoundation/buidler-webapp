@@ -10,7 +10,6 @@ import { ICast, IMetadataUrl } from "models/FC";
 import { getURLObject } from "helpers/CastHelper";
 import api from "api";
 import MetadataFeed from "shared/MetadataFeed";
-import FeedItem from "shared/FeedItem";
 
 const FeedByUrl = () => {
   const navigate = useNavigate();
@@ -31,38 +30,23 @@ const FeedByUrl = () => {
     const loginElement = document.getElementById("btn-login");
     loginElement?.click();
   }, []);
-  const renderFeed = useCallback(
-    (cast: ICast) => {
-      if (isDomain) {
-        return (
-          <FeedItem cast={cast} key={cast.hash} explore onLogin={onLogin} />
-        );
-      }
-      return <CastItem cast={cast} key={cast.hash} homeFeed />;
-    },
-    [isDomain, onLogin]
-  );
+  const renderFeed = useCallback((cast: ICast) => {
+    return <CastItem cast={cast} key={cast.hash} homeFeed />;
+  }, []);
   const renderBody = useCallback(() => {
     if (explore.loading) return <Spinner size={30} />;
     return (
       <ol className={styles.list}>
         {metadata && (
           <div className={styles.metadata}>
-            <MetadataFeed metadata={metadata} hideTitle={isDomain} />
+            <MetadataFeed metadata={metadata} />
           </div>
         )}
         {explore?.data?.map(renderFeed)}
         {explore?.loadMore && <LoadingItem />}
       </ol>
     );
-  }, [
-    explore?.data,
-    explore?.loadMore,
-    explore.loading,
-    isDomain,
-    metadata,
-    renderFeed,
-  ]);
+  }, [explore?.data, explore?.loadMore, explore.loading, metadata, renderFeed]);
   const goBack = useCallback(() => {
     navigate(-1);
   }, [navigate]);
