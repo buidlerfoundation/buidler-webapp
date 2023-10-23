@@ -111,14 +111,15 @@ const FCWrapper = () => {
     }
     setLoading(false);
   }, [dispatch, logout]);
+  const feeds = useMemo(() => feedData?.data || [], [feedData?.data]);
   useEffect(() => {
     checkingAuth();
   }, [checkingAuth]);
   useEffect(() => {
-    if (filter.label && (feedData?.data || []).length === 0) {
+    if (filter.label && feeds.length === 0) {
       dispatch(getFeed({ type: filter.label, page: 1, limit: 20 }));
     }
-  }, [dispatch, feedData?.data, filter.label]);
+  }, [dispatch, feeds.length, filter.label]);
   useEffect(() => {
     if (exploreUrl) {
       dispatch(getFeedByUrl({ text: exploreUrl, page: 1, limit: 20 }));
