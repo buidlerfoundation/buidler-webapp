@@ -115,10 +115,10 @@ const FCWrapper = () => {
     checkingAuth();
   }, [checkingAuth]);
   useEffect(() => {
-    if (filter.label) {
+    if (filter.label && (feedData?.data || []).length === 0) {
       dispatch(getFeed({ type: filter.label, page: 1, limit: 20 }));
     }
-  }, [dispatch, filter.label]);
+  }, [dispatch, feedData?.data, filter.label]);
   useEffect(() => {
     if (exploreUrl) {
       dispatch(getFeedByUrl({ text: exploreUrl, page: 1, limit: 20 }));
@@ -163,6 +163,14 @@ const FCWrapper = () => {
     if (signedKeyRequest) return;
     requestSignerId();
   }, [requestSignerId, signedKeyRequest]);
+  const onMenuClick = useCallback(
+    async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      e.stopPropagation();
+      const target = e.currentTarget;
+      popupMenuRef.current.show(target);
+    },
+    []
+  );
   const renderRight = useCallback(() => {
     if (loading) return null;
     if (fcUser) {
@@ -184,7 +192,7 @@ const FCWrapper = () => {
         Login
       </div>
     );
-  }, [fcUser, loading, onLoginClick]);
+  }, [fcUser, loading, onLoginClick, onMenuClick]);
   const onHomeEndReach = useCallback(() => {
     if (feedData?.canMore && !feedData?.loadMore) {
       dispatch(
@@ -244,14 +252,6 @@ const FCWrapper = () => {
       onPageEndReach();
     }
   }, [onPageEndReach]);
-  const onMenuClick = useCallback(
-    async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      e.stopPropagation();
-      const target = e.currentTarget;
-      popupMenuRef.current.show(target);
-    },
-    []
-  );
   const onCloseMenu = useCallback(() => {
     popupMenuRef.current?.hide();
   }, []);
