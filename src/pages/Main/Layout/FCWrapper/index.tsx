@@ -24,17 +24,12 @@ import api from "api";
 import toast from "react-hot-toast";
 import IconDownload from "shared/SVG/FC/IconDownload";
 import useExtensionInstalled from "hooks/useExtensionInstalled";
-import {
-  HOME_FEED_ACTIONS,
-  getFeed,
-  getFeedByUrl,
-} from "reducers/HomeFeedReducers";
-import useFeedFilter from "hooks/useFeedFilter";
+import { HOME_FEED_ACTIONS, getFeedByUrl } from "reducers/HomeFeedReducers";
 import ModalFCReply from "shared/ModalFCReply";
-import useFeedData from "hooks/useFeedData";
 import ScrollRestoration from "../ScrollRestoration";
 import PopoverButton from "shared/PopoverButton";
 import PopupUserFCMenu from "shared/PopupUserFCMenu";
+import useFeedFilters from "hooks/useFeedFilters";
 
 interface IMenuItem {
   active?: boolean;
@@ -66,15 +61,13 @@ const MenuItemMemo = memo(MenuItem);
 
 const FCWrapper = () => {
   const dispatch = useAppDispatch();
-  const rootRef = useRef<any>();
   const popupMenuRef = useRef<any>();
-  const filter = useFeedFilter();
   const [loading, setLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [polling, setPolling] = useState(false);
+  const filters = useFeedFilters();
   const params = useParams<{ url: string }>();
   const exploreUrl = useMemo(() => params?.url, [params?.url]);
-  const explore = useAppSelector((state) => state.homeFeed.explore);
   const [signedKeyRequest, setSignedKeyRequest] = useState<
     ISignedKeyRequest | undefined | null
   >(null);
@@ -84,7 +77,6 @@ const FCWrapper = () => {
   const storeSignerId = useAppSelector((state) => state.fcUser?.signer_id);
   const pollingController = useRef(new AbortController());
   const location = useLocation();
-  const feedData = useFeedData();
   const activeColor = useMemo(() => "var(--color-primary-text)", []);
   const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
   const logout = useCallback(() => {
@@ -111,15 +103,9 @@ const FCWrapper = () => {
     }
     setLoading(false);
   }, [dispatch, logout]);
-  const feeds = useMemo(() => feedData?.data || [], [feedData?.data]);
   useEffect(() => {
     checkingAuth();
   }, [checkingAuth]);
-  useEffect(() => {
-    if (filter.label && feeds.length === 0) {
-      dispatch(getFeed({ type: filter.label, page: 1, limit: 20 }));
-    }
-  }, [dispatch, feeds.length, filter.label]);
   useEffect(() => {
     if (exploreUrl) {
       dispatch(getFeedByUrl({ text: exploreUrl, page: 1, limit: 20 }));
@@ -194,65 +180,6 @@ const FCWrapper = () => {
       </div>
     );
   }, [fcUser, loading, onLoginClick, onMenuClick]);
-  const onHomeEndReach = useCallback(() => {
-    if (feedData?.canMore && !feedData?.loadMore) {
-      dispatch(
-        getFeed({
-          type: filter.label,
-          page: (feedData?.currentPage || 1) + 1,
-          limit: 20,
-        })
-      );
-    }
-  }, [
-    dispatch,
-    feedData?.canMore,
-    feedData?.currentPage,
-    feedData?.loadMore,
-    filter.label,
-  ]);
-  const onFeedByUrlEndReach = useCallback(() => {
-    if (exploreUrl && explore?.canMore && !explore?.loadMore) {
-      dispatch(
-        getFeedByUrl({
-          text: exploreUrl,
-          page: (explore?.currentPage || 1) + 1,
-          limit: 20,
-        })
-      );
-    }
-  }, [
-    dispatch,
-    explore?.canMore,
-    explore?.currentPage,
-    explore?.loadMore,
-    exploreUrl,
-  ]);
-  const onPageEndReach = useCallback(() => {
-    if (location.pathname === "/") {
-      onHomeEndReach();
-    } else if (exploreUrl) {
-      onFeedByUrlEndReach();
-    }
-  }, [exploreUrl, location.pathname, onFeedByUrlEndReach, onHomeEndReach]);
-  const onPageScroll = useCallback(
-    (e: any) => {
-      const { scrollTop, scrollHeight, clientHeight } = e.target;
-      const compare = Math.round(scrollTop + clientHeight);
-      if (compare === scrollHeight + 1 || compare === scrollHeight) {
-        onPageEndReach();
-      }
-    },
-    [onPageEndReach]
-  );
-  const windowScrollListener = useCallback(() => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop ===
-      document.documentElement.offsetHeight
-    ) {
-      onPageEndReach();
-    }
-  }, [onPageEndReach]);
   const onCloseMenu = useCallback(() => {
     popupMenuRef.current?.hide();
   }, []);
@@ -260,18 +187,16 @@ const FCWrapper = () => {
     logout();
     onCloseMenu();
   }, [logout, onCloseMenu]);
-  useEffect(() => {
-    window.addEventListener("scroll", windowScrollListener);
-    return () => {
-      window.removeEventListener("scroll", windowScrollListener);
-    };
-  }, [windowScrollListener]);
+  const activeHome = useMemo(
+    () => !!filters.find((el) => el.path === location.pathname),
+    [filters, location.pathname]
+  );
+  const activeExplore = useMemo(
+    () => location.pathname.includes("/explore"),
+    [location.pathname]
+  );
   return (
-    <div
-      className={`buidler-plugin-theme-light ${styles.container}`}
-      onScroll={onPageScroll}
-      ref={rootRef}
-    >
+    <div className={`buidler-plugin-theme-light ${styles.container}`}>
       <aside className={styles["left-side"]}>
         <Link
           className={`${styles["menu-item"]} ${styles["brand-wrap"]}`}
@@ -285,23 +210,19 @@ const FCWrapper = () => {
             title="Home"
             to="/"
             icon={
-              <IconMenuHome
-                fill={location.pathname === "/" ? activeColor : inactiveColor}
-              />
+              <IconMenuHome fill={activeHome ? activeColor : inactiveColor} />
             }
-            active={location.pathname === "/"}
+            active={activeHome}
           />
           <MenuItemMemo
             title="Explore"
             to="/explore"
             icon={
               <IconMenuExplore
-                fill={
-                  location.pathname === "/explore" ? activeColor : inactiveColor
-                }
+                fill={activeExplore ? activeColor : inactiveColor}
               />
             }
-            active={location.pathname === "/explore"}
+            active={activeExplore}
           />
           {fcUser && (
             <div className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}>
@@ -386,7 +307,7 @@ const FCWrapper = () => {
           />
         }
       />
-      <ScrollRestoration scrollElement={rootRef.current} />
+      <ScrollRestoration />
     </div>
   );
 };

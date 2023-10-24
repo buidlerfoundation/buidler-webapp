@@ -24,8 +24,11 @@ import HomeFeed from "pages/HomeFeed";
 import Explore from "pages/Explore";
 import HomeFeedDetail from "pages/HomeFeedDetail";
 import FeedByUrl from "pages/FeedByUrl";
+import HomeFeedWrapper from "./Layout/HomeFeedWrapper";
+import useFeedFilters from "hooks/useFeedFilters";
 
 const Main = () => {
+  const filters = useFeedFilters();
   return (
     <div className={styles.container}>
       <Routes>
@@ -55,7 +58,15 @@ const Main = () => {
           </Route>
         </Route>
         <Route element={<FCWrapper />}>
-          <Route path="/" element={<HomeFeed />} />
+          <Route element={<HomeFeedWrapper />}>
+            {filters.map((el) => (
+              <Route
+                key={el.path}
+                path={el.path}
+                element={<HomeFeed filter={el.label} />}
+              />
+            ))}
+          </Route>
           <Route path="/:fc_username/:hash" element={<HomeFeedDetail />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/explore/:url" element={<FeedByUrl />} />

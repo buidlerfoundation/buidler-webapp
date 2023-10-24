@@ -1,46 +1,46 @@
 .container {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  .head {
+  .filter-head {
+    height: 70px;
+    padding: 0 20px;
     display: flex;
     align-items: center;
-    padding: 0 15px;
-    height: 70px;
-    border-bottom: 1px solid var(--color-stroke);
+    column-gap: 15px;
     background-color: var(--color-background-1);
     position: sticky;
     top: 0;
-    z-index: 1;
-    .btn-back {
-      cursor: pointer;
+    .filter-item {
       display: flex;
       align-items: center;
-      height: 70px;
-      font-weight: 700;
-      font-size: 16px;
-      line-height: 22px;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 10px;
+      color: var(--color-secondary-text);
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 19px;
+      text-transform: capitalize;
+      cursor: pointer;
+    }
+    .filter-item:hover,
+    .filter-active {
+      background-color: var(--color-stroke);
       color: var(--color-primary-text);
-      span {
-        margin-left: 10px;
-      }
     }
   }
-  .metadata {
-    padding: 20px;
-    border-bottom: 1px solid var(--color-stroke);
-  }
   .list {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    flex: 1;
   }
 }
 
 @media only screen and (max-width: 659px) {
   .container {
     padding-top: 60px;
-    .head {
+    .filter-head {
       position: fixed;
       top: 60px;
       left: 0;

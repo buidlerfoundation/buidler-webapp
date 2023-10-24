@@ -1,15 +1,9 @@
 import React from "react";
-import useFeedFilter from "./useFeedFilter";
 import useAppSelector from "./useAppSelector";
 
-function useFeedData() {
-  const feedFilter = useFeedFilter();
+function useFeedData(filter: string) {
   const feedMap = useAppSelector((state) => state.homeFeed.feedMap);
-
-  return React.useMemo(
-    () => feedMap?.[feedFilter.label],
-    [feedFilter.label, feedMap]
-  );
+  return React.useMemo(() => feedMap?.[filter], [feedMap, filter]);
 }
 
 export default useFeedData;

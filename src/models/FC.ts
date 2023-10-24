@@ -79,4 +79,5 @@ export interface IMetadataUrl {
 export interface IFCFilterType {
   label: "trending" | "newest" | "by domain";
   id: string;
+  path: string;
 }

@@ -40,10 +40,10 @@ const initialState: HomeFeedState = {
   castRepliesMap: {},
   openNewCast: false,
   filters: [
-    { label: "trending", id: "1" },
-    { label: "newest", id: "2" },
+    { label: "trending", path: "/", id: "1" },
+    { label: "newest", id: "2", path: "/newest" },
   ],
-  currentFilter: { label: "trending", id: "1" },
+  currentFilter: { label: "trending", path: "/", id: "1" },
   explore: {
     data: [],
   },

@@ -10,8 +10,11 @@ import { ICast, IMetadataUrl } from "models/FC";
 import { getURLObject } from "helpers/CastHelper";
 import api from "api";
 import MetadataFeed from "shared/MetadataFeed";
+import useAppDispatch from "hooks/useAppDispatch";
+import { getFeedByUrl } from "reducers/HomeFeedReducers";
 
 const FeedByUrl = () => {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const params = useParams<{ url: string }>();
   const exploreUrl = useMemo(() => params?.url, [params?.url]);
@@ -50,6 +53,23 @@ const FeedByUrl = () => {
   const goBack = useCallback(() => {
     navigate(-1);
   }, [navigate]);
+  const onPageEndReach = useCallback(() => {
+    if (exploreUrl && explore?.canMore && !explore?.loadMore) {
+      dispatch(
+        getFeedByUrl({
+          text: exploreUrl,
+          page: (explore?.currentPage || 1) + 1,
+          limit: 20,
+        })
+      );
+    }
+  }, [
+    dispatch,
+    explore?.canMore,
+    explore?.currentPage,
+    explore?.loadMore,
+    exploreUrl,
+  ]);
   useEffect(() => {
     if (exploreUrl) {
       api.getEmbeddedMetadata(exploreUrl).then((res) => {
@@ -59,6 +79,20 @@ const FeedByUrl = () => {
       });
     }
   }, [exploreUrl]);
+  const windowScrollListener = useCallback(() => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop ===
+      document.documentElement.offsetHeight
+    ) {
+      onPageEndReach();
+    }
+  }, [onPageEndReach]);
+  useEffect(() => {
+    window.addEventListener("scroll", windowScrollListener);
+    return () => {
+      window.removeEventListener("scroll", windowScrollListener);
+    };
+  }, [windowScrollListener]);
   return (
     <div className={styles.container}>
       <nav className={styles.head}>
