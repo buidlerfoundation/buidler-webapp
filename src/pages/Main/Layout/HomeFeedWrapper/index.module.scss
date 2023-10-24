@@ -11,6 +11,7 @@
     background-color: var(--color-background-1);
     position: sticky;
     top: 0;
+    z-index: 1;
     .filter-item {
       display: flex;
       align-items: center;

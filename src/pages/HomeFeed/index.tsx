@@ -50,29 +50,28 @@ const HomeFeed = ({ filter }: IHomeFeed) => {
     }
   }, [onPageEndReach]);
   useEffect(() => {
-    if (feeds.length === 0) {
+    if (feeds.length === 0 && !feedData?.loading) {
       dispatch(getFeed({ type: filter, page: 1, limit: 20 }));
     }
-  }, [dispatch, feeds.length, filter]);
+  }, [dispatch, feedData?.loading, feeds.length, filter]);
   useEffect(() => {
     window.addEventListener("scroll", windowScrollListener);
     return () => {
       window.removeEventListener("scroll", windowScrollListener);
     };
   }, [windowScrollListener]);
-  if (feeds.length > 0) {
-    return (
-      <ol className={styles.list}>
-        {feeds.map(renderFeed)}
-        {feedData?.loadMore && <LoadingItem />}
-      </ol>
-    );
-  }
-  if (feedData?.loading) {
-    return <Spinner size={30} />;
-  }
-  // empty
-  return null;
+  return (
+    <ol className={styles.list}>
+      {feeds.length > 0 ? (
+        <>
+          {feeds.map(renderFeed)}
+          {feedData?.loadMore && <LoadingItem />}
+        </>
+      ) : feedData?.loading ? (
+        <Spinner size={30} />
+      ) : null}
+    </ol>
+  );
 };
 
 export default memo(HomeFeed);
