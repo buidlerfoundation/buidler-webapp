@@ -50,10 +50,10 @@ const HomeFeed = ({ filter }: IHomeFeed) => {
     }
   }, [onPageEndReach]);
   useEffect(() => {
-    if (feeds.length === 0 && !feedData?.loading) {
+    if (!feedData) {
       dispatch(getFeed({ type: filter, page: 1, limit: 20 }));
     }
-  }, [dispatch, feedData?.loading, feeds.length, filter]);
+  }, [dispatch, feedData, filter]);
   useEffect(() => {
     window.addEventListener("scroll", windowScrollListener);
     return () => {
