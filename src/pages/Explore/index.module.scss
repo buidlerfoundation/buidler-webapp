@@ -1,4 +1,6 @@
 .container {
+  position: relative;
+  flex: 1;
   .head {
     height: 70px;
     border-bottom: 1px solid var(--color-stroke);
@@ -34,6 +36,24 @@
         justify-content: center;
         pointer-events: none;
         color: var(--color-mute-text);
+      }
+    }
+  }
+  .screenshot-container {
+    position: absolute;
+    bottom: 0;
+    .screenshot-wrap {
+      display: inline-block;
+      padding: 30px;
+      .screenshot {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 8px 8px 20px 0 #00000040;
+        border-radius: 10px;
+        width: 300px;
+        height: 300px;
+        background-color: red;
       }
     }
   }

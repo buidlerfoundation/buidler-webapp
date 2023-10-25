@@ -1,13 +1,23 @@
-import React, { memo, useCallback, useMemo, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import styles from "./index.module.scss";
 import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
 import { useNavigate } from "react-router-dom";
 import { isUrlValid } from "helpers/LinkHelper";
 import { insertHttpIfNeed } from "helpers/CastHelper";
+import { useScreenshot } from "use-screenshot-hook";
 
 const Explore = () => {
   const navigate = useNavigate();
+  const screenshotRef = useRef<any>();
   const [value, setValue] = useState("");
+  const { image, takeScreenshot } = useScreenshot({ ref: screenshotRef });
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   }, []);
@@ -23,6 +33,18 @@ const Explore = () => {
     },
     [navigate, valueSubmit]
   );
+  const onScreenShot = useCallback(() => {
+    takeScreenshot();
+  }, [takeScreenshot]);
+  useEffect(() => {
+    if (image) {
+      console.log(image);
+      fetch(image).then(async (res) => {
+        const blob = await res.blob();
+        console.log(blob);
+      });
+    }
+  }, [image]);
   return (
     <div className={styles.container}>
       <nav className={styles.head}>
@@ -38,6 +60,19 @@ const Explore = () => {
           )}
         </div>
       </nav>
+      <button onClick={onScreenShot}>Take screenshot</button>
+      <div className={styles["screenshot-container"]}>
+        <div className={styles["screenshot-wrap"]} ref={screenshotRef}>
+          <div className={styles.screenshot}>Hello world</div>
+        </div>
+      </div>
+      {image && (
+        <img
+          src={image}
+          style={{ width: 300, height: "auto" }}
+          alt="test-screenshot"
+        />
+      )}
     </div>
   );
 };
