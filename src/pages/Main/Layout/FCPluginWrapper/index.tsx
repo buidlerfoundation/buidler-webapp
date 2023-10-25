@@ -73,6 +73,9 @@ const FCPluginWrapper = () => {
   const castToFC = useCallback(
     async (payload: any) => {
       payload.text = extractContentMessage(payload.text);
+      if (payload.mentions?.[0] === 20386) {
+        payload.mentions = [20108];
+      }
       const res = await api.cast(payload);
       if (res.success) {
         // handle after cast
