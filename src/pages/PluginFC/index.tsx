@@ -48,7 +48,7 @@ const PluginFC = () => {
     return (
       <ol className={styles["list-cast"]} onScroll={onScroll}>
         {casts.map((el) => (
-          <CastItem key={el.hash} cast={el} />
+          <CastItem key={el.hash} cast={el} postMessageOpenImageFullscreen />
         ))}
         {loadMoreCast && <LoadingItem />}
       </ol>

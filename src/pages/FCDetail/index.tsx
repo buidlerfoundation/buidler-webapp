@@ -43,9 +43,15 @@ const FCDetail = () => {
             replyCount={
               castRepliesData?.data?.length || castDetail?.replies?.count || 0
             }
+            postMessageOpenImageFullscreen
           />
           {castRepliesData?.data?.map((el) => (
-            <CastItem cast={el} key={el.hash} comment />
+            <CastItem
+              cast={el}
+              key={el.hash}
+              comment
+              postMessageOpenImageFullscreen
+            />
           ))}
         </div>
       )}
