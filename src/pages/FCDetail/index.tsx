@@ -8,7 +8,7 @@ import CastDetailItem from "shared/CastDetailItem";
 import useAppDispatch from "hooks/useAppDispatch";
 import useAppSelector from "hooks/useAppSelector";
 import useFeedRepliesData from "hooks/useFeedRepliesData";
-import { getCastDetail } from "reducers/HomeFeedReducers";
+import { getCastDetail, getCastReplies } from "reducers/HomeFeedReducers";
 
 const FCDetail = () => {
   const dispatch = useAppDispatch();
@@ -27,6 +27,33 @@ const FCDetail = () => {
   useEffect(() => {
     getCast();
   }, [getCast]);
+  const onScroll = useCallback(
+    (e: any) => {
+      const { scrollTop, scrollHeight, clientHeight } = e.target;
+      const compare = Math.round(scrollTop + clientHeight);
+      if (
+        (compare === scrollHeight + 1 || compare === scrollHeight) &&
+        castRepliesData.canMore &&
+        !castRepliesData.loadMore &&
+        castHash
+      ) {
+        dispatch(
+          getCastReplies({
+            hash: castHash,
+            page: (castRepliesData.currentPage || 1) + 1,
+            limit: 20,
+          })
+        );
+      }
+    },
+    [
+      castHash,
+      castRepliesData.canMore,
+      castRepliesData.currentPage,
+      castRepliesData.loadMore,
+      dispatch,
+    ]
+  );
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -37,7 +64,7 @@ const FCDetail = () => {
       </div>
       {loading && <LoadingItem />}
       {!loading && castDetail && (
-        <div className={styles["cast-detail__wrap"]}>
+        <div className={styles["cast-detail__wrap"]} onScroll={onScroll}>
           <CastDetailItem
             cast={castDetail}
             replyCount={
@@ -53,6 +80,7 @@ const FCDetail = () => {
               postMessageOpenImageFullscreen
             />
           ))}
+          {castRepliesData.loadMore && <LoadingItem />}
         </div>
       )}
     </div>
