@@ -1,6 +1,6 @@
 import api from "api";
 import { AsyncKey } from "common/AppConfig";
-import { clearData, setCookie } from "common/Cookie";
+import { clearData, getCookie, setCookie } from "common/Cookie";
 import { extractContentMessage } from "helpers/MessageHelper";
 import useAppDispatch from "hooks/useAppDispatch";
 import useAppSelector from "hooks/useAppSelector";
@@ -157,6 +157,14 @@ const FCPluginWrapper = () => {
         dispatch(FC_USER_ACTIONS.updateSignerId(signerId));
       } else {
         logout();
+      }
+    } else {
+      const signerIdFromCookie = await getCookie(AsyncKey.signerIdKey);
+      if (signerIdFromCookie) {
+        const fcUser = await dispatch(getCurrentFCUser()).unwrap();
+        if (fcUser) {
+          dispatch(FC_USER_ACTIONS.updateSignerId(signerIdFromCookie));
+        }
       }
     }
   }, [dispatch, logout, signerId]);
