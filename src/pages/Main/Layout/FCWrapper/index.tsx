@@ -30,6 +30,8 @@ import ScrollRestoration from "../ScrollRestoration";
 import PopoverButton from "shared/PopoverButton";
 import PopupUserFCMenu from "shared/PopupUserFCMenu";
 import useFeedFilters from "hooks/useFeedFilters";
+import ComposeButton from "shared/ComposeButton";
+import ModalCompose from "shared/ModalCompose";
 
 interface IMenuItem {
   active?: boolean;
@@ -65,6 +67,7 @@ const FCWrapper = () => {
   const [loading, setLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [polling, setPolling] = useState(false);
+  const [openDiscussion, setOpenDiscussion] = useState(false);
   const filters = useFeedFilters();
   const params = useParams<{ url: string }>();
   const exploreUrl = useMemo(() => params?.url, [params?.url]);
@@ -79,6 +82,10 @@ const FCWrapper = () => {
   const location = useLocation();
   const activeColor = useMemo(() => "var(--color-primary-text)", []);
   const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
+  const toggleDiscussion = useCallback(
+    () => setOpenDiscussion((current) => !current),
+    []
+  );
   const logout = useCallback(() => {
     window.top?.postMessage(
       { type: "b-fc-plugin-logout" },
@@ -195,6 +202,20 @@ const FCWrapper = () => {
     () => location.pathname.includes("/explore"),
     [location.pathname]
   );
+  const onOpenDiscussion = useCallback(() => {
+    if (!fcUser) {
+      onLoginClick();
+      return;
+    }
+    toggleDiscussion();
+  }, [fcUser, onLoginClick, toggleDiscussion]);
+  const onOpenReview = useCallback(() => {
+    if (!fcUser) {
+      onLoginClick();
+      return;
+    }
+    toggleDiscussion();
+  }, [fcUser, onLoginClick, toggleDiscussion]);
   return (
     <div className={`buidler-plugin-theme-light ${styles.container}`}>
       <aside className={styles["left-side"]}>
@@ -202,7 +223,16 @@ const FCWrapper = () => {
           className={`${styles["menu-item"]} ${styles["brand-wrap"]}`}
           to="/"
         >
-          <IconBuidlerLogo size={30} />
+          <div
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 4,
+              overflow: "hidden",
+            }}
+          >
+            <IconBuidlerLogo size={30} />
+          </div>
           <span style={{ margin: "0 10px" }}>Buidler</span>
         </Link>
         <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
@@ -223,6 +253,10 @@ const FCWrapper = () => {
               />
             }
             active={activeExplore}
+          />
+          <ComposeButton
+            openDiscussion={onOpenDiscussion}
+            openReview={onOpenReview}
           />
           {fcUser && (
             <div className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}>
@@ -316,6 +350,7 @@ const FCWrapper = () => {
           />
         }
       />
+      <ModalCompose open={openDiscussion} handleClose={toggleDiscussion} />
       <ScrollRestoration />
     </div>
   );

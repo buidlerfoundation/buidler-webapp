@@ -435,7 +435,7 @@ html {
   --color-accent-2: #d8d0bd;
   --color-darkest-background: #ffffff;
   --color-darkest-background80: #ffffffcc;
-  --color-backdrop: rgba(0, 0, 0, 0.75);
+  --color-backdrop: rgba(0, 0, 0, 0.25);
   --color-lighter-background: #f8f8f8;
   --color-highlight: #cecece;
   --color-stroke: #f3f3f3;
@@ -469,6 +469,23 @@ html {
   --content-muted-dark: #86868b;
   --content-dark: #121212;
   --content-muted-2: #727272;
+
+  --color-bright-text: #ffffff;
+  --color-primary-text: #202020;
+  --color-secondary-text: #666666;
+  --color-mute-text: #949494;
+  --color-background-1: #ffffff;
+  --color-background-2: #f8f8f8;
+  --color-background-3: #cecece;
+  --color-background-4: #bbbbbb;
+  --color-background-5: #e8e8e8;
+  --color-background-6: #fafafa;
+  --color-warpcast: #c848ff;
+  --color-fc-accent: #1159d5;
+  --color-stroke: #f3f3f3;
+  --color-recast: rgb(66, 183, 72);
+  --color-like: rgb(213, 19, 56);
+  --color-highlight-action-high: #f3f3f3;
 }
 
 html.dark {

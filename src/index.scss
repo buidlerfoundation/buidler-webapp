@@ -60,6 +60,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: var(--color-primary-text) !important;
   font-weight: 500;
+  overflow: unset !important;
 }
 
 ol {
