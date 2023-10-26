@@ -1,15 +1,6 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { ICast, IFCFilterType } from "models/FC";
+import { ICast, IFCFilterType, IFeedData } from "models/FC";
 import api from "api";
-
-interface IFeedData {
-  data: ICast[];
-  total?: number;
-  currentPage?: number;
-  canMore?: boolean;
-  loading?: boolean;
-  loadMore?: boolean;
-}
 
 interface HomeFeedState {
   feedMap: {
@@ -21,10 +12,7 @@ interface HomeFeedState {
     loading: boolean;
   };
   castRepliesMap: {
-    [key: string]: {
-      loading: boolean;
-      data: ICast[];
-    };
+    [key: string]: IFeedData;
   };
   openNewCast: boolean;
   filters: IFCFilterType[];
@@ -59,16 +47,16 @@ export const getFeedByUrl = createAsyncThunk(
 
 export const getCastDetail = createAsyncThunk(
   "home-feed/get-by-hash",
-  async (payload: { hash: string }) => {
-    const res = await api.getCastDetail(payload.hash);
+  async (payload: { hash: string; page: number; limit: number }) => {
+    const res = await api.getCastDetail(payload);
     return res;
   }
 );
 
 export const getCastReplies = createAsyncThunk(
   "home-feed/get-replies",
-  async (payload: { hash: string }) => {
-    const res = await api.getCastDetail(payload.hash);
+  async (payload: { hash: string; page: number; limit: number }) => {
+    const res = await api.getCastDetail(payload);
     return res;
   }
 );
@@ -146,6 +134,10 @@ const homeFeedSlice = createSlice({
         };
       })
       .addCase(getCastDetail.fulfilled, (state, action) => {
+        const total = action.payload?.data?.replies?.count || 0;
+        const limit = action.meta.arg.limit;
+        const totalPage = Math.ceil(total / limit);
+
         state.castDetail = {
           loading: false,
           data: action.payload.data,
@@ -153,29 +145,53 @@ const homeFeedSlice = createSlice({
         state.castRepliesMap = {
           [action.meta.arg.hash]: {
             loading: false,
+            loadMore: false,
             data: action.payload.data?.replies?.casts || [],
+            currentPage: 1,
+            canMore: totalPage > 1,
+            total,
           },
         };
       })
       .addCase(getCastReplies.pending, (state, action) => {
-        const hash = action.meta.arg.hash;
-        state.castRepliesMap[hash] = {
-          loading: true,
-          data: state.castRepliesMap?.[hash]?.data || [],
-        };
+        const { page, hash } = action.meta.arg;
+        if (page === 1) {
+          state.castRepliesMap[hash] = {
+            ...(state.castRepliesMap?.[hash] || {}),
+            loading: true,
+          };
+        } else {
+          state.castRepliesMap[hash] = {
+            ...(state.castRepliesMap?.[hash] || {}),
+            loadMore: true,
+          };
+        }
       })
       .addCase(getCastReplies.rejected, (state, action) => {
         const hash = action.meta.arg.hash;
         state.castRepliesMap[hash] = {
+          ...(state.castRepliesMap?.[hash] || {}),
           loading: false,
-          data: state.castRepliesMap?.[hash]?.data || [],
+          loadMore: false,
         };
       })
       .addCase(getCastReplies.fulfilled, (state, action) => {
         const hash = action.meta.arg.hash;
+        const total = action.payload?.data?.replies?.count || 0;
+        const limit = action.meta.arg.limit;
+        const totalPage = Math.ceil(total / limit);
+        const currentPage = action.meta.arg.page;
+        const data = action.payload?.data?.replies?.casts || [];
         state.castRepliesMap[hash] = {
           loading: false,
-          data: action.payload.data?.replies?.casts || [],
+          loadMore: false,
+          currentPage,
+          total: totalPage,
+          data:
+            currentPage === 1
+              ? data
+              : [...(state.castRepliesMap[hash]?.data || []), ...data],
+          canMore: totalPage > currentPage,
         };
         if (action.payload.success) {
           if (
@@ -193,15 +209,18 @@ const homeFeedSlice = createSlice({
                 }
               );
           }
-          if (state.feedMap?.[state.currentFilter.label]) {
-            state.feedMap[state.currentFilter.label].data = state.feedMap[
-              state.currentFilter.label
-            ].data.map((el) => {
-              if (el.hash === action.meta.arg.hash) {
-                return action.payload.data || el;
+          const filter =
+            state.filters.find((el) => el.path === window.location.pathname)
+              ?.label || "";
+          if (state.feedMap?.[filter]) {
+            state.feedMap[filter].data = state.feedMap[filter].data.map(
+              (el) => {
+                if (el.hash === action.meta.arg.hash) {
+                  return action.payload.data || el;
+                }
+                return el;
               }
-              return el;
-            });
+            );
           }
         }
       })

@@ -41,8 +41,17 @@ export const listCasts = (params: {
     })}`
   );
 
-export const getCastDetail = (hash: string) =>
-  Caller.get<ICast>(`casts/${hash}`);
+export const getCastDetail = (params: {
+  hash: string;
+  page: number;
+  limit: number;
+}) =>
+  Caller.get<ICast>(
+    `casts/${params.hash}?${new URLSearchParams({
+      page: `${params.page}`,
+      limit: `${params.limit}`,
+    })}`
+  );
 
 export const deleteCast = (hash: string) => Caller.delete(`casts/${hash}`);
 

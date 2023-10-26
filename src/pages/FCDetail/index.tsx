@@ -6,9 +6,9 @@ import LoadingItem from "shared/LoadingItem";
 import CastItem from "shared/CastItem";
 import CastDetailItem from "shared/CastDetailItem";
 import useAppDispatch from "hooks/useAppDispatch";
-import { getCastDetail } from "reducers/FCCastReducers";
 import useAppSelector from "hooks/useAppSelector";
-import useCastRepliesData from "hooks/useCastReplies";
+import useFeedRepliesData from "hooks/useFeedRepliesData";
+import { getCastDetail, getCastReplies } from "reducers/HomeFeedReducers";
 
 const FCDetail = () => {
   const dispatch = useAppDispatch();
@@ -16,17 +16,44 @@ const FCDetail = () => {
   const onBack = useCallback(() => navigate(-1), [navigate]);
   const params = useParams<{ cast_hash: string }>();
   const castHash = useMemo(() => params?.cast_hash, [params?.cast_hash]);
-  const loading = useAppSelector((state) => state.fcCast.castDetail.loading);
-  const castDetail = useAppSelector((state) => state.fcCast.castDetail.data);
-  const castRepliesData = useCastRepliesData(castHash);
+  const loading = useAppSelector((state) => state.homeFeed.castDetail.loading);
+  const castDetail = useAppSelector((state) => state.homeFeed.castDetail.data);
+  const castRepliesData = useFeedRepliesData(castHash);
   const getCast = useCallback(async () => {
     if (castHash) {
-      dispatch(getCastDetail({ hash: castHash }));
+      dispatch(getCastDetail({ hash: castHash, page: 1, limit: 20 }));
     }
   }, [castHash, dispatch]);
   useEffect(() => {
     getCast();
   }, [getCast]);
+  const onScroll = useCallback(
+    (e: any) => {
+      const { scrollTop, scrollHeight, clientHeight } = e.target;
+      const compare = Math.round(scrollTop + clientHeight);
+      if (
+        (compare === scrollHeight + 1 || compare === scrollHeight) &&
+        castRepliesData.canMore &&
+        !castRepliesData.loadMore &&
+        castHash
+      ) {
+        dispatch(
+          getCastReplies({
+            hash: castHash,
+            page: (castRepliesData.currentPage || 1) + 1,
+            limit: 20,
+          })
+        );
+      }
+    },
+    [
+      castHash,
+      castRepliesData.canMore,
+      castRepliesData.currentPage,
+      castRepliesData.loadMore,
+      dispatch,
+    ]
+  );
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -37,7 +64,7 @@ const FCDetail = () => {
       </div>
       {loading && <LoadingItem />}
       {!loading && castDetail && (
-        <div className={styles["cast-detail__wrap"]}>
+        <div className={styles["cast-detail__wrap"]} onScroll={onScroll}>
           <CastDetailItem
             cast={castDetail}
             replyCount={
@@ -53,6 +80,7 @@ const FCDetail = () => {
               postMessageOpenImageFullscreen
             />
           ))}
+          {castRepliesData.loadMore && <LoadingItem />}
         </div>
       )}
     </div>

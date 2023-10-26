@@ -21,7 +21,6 @@ import styles from "./index.module.scss";
 import LoginFC from "shared/LoginFC";
 import {
   FC_CAST_ACTIONS,
-  getCastReplies,
   getCastsByUrl,
   getMainMetadata,
 } from "reducers/FCCastReducers";
@@ -31,6 +30,7 @@ import ImageView from "shared/ImageView";
 import { logoutAction } from "reducers/actions";
 import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
 import CopyRight from "pages/PluginFC/CopyRight";
+import { getCastReplies } from "reducers/HomeFeedReducers";
 
 const FCPluginWrapper = () => {
   const dispatch = useAppDispatch();
@@ -73,6 +73,9 @@ const FCPluginWrapper = () => {
   const castToFC = useCallback(
     async (payload: any) => {
       payload.text = extractContentMessage(payload.text);
+      if (payload.mentions?.[0] === 20386) {
+        payload.mentions = [20108];
+      }
       const res = await api.cast(payload);
       if (res.success) {
         // handle after cast
@@ -88,7 +91,13 @@ const FCPluginWrapper = () => {
           );
         }
         if (payload?.parent_cast_id?.hash) {
-          dispatch(getCastReplies({ hash: payload?.parent_cast_id?.hash }));
+          dispatch(
+            getCastReplies({
+              hash: payload?.parent_cast_id?.hash,
+              page: 1,
+              limit: 20,
+            })
+          );
         } else if (queryUrl) {
           dispatch(getCastsByUrl({ text: queryUrl, page: 1, limit: 20 }));
         }

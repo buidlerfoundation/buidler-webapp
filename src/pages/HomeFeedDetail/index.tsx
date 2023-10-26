@@ -6,10 +6,11 @@ import MetadataFeed from "shared/MetadataFeed";
 import useAppSelector from "hooks/useAppSelector";
 import useFeedRepliesData from "hooks/useFeedRepliesData";
 import useAppDispatch from "hooks/useAppDispatch";
-import { getCastDetail } from "reducers/HomeFeedReducers";
+import { getCastDetail, getCastReplies } from "reducers/HomeFeedReducers";
 import Spinner from "shared/Spinner";
 import CastDetailItem from "shared/CastDetailItem";
 import CastItem from "shared/CastItem";
+import LoadingItem from "shared/LoadingItem";
 
 const HomeFeedDetail = () => {
   const dispatch = useAppDispatch();
@@ -24,13 +25,44 @@ const HomeFeedDetail = () => {
   }, [navigate]);
   useEffect(() => {
     if (hash) {
-      dispatch(getCastDetail({ hash }));
+      dispatch(getCastDetail({ hash, page: 1, limit: 20 }));
     }
   }, [dispatch, hash]);
   const onLogin = useCallback(() => {
     const loginElement = document.getElementById("btn-login");
     loginElement?.click();
   }, []);
+  const onPageEndReach = useCallback(() => {
+    if (castRepliesData?.canMore && !castRepliesData?.loadMore && hash) {
+      dispatch(
+        getCastReplies({
+          hash,
+          page: (castRepliesData?.currentPage || 1) + 1,
+          limit: 20,
+        })
+      );
+    }
+  }, [
+    castRepliesData?.canMore,
+    castRepliesData?.currentPage,
+    castRepliesData?.loadMore,
+    dispatch,
+    hash,
+  ]);
+  const windowScrollListener = useCallback(() => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop ===
+      document.documentElement.offsetHeight
+    ) {
+      onPageEndReach();
+    }
+  }, [onPageEndReach]);
+  useEffect(() => {
+    window.addEventListener("scroll", windowScrollListener);
+    return () => {
+      window.removeEventListener("scroll", windowScrollListener);
+    };
+  }, [windowScrollListener]);
   return (
     <div className={styles.container}>
       <nav className={styles.head}>
@@ -65,6 +97,7 @@ const HomeFeedDetail = () => {
               onLogin={onLogin}
             />
           ))}
+          {castRepliesData?.loadMore && <LoadingItem />}
         </div>
       )}
     </div>

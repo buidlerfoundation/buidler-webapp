@@ -257,7 +257,16 @@ const FCWrapper = () => {
       <main className={styles["page-container"]}>
         <div className={styles["nav-mobile"]}>
           <Link className={styles["mobile-brand-wrap"]} to="/">
-            <IconBuidlerLogo size={30} />
+            <div
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 4,
+                overflow: "hidden",
+              }}
+            >
+              <IconBuidlerLogo size={30} />
+            </div>
             <span style={{ margin: "0 10px" }}>Buidler</span>
           </Link>
           {fcUser ? (

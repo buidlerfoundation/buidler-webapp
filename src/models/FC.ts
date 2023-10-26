@@ -82,3 +82,12 @@ export interface IFCFilterType {
   id: string;
   path: string;
 }
+
+export interface IFeedData {
+  data: ICast[];
+  total?: number;
+  currentPage?: number;
+  canMore?: boolean;
+  loading?: boolean;
+  loadMore?: boolean;
+}
