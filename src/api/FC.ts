@@ -87,3 +87,9 @@ export const getHomeFeed = (params: {
       limit: `${params.limit}`,
     })}`
   );
+
+export const upload = (file?: any) => {
+  const data = new FormData();
+  data.append("file", file);
+  return Caller.post<string>(`attachments`, data);
+};

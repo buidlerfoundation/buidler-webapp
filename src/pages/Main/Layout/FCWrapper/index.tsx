@@ -32,6 +32,7 @@ import PopupUserFCMenu from "shared/PopupUserFCMenu";
 import useFeedFilters from "hooks/useFeedFilters";
 import ComposeButton from "shared/ComposeButton";
 import ModalCompose from "shared/ModalCompose";
+import ModalReviewResult from "shared/ModalReviewResult";
 
 interface IMenuItem {
   active?: boolean;
@@ -69,6 +70,7 @@ const FCWrapper = () => {
   const [polling, setPolling] = useState(false);
   const [openDiscussion, setOpenDiscussion] = useState(false);
   const [openReview, setOpenReview] = useState(false);
+  const [openReviewResult, setOpenReviewResult] = useState(false);
   const filters = useFeedFilters();
   const params = useParams<{ url: string }>();
   const exploreUrl = useMemo(() => params?.url, [params?.url]);
@@ -89,6 +91,10 @@ const FCWrapper = () => {
   );
   const toggleReview = useCallback(
     () => setOpenReview((current) => !current),
+    []
+  );
+  const toggleReviewResult = useCallback(
+    () => setOpenReviewResult((current) => !current),
     []
   );
   const logout = useCallback(() => {
@@ -360,6 +366,11 @@ const FCWrapper = () => {
         type="review"
         open={openReview}
         handleClose={toggleReview}
+        openResult={toggleReviewResult}
+      />
+      <ModalReviewResult
+        open={openReviewResult}
+        handleClose={toggleReviewResult}
       />
       <ScrollRestoration />
     </div>

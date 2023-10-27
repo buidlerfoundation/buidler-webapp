@@ -11,17 +11,20 @@ export const insertHttpIfNeed = (str?: string) => {
   return `https://${str}`;
 };
 
-export const normalizeContentUrl = (string: string) => {
+export const normalizeContentUrl = (string: string, boldUrl?: string) => {
   return string
     .split(" ")
     .map((str) => {
       if (str.includes("..") || (str.includes("@") && !str.includes("/")))
         return str;
+      const href = insertHttpIfNeed(str.match(regexUrl)?.[0]);
       return str.replace(
         regexUrl,
         `<a href='${insertHttpIfNeed(
           str.match(regexUrl)?.[0]
-        )}' class='mention-string' target='_blank' onclick='event.stopPropagation();'>$1</a>`
+        )}' class='mention-string ${
+          href === boldUrl ? "text-smb" : ""
+        }' target='_blank' onclick='event.stopPropagation();'>$1</a>`
       );
     })
     .join(" ");
@@ -46,7 +49,10 @@ export const normalizeContentCast = (cast: ICast) => {
     );
     res = output.join("");
   }
-  res = res.split("\n").map(normalizeContentUrl).join("\n");
+  res = res
+    .split("\n")
+    .map((str) => normalizeContentUrl(str))
+    .join("\n");
   cast.mentions.forEach((el) => {
     const regex = new RegExp(`@${el.username}`, "gim");
     res = res.replace(
