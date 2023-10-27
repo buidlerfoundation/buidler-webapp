@@ -68,6 +68,7 @@ const FCWrapper = () => {
   const [loginLoading, setLoginLoading] = useState(false);
   const [polling, setPolling] = useState(false);
   const [openDiscussion, setOpenDiscussion] = useState(false);
+  const [openReview, setOpenReview] = useState(false);
   const filters = useFeedFilters();
   const params = useParams<{ url: string }>();
   const exploreUrl = useMemo(() => params?.url, [params?.url]);
@@ -84,6 +85,10 @@ const FCWrapper = () => {
   const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
   const toggleDiscussion = useCallback(
     () => setOpenDiscussion((current) => !current),
+    []
+  );
+  const toggleReview = useCallback(
+    () => setOpenReview((current) => !current),
     []
   );
   const logout = useCallback(() => {
@@ -214,8 +219,8 @@ const FCWrapper = () => {
       onLoginClick();
       return;
     }
-    toggleDiscussion();
-  }, [fcUser, onLoginClick, toggleDiscussion]);
+    toggleReview();
+  }, [fcUser, onLoginClick, toggleReview]);
   return (
     <div className={`buidler-plugin-theme-light ${styles.container}`}>
       <aside className={styles["left-side"]}>
@@ -351,6 +356,11 @@ const FCWrapper = () => {
         }
       />
       <ModalCompose open={openDiscussion} handleClose={toggleDiscussion} />
+      <ModalCompose
+        type="review"
+        open={openReview}
+        handleClose={toggleReview}
+      />
       <ScrollRestoration />
     </div>
   );
