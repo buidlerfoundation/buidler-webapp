@@ -70,7 +70,6 @@ const FCWrapper = () => {
   const [polling, setPolling] = useState(false);
   const [openDiscussion, setOpenDiscussion] = useState(false);
   const [openReview, setOpenReview] = useState(false);
-  const [openReviewResult, setOpenReviewResult] = useState(false);
   const filters = useFeedFilters();
   const params = useParams<{ url: string }>();
   const exploreUrl = useMemo(() => params?.url, [params?.url]);
@@ -85,6 +84,7 @@ const FCWrapper = () => {
   const location = useLocation();
   const activeColor = useMemo(() => "var(--color-primary-text)", []);
   const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
+  const [resultData, setResultData] = useState<any>(null);
   const toggleDiscussion = useCallback(
     () => setOpenDiscussion((current) => !current),
     []
@@ -93,10 +93,12 @@ const FCWrapper = () => {
     () => setOpenReview((current) => !current),
     []
   );
-  const toggleReviewResult = useCallback(
-    () => setOpenReviewResult((current) => !current),
-    []
-  );
+  const onOpenResult = useCallback((data: any) => {
+    setResultData(data);
+  }, []);
+  const onCloseReviewResult = useCallback(() => {
+    setResultData(null);
+  }, []);
   const logout = useCallback(() => {
     window.top?.postMessage(
       { type: "b-fc-plugin-logout" },
@@ -366,11 +368,12 @@ const FCWrapper = () => {
         type="review"
         open={openReview}
         handleClose={toggleReview}
-        openResult={toggleReviewResult}
+        openResult={onOpenResult}
       />
       <ModalReviewResult
-        open={openReviewResult}
-        handleClose={toggleReviewResult}
+        open={!!resultData}
+        resultData={resultData}
+        handleClose={onCloseReviewResult}
       />
       <ScrollRestoration />
     </div>
