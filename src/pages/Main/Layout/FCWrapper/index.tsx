@@ -84,6 +84,10 @@ const FCWrapper = () => {
   const location = useLocation();
   const activeColor = useMemo(() => "var(--color-primary-text)", []);
   const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
+  const showBorder = useMemo(
+    () => location.pathname !== "/" && location.pathname !== "/newest",
+    [location.pathname]
+  );
   const [resultData, setResultData] = useState<any>(null);
   const toggleDiscussion = useCallback(
     () => setOpenDiscussion((current) => !current),
@@ -301,7 +305,11 @@ const FCWrapper = () => {
           </a>
         )}
       </aside>
-      <main className={styles["page-container"]}>
+      <main
+        className={`${styles["page-container"]} ${
+          showBorder ? styles["side-border"] : ""
+        }`}
+      >
         <div className={styles["nav-mobile"]}>
           <Link className={styles["mobile-brand-wrap"]} to="/">
             <div

@@ -68,13 +68,16 @@
     }
   }
 
+  .side-border {
+    border-left: 1px solid var(--color-stroke);
+    border-right: 1px solid var(--color-stroke);
+  }
+
   .page-container {
     width: 600px;
     min-height: 100%;
     min-height: 100vh;
     height: fit-content;
-    border-left: 1px solid var(--color-stroke);
-    border-right: 1px solid var(--color-stroke);
     display: flex;
     flex-direction: column;
     .nav-mobile {
