@@ -104,6 +104,7 @@ import iconVideoPlay from "../assets/images/ic_video_play.svg";
 import icExplore from "../assets/images/ic_explore.png";
 import icDefaultAvatar from "../assets/images/ic_default_avatar.svg";
 import icDefaultSiteLogo from "../assets/images/ic_default_site_logo.svg";
+import icDefaultSiteLogoGray from "../assets/images/ic_default_site_logo_gray.svg";
 
 // website
 import logoDark from "../assets/website/nav_logo.svg";
@@ -230,6 +231,7 @@ const images = {
   icExplore,
   icDefaultAvatar,
   icDefaultSiteLogo,
+  icDefaultSiteLogoGray,
 };
 
 export default images;
