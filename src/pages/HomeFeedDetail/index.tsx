@@ -51,8 +51,8 @@ const HomeFeedDetail = () => {
   ]);
   const windowScrollListener = useCallback(() => {
     if (
-      window.innerHeight + document.documentElement.scrollTop ===
-      document.documentElement.offsetHeight
+      Math.ceil(window.innerHeight + document.documentElement.scrollTop) ===
+      Math.ceil(document.documentElement.offsetHeight)
     ) {
       onPageEndReach();
     }
@@ -66,10 +66,7 @@ const HomeFeedDetail = () => {
   return (
     <div className={styles.container}>
       <nav className={styles.head}>
-        <div
-          className={`${styles["btn-back"]} normal-button-clear`}
-          onClick={goBack}
-        >
+        <div className={styles["btn-back"]} onClick={goBack}>
           <IconArrowBack />
           <span>Post</span>
         </div>
@@ -80,23 +77,25 @@ const HomeFeedDetail = () => {
           <div className={styles.metadata}>
             <MetadataFeed metadata={castDetail.metadata} />
           </div>
-          <CastDetailItem
-            cast={castDetail}
-            replyCount={
-              castRepliesData?.data?.length || castDetail?.replies?.count || 0
-            }
-            homeFeed
-            onLogin={onLogin}
-          />
-          {castRepliesData?.data?.map((el) => (
-            <CastItem
-              cast={el}
-              key={el.hash}
-              comment
+          <div className={styles["list-cast"]}>
+            <CastDetailItem
+              cast={castDetail}
+              replyCount={
+                castDetail?.replies?.count || castRepliesData?.data?.length || 0
+              }
               homeFeed
               onLogin={onLogin}
             />
-          ))}
+            {castRepliesData?.data?.map((el) => (
+              <CastItem
+                cast={el}
+                key={el.hash}
+                comment
+                homeFeed
+                onLogin={onLogin}
+              />
+            ))}
+          </div>
           {castRepliesData?.loadMore && <LoadingItem />}
         </div>
       )}

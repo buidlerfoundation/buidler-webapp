@@ -89,10 +89,6 @@ const FCWrapper = () => {
   const location = useLocation();
   const activeColor = useMemo(() => "var(--color-primary-text)", []);
   const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
-  const showBorder = useMemo(
-    () => location.pathname !== "/" && location.pathname !== "/newest",
-    [location.pathname]
-  );
   const [resultData, setResultData] = useState<any>(null);
   const toggleDiscussion = useCallback(
     () => setOpenDiscussion((current) => !current),
@@ -290,7 +286,7 @@ const FCWrapper = () => {
             }
             active={activeCommunity}
           />
-          <MenuItemMemo
+          {/* <MenuItemMemo
             title="Explore"
             to="/explore"
             icon={
@@ -299,7 +295,7 @@ const FCWrapper = () => {
               />
             }
             active={activeExplore}
-          />
+          /> */}
           <ComposeButton
             openDiscussion={onOpenDiscussion}
             openReview={onOpenReview}
@@ -334,11 +330,7 @@ const FCWrapper = () => {
           </a>
         )}
       </aside>
-      <main
-        className={`${styles["page-container"]} ${
-          showBorder ? styles["side-border"] : ""
-        }`}
-      >
+      <main className={styles["page-container"]}>
         <Outlet />
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>

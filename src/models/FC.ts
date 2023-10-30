@@ -75,6 +75,7 @@ export interface IMetadataUrl {
   description?: string;
   logo?: string;
   url?: string;
+  site_name?: string;
 }
 
 export interface IFCFilterType {

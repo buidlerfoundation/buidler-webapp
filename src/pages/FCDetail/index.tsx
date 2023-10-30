@@ -68,7 +68,7 @@ const FCDetail = () => {
           <CastDetailItem
             cast={castDetail}
             replyCount={
-              castRepliesData?.data?.length || castDetail?.replies?.count || 0
+              castDetail?.replies?.count || castRepliesData?.data?.length || 0
             }
             postMessageOpenImageFullscreen
           />
