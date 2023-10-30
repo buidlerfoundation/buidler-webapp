@@ -501,6 +501,17 @@ html.dark {
   --color-highlight-action-high: #f3f3f3;
   --color-light-text: #ffffff;
   --color-muted-text: #616164;
+
+  --color-background-1: #000000;
+  --color-background-2: #121212;
+  --color-background-3: #363636;
+  --color-background-4: #363636;
+  --color-background-5: #363636;
+  --color-background-6: #363636;
+}
+
+html {
+  background-color: var(--color-background-1);
 }
 
 @media only screen and (max-height: 900px) {

@@ -152,6 +152,18 @@ const homeFeedSlice = createSlice({
             total,
           },
         };
+        state.filters.forEach((filter) => {
+          if (state.feedMap?.[filter.label]) {
+            state.feedMap[filter.label].data = state.feedMap[
+              filter.label
+            ].data.map((el) => {
+              if (el.hash === action.meta.arg.hash) {
+                return action.payload.data || el;
+              }
+              return el;
+            });
+          }
+        });
       })
       .addCase(getCastReplies.pending, (state, action) => {
         const { page, hash } = action.meta.arg;
@@ -209,19 +221,18 @@ const homeFeedSlice = createSlice({
                 }
               );
           }
-          const filter =
-            state.filters.find((el) => el.path === window.location.pathname)
-              ?.label || "";
-          if (state.feedMap?.[filter]) {
-            state.feedMap[filter].data = state.feedMap[filter].data.map(
-              (el) => {
+          state.filters.forEach((filter) => {
+            if (state.feedMap?.[filter.label]) {
+              state.feedMap[filter.label].data = state.feedMap[
+                filter.label
+              ].data.map((el) => {
                 if (el.hash === action.meta.arg.hash) {
                   return action.payload.data || el;
                 }
                 return el;
-              }
-            );
-          }
+              });
+            }
+          });
         }
       })
       .addCase(deleteCast.fulfilled, (state, action) => {

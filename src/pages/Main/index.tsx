@@ -26,6 +26,7 @@ import HomeFeedDetail from "pages/HomeFeedDetail";
 import FeedByUrl from "pages/FeedByUrl";
 import HomeFeedWrapper from "./Layout/HomeFeedWrapper";
 import useFeedFilters from "hooks/useFeedFilters";
+import Community from "pages/Community";
 
 const Main = () => {
   const filters = useFeedFilters();
@@ -68,6 +69,7 @@ const Main = () => {
             ))}
           </Route>
           <Route path="/:fc_username/:hash" element={<HomeFeedDetail />} />
+          <Route path="/community" element={<Community />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/explore/:url" element={<FeedByUrl />} />
         </Route>

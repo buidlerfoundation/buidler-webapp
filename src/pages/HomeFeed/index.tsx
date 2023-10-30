@@ -43,8 +43,8 @@ const HomeFeed = ({ filter }: IHomeFeed) => {
   ]);
   const windowScrollListener = useCallback(() => {
     if (
-      window.innerHeight + document.documentElement.scrollTop ===
-      document.documentElement.offsetHeight
+      Math.ceil(window.innerHeight + document.documentElement.scrollTop) ===
+      Math.ceil(document.documentElement.offsetHeight)
     ) {
       onPageEndReach();
     }

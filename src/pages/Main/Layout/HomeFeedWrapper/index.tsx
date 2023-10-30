@@ -39,7 +39,10 @@ const HomeFeedWrapper = () => {
   );
   return (
     <div className={styles.container}>
-      <nav className={styles["filter-head"]}>{filters.map(renderFilter)}</nav>
+      <div className={styles.header}>
+        <div className={styles.title}>Home</div>
+        <nav className={styles["filter-head"]}>{filters.map(renderFilter)}</nav>
+      </div>
       <Outlet />
     </div>
   );

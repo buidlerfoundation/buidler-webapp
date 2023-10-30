@@ -33,6 +33,8 @@ import useFeedFilters from "hooks/useFeedFilters";
 import ComposeButton from "shared/ComposeButton";
 import ModalCompose from "shared/ModalCompose";
 import ModalReviewResult from "shared/ModalReviewResult";
+import IconMenuCommunity from "shared/SVG/FC/IconMenuCommunity";
+import useQuery from "hooks/useQuery";
 
 interface IMenuItem {
   active?: boolean;
@@ -67,9 +69,12 @@ const FCWrapper = () => {
   const popupMenuRef = useRef<any>();
   const [loading, setLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
+  const [theme, setTheme] = useState("");
+  const query = useQuery();
   const [polling, setPolling] = useState(false);
   const [openDiscussion, setOpenDiscussion] = useState(false);
   const [openReview, setOpenReview] = useState(false);
+  const initialTheme = useMemo(() => query.get("theme"), [query]);
   const filters = useFeedFilters();
   const params = useParams<{ url: string }>();
   const exploreUrl = useMemo(() => params?.url, [params?.url]);
@@ -127,6 +132,14 @@ const FCWrapper = () => {
     }
     setLoading(false);
   }, [dispatch, logout]);
+  useEffect(() => {
+    if (initialTheme) {
+      document
+        .getElementsByTagName("html")?.[0]
+        ?.setAttribute("class", initialTheme);
+      setTheme(initialTheme);
+    }
+  }, [initialTheme]);
   useEffect(() => {
     checkingAuth();
   }, [checkingAuth]);
@@ -219,6 +232,10 @@ const FCWrapper = () => {
     () => location.pathname.includes("/explore"),
     [location.pathname]
   );
+  const activeCommunity = useMemo(
+    () => location.pathname.includes("/community"),
+    [location.pathname]
+  );
   const onOpenDiscussion = useCallback(() => {
     if (!fcUser) {
       onLoginClick();
@@ -234,7 +251,9 @@ const FCWrapper = () => {
     toggleReview();
   }, [fcUser, onLoginClick, toggleReview]);
   return (
-    <div className={`buidler-plugin-theme-light ${styles.container}`}>
+    <div
+      className={`buidler-plugin-theme-${theme || "light"} ${styles.container}`}
+    >
       <aside className={styles["left-side"]}>
         <Link
           className={`${styles["menu-item"]} ${styles["brand-wrap"]}`}
@@ -260,6 +279,16 @@ const FCWrapper = () => {
               <IconMenuHome fill={activeHome ? activeColor : inactiveColor} />
             }
             active={activeHome}
+          />
+          <MenuItemMemo
+            title="Communities"
+            to="/community"
+            icon={
+              <IconMenuCommunity
+                fill={activeCommunity ? activeColor : inactiveColor}
+              />
+            }
+            active={activeCommunity}
           />
           <MenuItemMemo
             title="Explore"
@@ -310,39 +339,6 @@ const FCWrapper = () => {
           showBorder ? styles["side-border"] : ""
         }`}
       >
-        <div className={styles["nav-mobile"]}>
-          <Link className={styles["mobile-brand-wrap"]} to="/">
-            <div
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 4,
-                overflow: "hidden",
-              }}
-            >
-              <IconBuidlerLogo size={30} />
-            </div>
-            <span style={{ margin: "0 10px" }}>Buidler</span>
-          </Link>
-          {fcUser ? (
-            <div onClick={onMenuClick}>
-              <ImageView
-                src={fcUser.pfp.url}
-                alt="avatar"
-                className={styles.avatar}
-                style={{ marginRight: 15 }}
-              />
-            </div>
-          ) : (
-            <div
-              id="btn-login"
-              className={styles["btn-login"]}
-              onClick={onLoginClick}
-            >
-              Login
-            </div>
-          )}
-        </div>
         <Outlet />
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>

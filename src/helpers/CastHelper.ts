@@ -69,7 +69,7 @@ export const removeProtocol = (url?: string) => {
   }
   try {
     const urlObj = new URL(url);
-    return url.replace(`${urlObj.protocol}//`, "");
+    return url.replace(`${urlObj.protocol}//`, "").replace("www.", "");
   } catch (error) {
     return url;
   }
