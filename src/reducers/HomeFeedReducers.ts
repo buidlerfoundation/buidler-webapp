@@ -30,12 +30,12 @@ const initialState: HomeFeedState = {
   filters: [
     { label: "trending", path: "/", id: "1", value: "trending" },
     {
-      label: "most discussions",
+      label: "active",
       id: "2",
       path: "/most-discussion",
       value: "most-commented",
     },
-    { label: "newest", id: "3", path: "/newest", value: "newest" },
+    { label: "new", id: "3", path: "/newest", value: "newest" },
   ],
   currentFilter: { label: "trending", path: "/", id: "1", value: "trending" },
   explore: {
