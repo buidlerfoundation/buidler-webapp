@@ -34,6 +34,9 @@ const ScrollRestoration = () => {
       previousPath.current = location.pathname;
     }
   }, [location.pathname]);
+  useEffect(() => {
+    lastScrollOffsetByPath.current = {};
+  }, []);
   return null;
 };
 
