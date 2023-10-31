@@ -64,7 +64,7 @@ const Main = () => {
               <Route
                 key={el.path}
                 path={el.path}
-                element={<HomeFeed filter={el.label} />}
+                element={<HomeFeed filter={el.value} />}
               />
             ))}
           </Route>

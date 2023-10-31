@@ -84,7 +84,7 @@ export const compareEmbeddedUrl = (embeddedUrl: string, queryUrl: string) => {
   );
 };
 
-const capitalize = (str?: string) => {
+export const capitalize = (str?: string) => {
   if (!str) return "";
   return str[0].toUpperCase() + str.slice(1);
 };

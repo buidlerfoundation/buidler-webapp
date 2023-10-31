@@ -73,7 +73,6 @@ const FCWrapper = () => {
   const query = useQuery();
   const [polling, setPolling] = useState(false);
   const [openDiscussion, setOpenDiscussion] = useState(false);
-  const [openReview, setOpenReview] = useState(false);
   const initialTheme = useMemo(() => query.get("theme"), [query]);
   const filters = useFeedFilters();
   const params = useParams<{ url: string }>();
@@ -92,10 +91,6 @@ const FCWrapper = () => {
   const [resultData, setResultData] = useState<any>(null);
   const toggleDiscussion = useCallback(
     () => setOpenDiscussion((current) => !current),
-    []
-  );
-  const toggleReview = useCallback(
-    () => setOpenReview((current) => !current),
     []
   );
   const onOpenResult = useCallback((data: any) => {
@@ -239,13 +234,6 @@ const FCWrapper = () => {
     }
     toggleDiscussion();
   }, [fcUser, onLoginClick, toggleDiscussion]);
-  const onOpenReview = useCallback(() => {
-    if (!fcUser) {
-      onLoginClick();
-      return;
-    }
-    toggleReview();
-  }, [fcUser, onLoginClick, toggleReview]);
   return (
     <div
       className={`buidler-plugin-theme-${theme || "light"} ${styles.container}`}
@@ -296,10 +284,7 @@ const FCWrapper = () => {
             }
             active={activeExplore}
           /> */}
-          <ComposeButton
-            openDiscussion={onOpenDiscussion}
-            openReview={onOpenReview}
-          />
+          <ComposeButton onClick={onOpenDiscussion} />
           {fcUser && (
             <div className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}>
               <ImageView
@@ -359,11 +344,9 @@ const FCWrapper = () => {
           />
         }
       />
-      <ModalCompose open={openDiscussion} handleClose={toggleDiscussion} />
       <ModalCompose
-        type="review"
-        open={openReview}
-        handleClose={toggleReview}
+        open={openDiscussion}
+        handleClose={toggleDiscussion}
         openResult={onOpenResult}
       />
       <ModalReviewResult
