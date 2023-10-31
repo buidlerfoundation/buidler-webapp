@@ -117,12 +117,10 @@ const FCWrapper = () => {
       const fcUser = await dispatch(getCurrentFCUser()).unwrap();
       if (fcUser) {
         dispatch(FC_USER_ACTIONS.updateSignerId(signerId));
-      } else {
-        logout();
       }
     }
     setLoading(false);
-  }, [dispatch, logout]);
+  }, [dispatch]);
   useEffect(() => {
     if (initialTheme) {
       document
@@ -163,8 +161,6 @@ const FCWrapper = () => {
             dispatch(
               FC_USER_ACTIONS.updateSignerId(resPolling?.data?.signer_id)
             );
-          } else {
-            logout();
           }
         }
       } catch (error: any) {
@@ -173,7 +169,7 @@ const FCWrapper = () => {
       }
       setPolling(false);
     }
-  }, [dispatch, loginLoading, logout]);
+  }, [dispatch, loginLoading]);
   const onLoginClick = useCallback(() => {
     if (signedKeyRequest) return;
     requestSignerId();
