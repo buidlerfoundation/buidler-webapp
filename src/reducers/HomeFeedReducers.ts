@@ -53,7 +53,12 @@ export const getFeedByUrl = createAsyncThunk(
 
 export const getCastDetail = createAsyncThunk(
   "home-feed/get-by-hash",
-  async (payload: { hash: string; page: number; limit: number }) => {
+  async (payload: {
+    hash: string;
+    page: number;
+    limit: number;
+    cast_author_fid?: string;
+  }) => {
     const res = await api.getCastDetail(payload);
     return res;
   }

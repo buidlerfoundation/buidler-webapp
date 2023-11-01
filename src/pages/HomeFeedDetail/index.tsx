@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import IconArrowBack from "shared/SVG/IconArrowBack";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import MetadataFeed from "shared/MetadataFeed";
 import useAppSelector from "hooks/useAppSelector";
 import useFeedRepliesData from "hooks/useFeedRepliesData";
@@ -15,6 +15,7 @@ import LoadingItem from "shared/LoadingItem";
 const HomeFeedDetail = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const loading = useAppSelector((state) => state.homeFeed.castDetail.loading);
   const params = useParams<{ hash: string }>();
   const hash = useMemo(() => params?.hash, [params?.hash]);
@@ -25,9 +26,17 @@ const HomeFeedDetail = () => {
   }, [navigate]);
   useEffect(() => {
     if (hash) {
-      dispatch(getCastDetail({ hash, page: 1, limit: 20 }));
+      console.log('XXX: ', location.state?.cast_author_fid);
+      dispatch(
+        getCastDetail({
+          hash,
+          page: 1,
+          limit: 20,
+          cast_author_fid: location.state?.cast_author_fid,
+        })
+      );
     }
-  }, [dispatch, hash]);
+  }, [dispatch, hash, location.state?.cast_author_fid]);
   const onLogin = useCallback(() => {
     const loginElement = document.getElementById("btn-login");
     loginElement?.click();

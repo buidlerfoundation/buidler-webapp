@@ -126,6 +126,9 @@ a {
 .MuiPaper-root {
   background-color: transparent !important;
   color: var(--color-primary-text) !important;
+  p {
+    margin-bottom: 0;
+  }
 }
 .MuiPickersCalendarHeader-dayLabel {
   color: var(--color-primary-text) !important;

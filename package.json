@@ -43,6 +43,7 @@
     "react-redux": "^8.0.7",
     "react-router-dom": "^6.13.0",
     "react-scripts": "4.0.3",
+    "react-share-social": "^0.1.55",
     "sass": "^1.63.2",
     "socket.io-client": "4.7.2",
     "typescript": "^4.4.2",

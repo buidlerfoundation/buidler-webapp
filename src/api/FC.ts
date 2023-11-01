@@ -45,13 +45,17 @@ export const getCastDetail = (params: {
   hash: string;
   page: number;
   limit: number;
-}) =>
-  Caller.get<ICast>(
-    `casts/${params.hash}?${new URLSearchParams({
-      page: `${params.page}`,
-      limit: `${params.limit}`,
-    })}`
-  );
+  cast_author_fid?: string;
+}) => {
+  const query = new URLSearchParams({
+    page: `${params.page}`,
+    limit: `${params.limit}`,
+  });
+  if (params.cast_author_fid) {
+    query.append("cast_author_fid", params.cast_author_fid);
+  }
+  return Caller.get<ICast>(`casts/${params.hash}?${query}`);
+};
 
 export const deleteCast = (hash: string) => Caller.delete(`casts/${hash}`);
 

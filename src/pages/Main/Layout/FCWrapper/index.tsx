@@ -44,8 +44,17 @@ interface IMenuItem {
 }
 
 const MenuItem = ({ active, title, to, icon }: IMenuItem) => {
+  const onMenuClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+      if (active) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "auto" });
+      }
+    },
+    [active]
+  );
   return (
-    <Link className={styles["menu-item"]} to={to}>
+    <Link className={styles["menu-item"]} to={to} onClick={onMenuClick}>
       {icon}
       <span
         style={{
