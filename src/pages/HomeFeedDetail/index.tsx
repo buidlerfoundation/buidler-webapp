@@ -26,7 +26,6 @@ const HomeFeedDetail = () => {
   }, [navigate]);
   useEffect(() => {
     if (hash) {
-      console.log('XXX: ', location.state?.cast_author_fid);
       dispatch(
         getCastDetail({
           hash,
