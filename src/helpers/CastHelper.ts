@@ -31,7 +31,7 @@ export const normalizeContentUrl = (string: string, boldUrl?: string) => {
 };
 
 export const normalizeContentCast = (cast: ICast) => {
-  let res = "";
+  let res = cast.text;
   const encoder = new TextEncoder();
   const decoder = new TextDecoder("utf-8");
   const byteArray = encoder.encode(cast.text);
