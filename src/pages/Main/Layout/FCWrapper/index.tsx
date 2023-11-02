@@ -113,6 +113,7 @@ const FCWrapper = () => {
       { type: "b-fc-plugin-logout" },
       { targetOrigin: "*" }
     );
+    setSignedKeyRequest(null);
     clearData();
     dispatch(logoutAction());
   }, [dispatch]);
@@ -123,6 +124,7 @@ const FCWrapper = () => {
     setLoading(true);
     const signerId = await getCookie(AsyncKey.signerIdKey);
     if (signerId) {
+      setCookie(AsyncKey.signerIdKey, signerId);
       const fcUser = await dispatch(getCurrentFCUser()).unwrap();
       if (fcUser) {
         dispatch(FC_USER_ACTIONS.updateSignerId(signerId));

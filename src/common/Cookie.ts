@@ -46,6 +46,9 @@ export const setCookie = (key: string, val: any) => {
     );
     store.dispatch(SESSION_ACTIONS.updateSession({ key, value: val }));
     Cookies.set(key, val);
+    if (process.env.REACT_APP_ENABLE_INSPECT) {
+      Cookies.set(key, val, { domain: "buidler.app" });
+    }
     return resolve();
   });
 };
