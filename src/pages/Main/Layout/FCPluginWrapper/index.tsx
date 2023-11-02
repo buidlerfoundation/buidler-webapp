@@ -298,7 +298,16 @@ const FCPluginWrapper = () => {
     >
       <div className={styles.header}>
         <a className={styles["btn-jump-out"]} href="/" target="_blank">
-          <IconBuidlerLogo />
+          <div
+            style={{
+              width: 25,
+              height: 25,
+              borderRadius: 4,
+              overflow: "hidden",
+            }}
+          >
+            <IconBuidlerLogo />
+          </div>
           <span style={{ margin: "0 10px" }}>Buidler</span>
         </a>
         {fcUser ? (
