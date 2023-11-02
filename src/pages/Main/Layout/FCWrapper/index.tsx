@@ -158,6 +158,7 @@ const FCWrapper = () => {
     } else {
       const signerIdFromCookie = await getCookie(AsyncKey.signerIdKey);
       if (signerIdFromCookie) {
+        setCookie(AsyncKey.signerIdKey, signerIdFromCookie);
         const fcUser = await dispatch(getCurrentFCUser()).unwrap();
         if (fcUser) {
           dispatch(FC_USER_ACTIONS.updateSignerId(signerIdFromCookie));
