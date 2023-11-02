@@ -180,4 +180,4 @@ export const signTypeData = {
 };
 
 export const pageNames = ["communities", "channels", "panel", "plugin"];
-export const websitePath = ["/", "/terms", "/privacy"];
+export const websitePath = ["/landing-page", "/terms", "/privacy"];

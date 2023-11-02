@@ -64,6 +64,8 @@ export interface ICast {
     count?: number;
     casts?: ICast[];
   };
+  metadata?: IMetadataUrl;
+  created_at: string;
 }
 
 export interface IMetadataUrl {
@@ -71,4 +73,23 @@ export interface IMetadataUrl {
   title?: string;
   card?: string;
   description?: string;
+  logo?: string;
+  url?: string;
+  site_name?: string;
+}
+
+export interface IFCFilterType {
+  label: string;
+  id: string;
+  path: string;
+  value: "trending" | "newest" | "by domain" | "most-commented";
+}
+
+export interface IFeedData {
+  data: ICast[];
+  total?: number;
+  currentPage?: number;
+  canMore?: boolean;
+  loading?: boolean;
+  loadMore?: boolean;
 }

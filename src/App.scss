@@ -126,6 +126,9 @@ a {
 .MuiPaper-root {
   background-color: transparent !important;
   color: var(--color-primary-text) !important;
+  p {
+    margin-bottom: 0;
+  }
 }
 .MuiPickersCalendarHeader-dayLabel {
   color: var(--color-primary-text) !important;
@@ -389,6 +392,43 @@ iframe {
   }
 }
 
+.popup-menu-container {
+  width: 295px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: var(--color-background-1);
+  .group {
+    display: flex;
+    flex-direction: column;
+    padding: 5px 0;
+    background-color: var(--color-background-2);
+    border-radius: 10px;
+    margin-top: 10px;
+    .menu-item {
+      display: flex;
+      align-items: center;
+      height: 45px;
+      padding: 0 15px;
+      .name {
+        flex: 1;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 22px;
+        color: var(--color-primary-text);
+        margin-left: 15px;
+      }
+      &:hover {
+        cursor: pointer;
+      }
+    }
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
+
 code {
   white-space: pre-line;
 }
@@ -398,7 +438,7 @@ html {
   --color-accent-2: #d8d0bd;
   --color-darkest-background: #ffffff;
   --color-darkest-background80: #ffffffcc;
-  --color-backdrop: rgba(0, 0, 0, 0.75);
+  --color-backdrop: rgba(0, 0, 0, 0.25);
   --color-lighter-background: #f8f8f8;
   --color-highlight: #cecece;
   --color-stroke: #f3f3f3;
@@ -432,6 +472,24 @@ html {
   --content-muted-dark: #86868b;
   --content-dark: #121212;
   --content-muted-2: #727272;
+
+  --color-bright-text: #ffffff;
+  --color-primary-text: #202020;
+  --color-secondary-text: #666666;
+  --color-mute-text: #949494;
+  --color-background-1: #ffffff;
+  --color-background-opacity-1: #fffffff7;
+  --color-background-2: #f8f8f8;
+  --color-background-3: #cecece;
+  --color-background-4: #bbbbbb;
+  --color-background-5: #e8e8e8;
+  --color-background-6: #fafafa;
+  --color-warpcast: #c848ff;
+  --color-fc-accent: #1159d5;
+  --color-stroke: #f3f3f3;
+  --color-recast: rgb(66, 183, 72);
+  --color-like: rgb(213, 19, 56);
+  --color-highlight-action-high: #f3f3f3;
 }
 
 html.dark {
@@ -447,6 +505,18 @@ html.dark {
   --color-highlight-action-high: #f3f3f3;
   --color-light-text: #ffffff;
   --color-muted-text: #616164;
+
+  --color-background-1: #000000;
+  --color-background-opacity-1: #000000f7;
+  --color-background-2: #121212;
+  --color-background-3: #363636;
+  --color-background-4: #363636;
+  --color-background-5: #363636;
+  --color-background-6: #363636;
+}
+
+html {
+  background-color: var(--color-background-1);
 }
 
 @media only screen and (max-height: 900px) {
@@ -462,7 +532,13 @@ html.dark {
 
 @media only screen and (max-width: 576px) {
   .hide-xs {
-    display: none;
+    display: none !important;
+  }
+}
+
+@media only screen and (min-width: 575px) {
+  .hide-desktop {
+    display: none !important;
   }
 }
 
@@ -499,11 +575,14 @@ html.dark {
   --color-bright-text: #ffffff;
   --color-primary-text: #202020;
   --color-secondary-text: #666666;
+  --color-mute-text: #949494;
   --color-background-1: #ffffff;
+  --color-background-opacity-1: #fffffff7;
   --color-background-2: #f8f8f8;
   --color-background-3: #cecece;
   --color-background-4: #bbbbbb;
   --color-background-5: #e8e8e8;
+  --color-background-6: #fafafa;
   --color-warpcast: #c848ff;
   --color-fc-accent: #1159d5;
   --color-stroke: #f3f3f3;
@@ -519,11 +598,14 @@ html.dark {
   --color-bright-text: #000000;
   --color-primary-text: #e8e8e8;
   --color-secondary-text: #a0a3ad;
+  --color-mute-text: #a0a3ad;
   --color-background-1: #000000;
+  --color-background-opacity-1: #000000f7;
   --color-background-2: #121212;
   --color-background-3: #363636;
   --color-background-4: #363636;
   --color-background-5: #363636;
+  --color-background-6: #363636;
   --color-warpcast: #c848ff;
   --color-fc-accent: #1159d5;
   --color-stroke: #242424;
@@ -535,11 +617,14 @@ html.dark {
   --color-bright-text: #000000;
   --color-primary-text: #e8e8e8;
   --color-secondary-text: #a0a3ad;
+  --color-mute-text: #a0a3ad;
   --color-background-1: rgb(21, 32, 43);
+  --color-background-opacity-1: rgba(21, 32, 43, 0.97);
   --color-background-2: rgb(39, 51, 64);
   --color-background-3: #363636;
   --color-background-4: #363636;
   --color-background-5: #363636;
+  --color-background-6: #363636;
   --color-warpcast: #c848ff;
   --color-fc-accent: #1159d5;
   --color-stroke: rgb(66, 83, 100);

@@ -1,10 +1,12 @@
 import { useMemo } from "react";
 import useAppSelector from "./useAppSelector";
-import { ICast } from "models/FC";
+import { IFeedData } from "models/FC";
 
-function useCastRepliesData(hash?: string | null) {
-  const castRepliesMap = useAppSelector((state) => state.fcCast.castRepliesMap);
-  return useMemo<{ loading: boolean; data: ICast[] }>(() => {
+function useFeedRepliesData(hash?: string | null) {
+  const castRepliesMap = useAppSelector(
+    (state) => state.homeFeed.castRepliesMap
+  );
+  return useMemo<IFeedData>(() => {
     if (!hash)
       return {
         loading: false,
@@ -19,4 +21,4 @@ function useCastRepliesData(hash?: string | null) {
   }, [castRepliesMap, hash]);
 }
 
-export default useCastRepliesData;
+export default useFeedRepliesData;

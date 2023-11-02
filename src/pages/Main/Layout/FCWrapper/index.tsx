@@ -1,11 +1,3 @@
-import api from "api";
-import { AsyncKey } from "common/AppConfig";
-import { clearData, getCookie, setCookie } from "common/Cookie";
-import { extractContentMessage } from "helpers/MessageHelper";
-import useAppDispatch from "hooks/useAppDispatch";
-import useAppSelector from "hooks/useAppSelector";
-import useQuery from "hooks/useQuery";
-import { ISignedKeyRequest } from "models/FC";
 import React, {
   memo,
   useCallback,
@@ -14,100 +6,164 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { toast } from "react-hot-toast";
-import { Outlet, useNavigate, useParams } from "react-router-dom";
-import { FC_USER_ACTIONS, getCurrentFCUser } from "reducers/FCUserReducers";
+import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 import styles from "./index.module.scss";
+import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
+import IconMenuHome from "shared/SVG/FC/IconMenuHome";
+import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
+import { clearData, getCookie, setCookie } from "common/Cookie";
+import { AsyncKey } from "common/AppConfig";
+import useAppDispatch from "hooks/useAppDispatch";
+import { FC_USER_ACTIONS, getCurrentFCUser } from "reducers/FCUserReducers";
+import { logoutAction } from "reducers/actions";
+import useAppSelector from "hooks/useAppSelector";
+import ImageView from "shared/ImageView";
 import LoginFC from "shared/LoginFC";
-import {
-  FC_CAST_ACTIONS,
-  getCastReplies,
-  getCastsByUrl,
-  getMainMetadata,
-} from "reducers/FCCastReducers";
+import { ISignedKeyRequest } from "models/FC";
+import api from "api";
+import toast from "react-hot-toast";
+import IconDownload from "shared/SVG/FC/IconDownload";
+import useExtensionInstalled from "hooks/useExtensionInstalled";
+import { HOME_FEED_ACTIONS, getFeedByUrl } from "reducers/HomeFeedReducers";
+import ModalFCReply from "shared/ModalFCReply";
+import ScrollRestoration from "../ScrollRestoration";
 import PopoverButton from "shared/PopoverButton";
 import PopupUserFCMenu from "shared/PopupUserFCMenu";
-import ImageView from "shared/ImageView";
-import { logoutAction } from "reducers/actions";
-import ModalFCCast from "shared/ModalFCCast";
-import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
-import CopyRight from "pages/PluginFC/CopyRight";
+import useFeedFilters from "hooks/useFeedFilters";
+import ComposeButton from "shared/ComposeButton";
+import ModalCompose from "shared/ModalCompose";
+import ModalReviewResult from "shared/ModalReviewResult";
+import IconMenuCommunity from "shared/SVG/FC/IconMenuCommunity";
+import useQuery from "hooks/useQuery";
+
+interface IMenuItem {
+  active?: boolean;
+  title: string;
+  to: string;
+  icon: React.ReactElement;
+}
+
+const MenuItem = ({ active, title, to, icon }: IMenuItem) => {
+  const onMenuClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+      if (active) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "auto" });
+      }
+    },
+    [active]
+  );
+  return (
+    <Link className={styles["menu-item"]} to={to} onClick={onMenuClick}>
+      {icon}
+      <span
+        style={{
+          marginLeft: 10,
+          color: active
+            ? "var(--color-primary-text)"
+            : "var(--color-secondary-text)",
+          fontWeight: active ? 700 : 600,
+        }}
+      >
+        {title}
+      </span>
+    </Link>
+  );
+};
+
+const MenuItemMemo = memo(MenuItem);
 
 const FCWrapper = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const popupMenuRef = useRef<any>();
+  const [loading, setLoading] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
   const [theme, setTheme] = useState("");
   const query = useQuery();
-  const params = useParams<{ cast_hash: string }>();
-  const castHash = useMemo(() => params?.cast_hash, [params?.cast_hash]);
-  const initialTheme = useMemo(() => query.get("theme"), [query]);
-  const pollingController = useRef(new AbortController());
-  const q = useMemo(() => query.get("q"), [query]);
-  const [loading, setLoading] = useState(false);
+  const querySignerId = useMemo(() => query.get("signer_id"), [query]);
   const [polling, setPolling] = useState(false);
-  const [castQueue, setCastQueue] = useState<any>(null);
+  const [openDiscussion, setOpenDiscussion] = useState(false);
+  const initialTheme = useMemo(() => query.get("theme"), [query]);
+  const filters = useFeedFilters();
+  const params = useParams<{ url: string }>();
+  const exploreUrl = useMemo(() => params?.url, [params?.url]);
   const [signedKeyRequest, setSignedKeyRequest] = useState<
     ISignedKeyRequest | undefined | null
   >(null);
-  const storeSignerId = useAppSelector((state) => state.fcUser?.signer_id);
-  const queryUrl = useAppSelector((state) => state.fcCast.queryUrl);
+  const isExtensionInstalled = useExtensionInstalled();
   const fcUser = useAppSelector((state) => state.fcUser?.data);
-  const replyCast = useAppSelector((state) => state.fcCast.replyCast);
-  const openNewCast = useAppSelector((state) => state.fcCast.openNewCast);
-  const signerId = useMemo(() => query.get("signer_id"), [query]);
-  const handleCloseNewCast = useCallback(() => {
-    dispatch(FC_CAST_ACTIONS.toggleNewCast());
-  }, [dispatch]);
+  const replyCast = useAppSelector((state) => state.homeFeed.replyCast);
+  const storeSignerId = useAppSelector((state) => state.fcUser?.signer_id);
+  const pollingController = useRef(new AbortController());
+  const location = useLocation();
+  const activeColor = useMemo(() => "var(--color-primary-text)", []);
+  const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
+  const [resultData, setResultData] = useState<any>(null);
+  const toggleDiscussion = useCallback(
+    () => setOpenDiscussion((current) => !current),
+    []
+  );
+  const onOpenResult = useCallback((data: any) => {
+    setResultData(data);
+  }, []);
+  const onCloseReviewResult = useCallback(() => {
+    setResultData(null);
+  }, []);
   const logout = useCallback(() => {
     window.top?.postMessage(
       { type: "b-fc-plugin-logout" },
       { targetOrigin: "*" }
     );
+    setSignedKeyRequest(null);
     clearData();
     dispatch(logoutAction());
   }, [dispatch]);
-  const onCloseMenu = useCallback(() => {
-    popupMenuRef.current?.hide();
-  }, []);
-  const onLogoutClick = useCallback(() => {
-    logout();
-    onCloseMenu();
-  }, [logout, onCloseMenu]);
-  const castToFC = useCallback(
-    async (payload: any) => {
-      payload.text = extractContentMessage(payload.text);
-      if (payload.mentions?.[0] === 20386) {
-        payload.mentions = [20108];
-      }
-      const res = await api.cast(payload);
-      if (res.success) {
-        // handle after cast
-        if (fcUser?.username) {
-          window.top?.postMessage(
-            {
-              type: "b-fc-plugin-open-tab",
-              url: `https://warpcast.com/${
-                fcUser?.username
-              }/0x${res.data?.slice(0, 6)}`,
-            },
-            { targetOrigin: "*" }
-          );
-        }
-        if (payload?.parent_cast_id?.hash) {
-          dispatch(getCastReplies({ hash: payload?.parent_cast_id?.hash }));
-        } else if (queryUrl) {
-          dispatch(getCastsByUrl({ text: queryUrl, page: 1, limit: 20 }));
-        }
-      }
-      setCastQueue(null);
-    },
-    [dispatch, fcUser?.username, queryUrl]
-  );
-  const requestSignerId = useCallback(async () => {
+  const onCloseReply = useCallback(() => {
+    dispatch(HOME_FEED_ACTIONS.updateReplyCast());
+  }, [dispatch]);
+  const checkingAuth = useCallback(async () => {
     setLoading(true);
-    const res = await api.requestSignedKey();
+    const signerId = await getCookie(AsyncKey.signerIdKey);
+    if (signerId) {
+      setCookie(AsyncKey.signerIdKey, signerId);
+      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
+      if (fcUser) {
+        dispatch(FC_USER_ACTIONS.updateSignerId(signerId));
+      }
+    } else if (querySignerId) {
+      await setCookie(AsyncKey.signerIdKey, querySignerId);
+      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
+      if (fcUser) {
+        dispatch(FC_USER_ACTIONS.updateSignerId(querySignerId));
+      }
+    }
     setLoading(false);
+  }, [dispatch, querySignerId]);
+  useEffect(() => {
+    if (initialTheme) {
+      document
+        .getElementsByTagName("html")?.[0]
+        ?.setAttribute("class", initialTheme);
+      setTheme(initialTheme);
+    }
+  }, [initialTheme]);
+  useEffect(() => {
+    checkingAuth();
+  }, [checkingAuth]);
+  useEffect(() => {
+    if (exploreUrl) {
+      dispatch(getFeedByUrl({ text: exploreUrl, page: 1, limit: 20 }));
+    }
+  }, [dispatch, exploreUrl]);
+  const onWithoutLoginClick = useCallback(() => {
+    pollingController.current.abort();
+    setSignedKeyRequest(null);
+  }, []);
+  const requestSignerId = useCallback(async () => {
+    if (loginLoading) return;
+    setLoginLoading(true);
+    const res = await api.requestSignedKey();
+    setLoginLoading(false);
     if (res.data?.token) {
       setSignedKeyRequest(res.data);
       setPolling(true);
@@ -123,8 +179,6 @@ const FCWrapper = () => {
             dispatch(
               FC_USER_ACTIONS.updateSignerId(resPolling?.data?.signer_id)
             );
-          } else {
-            logout();
           }
         }
       } catch (error: any) {
@@ -133,153 +187,11 @@ const FCWrapper = () => {
       }
       setPolling(false);
     }
-  }, [dispatch, logout]);
-  const initialSignerId = useCallback(
-    async (id: string) => {
-      await setCookie(AsyncKey.signerIdKey, id);
-      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
-      if (fcUser) {
-        dispatch(FC_USER_ACTIONS.updateSignerId(id));
-      } else {
-        logout();
-      }
-    },
-    [dispatch, logout]
-  );
-  const checkingSignerId = useCallback(async () => {
-    if (signerId) {
-      await setCookie(AsyncKey.signerIdKey, signerId);
-      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
-      if (fcUser) {
-        dispatch(FC_USER_ACTIONS.updateSignerId(signerId));
-      } else {
-        logout();
-      }
-    } else {
-      const signerIdFromCookie = await getCookie(AsyncKey.signerIdKey);
-      if (signerIdFromCookie) {
-        await setCookie(AsyncKey.signerIdKey, signerIdFromCookie);
-        const fcUser = await dispatch(getCurrentFCUser()).unwrap();
-        if (fcUser) {
-          dispatch(FC_USER_ACTIONS.updateSignerId(signerIdFromCookie));
-        }
-      }
-    }
-  }, [dispatch, logout, signerId]);
-  const onCloseModalReply = useCallback(() => {
-    dispatch(FC_CAST_ACTIONS.updateReplyCast());
-  }, [dispatch]);
-  useEffect(() => {
-    if (q) {
-      dispatch(FC_CAST_ACTIONS.updateQueryUrl(q));
-    }
-  }, [dispatch, q]);
-  useEffect(() => {
-    if (queryUrl) {
-      dispatch(getCastsByUrl({ text: queryUrl, page: 1, limit: 20 }));
-      dispatch(getMainMetadata(queryUrl));
-    }
-  }, [dispatch, queryUrl]);
-  useEffect(() => {
-    checkingSignerId();
-  }, [checkingSignerId]);
-  useEffect(() => {
-    if (storeSignerId) {
-      window.top?.postMessage(
-        { type: "b-fc-plugin-logged", signerId: storeSignerId },
-        { targetOrigin: "*" }
-      );
-    }
-  }, [storeSignerId]);
-  useEffect(() => {
-    let timeout: any = null;
-    if (fcUser?.username && castQueue) {
-      // timeout to cast to fc after login
-      timeout = setTimeout(() => {
-        castToFC(castQueue);
-      }, 1000);
-    }
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-    };
-  }, [castQueue, castToFC, fcUser?.username]);
-  useEffect(() => {
-    if (initialTheme) {
-      setTheme(initialTheme);
-    }
-  }, [initialTheme]);
-  useEffect(() => {
-    const messageListener = async (
-      e: MessageEvent<{ type: string; payload: any; metadata?: any }>
-    ) => {
-      if (e?.data?.type === "b-fc-open-login") {
-        onLoginClick();
-      }
-      if (e?.data?.type === "b-fc-update-tw-theme") {
-        setTheme(e.data.payload);
-      }
-      if (e?.data?.type === "b-fc-reload-iframe") {
-        // reload
-      }
-      if (e?.data?.type === "tw-cast") {
-        castToFC(e.data.payload);
-      }
-      if (e?.data?.type === "tw-cast-queue") {
-        setCastQueue(e.data.payload);
-      }
-      if (e?.data?.type === "b-fc-update-tw-url") {
-        dispatch(FC_CAST_ACTIONS.updateQueryUrl(e?.data?.payload?.url || ""));
-        dispatch(FC_CAST_ACTIONS.updateTitleUrl(e?.data?.payload?.title || ""));
-        if (castHash) {
-          navigate(-1);
-        }
-      }
-      if (e?.data?.type === "b-fc-initial-data") {
-        const { signerId, q, theme, title } = e?.data?.payload || {};
-        if (signerId) {
-          initialSignerId(signerId);
-        }
-        if (q) {
-          dispatch(FC_CAST_ACTIONS.updateQueryUrl(q));
-        }
-        if (theme) {
-          setTheme(theme);
-        }
-        if (title) {
-          dispatch(FC_CAST_ACTIONS.updateTitleUrl(title));
-        }
-      }
-      if (e?.data?.type === "b-fc-new-cast") {
-        dispatch(FC_CAST_ACTIONS.openNewCast());
-      }
-      if (e?.data?.type === "b-fc-close-reply") {
-        onCloseModalReply();
-      }
-    };
-    window.addEventListener("message", messageListener);
-    return () => {
-      window.removeEventListener("message", messageListener);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [castHash, onCloseModalReply, castToFC, dispatch, initialSignerId]);
-  const onWithoutLoginClick = useCallback(() => {
-    pollingController.current.abort();
-    setSignedKeyRequest(null);
-    if (openNewCast) {
-      handleCloseNewCast();
-    }
-  }, [handleCloseNewCast, openNewCast]);
+  }, [dispatch, loginLoading]);
   const onLoginClick = useCallback(() => {
     if (signedKeyRequest) return;
     requestSignerId();
   }, [requestSignerId, signedKeyRequest]);
-  useEffect(() => {
-    if (openNewCast && !fcUser) {
-      onLoginClick();
-    }
-  }, [fcUser, onLoginClick, openNewCast]);
   const onMenuClick = useCallback(
     async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       e.stopPropagation();
@@ -288,41 +200,139 @@ const FCWrapper = () => {
     },
     []
   );
-  useEffect(() => {
-    if (replyCast) {
-      window.top?.postMessage(
-        { type: "b-fc-plugin-open-reply", payload: replyCast },
-        { targetOrigin: "*" }
+  const renderRight = useCallback(() => {
+    if (loading) return null;
+    if (fcUser) {
+      return (
+        <div className={styles["user-info"]} onClick={onMenuClick}>
+          <span className="truncate" style={{ marginRight: 10, maxWidth: 170 }}>
+            {fcUser.display_name}
+          </span>
+          <ImageView
+            src={fcUser.pfp.url}
+            className={styles.avatar}
+            alt="avatar"
+          />
+        </div>
       );
     }
-  }, [replyCast]);
+    return (
+      <div className={styles["btn-login"]} onClick={onLoginClick}>
+        Login
+      </div>
+    );
+  }, [fcUser, loading, onLoginClick, onMenuClick]);
+  const onCloseMenu = useCallback(() => {
+    popupMenuRef.current?.hide();
+  }, []);
+  const onLogoutClick = useCallback(() => {
+    logout();
+    onCloseMenu();
+  }, [logout, onCloseMenu]);
+  const activeHome = useMemo(
+    () => !!filters.find((el) => el.path === location.pathname),
+    [filters, location.pathname]
+  );
+  const activeExplore = useMemo(
+    () => location.pathname.includes("/explore"),
+    [location.pathname]
+  );
+  const activeCommunity = useMemo(
+    () => location.pathname.includes("/community"),
+    [location.pathname]
+  );
+  const onOpenDiscussion = useCallback(() => {
+    if (!fcUser) {
+      onLoginClick();
+      return;
+    }
+    toggleDiscussion();
+  }, [fcUser, onLoginClick, toggleDiscussion]);
   return (
     <div
       className={`buidler-plugin-theme-${theme || "light"} ${styles.container}`}
     >
-      <div className={styles.header}>
-        <a className={styles["btn-jump-out"]} href="/" target="_blank">
-          <IconBuidlerLogo />
+      <aside className={styles["left-side"]}>
+        <Link
+          className={`${styles["menu-item"]} ${styles["brand-wrap"]}`}
+          to="/"
+        >
+          <div
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 4,
+              overflow: "hidden",
+            }}
+          >
+            <IconBuidlerLogo size={30} />
+          </div>
           <span style={{ margin: "0 10px" }}>Buidler</span>
-        </a>
-        {fcUser ? (
-          <div className={styles["user-info"]} onClick={onMenuClick}>
-            {fcUser.pfp?.url && (
-              <ImageView
-                src={fcUser.pfp?.url}
-                alt="fc-user-avatar"
-                className={styles.avatar}
+        </Link>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <MenuItemMemo
+            title="Home"
+            to="/home"
+            icon={
+              <IconMenuHome fill={activeHome ? activeColor : inactiveColor} />
+            }
+            active={activeHome}
+          />
+          {/* <MenuItemMemo
+            title="Communities"
+            to="/community"
+            icon={
+              <IconMenuCommunity
+                fill={activeCommunity ? activeColor : inactiveColor}
               />
-            )}
-          </div>
-        ) : (
-          <div className={styles["btn-login"]} onClick={onLoginClick}>
-            <span>Login</span>
-          </div>
+            }
+            active={activeCommunity}
+          /> */}
+          {/* <MenuItemMemo
+            title="Explore"
+            to="/explore"
+            icon={
+              <IconMenuExplore
+                fill={activeExplore ? activeColor : inactiveColor}
+              />
+            }
+            active={activeExplore}
+          /> */}
+          <ComposeButton onClick={onOpenDiscussion} />
+          {fcUser && (
+            <div className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}>
+              <ImageView
+                src={fcUser?.pfp.url}
+                className={styles.avatar}
+                alt="avatar"
+              />
+            </div>
+          )}
+        </div>
+        {!isExtensionInstalled && (
+          <a
+            className={styles["extension-description-container"]}
+            href="https://chrome.google.com/webstore/detail/buidler-one-extension-any/omhbdacaeafhladkifficmjmpeaijlfc"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span className={styles["extension-description"]}>
+              Please install extension for the full experience with Buidler!
+            </span>
+            <div className={styles.cta}>
+              <IconDownload
+                fill="var(--color-mention)"
+                style={{ marginRight: 10 }}
+              />
+              <span>Download Extension</span>
+            </div>
+          </a>
         )}
-      </div>
-      <Outlet />
-      <CopyRight />
+      </aside>
+      <main className={styles["page-container"]}>
+        <Outlet />
+      </main>
+      <aside className={styles["right-side"]}>{renderRight()}</aside>
       {!storeSignerId && signedKeyRequest?.deeplinkUrl && (
         <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>
           <LoginFC
@@ -331,23 +341,34 @@ const FCWrapper = () => {
           />
         </div>
       )}
-      <ModalFCCast
-        open={openNewCast}
-        handleClose={handleCloseNewCast}
-        theme={theme}
-      />
+      {fcUser && (
+        <ModalFCReply
+          open={!!replyCast}
+          handleClose={onCloseReply}
+          cast={replyCast}
+        />
+      )}
       <PopoverButton
         ref={popupMenuRef}
         popupOnly
-        style={{ top: 10 }}
         componentPopup={
           <PopupUserFCMenu
             onCloseMenu={onCloseMenu}
-            theme={theme}
             onLogoutClick={onLogoutClick}
           />
         }
       />
+      <ModalCompose
+        open={openDiscussion}
+        handleClose={toggleDiscussion}
+        openResult={onOpenResult}
+      />
+      <ModalReviewResult
+        open={!!resultData}
+        resultData={resultData}
+        handleClose={onCloseReviewResult}
+      />
+      <ScrollRestoration />
     </div>
   );
 };

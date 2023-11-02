@@ -4,7 +4,7 @@ import "./App.scss";
 import "styles/spacing.scss";
 import "styles/emoji.scss";
 import Main from "pages/Main";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CustomEventName } from "services/events/WindowEvent";
 import AppToastNotification from "shared/AppToastNotification";
 import moment from "moment";
@@ -56,16 +56,23 @@ function App() {
       } = e;
       navigate(path, { replace: !push });
     };
+    const eventKeyDown = (e: any) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+      }
+    };
     window.addEventListener("offline", eventOffline);
     window.addEventListener("online", eventOnline);
     window.addEventListener("paste", eventPaste);
     window.addEventListener("contextmenu", eventContextMenu);
+    window.addEventListener("keydown", eventKeyDown);
     window.addEventListener(CustomEventName.CHANGE_ROUTE, changeRouteListener);
     return () => {
       window.removeEventListener("offline", eventOffline);
       window.removeEventListener("online", eventOnline);
       window.removeEventListener("paste", eventPaste);
       window.removeEventListener("contextmenu", eventContextMenu);
+      window.removeEventListener("keydown", eventKeyDown);
       window.removeEventListener(
         CustomEventName.CHANGE_ROUTE,
         changeRouteListener
@@ -88,6 +95,13 @@ function App() {
   //     window.removeEventListener("click", eventClick);
   //   };
   // }, []);
+  useEffect(() => {
+    if (Link.defaultProps == null) Link.defaultProps = {};
+    Link.defaultProps.onClick = (e) => {
+      e.stopPropagation();
+    };
+    Link.defaultProps.preventScrollReset = true;
+  }, []);
   return (
     <>
       <Main />

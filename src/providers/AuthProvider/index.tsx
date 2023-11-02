@@ -334,7 +334,8 @@ const AuthProvider = ({ children }: IAuthProps) => {
   const checkingAuth = useCallback(async () => {
     if (
       websitePath.includes(location.pathname) ||
-      location.pathname.includes("/plugin-fc")
+      location.pathname.includes("/plugin-fc") ||
+      location.pathname.includes("/")
     ) {
       setLoading(false);
       return;

@@ -41,8 +41,21 @@ export const listCasts = (params: {
     })}`
   );
 
-export const getCastDetail = (hash: string) =>
-  Caller.get<ICast>(`casts/${hash}`);
+export const getCastDetail = (params: {
+  hash: string;
+  page: number;
+  limit: number;
+  cast_author_fid?: string;
+}) => {
+  const query = new URLSearchParams({
+    page: `${params.page}`,
+    limit: `${params.limit}`,
+  });
+  if (params.cast_author_fid) {
+    query.append("cast_author_fid", params.cast_author_fid);
+  }
+  return Caller.get<ICast>(`casts/${params.hash}?${query}`);
+};
 
 export const deleteCast = (hash: string) => Caller.delete(`casts/${hash}`);
 
@@ -65,3 +78,22 @@ export const getEmbeddedMetadata = (url: string) =>
     undefined,
     true
   );
+
+export const getHomeFeed = (params: {
+  type: string;
+  page: number;
+  limit: number;
+}) =>
+  Caller.get<ICast[]>(
+    `home/?${new URLSearchParams({
+      type: params.type,
+      page: `${params.page}`,
+      limit: `${params.limit}`,
+    })}`
+  );
+
+export const upload = (file?: any) => {
+  const data = new FormData();
+  data.append("file", file);
+  return Caller.post<string>(`attachments`, data);
+};

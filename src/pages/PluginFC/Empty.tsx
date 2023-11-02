@@ -4,7 +4,6 @@ import IconPlus from "shared/SVG/IconPlus";
 
 const Empty = () => {
   const onCreateCastClick = useCallback(() => {
-    // dispatch(FC_CAST_ACTIONS.toggleNewCast());
     window.top?.postMessage(
       { type: "b-fc-plugin-open-compose" },
       { targetOrigin: "*" }

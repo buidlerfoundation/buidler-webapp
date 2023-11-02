@@ -5,10 +5,8 @@ import AppConfig, {
   AsyncKey,
   ignoreMessageErrorApis,
   importantApis,
-  whiteListRefreshTokenApis,
 } from "../common/AppConfig";
 import { clearData, getCookie } from "../common/Cookie";
-import { refreshTokenAction } from "reducers/UserActions";
 import { BaseDataApi } from "models/User";
 import { logoutAction } from "reducers/actions";
 
@@ -128,15 +126,15 @@ const fetchWithRetry: any = (
     });
 };
 
-function isWhiteList(method: string, uri: string) {
-  return (
-    whiteListRefreshTokenApis.includes(`${method}-${uri}`) ||
-    /authentication\/ott\/.*/.test(`${method}-${uri}`) ||
-    /get-external\?url=.*/.test(`${method}-${uri}`) ||
-    /signers/.test(`${method}-${uri}`) ||
-    /users/.test(`${method}-${uri}`)
-  );
-}
+// function isWhiteList(method: string, uri: string) {
+//   return (
+//     whiteListRefreshTokenApis.includes(`${method}-${uri}`) ||
+//     /authentication\/ott\/.*/.test(`${method}-${uri}`) ||
+//     /get-external\?url=.*/.test(`${method}-${uri}`) ||
+//     /signers/.test(`${method}-${uri}`) ||
+//     /users/.test(`${method}-${uri}`)
+//   );
+// }
 
 async function requestAPI<T = any>(
   method: string,
@@ -153,29 +151,29 @@ async function requestAPI<T = any>(
       statusCode: 403,
     };
   }
-  if (!isWhiteList(method, uri)) {
-    const expireTokenTime = await getCookie(AsyncKey.tokenExpire);
-    if (expireTokenTime && new Date().getTime() / 1000 > expireTokenTime) {
-      const { success, message } = await store
-        .dispatch(refreshTokenAction())
-        .unwrap();
-      if (!success) {
-        if (
-          message === "Failed to authenticate refresh token" ||
-          message === "Failed to authenticate token"
-        ) {
-          handleClearDataAndReload();
-        } else {
-          toast.error(message);
-        }
-        return {
-          success: false,
-          statusCode: 403,
-        };
-      }
-      // re init socket
-    }
-  }
+  // if (!isWhiteList(method, uri)) {
+  //   const expireTokenTime = await getCookie(AsyncKey.tokenExpire);
+  //   if (expireTokenTime && new Date().getTime() / 1000 > expireTokenTime) {
+  //     const { success, message } = await store
+  //       .dispatch(refreshTokenAction())
+  //       .unwrap();
+  //     if (!success) {
+  //       if (
+  //         message === "Failed to authenticate refresh token" ||
+  //         message === "Failed to authenticate token"
+  //       ) {
+  //         handleClearDataAndReload();
+  //       } else {
+  //         toast.error(message);
+  //       }
+  //       return {
+  //         success: false,
+  //         statusCode: 403,
+  //       };
+  //     }
+  //     // re init socket
+  //   }
+  // }
   // Build API header
   let headers: any = {
     Accept: "*/*",

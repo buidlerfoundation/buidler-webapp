@@ -2,9 +2,6 @@ import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import React, { useMemo } from "react";
 import { Provider } from "react-redux";
 import store from "store";
-import SocketProvider from "./SocketProvider";
-import AuthProvider from "./AuthProvider";
-import ImageProvider from "./ImageProvider";
 
 type ProvidersProps = {
   children: React.ReactNode;
@@ -31,13 +28,14 @@ const Providers = ({ children }: ProvidersProps) => {
   return (
     <Provider store={store}>
       <ThemeProvider theme={materialTheme}>
-        <SocketProvider>
-          {/* <WalletConnectProvider> */}
-          <AuthProvider>
-            <ImageProvider>{children}</ImageProvider>
-          </AuthProvider>
-          {/* </WalletConnectProvider> */}
-        </SocketProvider>
+        {children}
+        {/* <SocketProvider>
+          <WalletConnectProvider>
+            <AuthProvider>
+              <ImageProvider>{children}</ImageProvider>
+            </AuthProvider>
+          </WalletConnectProvider>
+        </SocketProvider> */}
         <CssBaseline />
       </ThemeProvider>
     </Provider>

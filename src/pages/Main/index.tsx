@@ -17,10 +17,19 @@ import Terms from "pages/Website/Terms";
 import Privacy from "pages/Website/Privacy";
 import WebsiteWrapper from "./Layout/WebsiteWrapper";
 import PluginFC from "pages/PluginFC";
-import FCWrapper from "./Layout/FCWrapper";
 import FCDetail from "pages/FCDetail";
+import FCPluginWrapper from "./Layout/FCPluginWrapper";
+import FCWrapper from "./Layout/FCWrapper";
+import HomeFeed from "pages/HomeFeed";
+import Explore from "pages/Explore";
+import HomeFeedDetail from "pages/HomeFeedDetail";
+import FeedByUrl from "pages/FeedByUrl";
+import HomeFeedWrapper from "./Layout/HomeFeedWrapper";
+import useFeedFilters from "hooks/useFeedFilters";
+import Community from "pages/Community";
 
 const Main = () => {
+  const filters = useFeedFilters();
   return (
     <div className={styles.container}>
       <Routes>
@@ -50,11 +59,23 @@ const Main = () => {
           </Route>
         </Route>
         <Route element={<FCWrapper />}>
+          <Route element={<HomeFeedWrapper />}>
+            {filters.map((el) => (
+              <Route
+                key={el.path}
+                path={el.path}
+                element={<HomeFeed filter={el.value} />}
+              />
+            ))}
+          </Route>
+          <Route path="/:fc_username/:hash" element={<HomeFeedDetail />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/explore/:url" element={<FeedByUrl />} />
+        </Route>
+        <Route element={<FCPluginWrapper />}>
           <Route path="/plugin-fc" element={<PluginFC />} />
-          <Route
-            path="/plugin-fc/:cast_hash"
-            element={<FCDetail />}
-          />
+          <Route path="/plugin-fc/:cast_hash" element={<FCDetail />} />
         </Route>
         <Route path="/started" element={<Started />} />
         <Route path="/plugin/*" element={<ErrorPluginPage />} />
