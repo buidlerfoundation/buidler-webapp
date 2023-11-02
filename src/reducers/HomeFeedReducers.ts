@@ -64,6 +64,21 @@ export const getCastDetail = createAsyncThunk(
   }
 );
 
+export const getResultCastByHash = createAsyncThunk(
+  "home-feed/get-result-hash",
+  async (payload: {
+    hash: string;
+    page: number;
+    limit: number;
+    cast_author_fid?: string;
+    parent_hash?: string;
+    query_url?: string;
+  }) => {
+    const res = await api.getCastDetail(payload);
+    return res;
+  }
+);
+
 export const getCastReplies = createAsyncThunk(
   "home-feed/get-replies",
   async (payload: { hash: string; page: number; limit: number }) => {
@@ -175,6 +190,33 @@ const homeFeedSlice = createSlice({
             });
           }
         });
+      })
+      .addCase(getResultCastByHash.fulfilled, (state, action) => {
+        const { parent_hash } = action.meta.arg;
+        if (parent_hash && action.payload.data) {
+          if (
+            state.castDetail.data &&
+            state.castDetail.data.hash === parent_hash
+          ) {
+            state.castDetail.data.replies = {
+              count: (state.castDetail.data.replies?.count || 0) + 1,
+              casts: [
+                action.payload.data,
+                ...(state.castDetail.data.replies?.casts || []),
+              ],
+            };
+          }
+          if (state.castRepliesMap?.[parent_hash]) {
+            state.castRepliesMap[parent_hash] = {
+              ...state.castRepliesMap[parent_hash],
+              total: (state.castRepliesMap[parent_hash].total || 0) + 1,
+              data: [
+                action.payload.data,
+                ...(state.castRepliesMap[parent_hash].data || []),
+              ],
+            };
+          }
+        }
       })
       .addCase(getCastReplies.pending, (state, action) => {
         const { page, hash } = action.meta.arg;

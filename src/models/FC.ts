@@ -9,7 +9,7 @@ export interface ISignedKeyRequest {
 }
 
 export interface IFCUser {
-  fid: number;
+  fid: string;
   username?: string;
   display_name?: string;
   pfp: {

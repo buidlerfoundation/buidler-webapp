@@ -1,7 +1,11 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ICast } from "models/FC";
 import api from "api";
-import { deleteCast, getCastReplies } from "./HomeFeedReducers";
+import {
+  deleteCast,
+  getCastReplies,
+  getResultCastByHash,
+} from "./HomeFeedReducers";
 
 interface FCCastState {
   data: ICast[];
@@ -86,6 +90,12 @@ const fcCastSlice = createSlice({
         state.total = total;
         state.canMore = totalPage > currentPage;
         state.currentPage = currentPage;
+      })
+      .addCase(getResultCastByHash.fulfilled, (state, action) => {
+        const { query_url } = action.meta.arg;
+        if (query_url && action.payload.data) {
+          state.data = [action.payload.data, ...state.data];
+        }
       })
       .addCase(getMainMetadata.pending, (state) => {
         state.metadata = {
