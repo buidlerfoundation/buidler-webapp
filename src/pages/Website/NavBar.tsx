@@ -61,6 +61,11 @@ const NavBar = () => {
                 </Link>
               </li>
               <li className="nav-item">
+                <Link className={"nav-link"} to="/home">
+                  News Feed
+                </Link>
+              </li>
+              <li className="nav-item">
                 <a
                   className="nav-link"
                   href="https://buidler-extension.notion.site/Buidler-Roadmap-https-buidler-app-761e03885290404e875a6dca5282121b"
