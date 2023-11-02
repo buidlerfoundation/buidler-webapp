@@ -31,23 +31,31 @@ export const normalizeContentUrl = (string: string, boldUrl?: string) => {
 };
 
 export const normalizeContentCast = (cast: ICast) => {
-  let res = cast.text;
+  let res = "";
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder("utf-8");
+  const byteArray = encoder.encode(cast.text);
   if (cast.mentions_positions.length > 0) {
-    const output = [];
+    const outputByteArray: any = [];
     let start = 0;
     cast.mentions_positions.forEach((el, idx) => {
       if (cast.mentions?.[idx]) {
-        output.push(cast.text.slice(start, el));
-        output.push(`@${cast.mentions?.[idx]?.username}`);
+        const newByte = Array.from(
+          encoder.encode(`@${cast.mentions?.[idx]?.username}`)
+        );
+        outputByteArray.push(...Array.from(byteArray.slice(start, el)));
+        outputByteArray.push(...newByte);
         start = el;
       }
     });
-    output.push(
-      cast.text.slice(
-        cast.mentions_positions[cast.mentions_positions.length - 1]
+    outputByteArray.push(
+      ...Array.from(
+        byteArray.slice(
+          cast.mentions_positions[cast.mentions_positions.length - 1]
+        )
       )
     );
-    res = output.join("");
+    res = decoder.decode(new Uint8Array(outputByteArray));
   }
   res = res
     .split("\n")
