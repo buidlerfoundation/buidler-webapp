@@ -28,14 +28,14 @@ const initialState: HomeFeedState = {
   castRepliesMap: {},
   openNewCast: false,
   filters: [
-    { label: "trending", path: "/", id: "1", value: "trending" },
+    { label: "trending", path: "/home", id: "1", value: "trending" },
     {
       label: "active",
       id: "2",
-      path: "/most-discussion",
+      path: "/active",
       value: "most-commented",
     },
-    { label: "new", id: "3", path: "/newest", value: "newest" },
+    { label: "new", id: "3", path: "/new", value: "newest" },
   ],
   currentFilter: { label: "trending", path: "/", id: "1", value: "trending" },
   explore: {

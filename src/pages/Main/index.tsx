@@ -34,7 +34,7 @@ const Main = () => {
     <div className={styles.container}>
       <Routes>
         <Route element={<WebsiteWrapper />}>
-          <Route path="/landing-page" element={<Website />} />
+          <Route path="/" element={<Website />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
         </Route>

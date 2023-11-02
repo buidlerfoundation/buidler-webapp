@@ -80,6 +80,7 @@ const FCWrapper = () => {
   const [loginLoading, setLoginLoading] = useState(false);
   const [theme, setTheme] = useState("");
   const query = useQuery();
+  const querySignerId = useMemo(() => query.get("signer_id"), [query]);
   const [polling, setPolling] = useState(false);
   const [openDiscussion, setOpenDiscussion] = useState(false);
   const initialTheme = useMemo(() => query.get("theme"), [query]);
@@ -129,9 +130,15 @@ const FCWrapper = () => {
       if (fcUser) {
         dispatch(FC_USER_ACTIONS.updateSignerId(signerId));
       }
+    } else if (querySignerId) {
+      await setCookie(AsyncKey.signerIdKey, querySignerId);
+      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
+      if (fcUser) {
+        dispatch(FC_USER_ACTIONS.updateSignerId(querySignerId));
+      }
     }
     setLoading(false);
-  }, [dispatch]);
+  }, [dispatch, querySignerId]);
   useEffect(() => {
     if (initialTheme) {
       document
@@ -265,13 +272,13 @@ const FCWrapper = () => {
         <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <MenuItemMemo
             title="Home"
-            to="/"
+            to="/home"
             icon={
               <IconMenuHome fill={activeHome ? activeColor : inactiveColor} />
             }
             active={activeHome}
           />
-          <MenuItemMemo
+          {/* <MenuItemMemo
             title="Communities"
             to="/community"
             icon={
@@ -280,7 +287,7 @@ const FCWrapper = () => {
               />
             }
             active={activeCommunity}
-          />
+          /> */}
           {/* <MenuItemMemo
             title="Explore"
             to="/explore"
