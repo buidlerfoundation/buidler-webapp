@@ -217,7 +217,11 @@ const FCWrapper = () => {
       );
     }
     return (
-      <div className={styles["btn-login"]} onClick={onLoginClick}>
+      <div
+        id="btn-login"
+        className={styles["btn-login"]}
+        onClick={onLoginClick}
+      >
         Login
       </div>
     );
