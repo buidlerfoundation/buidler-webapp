@@ -30,7 +30,7 @@ import ImageView from "shared/ImageView";
 import { logoutAction } from "reducers/actions";
 import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
 import CopyRight from "pages/PluginFC/CopyRight";
-import { getCastReplies } from "reducers/HomeFeedReducers";
+import { getResultCastByHash } from "reducers/HomeFeedReducers";
 
 const FCPluginWrapper = () => {
   const dispatch = useAppDispatch();
@@ -77,7 +77,7 @@ const FCPluginWrapper = () => {
         payload.mentions = [20108];
       }
       const res = await api.cast(payload);
-      if (res.success) {
+      if (res.success && res.data) {
         // handle after cast
         if (fcUser?.username) {
           window.top?.postMessage(
@@ -92,19 +92,29 @@ const FCPluginWrapper = () => {
         }
         if (payload?.parent_cast_id?.hash) {
           dispatch(
-            getCastReplies({
-              hash: payload?.parent_cast_id?.hash,
+            getResultCastByHash({
+              parent_hash: payload?.parent_cast_id?.hash,
+              hash: res.data,
               page: 1,
               limit: 20,
+              cast_author_fid: fcUser?.fid,
             })
           );
         } else if (queryUrl) {
-          dispatch(getCastsByUrl({ text: queryUrl, page: 1, limit: 20 }));
+          dispatch(
+            getResultCastByHash({
+              hash: res.data,
+              page: 1,
+              limit: 20,
+              cast_author_fid: fcUser?.fid,
+              query_url: queryUrl,
+            })
+          );
         }
       }
       setCastQueue(null);
     },
-    [dispatch, fcUser?.username, queryUrl]
+    [dispatch, fcUser?.fid, fcUser?.username, queryUrl]
   );
   const requestSignerId = useCallback(async () => {
     if (loading) return;
