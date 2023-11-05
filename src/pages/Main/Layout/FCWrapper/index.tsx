@@ -282,7 +282,7 @@ const FCWrapper = () => {
             }
             active={activeHome}
           />
-          {/* <MenuItemMemo
+          <MenuItemMemo
             title="Communities"
             to="/community"
             icon={
@@ -291,7 +291,7 @@ const FCWrapper = () => {
               />
             }
             active={activeCommunity}
-          /> */}
+          />
           {/* <MenuItemMemo
             title="Explore"
             to="/explore"

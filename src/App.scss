@@ -449,7 +449,7 @@ html {
   --color-mention: #0584fe;
   --color-blue: #1159d5;
   --color-secondary-text: #666666;
-  --color-primary-text: #202020;
+  --color-primary-text: #000000;
   --color-dark-text: #222222;
   --color-highlight-action: #f8f8f8;
   --color-highlight-action-high: #363636;
@@ -474,7 +474,7 @@ html {
   --content-muted-2: #727272;
 
   --color-bright-text: #ffffff;
-  --color-primary-text: #202020;
+  --color-primary-text: #000000;
   --color-secondary-text: #666666;
   --color-mute-text: #949494;
   --color-background-1: #ffffff;
@@ -573,7 +573,7 @@ html {
 
 .buidler-plugin-theme-light {
   --color-bright-text: #ffffff;
-  --color-primary-text: #202020;
+  --color-primary-text: #000000;
   --color-secondary-text: #666666;
   --color-mute-text: #949494;
   --color-background-1: #ffffff;
@@ -596,9 +596,9 @@ html {
 }
 .buidler-plugin-theme-dark {
   --color-bright-text: #000000;
-  --color-primary-text: #e8e8e8;
-  --color-secondary-text: #a0a3ad;
-  --color-mute-text: #a0a3ad;
+  --color-primary-text: #ffffff;
+  --color-secondary-text: #acacac;
+  --color-mute-text: #727272;
   --color-background-1: #000000;
   --color-background-opacity-1: #000000f7;
   --color-background-2: #121212;
@@ -615,9 +615,9 @@ html {
 }
 .buidler-plugin-theme-dim {
   --color-bright-text: #000000;
-  --color-primary-text: #e8e8e8;
-  --color-secondary-text: #a0a3ad;
-  --color-mute-text: #a0a3ad;
+  --color-primary-text: #ffffff;
+  --color-secondary-text: #acacac;
+  --color-mute-text: #727272;
   --color-background-1: rgb(21, 32, 43);
   --color-background-opacity-1: rgba(21, 32, 43, 0.97);
   --color-background-2: rgb(39, 51, 64);
