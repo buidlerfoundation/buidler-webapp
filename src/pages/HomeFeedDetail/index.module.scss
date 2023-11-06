@@ -18,12 +18,16 @@
       font-size: 16px;
       line-height: 22px;
       color: var(--color-primary-text);
+      .icon-wrap {
+        width: 30px;
+        height: 30px;
+      }
       span {
         margin-left: 10px;
       }
       &:hover {
         cursor: pointer;
-        svg {
+        .icon-wrap {
           background-color: var(--color-stroke);
           border-radius: 50%;
         }

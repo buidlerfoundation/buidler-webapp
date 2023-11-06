@@ -75,7 +75,9 @@ const HomeFeedDetail = () => {
     <div className={styles.container}>
       <nav className={styles.head}>
         <div className={styles["btn-back"]} onClick={goBack}>
-          <IconArrowBack />
+          <div className={styles["icon-wrap"]}>
+            <IconArrowBack />
+          </div>
           <span>Post</span>
         </div>
       </nav>
