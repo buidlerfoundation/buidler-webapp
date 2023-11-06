@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import styles from "./index.module.scss";
 import useFeedFilters from "hooks/useFeedFilters";
 import { IFCFilterType } from "models/FC";
@@ -37,10 +37,14 @@ const HomeFeedWrapper = () => {
     ),
     [location.pathname]
   );
+  const title = useMemo(
+    () => filters.find((el) => el.path === location.pathname)?.title,
+    [filters, location.pathname]
+  );
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.title}>Home</div>
+        <div className={styles.title}>{title}</div>
         <nav className={styles["filter-head"]}>{filters.map(renderFilter)}</nav>
       </div>
       <Outlet />

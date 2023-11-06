@@ -78,7 +78,6 @@ const FCWrapper = () => {
   const popupMenuRef = useRef<any>();
   const [loading, setLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
-  const [theme, setTheme] = useState("");
   const query = useQuery();
   const querySignerId = useMemo(() => query.get("signer_id"), [query]);
   const [polling, setPolling] = useState(false);
@@ -144,7 +143,6 @@ const FCWrapper = () => {
       document
         .getElementsByTagName("html")?.[0]
         ?.setAttribute("class", initialTheme);
-      setTheme(initialTheme);
     }
   }, [initialTheme]);
   useEffect(() => {
@@ -253,9 +251,7 @@ const FCWrapper = () => {
     toggleDiscussion();
   }, [fcUser, onLoginClick, toggleDiscussion]);
   return (
-    <div
-      className={`buidler-plugin-theme-${theme || "light"} ${styles.container}`}
-    >
+    <div className={styles.container}>
       <aside className={styles["left-side"]}>
         <Link
           className={`${styles["menu-item"]} ${styles["brand-wrap"]}`}
@@ -282,7 +278,7 @@ const FCWrapper = () => {
             }
             active={activeHome}
           />
-          <MenuItemMemo
+          {/* <MenuItemMemo
             title="Communities"
             to="/community"
             icon={
@@ -291,7 +287,7 @@ const FCWrapper = () => {
               />
             }
             active={activeCommunity}
-          />
+          /> */}
           {/* <MenuItemMemo
             title="Explore"
             to="/explore"

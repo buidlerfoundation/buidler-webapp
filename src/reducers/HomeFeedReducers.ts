@@ -28,16 +28,35 @@ const initialState: HomeFeedState = {
   castRepliesMap: {},
   openNewCast: false,
   filters: [
-    { label: "trending", path: "/home", id: "1", value: "trending" },
+    {
+      label: "trending",
+      path: "/home",
+      id: "1",
+      value: "trending",
+      title: "Trending links on Farcaster",
+    },
     {
       label: "active",
       id: "2",
       path: "/active",
       value: "most-commented",
+      title: "Most active links on Farcaster",
     },
-    { label: "new", id: "3", path: "/new", value: "newest" },
+    {
+      label: "new",
+      id: "3",
+      path: "/new",
+      value: "newest",
+      title: "Newest links on Farcaster",
+    },
   ],
-  currentFilter: { label: "trending", path: "/", id: "1", value: "trending" },
+  currentFilter: {
+    label: "trending",
+    path: "/",
+    id: "1",
+    value: "trending",
+    title: "Trending links on Farcaster",
+  },
   explore: {
     data: [],
   },
