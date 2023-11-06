@@ -493,7 +493,6 @@ html {
   --color-highlight-action-high: #f3f3f3;
 
   @media (prefers-color-scheme: dark) {
-    --color-backdrop: rgba(255, 255, 255, 0.25);
     --color-darkest-background: #121212;
     --color-darkest-background80: #121212cc;
     --color-lighter-background: #191919;
@@ -589,7 +588,6 @@ html.light {
 }
 
 html.dark {
-  --color-backdrop: rgba(255, 255, 255, 0.25);
   --color-darkest-background: #121212;
   --color-darkest-background80: #121212cc;
   --color-lighter-background: #191919;
