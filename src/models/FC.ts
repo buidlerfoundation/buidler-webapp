@@ -83,6 +83,7 @@ export interface IFCFilterType {
   id: string;
   path: string;
   value: "trending" | "newest" | "by domain" | "most-commented";
+  title: string;
 }
 
 export interface IFeedData {

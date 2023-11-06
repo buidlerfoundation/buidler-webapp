@@ -273,6 +273,12 @@ const FCPluginWrapper = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [castHash, onCloseModalReply, castToFC, dispatch, initialSignerId]);
+  useEffect(() => {
+    if (theme) {
+      document.getElementsByTagName("html")?.[0]?.setAttribute("class", theme);
+      setTheme(theme);
+    }
+  }, [theme]);
   const onWithoutLoginClick = useCallback(() => {
     pollingController.current.abort();
     setSignedKeyRequest(null);
@@ -304,7 +310,7 @@ const FCPluginWrapper = () => {
   }, [replyCast]);
   return (
     <div
-      className={`buidler-plugin-theme-${theme || "light"} ${styles.container}`}
+      className={styles.container}
     >
       <div className={styles.header}>
         <a className={styles["btn-jump-out"]} href="/" target="_blank">
