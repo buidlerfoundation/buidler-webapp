@@ -1,10 +1,7 @@
 import { ICast } from "models/FC";
 
-// export const regexUrl =
-//   /(\b(?:https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,256}(?:\/\S*)?(?:\?\S*)?\b)/gim;
-
 export const regexUrl =
-  /((https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,256}\b([-a-zA-Z0-9@:%_+.~#(?&//=]*))/gim;
+  /(\b(?:https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,256}((?:\/\S*)?(?:\?\S*)?\b)?([&/#]*)?)/gim;
 
 export const insertHttpIfNeed = (str?: string) => {
   if (!str) return "";
