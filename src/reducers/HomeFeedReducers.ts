@@ -43,11 +43,11 @@ const initialState: HomeFeedState = {
       title: "Most active links on Farcaster",
     },
     {
-      label: "new",
+      label: "top",
       id: "3",
-      path: "/new",
-      value: "newest",
-      title: "Newest links on Farcaster",
+      path: "/top",
+      value: "most-liked",
+      title: "Top links on Farcaster",
     },
   ],
   currentFilter: {

@@ -33,21 +33,28 @@ const FeedByUrl = () => {
     const loginElement = document.getElementById("btn-login");
     loginElement?.click();
   }, []);
-  const renderFeed = useCallback((cast: ICast) => {
-    return <CastItem cast={cast} key={cast.hash} homeFeed />;
-  }, []);
+  const renderFeed = useCallback(
+    (cast: ICast) => {
+      return (
+        <CastItem cast={cast} key={cast.hash} homeFeed onLogin={onLogin} />
+      );
+    },
+    [onLogin]
+  );
   const renderBody = useCallback(() => {
     if (explore.loading) return <Spinner size={30} />;
     return (
-      <ol className={styles.list}>
+      <>
         {metadata && (
           <div className={styles.metadata}>
             <MetadataFeed metadata={metadata} />
           </div>
         )}
-        {explore?.data?.map(renderFeed)}
-        {explore?.loadMore && <LoadingItem />}
-      </ol>
+        <ol className={styles["list-cast"]}>
+          {explore?.data?.map(renderFeed)}
+          {explore?.loadMore && <LoadingItem />}
+        </ol>
+      </>
     );
   }, [explore?.data, explore?.loadMore, explore.loading, metadata, renderFeed]);
   const goBack = useCallback(() => {
@@ -73,8 +80,10 @@ const FeedByUrl = () => {
   useEffect(() => {
     if (exploreUrl) {
       api.getEmbeddedMetadata(exploreUrl).then((res) => {
-        if (res.success) {
-          setMetadata(res.data);
+        if (res.success && res.data) {
+          const data = res.data;
+          data.url = exploreUrl;
+          setMetadata(data);
         }
       });
     }
@@ -97,11 +106,13 @@ const FeedByUrl = () => {
     <div className={styles.container}>
       <nav className={styles.head}>
         <div className={styles["btn-back"]} onClick={goBack}>
-          <IconArrowBack />
+          <div className={styles["icon-wrap"]}>
+            <IconArrowBack />
+          </div>
           <span>{pageTitle}</span>
         </div>
       </nav>
-      {renderBody()}
+      <div className={styles.body}>{renderBody()}</div>
     </div>
   );
 };

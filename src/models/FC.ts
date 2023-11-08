@@ -83,7 +83,7 @@ export interface IFCFilterType {
   label: string;
   id: string;
   path: string;
-  value: "trending" | "newest" | "by domain" | "most-commented";
+  value: "trending" | "newest" | "by domain" | "most-commented" | "most-liked";
   title: string;
 }
 
