@@ -66,6 +66,7 @@ export interface ICast {
   };
   metadata?: IMetadataUrl;
   created_at: string;
+  total_casts: number;
 }
 
 export interface IMetadataUrl {

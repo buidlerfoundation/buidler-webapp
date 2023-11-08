@@ -255,7 +255,7 @@ const FCWrapper = () => {
       <aside className={styles["left-side"]}>
         <Link
           className={`${styles["menu-item"]} ${styles["brand-wrap"]}`}
-          to="/"
+          to="/home"
         >
           <div
             style={{
