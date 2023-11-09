@@ -136,8 +136,6 @@ const FCPluginWrapper = () => {
             dispatch(
               FC_USER_ACTIONS.updateSignerId(resPolling?.data?.signer_id)
             );
-          } else {
-            logout();
           }
         }
       } catch (error: any) {
@@ -146,18 +144,16 @@ const FCPluginWrapper = () => {
       }
       setPolling(false);
     }
-  }, [dispatch, loading, logout]);
+  }, [dispatch, loading]);
   const initialSignerId = useCallback(
     async (id: string) => {
       await setCookie(AsyncKey.signerIdKey, id);
       const fcUser = await dispatch(getCurrentFCUser()).unwrap();
       if (fcUser) {
         dispatch(FC_USER_ACTIONS.updateSignerId(id));
-      } else {
-        logout();
       }
     },
-    [dispatch, logout]
+    [dispatch]
   );
   const checkingSignerId = useCallback(async () => {
     if (signerId) {
@@ -165,8 +161,6 @@ const FCPluginWrapper = () => {
       const fcUser = await dispatch(getCurrentFCUser()).unwrap();
       if (fcUser) {
         dispatch(FC_USER_ACTIONS.updateSignerId(signerId));
-      } else {
-        logout();
       }
     } else {
       const signerIdFromCookie = await getCookie(AsyncKey.signerIdKey);
@@ -177,7 +171,7 @@ const FCPluginWrapper = () => {
         }
       }
     }
-  }, [dispatch, logout, signerId]);
+  }, [dispatch, signerId]);
   const onCloseModalReply = useCallback(() => {
     dispatch(FC_CAST_ACTIONS.updateReplyCast());
   }, [dispatch]);
