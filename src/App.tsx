@@ -47,9 +47,6 @@ function App() {
         document.execCommand("insertText", false, text);
       }
     };
-    const eventContextMenu = (e: any) => {
-      if (!process.env.REACT_APP_ENABLE_INSPECT) e.preventDefault();
-    };
     const changeRouteListener = (e: any) => {
       const {
         detail: { path, push },
@@ -64,14 +61,12 @@ function App() {
     window.addEventListener("offline", eventOffline);
     window.addEventListener("online", eventOnline);
     window.addEventListener("paste", eventPaste);
-    window.addEventListener("contextmenu", eventContextMenu);
     window.addEventListener("keydown", eventKeyDown);
     window.addEventListener(CustomEventName.CHANGE_ROUTE, changeRouteListener);
     return () => {
       window.removeEventListener("offline", eventOffline);
       window.removeEventListener("online", eventOnline);
       window.removeEventListener("paste", eventPaste);
-      window.removeEventListener("contextmenu", eventContextMenu);
       window.removeEventListener("keydown", eventKeyDown);
       window.removeEventListener(
         CustomEventName.CHANGE_ROUTE,
