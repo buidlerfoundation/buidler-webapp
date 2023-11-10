@@ -1,7 +1,6 @@
 import api from "api";
 import { AsyncKey } from "common/AppConfig";
 import { clearData, getCookie, setCookie } from "common/Cookie";
-import { extractContentMessage } from "helpers/MessageHelper";
 import useAppDispatch from "hooks/useAppDispatch";
 import useAppSelector from "hooks/useAppSelector";
 import useQuery from "hooks/useQuery";
@@ -31,6 +30,10 @@ import { logoutAction } from "reducers/actions";
 import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
 import CopyRight from "pages/PluginFC/CopyRight";
 import { getResultCastByHash } from "reducers/HomeFeedReducers";
+import {
+  extractContentMessage,
+  normalizeContentCastToSubmit,
+} from "helpers/CastHelper";
 
 const FCPluginWrapper = () => {
   const dispatch = useAppDispatch();
@@ -70,13 +73,24 @@ const FCPluginWrapper = () => {
     logout();
     onCloseMenu();
   }, [logout, onCloseMenu]);
+  const getPayloadToSubmit = useCallback((payload: any) => {
+    if (payload.onlyLink) {
+      return payload;
+    } else {
+      const mentionData = normalizeContentCastToSubmit(payload.text);
+      return {
+        ...payload,
+        text: mentionData.content,
+        mentions: mentionData.mentions,
+        mentions_positions: mentionData.mentionPositions,
+      };
+    }
+  }, []);
   const castToFC = useCallback(
     async (payload: any) => {
       payload.text = extractContentMessage(payload.text);
-      if (payload.mentions?.[0] === 20386) {
-        payload.mentions = [20108];
-      }
-      const res = await api.cast(payload);
+      const payloadToSubmit = getPayloadToSubmit(payload);
+      const res = await api.cast(payloadToSubmit);
       if (res.success && res.data) {
         // handle after cast
         if (fcUser?.username) {
@@ -303,9 +317,7 @@ const FCPluginWrapper = () => {
     }
   }, [replyCast]);
   return (
-    <div
-      className={styles.container}
-    >
+    <div className={styles.container}>
       <div className={styles.header}>
         <a className={styles["btn-jump-out"]} href="/" target="_blank">
           <div
