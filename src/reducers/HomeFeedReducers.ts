@@ -47,7 +47,7 @@ const initialState: HomeFeedState = {
       id: "3",
       path: "/top",
       value: "most-liked",
-      title: "Top links on Farcaster",
+      title: "Top links of the week on Farcaster",
     },
   ],
   currentFilter: {
