@@ -128,7 +128,7 @@ const FCPluginWrapper = () => {
       }
       setCastQueue(null);
     },
-    [dispatch, fcUser?.fid, fcUser?.username, queryUrl]
+    [dispatch, fcUser?.fid, fcUser?.username, getPayloadToSubmit, queryUrl]
   );
   const requestSignerId = useCallback(async () => {
     if (loading) return;
