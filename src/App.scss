@@ -429,6 +429,10 @@ iframe {
   }
 }
 
+#popup-mention {
+  z-index: 1301 !important;
+}
+
 code {
   white-space: pre-line;
 }

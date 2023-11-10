@@ -148,3 +148,70 @@ export const getURLObject = (url?: string) => {
     return null;
   }
 };
+
+export const getLastIndexOfMention = (s: string) => {
+  const mentionRegex =
+    /(<a class="mention-string" data-fid=".*?">)(.*?)(<\/a>)/g;
+  const mentionMatches = s.match(mentionRegex) || [];
+  if (mentionMatches?.length > 0) {
+    return s.lastIndexOf(mentionMatches[mentionMatches.length - 1]);
+  }
+  return -1;
+};
+
+export const extractContentMessage = (content: string) => {
+  const mentionRegex =
+    /<a class="mention-string" data-fid="(.*?)">(.*?)<\/a>/gim;
+
+  const span = document.createElement("span");
+  span.innerHTML = content
+    .replace(/<div><br><\/div>/gim, "\n")
+    .replace(/<div>(.*?)<\/div>/gim, "<br>$1")
+    .replace(mentionRegex, `<$1-$2>`)
+    .replace(/<br>/gim, "\n");
+  const text = span.textContent || span.innerText;
+  return text.trim();
+};
+
+export const normalizeContentCastToSubmit = (content: string) => {
+  const encoder = new TextEncoder();
+  const mentionRegexSplit = /(<[0-9].*?-[a-z.@].*?>)/;
+  const contentRegexSplit = /<[0-9].*?-[a-z.@].*?>/;
+  const mentionRegex = /<([0-9].*?)-[a-z.@].*?>/;
+  const splitted = content.split(mentionRegexSplit);
+  const mentionData = splitted.reduce<{
+    mentions: number[];
+    mentionPositions: number[];
+  }>(
+    (res, value, index) => {
+      if (!value) return res;
+      const { mentions, mentionPositions } = res;
+      const currentPosition =
+        mentionPositions?.[mentionPositions.length - 1] || 0;
+      const mention = mentionRegex.exec(value)?.[1];
+      if (mention) {
+        if (mentionPositions.length === 0) {
+          mentionPositions.push(0);
+        }
+        mentions.push(parseInt(mention));
+      } else if (index < splitted.length - 1) {
+        mentionPositions.push(currentPosition + encoder.encode(value).length);
+      }
+      return {
+        mentions,
+        mentionPositions,
+      };
+    },
+    {
+      mentions: [],
+      mentionPositions: [],
+    }
+  );
+  return {
+    ...mentionData,
+    content: content
+      .split(contentRegexSplit)
+      .filter((str) => !!str)
+      .join(""),
+  };
+};

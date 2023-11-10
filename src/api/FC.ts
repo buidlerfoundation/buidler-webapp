@@ -97,3 +97,9 @@ export const upload = (file?: any) => {
   data.append("file", file);
   return Caller.post<string>(`attachments`, data);
 };
+
+export const getFCUsersByName = (name: string) => {
+  return Caller.get<IFCUser[]>(
+    `users?${new URLSearchParams({ username: name, limit: "20" })}`
+  );
+};
