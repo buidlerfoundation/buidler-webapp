@@ -22,7 +22,11 @@ const HomeFeedDetail = () => {
   const castDetail = useAppSelector((state) => state.homeFeed.castDetail.data);
   const castRepliesData = useFeedRepliesData(hash);
   const goBack = useCallback(() => {
-    navigate(-1);
+    if (window?.history?.state?.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate("/home", { replace: true });
+    }
   }, [navigate]);
   useEffect(() => {
     if (hash) {

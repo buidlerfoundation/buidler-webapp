@@ -215,3 +215,8 @@ export const normalizeContentCastToSubmit = (content: string) => {
       .join(""),
   };
 };
+
+export const normalizeMetadataTitle = (title?: string) => {
+  if (!title) return "";
+  return title.replace(/^\(\d+\)/, "");
+};
