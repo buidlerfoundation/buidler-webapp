@@ -75,6 +75,12 @@ const HomeFeedDetail = () => {
       window.removeEventListener("scroll", windowScrollListener);
     };
   }, [windowScrollListener]);
+  useEffect(() => {
+    window?.scrollTo?.({
+      top: 0,
+      behavior: "auto",
+    });
+  }, []);
   return (
     <div className={styles.container}>
       <nav className={styles.head}>

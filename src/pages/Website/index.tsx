@@ -7,8 +7,10 @@ import images from "common/images";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
+import { useNavigate } from "react-router-dom";
 
 const Website = () => {
+  const navigate = useNavigate();
   const [showVideo, setShowVideo] = useState(false);
   const [faqExpand, setFAQExpand] = useState("");
   const previousScrollTop = useRef(0);
@@ -73,6 +75,12 @@ const Website = () => {
   }, [toggleVideo]);
   const onCommunityClick = useCallback(() => {
     window.open("/communities", "_blank");
+  }, []);
+  useEffect(() => {
+    if ("standalone" in window.navigator && window.navigator.standalone) {
+      navigate("/home", { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div className="home" onScroll={onScroll}>
