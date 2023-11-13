@@ -47,6 +47,7 @@ const FCPluginWrapper = () => {
   const pollingController = useRef(new AbortController());
   const q = useMemo(() => query.get("q"), [query]);
   const [loading, setLoading] = useState(false);
+  const [openLogin, setOpenLogin] = useState(false);
   const [polling, setPolling] = useState(false);
   const [castQueue, setCastQueue] = useState<any>(null);
   const [signedKeyRequest, setSignedKeyRequest] = useState<
@@ -133,6 +134,7 @@ const FCPluginWrapper = () => {
   const requestSignerId = useCallback(async () => {
     if (loading) return;
     setLoading(true);
+    setOpenLogin(true);
     const res = await api.requestSignedKey();
     setLoading(false);
     if (res.data?.token) {
@@ -290,6 +292,7 @@ const FCPluginWrapper = () => {
   const onWithoutLoginClick = useCallback(() => {
     pollingController.current.abort();
     setSignedKeyRequest(null);
+    setOpenLogin(false);
   }, []);
   const onLoginClick = useCallback(() => {
     if (signedKeyRequest) return;
@@ -350,10 +353,10 @@ const FCPluginWrapper = () => {
       </div>
       <Outlet />
       <CopyRight />
-      {!storeSignerId && signedKeyRequest?.deeplinkUrl && (
+      {!storeSignerId && openLogin && (
         <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>
           <LoginFC
-            deepLink={signedKeyRequest.deeplinkUrl}
+            deepLink={signedKeyRequest?.deeplinkUrl}
             onWithoutLoginClick={onWithoutLoginClick}
           />
         </div>

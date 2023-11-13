@@ -78,6 +78,7 @@ const FCWrapper = () => {
   const popupMenuRef = useRef<any>();
   const [loading, setLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
+  const [openLogin, setOpenLogin] = useState(false);
   const query = useQuery();
   const querySignerId = useMemo(() => query.get("signer_id"), [query]);
   const [polling, setPolling] = useState(false);
@@ -156,10 +157,12 @@ const FCWrapper = () => {
   const onWithoutLoginClick = useCallback(() => {
     pollingController.current.abort();
     setSignedKeyRequest(null);
+    setOpenLogin(false);
   }, []);
   const requestSignerId = useCallback(async () => {
     if (loginLoading) return;
     setLoginLoading(true);
+    setOpenLogin(true);
     const res = await api.requestSignedKey();
     setLoginLoading(false);
     if (res.data?.token) {
@@ -333,10 +336,10 @@ const FCWrapper = () => {
         <Outlet />
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>
-      {!storeSignerId && signedKeyRequest?.deeplinkUrl && (
+      {!storeSignerId && openLogin && (
         <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>
           <LoginFC
-            deepLink={signedKeyRequest.deeplinkUrl}
+            deepLink={signedKeyRequest?.deeplinkUrl}
             onWithoutLoginClick={onWithoutLoginClick}
           />
         </div>
