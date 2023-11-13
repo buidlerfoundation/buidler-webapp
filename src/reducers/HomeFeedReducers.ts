@@ -47,7 +47,7 @@ const initialState: HomeFeedState = {
       id: "3",
       path: "/top",
       value: "most-liked",
-      title: "Top links of the week on Farcaster",
+      title: "Top links on Farcaster",
     },
   ],
   currentFilter: {
@@ -198,9 +198,9 @@ const homeFeedSlice = createSlice({
           },
         };
         state.filters.forEach((filter) => {
-          if (state.feedMap?.[filter.label]) {
-            state.feedMap[filter.label].data = state.feedMap[
-              filter.label
+          if (state.feedMap?.[filter.value]) {
+            state.feedMap[filter.value].data = state.feedMap[
+              filter.value
             ].data.map((el) => {
               if (el.hash === action.meta.arg.hash) {
                 return action.payload.data || el;
@@ -294,9 +294,9 @@ const homeFeedSlice = createSlice({
               );
           }
           state.filters.forEach((filter) => {
-            if (state.feedMap?.[filter.label]) {
-              state.feedMap[filter.label].data = state.feedMap[
-                filter.label
+            if (state.feedMap?.[filter.value]) {
+              state.feedMap[filter.value].data = state.feedMap[
+                filter.value
               ].data.map((el) => {
                 if (el.hash === action.meta.arg.hash) {
                   return action.payload.data || el;
@@ -315,11 +315,13 @@ const homeFeedSlice = createSlice({
               cast.parent_hash
             ].data.filter((el) => el.hash !== cast.hash);
           }
-          if (state.feedMap?.[state.currentFilter.label]) {
-            state.feedMap[state.currentFilter.label].data = state.feedMap[
-              state.currentFilter.label
-            ].data.filter((el) => el.hash !== cast.hash);
-          }
+          state.filters.forEach((filter) => {
+            if (state.feedMap?.[filter.value]) {
+              state.feedMap[filter.value].data = state.feedMap[
+                filter.value
+              ].data.filter((el) => el.hash !== cast.hash);
+            }
+          });
         }
       })
       .addCase(getFeedByUrl.pending, (state, action) => {
