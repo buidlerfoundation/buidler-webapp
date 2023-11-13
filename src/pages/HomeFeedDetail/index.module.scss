@@ -38,7 +38,6 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    margin-bottom: 70px;
     .metadata {
       border-radius: 10px;
       overflow: hidden;
@@ -53,6 +52,22 @@
       border: 1px solid var(--color-stroke);
       overflow: hidden;
     }
+  }
+  .other-title {
+    padding-top: 30px;
+    font-weight: 700;
+    color: var(--color-primary-text);
+    font-size: 16px;
+    line-height: 22px;
+  }
+  .list-other-cast {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    border: 1px solid var(--color-stroke);
+    overflow: hidden;
+    margin-bottom: 70px;
   }
 }
 
@@ -72,6 +87,14 @@
         margin-top: 0;
         border: none;
       }
+    }
+    .other-title {
+      padding: 30px 15px 0 15px;
+      border-top: 1px solid var(--color-stroke);
+    }
+    .list-other-cast {
+      margin-top: 0;
+      border: none;
     }
   }
 }
