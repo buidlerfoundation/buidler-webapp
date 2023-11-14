@@ -66,6 +66,8 @@ const FCPluginWrapper = () => {
     );
     clearData();
     dispatch(logoutAction());
+    setOpenLogin(false);
+    setSignedKeyRequest(null);
   }, [dispatch]);
   const onCloseMenu = useCallback(() => {
     popupMenuRef.current?.hide();
@@ -157,6 +159,7 @@ const FCPluginWrapper = () => {
       } catch (error: any) {
         toast.error(error.message);
         setSignedKeyRequest(null);
+        setOpenLogin(false);
       }
       setPolling(false);
     }

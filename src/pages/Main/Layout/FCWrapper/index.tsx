@@ -115,6 +115,7 @@ const FCWrapper = () => {
       { targetOrigin: "*" }
     );
     setSignedKeyRequest(null);
+    setOpenLogin(false);
     clearData();
     dispatch(logoutAction());
   }, [dispatch]);
@@ -185,6 +186,7 @@ const FCWrapper = () => {
       } catch (error: any) {
         toast.error(error.message);
         setSignedKeyRequest(null);
+        setOpenLogin(false);
       }
       setPolling(false);
     }
