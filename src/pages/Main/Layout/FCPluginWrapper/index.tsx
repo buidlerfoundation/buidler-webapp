@@ -1,6 +1,6 @@
 import api from "api";
 import { AsyncKey } from "common/AppConfig";
-import { clearData, getCookie, setCookie } from "common/Cookie";
+import { clearData, getCookie, removeCookie, setCookie } from "common/Cookie";
 import useAppDispatch from "hooks/useAppDispatch";
 import useAppSelector from "hooks/useAppSelector";
 import useQuery from "hooks/useQuery";
@@ -142,6 +142,7 @@ const FCPluginWrapper = () => {
     if (res.data?.token) {
       setSignedKeyRequest(res.data);
       setPolling(true);
+      await setCookie(AsyncKey.requestTokenKey, res.data?.token);
       try {
         const resPolling = await api.pollingSignedKey(
           res.data?.token,
@@ -149,6 +150,7 @@ const FCPluginWrapper = () => {
         );
         if (resPolling?.data?.signer_id) {
           await setCookie(AsyncKey.signerIdKey, resPolling?.data?.signer_id);
+          await removeCookie(AsyncKey.requestTokenKey);
           const fcUser = await dispatch(getCurrentFCUser()).unwrap();
           if (fcUser) {
             dispatch(
@@ -174,6 +176,19 @@ const FCPluginWrapper = () => {
     },
     [dispatch]
   );
+  const checkRequestToken = useCallback(async () => {
+    const reqToken = await getCookie(AsyncKey.requestTokenKey);
+    if (!reqToken) return;
+    const res = await api.checkRequestToken(reqToken);
+    if (res.data?.state === "completed" && res.data?.signer_id) {
+      await setCookie(AsyncKey.signerIdKey, res?.data?.signer_id);
+      await removeCookie(AsyncKey.requestTokenKey);
+      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
+      if (fcUser) {
+        dispatch(FC_USER_ACTIONS.updateSignerId(res?.data?.signer_id));
+      }
+    }
+  }, [dispatch]);
   const checkingSignerId = useCallback(async () => {
     if (signerId) {
       await setCookie(AsyncKey.signerIdKey, signerId);
@@ -188,9 +203,11 @@ const FCPluginWrapper = () => {
         if (fcUser) {
           dispatch(FC_USER_ACTIONS.updateSignerId(signerIdFromCookie));
         }
+      } else {
+        checkRequestToken();
       }
     }
-  }, [dispatch, signerId]);
+  }, [checkRequestToken, dispatch, signerId]);
   const onCloseModalReply = useCallback(() => {
     dispatch(FC_CAST_ACTIONS.updateReplyCast());
   }, [dispatch]);

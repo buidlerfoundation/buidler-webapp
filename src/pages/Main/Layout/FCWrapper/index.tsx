@@ -11,7 +11,7 @@ import styles from "./index.module.scss";
 import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
 import IconMenuHome from "shared/SVG/FC/IconMenuHome";
 import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
-import { clearData, getCookie, setCookie } from "common/Cookie";
+import { clearData, getCookie, removeCookie, setCookie } from "common/Cookie";
 import { AsyncKey } from "common/AppConfig";
 import useAppDispatch from "hooks/useAppDispatch";
 import { FC_USER_ACTIONS, getCurrentFCUser } from "reducers/FCUserReducers";
@@ -122,6 +122,19 @@ const FCWrapper = () => {
   const onCloseReply = useCallback(() => {
     dispatch(HOME_FEED_ACTIONS.updateReplyCast());
   }, [dispatch]);
+  const checkRequestToken = useCallback(async () => {
+    const reqToken = await getCookie(AsyncKey.requestTokenKey);
+    if (!reqToken) return;
+    const res = await api.checkRequestToken(reqToken);
+    if (res.data?.state === "completed" && res.data?.signer_id) {
+      await setCookie(AsyncKey.signerIdKey, res?.data?.signer_id);
+      await removeCookie(AsyncKey.requestTokenKey);
+      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
+      if (fcUser) {
+        dispatch(FC_USER_ACTIONS.updateSignerId(res?.data?.signer_id));
+      }
+    }
+  }, [dispatch]);
   const checkingAuth = useCallback(async () => {
     setLoading(true);
     const signerId = await getCookie(AsyncKey.signerIdKey);
@@ -137,9 +150,11 @@ const FCWrapper = () => {
       if (fcUser) {
         dispatch(FC_USER_ACTIONS.updateSignerId(querySignerId));
       }
+    } else {
+      await checkRequestToken();
     }
     setLoading(false);
-  }, [dispatch, querySignerId]);
+  }, [checkRequestToken, dispatch, querySignerId]);
   useEffect(() => {
     if (initialTheme) {
       document
@@ -168,6 +183,7 @@ const FCWrapper = () => {
     setLoginLoading(false);
     if (res.data?.token) {
       setSignedKeyRequest(res.data);
+      await setCookie(AsyncKey.requestTokenKey, res.data?.token);
       setPolling(true);
       try {
         const resPolling = await api.pollingSignedKey(
@@ -176,6 +192,7 @@ const FCWrapper = () => {
         );
         if (resPolling?.data?.signer_id) {
           await setCookie(AsyncKey.signerIdKey, resPolling?.data?.signer_id);
+          await removeCookie(AsyncKey.requestTokenKey);
           const fcUser = await dispatch(getCurrentFCUser()).unwrap();
           if (fcUser) {
             dispatch(

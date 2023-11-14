@@ -4,6 +4,9 @@ import Caller from "./Caller";
 export const requestSignedKey = () =>
   Caller.post<ISignedKeyRequest>("xcaster/signers");
 
+export const checkRequestToken = (token: string) =>
+  Caller.get<ISignedKeyRequest>(`xcaster/signers?token=${token}`);
+
 export const pollingSignedKey = async (
   token: string,
   controller?: AbortController
