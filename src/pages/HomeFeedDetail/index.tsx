@@ -28,6 +28,10 @@ const HomeFeedDetail = () => {
   );
   const castDetail = useAppSelector((state) => state.homeFeed.castDetail.data);
   const castRepliesData = useFeedRepliesData(hash);
+  const replyCount = useMemo(
+    () => castDetail?.replies?.count || castRepliesData?.data?.length || 0,
+    [castDetail?.replies?.count, castRepliesData?.data?.length]
+  );
   const renderOther = useMemo(
     () => !castRepliesData.canMore && otherCastsFiltered.length > 0 && !loading,
     [castRepliesData.canMore, loading, otherCastsFiltered.length]
@@ -49,6 +53,7 @@ const HomeFeedDetail = () => {
           cast_author_fid: location.state?.cast_author_fid,
         })
       );
+      setOtherCasts([]);
     }
   }, [dispatch, hash, location.state?.cast_author_fid]);
   useEffect(() => {
@@ -121,9 +126,7 @@ const HomeFeedDetail = () => {
           <div className={styles["list-cast"]}>
             <CastDetailItem
               cast={castDetail}
-              replyCount={
-                castDetail?.replies?.count || castRepliesData?.data?.length || 0
-              }
+              replyCount={replyCount}
               homeFeed
               onLogin={onLogin}
             />
@@ -142,7 +145,10 @@ const HomeFeedDetail = () => {
       )}
       {renderOther && (
         <>
-          <span className={styles["other-title"]}>
+          <span
+            className={styles["other-title"]}
+            style={replyCount === 0 ? { borderTop: "none" } : {}}
+          >
             What other people say about this link
           </span>
           <div className={styles["list-other-cast"]}>
