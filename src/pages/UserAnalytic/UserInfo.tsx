@@ -25,7 +25,7 @@ const UserInfo = ({ user }: IUserInfo) => {
         <div className={styles["user-info"]}>
           <div className={styles["name-wrap"]}>
             <span className={styles.name}>{user?.display_name}</span>
-            <span className={styles.username}>{user?.username}</span>
+            <span className={styles.username}>@{user?.username}</span>
           </div>
           <div className={styles["user-relate-info"]}>
             <div className={styles["relate-item"]}>

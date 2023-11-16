@@ -30,7 +30,32 @@ export const normalizeEngagementData = (data: IDataUserEngagement) => {
 
 export const normalizeActivitiesData = (data: IDataUserEngagement) => {
   const { likes, recasts } = data;
-  const map: any = {};
+  const map: any = {
+    "12AM": { name: "12AM" },
+    "1AM": { name: "1AM" },
+    "2AM": { name: "2AM" },
+    "3AM": { name: "3AM" },
+    "4AM": { name: "4AM" },
+    "5AM": { name: "5AM" },
+    "6AM": { name: "6AM" },
+    "7AM": { name: "7AM" },
+    "8AM": { name: "8AM" },
+    "9AM": { name: "9AM" },
+    "10AM": { name: "10AM" },
+    "11AM": { name: "11AM" },
+    "12PM": { name: "12PM" },
+    "1PM": { name: "1PM" },
+    "2PM": { name: "2PM" },
+    "3PM": { name: "3PM" },
+    "4PM": { name: "4PM" },
+    "5PM": { name: "5PM" },
+    "6PM": { name: "6PM" },
+    "7PM": { name: "7PM" },
+    "8PM": { name: "8PM" },
+    "9PM": { name: "9PM" },
+    "10PM": { name: "10PM" },
+    "11PM": { name: "11PM" },
+  };
   likes.forEach((el) => {
     const key = el.formatted_time.split(":")?.[1] || "";
     map[key] = {
