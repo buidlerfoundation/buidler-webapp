@@ -1,4 +1,12 @@
-import { ICast, IFCUser, IMetadataUrl, ISignedKeyRequest } from "models/FC";
+import {
+  ActivityPeriod,
+  ICast,
+  IDataUserEngagement,
+  IFCUser,
+  IFCUserActivity,
+  IMetadataUrl,
+  ISignedKeyRequest,
+} from "models/FC";
 import Caller from "./Caller";
 
 export const requestSignedKey = () =>
@@ -27,7 +35,10 @@ export const pollingSignedKey = async (
   }
 };
 
-export const getCurrentFCUser = () => Caller.get<IFCUser>("xcaster/users/me");
+export const getCurrentFCUser = () => Caller.get<IFCUser>("users/me");
+
+export const getFCUser = (username: string) =>
+  Caller.get<IFCUser>(`users/${username}`);
 
 export const cast = (data: any) => Caller.post<string>("casts", data);
 
@@ -106,3 +117,17 @@ export const getFCUsersByName = (name: string) => {
     `users?${new URLSearchParams({ username: name, limit: "20" })}`
   );
 };
+
+export const getUserActivities = (params: {
+  username: string;
+  type: ActivityPeriod;
+}) =>
+  Caller.get<IFCUserActivity>(
+    `users/${params.username}/activities?type=${params.type}`
+  );
+
+export const getUserDataEngagement = (name: string) =>
+  Caller.get<IDataUserEngagement>(`users/${name}/data/engagement`);
+
+export const getUserDataActivities = (name: string) =>
+  Caller.get<IDataUserEngagement>(`users/${name}/data/activities`);

@@ -25,8 +25,9 @@ export interface IFCUser {
       description?: string;
     };
   };
-  followerCount?: number;
-  followingCount?: number;
+  total_cast?: number;
+  total_follower?: number;
+  total_following?: number;
   activeOnFcNetwork?: boolean;
   viewerContext?: {
     following?: boolean;
@@ -94,4 +95,33 @@ export interface IFeedData {
   canMore?: boolean;
   loading?: boolean;
   loadMore?: boolean;
+}
+
+export type ActivityPeriod = "1d" | "7d" | "14d" | "30d" | "90d";
+
+export interface IActivity {
+  total: number;
+  changed: number;
+}
+export interface IFCUserActivity {
+  cast: IActivity;
+  follower: IActivity;
+  following: IActivity;
+  replied_cast: IActivity;
+}
+
+export interface IActivityFilter {
+  label: string;
+  period: ActivityPeriod;
+}
+
+export interface IDataChart {
+  formatted_time: string;
+  timestamp: number;
+  value: number;
+}
+
+export interface IDataUserEngagement {
+  likes: IDataChart[];
+  recasts: IDataChart[];
 }
