@@ -40,7 +40,10 @@ const EngagementChart = ({ data }: IEngagementChart) => {
         >
           <XAxis dataKey="name" height={1} tick={false} />
           <YAxis domain={[0, max]} width={1} tick={false} />
-          <Tooltip content={<ChartTooltip />} />
+          <Tooltip
+            content={<ChartTooltip />}
+            cursor={{ fill: "var(--color-stroke)" }}
+          />
           <Bar dataKey="like" stackId="a" fill="var(--color-mention)" />
           <Bar dataKey="recast" stackId="a" fill="var(--color-recast)" />
           <ReferenceLine

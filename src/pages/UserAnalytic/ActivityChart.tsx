@@ -40,7 +40,10 @@ const ActivityChart = ({ data }: IActivityChart) => {
         >
           <XAxis dataKey="name" height={1} tick={false} />
           <YAxis domain={[0, max]} width={1} tick={false} />
-          <Tooltip content={<ChartTooltip />} />
+          <Tooltip
+            content={<ChartTooltip />}
+            cursor={{ fill: "var(--color-stroke)" }}
+          />
           <Bar dataKey="activities" stackId="a" fill="#7c65c1" />
           <ReferenceLine
             y={dataChart.max}

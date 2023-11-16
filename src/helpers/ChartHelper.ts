@@ -28,43 +28,64 @@ export const normalizeEngagementData = (data: IDataUserEngagement) => {
   };
 };
 
+const convertHour = (h: string) => {
+  if (h === "12AM") return 0;
+  if (h === "12PM") return 12;
+  const isAM = h.includes("AM");
+  if (isAM) return parseInt(h);
+  return parseInt(h) + 12;
+};
+
+const applyTimeZoneOffset = (h: number) => {
+  const timeWithTimeZone = h - new Date().getTimezoneOffset() / 60;
+  if (timeWithTimeZone < 0) return timeWithTimeZone + 24;
+  if (timeWithTimeZone > 23) return timeWithTimeZone - 24;
+  return timeWithTimeZone;
+};
+
 export const normalizeActivitiesData = (data: IDataUserEngagement) => {
   const { likes, recasts } = data;
   const map: any = {
-    "12AM": { name: "12AM" },
-    "1AM": { name: "1AM" },
-    "2AM": { name: "2AM" },
-    "3AM": { name: "3AM" },
-    "4AM": { name: "4AM" },
-    "5AM": { name: "5AM" },
-    "6AM": { name: "6AM" },
-    "7AM": { name: "7AM" },
-    "8AM": { name: "8AM" },
-    "9AM": { name: "9AM" },
-    "10AM": { name: "10AM" },
-    "11AM": { name: "11AM" },
-    "12PM": { name: "12PM" },
-    "1PM": { name: "1PM" },
-    "2PM": { name: "2PM" },
-    "3PM": { name: "3PM" },
-    "4PM": { name: "4PM" },
-    "5PM": { name: "5PM" },
-    "6PM": { name: "6PM" },
-    "7PM": { name: "7PM" },
-    "8PM": { name: "8PM" },
-    "9PM": { name: "9PM" },
-    "10PM": { name: "10PM" },
-    "11PM": { name: "11PM" },
+    "0:00": { name: "0:00" },
+    "1:00": { name: "1:00" },
+    "2:00": { name: "2:00" },
+    "3:00": { name: "3:00" },
+    "4:00": { name: "4:00" },
+    "5:00": { name: "5:00" },
+    "6:00": { name: "6:00" },
+    "7:00": { name: "7:00" },
+    "8:00": { name: "8:00" },
+    "9:00": { name: "9:00" },
+    "10:00": { name: "10:00" },
+    "11:00": { name: "11:00" },
+    "12:00": { name: "12:00" },
+    "13:00": { name: "13:00" },
+    "14:00": { name: "14:00" },
+    "15:00": { name: "15:00" },
+    "16:00": { name: "16:00" },
+    "17:00": { name: "17:00" },
+    "18:00": { name: "18:00" },
+    "19:00": { name: "19:00" },
+    "20:00": { name: "20:00" },
+    "21:00": { name: "21:00" },
+    "22:00": { name: "22:00" },
+    "23:00": { name: "23:00" },
   };
   likes.forEach((el) => {
-    const key = el.formatted_time.split(":")?.[1] || "";
+    const time = el.formatted_time.split(":")?.[1] || "";
+    const h = convertHour(time);
+    const timeWithTZ = applyTimeZoneOffset(h);
+    const key = `${timeWithTZ}:00`;
     map[key] = {
       name: key,
       activities: el.value + (map[key]?.activities || 0),
     };
   });
   recasts.forEach((el) => {
-    const key = el.formatted_time.split(":")?.[1] || "";
+    const time = el.formatted_time.split(":")?.[1] || "";
+    const h = convertHour(time);
+    const timeWithTZ = applyTimeZoneOffset(h);
+    const key = `${timeWithTZ}:00`;
     map[key] = {
       ...(map[key] || {}),
       name: key,

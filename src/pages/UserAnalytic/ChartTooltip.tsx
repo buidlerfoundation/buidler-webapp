@@ -9,7 +9,7 @@ const ChartTooltip = ({ active, payload, label }: any) => {
           borderRadius: 10,
           padding: 10,
           flexDirection: "column",
-          backgroundColor: "#000000d0",
+          backgroundColor: "#00000099",
           color: "white",
           gap: 3,
           alignItems: "center",
