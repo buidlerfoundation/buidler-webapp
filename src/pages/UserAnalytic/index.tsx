@@ -26,11 +26,7 @@ const UserAnalytic = () => {
   );
   const navigate = useNavigate();
   const goBack = useCallback(() => {
-    if (window?.history?.state?.idx > 0) {
-      navigate(-1);
-    } else {
-      navigate("/home", { replace: true });
-    }
+    navigate("/analytic", { replace: true });
   }, [navigate]);
   useEffect(() => {
     if (username) {
