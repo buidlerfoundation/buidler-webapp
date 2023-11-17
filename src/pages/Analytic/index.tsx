@@ -112,7 +112,8 @@ const Analytic = () => {
         fid: "680",
         name: "woj — q/dau",
         username: "woj.eth",
-        avatar: "https://i.imgur.com/UIqZP1q.png",
+        avatar:
+          "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_168/https%3A%2F%2Fi.imgur.com%2FUIqZP1q.png",
       },
       {
         fid: "124",
@@ -139,7 +140,7 @@ const Analytic = () => {
         fid: "6806",
         name: "dawufigpt - mid/MAU",
         username: "dawufi",
-        avatar: "https://i.imgur.com/E51kh9y.gif",
+        avatar: "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_gif,w_168/https%3A%2F%2Fi.imgur.com%2FE51kh9y.gif",
       },
       {
         fid: "378",
@@ -152,13 +153,15 @@ const Analytic = () => {
         fid: "534",
         name: "mike rainbow (rainbow mike)",
         username: "mikedemarais.eth",
-        avatar: "https://i.imgur.com/nqy5Wsi.gif",
+        avatar:
+          "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_gif,w_168/https%3A%2F%2Fi.imgur.com%2Fnqy5Wsi.gif",
       },
       {
         fid: "129",
         name: "phil",
         username: "phil",
-        avatar: "https://i.imgur.com/sx6qqM7.jpg",
+        avatar:
+          "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_jpg,w_168/https%3A%2F%2Fi.imgur.com%2Fsx6qqM7.jpg",
       },
       {
         fid: "4163",
@@ -171,7 +174,8 @@ const Analytic = () => {
         fid: "20071",
         name: "Edric",
         username: "edricnguyen.eth",
-        avatar: "https://i.imgur.com/t2mJvYg.jpg",
+        avatar:
+          "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_jpg,w_168/https%3A%2F%2Fi.imgur.com%2Ft2mJvYg.jpg",
       },
     ],
     []
