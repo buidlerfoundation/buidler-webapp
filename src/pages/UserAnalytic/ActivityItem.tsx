@@ -51,7 +51,10 @@ const ActivityItem = ({ activity, label }: IActivityItem) => {
         {suffix}
         {total}
       </div>
-      <div className={styles["activity-changed"]}>
+      <div
+        className={styles["activity-changed"]}
+        style={!changed ? { opacity: 0 } : {}}
+      >
         {renderChangeIcon()}
         <span style={{ color }}>{Math.abs(changed)}</span>
       </div>

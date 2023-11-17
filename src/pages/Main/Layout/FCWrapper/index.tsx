@@ -305,8 +305,8 @@ const FCWrapper = () => {
             }
             active={activeHome}
           />
-          {/* <MenuItemMemo
-            title="Farcaster Insight"
+          <MenuItemMemo
+            title="Insights"
             to="/analytic"
             icon={
               <IconMenuAnalytic
@@ -314,7 +314,7 @@ const FCWrapper = () => {
               />
             }
             active={activeAnalytic}
-          /> */}
+          />
           {/* <MenuItemMemo
             title="Communities"
             to="/community"
