@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import ChartTooltip from "./ChartTooltip";
 import { normalizeActivitiesData } from "helpers/ChartHelper";
+import ChartXAxis from "./ChartXAxis";
 
 interface IActivityChart {
   data?: IDataUserEngagement;
@@ -38,7 +39,7 @@ const ActivityChart = ({ data }: IActivityChart) => {
           data={dataChart.dataChart}
           margin={{ top: 0, bottom: 0, left: 0, right: 0 }}
         >
-          <XAxis dataKey="name" height={1} tick={false} />
+          <XAxis dataKey="name" tick={<ChartXAxis />} />
           <YAxis domain={[0, max]} width={1} tick={false} />
           <Tooltip
             content={<ChartTooltip />}

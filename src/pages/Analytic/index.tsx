@@ -1,28 +1,18 @@
-import React, { memo, useCallback, useMemo, useState } from "react";
+import React, { memo, useCallback, useState } from "react";
 import styles from "./index.module.scss";
-import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
 import { useNavigate } from "react-router-dom";
-import { isUrlValid } from "helpers/LinkHelper";
-import { insertHttpIfNeed } from "helpers/CastHelper";
+import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
 
-const Explore = () => {
+const Analytic = () => {
   const navigate = useNavigate();
   const [value, setValue] = useState("");
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   }, []);
-  const valueSubmit = useMemo(() => insertHttpIfNeed(value), [value]);
-  const onSubmit = useCallback(
-    (e: any) => {
-      e.preventDefault();
-      if (isUrlValid(valueSubmit)) {
-        navigate(`${encodeURIComponent(valueSubmit)}`);
-      } else {
-        // error
-      }
-    },
-    [navigate, valueSubmit]
-  );
+  const onSubmit = useCallback((e: any) => {
+    e.preventDefault();
+    // call api check user
+  }, []);
   return (
     <div className={styles.container}>
       <nav className={styles.head}>
@@ -33,7 +23,7 @@ const Explore = () => {
           {!value && (
             <div className={styles.placeholder}>
               <IconMenuExplore size={18} fill="var(--color-mute-text)" />
-              <span style={{ marginLeft: 10 }}>Enter any url</span>
+              <span style={{ marginLeft: 10 }}>Search by username</span>
             </div>
           )}
         </div>
@@ -42,4 +32,4 @@ const Explore = () => {
   );
 };
 
-export default memo(Explore);
+export default memo(Analytic);

@@ -17,6 +17,12 @@ const ActivityItem = ({ activity, label }: IActivityItem) => {
     () => (isIncrease ? "var(--color-success)" : "var(--color-urgent)"),
     [isIncrease]
   );
+  const total = useMemo(() => activity?.total, [activity?.total]);
+  const suffix = useMemo(() => {
+    if (!total) return "";
+    if (total > 0) return "+";
+    return "-";
+  }, [total]);
   const renderChangeIcon = useCallback(() => {
     if (isEqual) return null;
     if (isDecrease)
@@ -41,7 +47,10 @@ const ActivityItem = ({ activity, label }: IActivityItem) => {
   return (
     <div className={styles["activity-item"]}>
       <span className={styles["activity-label"]}>{label}</span>
-      <div className={styles["activity-total"]}>{activity?.total}</div>
+      <div className={styles["activity-total"]}>
+        {suffix}
+        {total}
+      </div>
       <div className={styles["activity-changed"]}>
         {renderChangeIcon()}
         <span style={{ color }}>{Math.abs(changed)}</span>

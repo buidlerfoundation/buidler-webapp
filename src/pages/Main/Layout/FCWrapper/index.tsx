@@ -35,6 +35,7 @@ import ModalCompose from "shared/ModalCompose";
 import ModalReviewResult from "shared/ModalReviewResult";
 import IconMenuCommunity from "shared/SVG/FC/IconMenuCommunity";
 import useQuery from "hooks/useQuery";
+import IconMenuAnalytic from "shared/SVG/FC/IconMenuAnalytic";
 
 interface IMenuItem {
   active?: boolean;
@@ -257,6 +258,10 @@ const FCWrapper = () => {
     () => !!filters.find((el) => el.path === location.pathname),
     [filters, location.pathname]
   );
+  const activeAnalytic = useMemo(
+    () => location.pathname.includes("/analytic"),
+    [location.pathname]
+  );
   const activeExplore = useMemo(
     () => location.pathname.includes("/explore"),
     [location.pathname]
@@ -300,6 +305,16 @@ const FCWrapper = () => {
             }
             active={activeHome}
           />
+          {/* <MenuItemMemo
+            title="Farcaster Insight"
+            to="/analytic"
+            icon={
+              <IconMenuAnalytic
+                fill={activeAnalytic ? activeColor : inactiveColor}
+              />
+            }
+            active={activeAnalytic}
+          /> */}
           {/* <MenuItemMemo
             title="Communities"
             to="/community"

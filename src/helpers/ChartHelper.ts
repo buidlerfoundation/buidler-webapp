@@ -1,18 +1,19 @@
 import { IDataUserEngagement } from "models/FC";
+import { dateFormatted } from "utils/DateUtils";
 
 export const normalizeEngagementData = (data: IDataUserEngagement) => {
   const { likes, recasts } = data;
   const map: any = {};
   likes.forEach((el) => {
     map[el.formatted_time] = {
-      name: el.formatted_time,
+      name: dateFormatted(el.formatted_time, "MMM DD"),
       like: el.value,
     };
   });
   recasts.forEach((el) => {
     map[el.formatted_time] = {
       ...(map[el.formatted_time] || {}),
-      name: el.formatted_time,
+      name: dateFormatted(el.formatted_time, "MMM DD"),
       recast: el.value,
     };
   });

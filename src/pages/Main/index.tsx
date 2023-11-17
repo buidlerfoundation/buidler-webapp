@@ -21,6 +21,7 @@ import HomeFeedWrapper from "./Layout/HomeFeedWrapper";
 import useFeedFilters from "hooks/useFeedFilters";
 import Community from "pages/Community";
 import UserAnalytic from "pages/UserAnalytic";
+import Analytic from "pages/Analytic";
 
 const Main = () => {
   const filters = useFeedFilters();
@@ -44,6 +45,7 @@ const Main = () => {
           </Route>
           <Route path="/analytic/:username" element={<UserAnalytic />} />
           <Route path="/community" element={<Community />} />
+          <Route path="/analytic" element={<Analytic />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/explore/:url" element={<FeedByUrl />} />
           <Route path="/:fc_username/:hash" element={<HomeFeedDetail />} />

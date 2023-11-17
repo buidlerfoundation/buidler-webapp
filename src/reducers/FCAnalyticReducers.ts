@@ -46,7 +46,9 @@ const initialState: FCAnalyticReducerState = {
   filters: [
     { label: "24h", period: "1d" },
     { label: "7d", period: "7d" },
+    { label: "14d", period: "14d" },
     { label: "1M", period: "30d" },
+    { label: "3M", period: "90d" },
   ],
 };
 

@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { normalizeEngagementData } from "helpers/ChartHelper";
 import ChartTooltip from "./ChartTooltip";
+import ChartXAxis from "./ChartXAxis";
 
 interface IEngagementChart {
   data?: IDataUserEngagement;
@@ -38,7 +39,7 @@ const EngagementChart = ({ data }: IEngagementChart) => {
           data={dataChart.dataChart}
           margin={{ top: 0, bottom: 0, left: 0, right: 0 }}
         >
-          <XAxis dataKey="name" height={1} tick={false} />
+          <XAxis dataKey="name" tick={<ChartXAxis />} />
           <YAxis domain={[0, max]} width={1} tick={false} />
           <Tooltip
             content={<ChartTooltip />}
