@@ -33,7 +33,7 @@ const ActivityChart = ({ data }: IActivityChart) => {
   );
   return (
     <div className={styles["chart-item"]}>
-      <span className={styles.label}>Activity by Hours</span>
+      <span className={styles.label}>Activities by Hours</span>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={dataChart.dataChart}

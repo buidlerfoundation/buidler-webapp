@@ -178,14 +178,14 @@
     }
     .charts {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 15px;
       margin-top: 15px;
       .chart-item {
         display: flex;
         flex-direction: column;
         gap: 15px;
-        width: 292px;
+        width: 100%;
         height: 200px;
       }
     }
@@ -208,9 +208,6 @@
     }
     .user-wrap .user-head .user-info .user-relate-info {
       column-gap: 10px;
-    }
-    .analytic-wrap .charts .chart-item {
-      width: 100%;
     }
   }
 }

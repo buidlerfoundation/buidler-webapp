@@ -6,9 +6,10 @@ import IconArrowBack from "shared/SVG/IconArrowBack";
 interface IActivityItem {
   activity?: IActivity;
   label: string;
+  showSuffix?: boolean;
 }
 
-const ActivityItem = ({ activity, label }: IActivityItem) => {
+const ActivityItem = ({ activity, label, showSuffix }: IActivityItem) => {
   const changed = useMemo(() => activity?.changed || 0, [activity?.changed]);
   const isDecrease = useMemo(() => changed < 0, [changed]);
   const isIncrease = useMemo(() => changed > 0, [changed]);
@@ -19,10 +20,10 @@ const ActivityItem = ({ activity, label }: IActivityItem) => {
   );
   const total = useMemo(() => activity?.total, [activity?.total]);
   const suffix = useMemo(() => {
-    if (!total) return "";
+    if (!total || !showSuffix) return "";
     if (total > 0) return "+";
     return "-";
-  }, [total]);
+  }, [total, showSuffix]);
   const renderChangeIcon = useCallback(() => {
     if (isEqual) return null;
     if (isDecrease)

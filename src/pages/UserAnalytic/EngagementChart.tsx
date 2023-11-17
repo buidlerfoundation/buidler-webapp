@@ -33,7 +33,7 @@ const EngagementChart = ({ data }: IEngagementChart) => {
   );
   return (
     <div className={styles["chart-item"]}>
-      <span className={styles.label}>Engagement</span>
+      <span className={styles.label}>Engagements by Date</span>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={dataChart.dataChart}

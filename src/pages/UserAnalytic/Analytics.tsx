@@ -34,6 +34,7 @@ const Analytics = ({ username, period }: IAnalytics) => {
         <ActivityItem
           label="Followers"
           activity={fcActivities?.data?.follower}
+          showSuffix
         />
         <ActivityItem label="Casts" activity={fcActivities?.data?.cast} />
       </div>

@@ -259,7 +259,7 @@ const FCWrapper = () => {
     [filters, location.pathname]
   );
   const activeAnalytic = useMemo(
-    () => location.pathname.includes("/analytic"),
+    () => location.pathname === "/analytic",
     [location.pathname]
   );
   const activeExplore = useMemo(
