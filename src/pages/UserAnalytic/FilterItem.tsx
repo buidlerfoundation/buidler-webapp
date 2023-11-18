@@ -10,7 +10,7 @@ interface IFilterItem {
 const FilterItem = ({ item }: IFilterItem) => {
   const [search, setSearch] = useSearchParams();
   const period = useMemo(
-    () => (search.get("period") || "1d") as ActivityPeriod,
+    () => (search.get("period") || "7d") as ActivityPeriod,
     [search]
   );
   const active = useMemo(() => period === item.period, [item.period, period]);

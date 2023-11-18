@@ -433,6 +433,11 @@ iframe {
   z-index: 1301 !important;
 }
 
+.MuiTooltip-tooltip {
+  background-color: var(--color-background-3) !important;
+  color: var(--color-primary-text) !important;
+}
+
 code {
   white-space: pre-line;
 }

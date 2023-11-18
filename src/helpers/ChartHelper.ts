@@ -1,4 +1,4 @@
-import { IDataUserEngagement } from "models/FC";
+import { IDataChart, IDataUserEngagement } from "models/FC";
 import { dateFormatted } from "utils/DateUtils";
 
 export const normalizeEngagementData = (data: IDataUserEngagement) => {
@@ -45,7 +45,6 @@ const applyTimeZoneOffset = (h: number) => {
 };
 
 export const normalizeActivitiesData = (data: IDataUserEngagement) => {
-  const { likes, recasts } = data;
   const map: any = {
     "0:00": { name: "0:00" },
     "1:00": { name: "1:00" },
@@ -72,26 +71,17 @@ export const normalizeActivitiesData = (data: IDataUserEngagement) => {
     "22:00": { name: "22:00" },
     "23:00": { name: "23:00" },
   };
-  likes.forEach((el) => {
-    const time = el.formatted_time.split(":")?.[1] || "";
-    const h = convertHour(time);
-    const timeWithTZ = applyTimeZoneOffset(h);
-    const key = `${timeWithTZ}:00`;
-    map[key] = {
-      name: key,
-      activities: el.value + (map[key]?.activities || 0),
-    };
-  });
-  recasts.forEach((el) => {
-    const time = el.formatted_time.split(":")?.[1] || "";
-    const h = convertHour(time);
-    const timeWithTZ = applyTimeZoneOffset(h);
-    const key = `${timeWithTZ}:00`;
-    map[key] = {
-      ...(map[key] || {}),
-      name: key,
-      activities: el.value + (map[key]?.activities || 0),
-    };
+  Object.values(data).forEach((elements: IDataChart[]) => {
+    elements.forEach((el) => {
+      const time = el.formatted_time.split(":")?.[1] || "";
+      const h = convertHour(time);
+      const timeWithTZ = applyTimeZoneOffset(h);
+      const key = `${timeWithTZ}:00`;
+      map[key] = {
+        name: key,
+        activities: el.value + (map[key]?.activities || 0),
+      };
+    });
   });
   const dataChart = Object.values(map);
   const max = dataChart.reduce((res: number, val: any) => {

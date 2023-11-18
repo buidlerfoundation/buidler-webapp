@@ -3,7 +3,7 @@ import styles from "./index.module.scss";
 import { IFCUser, IPagingData } from "models/FC";
 import ImageView from "shared/ImageView";
 import { Link } from "react-router-dom";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Tooltip } from "@mui/material";
 
 interface INonFollowerUser {
   data?: IPagingData<IFCUser>;
@@ -18,17 +18,15 @@ const NonFollowerUser = ({ data, onLoadMore }: INonFollowerUser) => {
       <span className={styles.label}>People who don't follow back</span>
       <div className={styles["list-non-follow"]}>
         {users.map((el) => (
-          <Link
-            to={`/analytic/${el.fid}`}
-            state={{ fromNonFollower: true }}
-            key={el.fid}
-          >
-            <ImageView
-              alt="avatar"
-              className={styles.avatar}
-              src={el?.pfp?.url}
-            />
-          </Link>
+          <Tooltip title={el.username} key={el.fid} placement="top">
+            <Link to={`/analytic/${el.fid}`} state={{ fromNonFollower: true }}>
+              <ImageView
+                alt="avatar"
+                className={styles.avatar}
+                src={el?.pfp?.url}
+              />
+            </Link>
+          </Tooltip>
         ))}
         {data?.canMore && (
           <div

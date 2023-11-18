@@ -45,7 +45,7 @@ const Analytics = ({ username, period }: IAnalytics) => {
   return (
     <div className={styles["analytic-wrap"]}>
       <div className={styles["activity-head"]}>
-        <span className={styles.label}>Activities</span>
+        <span className={styles.label}>Overview</span>
         <div className={styles.filter}>
           {filters.map((filter) => (
             <FilterItem item={filter} key={filter.period} />

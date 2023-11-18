@@ -28,7 +28,7 @@ const UserAnalytic = () => {
   const username = useMemo(() => params?.username, [params?.username]);
   const fcUser = useFCUserByName(username);
   const period = useMemo(
-    () => (search.get("period") || "1d") as ActivityPeriod,
+    () => (search.get("period") || "7d") as ActivityPeriod,
     [search]
   );
   const navigate = useNavigate();

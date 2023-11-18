@@ -35,6 +35,11 @@ export interface IFCUser {
     canSendDirectCasts?: boolean;
     hasUploadedInboxKeys?: boolean;
   };
+  reaction_data?: {
+    likes: number;
+    recasts: number;
+    replied_casts: number;
+  };
 }
 
 export interface ICast {
@@ -124,4 +129,5 @@ export interface IDataChart {
 export interface IDataUserEngagement {
   likes: IDataChart[];
   recasts: IDataChart[];
+  casts: IDataChart[];
 }
