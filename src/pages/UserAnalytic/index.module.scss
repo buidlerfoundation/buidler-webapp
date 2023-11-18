@@ -37,6 +37,7 @@
   .body {
     display: flex;
     flex-direction: column;
+    padding-bottom: 70px;
   }
   .user-wrap {
     display: flex;
@@ -205,6 +206,13 @@
     }
     .body {
       padding: 0 15px;
+      padding-bottom: 70px;
+    }
+    .analytic-wrap .activity-head {
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      row-gap: 15px;
     }
     .user-wrap .user-head .user-info .user-relate-info {
       column-gap: 10px;
