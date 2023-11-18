@@ -1,6 +1,11 @@
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import IconArrowBack from "shared/SVG/IconArrowBack";
 import useFCUserByName from "hooks/useFCUserByName";
 import useAppDispatch from "hooks/useAppDispatch";
@@ -8,6 +13,7 @@ import {
   getActivities,
   getDataActivities,
   getDataEngagement,
+  getNonFollowUsers,
   getUser,
 } from "reducers/FCAnalyticReducers";
 import UserInfo from "./UserInfo";
@@ -18,6 +24,7 @@ const UserAnalytic = () => {
   const dispatch = useAppDispatch();
   const [search] = useSearchParams();
   const params = useParams<{ username: string }>();
+  const location = useLocation();
   const username = useMemo(() => params?.username, [params?.username]);
   const fcUser = useFCUserByName(username);
   const period = useMemo(
@@ -26,11 +33,16 @@ const UserAnalytic = () => {
   );
   const navigate = useNavigate();
   const goBack = useCallback(() => {
-    navigate("/analytic", { replace: true });
-  }, [navigate]);
+    if (location.state?.fromNonFollower) {
+      navigate(-1);
+    } else {
+      navigate("/analytic", { replace: true });
+    }
+  }, [location.state?.fromNonFollower, navigate]);
   useEffect(() => {
     if (username) {
       dispatch(getUser({ username }));
+      dispatch(getNonFollowUsers({ username, page: 1, limit: 10 }));
       dispatch(getDataEngagement({ username }));
       dispatch(getDataActivities({ username }));
     }

@@ -88,8 +88,8 @@ export interface IFCFilterType {
   title: string;
 }
 
-export interface IFeedData {
-  data: ICast[];
+export interface IPagingData<T> {
+  data: T[];
   total?: number;
   currentPage?: number;
   canMore?: boolean;

@@ -191,6 +191,36 @@
       }
     }
   }
+  .non-follow-wrap {
+    display: flex;
+    flex-direction: column;
+    margin-top: 15px;
+    .list-non-follow {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 15px;
+      overflow-x: auto;
+      .avatar {
+        width: 45px;
+        min-width: 45px;
+        height: 45px;
+        border-radius: 50%;
+      }
+      .btn-more {
+        background-color: var(--color-background-3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--color-secondary-text);
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+  }
   .label {
     font-size: 18px;
     font-weight: 600;

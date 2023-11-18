@@ -6,6 +6,7 @@ import {
   IDataUserEngagement,
   IFCUser,
   IFCUserActivity,
+  IPagingData,
 } from "models/FC";
 
 interface IFCUserState {
@@ -35,6 +36,7 @@ type FCAnalyticReducerState = {
   activityMap: { [username: string]: IFCUserActivityState };
   dataEngagementMap: { [username: string]: IFCUserDataEngagementState };
   dataActivityMap: { [username: string]: IFCUserDataActivityState };
+  nonFollowUserMap: { [username: string]: IPagingData<IFCUser> };
   filters: IActivityFilter[];
 };
 
@@ -43,6 +45,7 @@ const initialState: FCAnalyticReducerState = {
   activityMap: {},
   dataEngagementMap: {},
   dataActivityMap: {},
+  nonFollowUserMap: {},
   filters: [
     { label: "24h", period: "1d" },
     { label: "7d", period: "7d" },
@@ -80,6 +83,14 @@ export const getDataActivities = createAsyncThunk(
   "fc-analytic/get-data-activities",
   async (payload: { username: string }) => {
     const res = await api.getUserDataActivities(payload.username);
+    return res;
+  }
+);
+
+export const getNonFollowUsers = createAsyncThunk(
+  "fc-analytic/get-non-follow",
+  async (payload: { username: string; page: number; limit: number }) => {
+    const res = api.getNonFollowerUsers(payload);
     return res;
   }
 );
@@ -177,6 +188,43 @@ const fcAnalyticSlice = createSlice({
         state.dataActivityMap[username] = {
           data: action.payload.data,
           loading: false,
+        };
+      })
+      .addCase(getNonFollowUsers.pending, (state, action) => {
+        const { page, username } = action.meta.arg;
+        const data = state.nonFollowUserMap[username] || {};
+        if (page === 1) {
+          data.loading = true;
+        } else {
+          data.loadMore = true;
+        }
+        state.nonFollowUserMap[username] = data;
+      })
+      .addCase(getNonFollowUsers.rejected, (state, action) => {
+        const { username } = action.meta.arg;
+        state.nonFollowUserMap[username] = {
+          ...(state.nonFollowUserMap[username] || {}),
+          loading: false,
+          loadMore: false,
+        };
+      })
+      .addCase(getNonFollowUsers.fulfilled, (state, action) => {
+        const total = action.payload.metadata?.total || 0;
+        const limit = action.meta.arg.limit;
+        const username = action.meta.arg.username;
+        const totalPage = Math.ceil(total / limit);
+        const currentPage = action.meta.arg.page;
+        const data = action.payload?.data || [];
+        state.nonFollowUserMap[username] = {
+          loading: false,
+          loadMore: false,
+          currentPage,
+          total,
+          canMore: totalPage > currentPage,
+          data:
+            currentPage === 1
+              ? data
+              : [...(state.nonFollowUserMap?.[username]?.data || []), ...data],
         };
       }),
 });

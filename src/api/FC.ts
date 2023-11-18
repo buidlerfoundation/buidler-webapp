@@ -131,3 +131,15 @@ export const getUserDataEngagement = (name: string) =>
 
 export const getUserDataActivities = (name: string) =>
   Caller.get<IDataUserEngagement>(`users/${name}/data/activities`);
+
+export const getNonFollowerUsers = (params: {
+  username: string;
+  page: number;
+  limit: number;
+}) =>
+  Caller.get<IFCUser[]>(
+    `users/${params.username}/non-followers?${new URLSearchParams({
+      page: `${params.page}`,
+      limit: `${params.limit}`,
+    })}`
+  );
