@@ -18,26 +18,31 @@ const NonFollowerUser = ({ data, onLoadMore }: INonFollowerUser) => {
       <span className={styles.label}>People who don't follow back</span>
       <div className={styles["list-non-follow"]}>
         {users.map((el) => (
-          <Link to={`/analytic/${el.fid}`} state={{ fromNonFollower: true }}>
+          <Link
+            to={`/analytic/${el.fid}`}
+            state={{ fromNonFollower: true }}
+            key={el.fid}
+          >
             <ImageView
               alt="avatar"
               className={styles.avatar}
               src={el?.pfp?.url}
-              key={el.fid}
             />
           </Link>
         ))}
-        <div
-          className={`${styles.avatar} ${styles["btn-more"]}`}
-          onClick={onLoadMore}
-          key="load-more"
-        >
-          {data?.loadMore ? (
-            <CircularProgress color="inherit" size={15} />
-          ) : (
-            "+10"
-          )}
-        </div>
+        {data?.canMore && (
+          <div
+            className={`${styles.avatar} ${styles["btn-more"]}`}
+            onClick={onLoadMore}
+            key="load-more"
+          >
+            {data?.loadMore ? (
+              <CircularProgress color="inherit" size={15} />
+            ) : (
+              "+10"
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
