@@ -37,6 +37,7 @@ type FCAnalyticReducerState = {
   dataEngagementMap: { [username: string]: IFCUserDataEngagementState };
   dataActivityMap: { [username: string]: IFCUserDataActivityState };
   nonFollowUserMap: { [username: string]: IPagingData<IFCUser> };
+  dataInteractionMap: { [username: string]: IPagingData<IFCUser> };
   filters: IActivityFilter[];
 };
 
@@ -46,6 +47,7 @@ const initialState: FCAnalyticReducerState = {
   dataEngagementMap: {},
   dataActivityMap: {},
   nonFollowUserMap: {},
+  dataInteractionMap: {},
   filters: [
     { label: "24h", period: "1d" },
     { label: "7d", period: "7d" },
@@ -91,6 +93,14 @@ export const getNonFollowUsers = createAsyncThunk(
   "fc-analytic/get-non-follow",
   async (payload: { username: string; page: number; limit: number }) => {
     const res = api.getNonFollowerUsers(payload);
+    return res;
+  }
+);
+
+export const getTopInteractions = createAsyncThunk(
+  "fc-analytic/get-top-interactions",
+  async (payload: { username: string; page: number; limit: number }) => {
+    const res = api.getTopInteractions(payload);
     return res;
   }
 );
@@ -225,6 +235,46 @@ const fcAnalyticSlice = createSlice({
             currentPage === 1
               ? data
               : [...(state.nonFollowUserMap?.[username]?.data || []), ...data],
+        };
+      })
+      .addCase(getTopInteractions.pending, (state, action) => {
+        const { page, username } = action.meta.arg;
+        const data = state.dataInteractionMap[username] || {};
+        if (page === 1) {
+          data.loading = true;
+        } else {
+          data.loadMore = true;
+        }
+        state.dataInteractionMap[username] = data;
+      })
+      .addCase(getTopInteractions.rejected, (state, action) => {
+        const { username } = action.meta.arg;
+        state.dataInteractionMap[username] = {
+          ...(state.dataInteractionMap[username] || {}),
+          loading: false,
+          loadMore: false,
+        };
+      })
+      .addCase(getTopInteractions.fulfilled, (state, action) => {
+        const total = action.payload.metadata?.total || 0;
+        const limit = action.meta.arg.limit;
+        const username = action.meta.arg.username;
+        const totalPage = Math.ceil(total / limit);
+        const currentPage = action.meta.arg.page;
+        const data = action.payload?.data || [];
+        state.dataInteractionMap[username] = {
+          loading: false,
+          loadMore: false,
+          currentPage,
+          total,
+          canMore: totalPage > currentPage,
+          data:
+            currentPage === 1
+              ? data
+              : [
+                  ...(state.dataInteractionMap?.[username]?.data || []),
+                  ...data,
+                ],
         };
       }),
 });

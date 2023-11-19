@@ -14,11 +14,13 @@ import {
   getDataActivities,
   getDataEngagement,
   getNonFollowUsers,
+  getTopInteractions,
   getUser,
 } from "reducers/FCAnalyticReducers";
 import UserInfo from "./UserInfo";
 import Analytics from "./Analytics";
 import { ActivityPeriod } from "models/FC";
+import useAppSelector from "hooks/useAppSelector";
 
 const UserAnalytic = () => {
   const dispatch = useAppDispatch();
@@ -27,18 +29,23 @@ const UserAnalytic = () => {
   const location = useLocation();
   const username = useMemo(() => params?.username, [params?.username]);
   const fcUser = useFCUserByName(username);
+  const user = useAppSelector((state) => state.fcUser.data);
   const period = useMemo(
     () => (search.get("period") || "7d") as ActivityPeriod,
     [search]
   );
   const navigate = useNavigate();
   const goBack = useCallback(() => {
-    if (location.state?.fromNonFollower) {
+    if (location.state?.fromNonFollower || location.state?.fromTopInteraction) {
       navigate(-1);
     } else {
       navigate("/analytic", { replace: true });
     }
-  }, [location.state?.fromNonFollower, navigate]);
+  }, [
+    location.state?.fromNonFollower,
+    location.state?.fromTopInteraction,
+    navigate,
+  ]);
   useEffect(() => {
     if (username) {
       dispatch(getUser({ username }));
@@ -52,6 +59,13 @@ const UserAnalytic = () => {
       dispatch(getActivities({ username, type: period }));
     }
   }, [dispatch, period, username]);
+  useEffect(() => {
+    if (username) {
+      dispatch(
+        getTopInteractions({ username, page: 1, limit: user?.fid ? 50 : 3 })
+      );
+    }
+  }, [dispatch, user?.fid, username]);
   return (
     <div className={styles.container}>
       <nav className={styles.head}>

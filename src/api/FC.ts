@@ -143,3 +143,15 @@ export const getNonFollowerUsers = (params: {
       limit: `${params.limit}`,
     })}`
   );
+
+export const getTopInteractions = (params: {
+  username: string;
+  page: number;
+  limit: number;
+}) =>
+  Caller.get<IFCUser[]>(
+    `users/${params.username}/top-reaction?${new URLSearchParams({
+      page: `${params.page}`,
+      limit: `${params.limit}`,
+    })}`
+  );

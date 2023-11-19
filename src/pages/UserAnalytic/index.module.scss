@@ -191,6 +191,21 @@
       }
     }
   }
+  .top-interaction-wrap {
+    display: flex;
+    flex-direction: column;
+    margin-top: 15px;
+    .sign-in-to-view {
+      height: 53px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--color-secondary-text);
+      font-weight: 600;
+      cursor: pointer;
+    }
+  }
   .non-follow-wrap {
     display: flex;
     flex-direction: column;

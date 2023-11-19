@@ -138,6 +138,23 @@ a {
   fill: var(--color-primary-text) !important;
 }
 
+.MuiTablePagination-root {
+  color: var(--color-mute-text) !important;
+  .MuiSvgIcon-root {
+    fill: var(--color-mute-text) !important;
+  }
+  .MuiIconButton-root.Mui-disabled {
+    opacity: 0.5;
+  }
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.MuiMenu-list {
+  background-color: var(--color-background-1) !important;
+}
+
 .MuiPickersCalendarHeader-iconButton {
   background-color: var(--color-lighter-background) !important;
   &:hover {
@@ -440,6 +457,32 @@ iframe {
 
 code {
   white-space: pre-line;
+}
+
+table,
+thead,
+tr,
+th,
+td {
+  border-color: var(--color-stroke) !important;
+  color: var(--color-mute-text) !important;
+}
+
+th {
+  white-space: nowrap;
+}
+
+td {
+  color: var(--color-primary-text) !important;
+  white-space: nowrap;
+}
+
+.MuiTableSortLabel-root:hover {
+  color: var(--color-mute-text) !important;
+}
+
+.MuiTableSortLabel-root.Mui-active {
+  color: var(--color-primary-text) !important;
 }
 
 html {

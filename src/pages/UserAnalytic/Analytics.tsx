@@ -13,6 +13,8 @@ import useDataNonFollowerUser from "hooks/useDataNonFollowerUser";
 import NonFollowerUser from "./NonFollowerUser";
 import useAppDispatch from "hooks/useAppDispatch";
 import { getNonFollowUsers } from "reducers/FCAnalyticReducers";
+import TopInteractions from "./TopInteractions";
+import useDataTopInteraction from "hooks/useDataTopInteraction";
 
 interface IAnalytics {
   username?: string;
@@ -26,6 +28,7 @@ const Analytics = ({ username, period }: IAnalytics) => {
   const dataEngagement = useFCUserDataEngagement(username);
   const dataActivities = useFCUserDataActivities(username);
   const dataNonFollowerUser = useDataNonFollowerUser(username);
+  const dataTopInteraction = useDataTopInteraction(username);
   const user = useAppSelector((state) => state.fcUser.data);
   const onLoadMoreUnFollowUsers = useCallback(() => {
     if (!user) {
@@ -64,6 +67,7 @@ const Analytics = ({ username, period }: IAnalytics) => {
         <EngagementChart data={dataEngagement?.data} />
         <ActivityChart data={dataActivities?.data} />
       </div>
+      <TopInteractions data={dataTopInteraction} />
       <NonFollowerUser
         data={dataNonFollowerUser}
         onLoadMore={onLoadMoreUnFollowUsers}
