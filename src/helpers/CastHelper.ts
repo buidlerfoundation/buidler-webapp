@@ -1,4 +1,5 @@
 import { ICast } from "models/FC";
+import { extractContent } from "./MessageHelper";
 
 export const regexUrl =
   /(\b(?:https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,256}((?:\/\S*)?(?:\?\S*)?\b)?([&/#]*)?)/gim;
@@ -219,4 +220,13 @@ export const normalizeContentCastToSubmit = (content: string) => {
 export const normalizeMetadataTitle = (title?: string) => {
   if (!title) return "";
   return title.replace(/^\(\d+\)/, "");
+};
+
+export const MAXIMUM_LENGTH = 320;
+
+export const getTextLength = (s: string) => {
+  const value = extractContent(s);
+  const encoder = new TextEncoder();
+  const byteArray = encoder.encode(value.trim());
+  return byteArray.length;
 };
