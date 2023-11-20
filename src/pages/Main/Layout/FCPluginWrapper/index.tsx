@@ -93,6 +93,7 @@ const FCPluginWrapper = () => {
     async (payload: any) => {
       payload.text = extractContentMessage(payload.text);
       const payloadToSubmit = getPayloadToSubmit(payload);
+      payloadToSubmit.source = "extension";
       const res = await api.cast(payloadToSubmit);
       if (res.success && res.data) {
         // handle after cast
