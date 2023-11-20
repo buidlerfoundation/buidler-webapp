@@ -71,6 +71,11 @@ export const normalizeActivitiesData = (data: IDataUserEngagement) => {
     "22:00": { name: "22:00" },
     "23:00": { name: "23:00" },
   };
+  const currentDate = new Date();
+  const timezoneOffsetInMinutes = currentDate.getTimezoneOffset();
+  const hoursOffset = Math.floor(Math.abs(timezoneOffsetInMinutes) / 60);
+  const formattedOffset =
+    (timezoneOffsetInMinutes < 0 ? "+" : "-") + hoursOffset;
   Object.values(data).forEach((elements: IDataChart[]) => {
     elements.forEach((el) => {
       const time = el.formatted_time.split(":")?.[1] || "";
@@ -78,7 +83,7 @@ export const normalizeActivitiesData = (data: IDataUserEngagement) => {
       const timeWithTZ = applyTimeZoneOffset(h);
       const key = `${timeWithTZ}:00`;
       map[key] = {
-        name: key,
+        name: key + ` (UTC ${formattedOffset})`,
         activities: el.value + (map[key]?.activities || 0),
       };
     });

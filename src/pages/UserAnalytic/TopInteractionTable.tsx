@@ -97,7 +97,7 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
                 <TableRow
                   hover
                   onClick={(event) => {
-                    navigate(`/analytic/${row.fid}`, {
+                    navigate(`/insights/${row.fid}`, {
                       state: { fromTopInteraction: true },
                     });
                   }}

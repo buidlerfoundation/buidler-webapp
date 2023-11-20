@@ -39,7 +39,7 @@ const UserAnalytic = () => {
     if (location.state?.fromNonFollower || location.state?.fromTopInteraction) {
       navigate(-1);
     } else {
-      navigate("/analytic", { replace: true });
+      navigate("/insights", { replace: true });
     }
   }, [
     location.state?.fromNonFollower,

@@ -43,9 +43,9 @@ const Main = () => {
               />
             ))}
           </Route>
-          <Route path="/analytic/:username" element={<UserAnalytic />} />
+          <Route path="/insights/:username" element={<UserAnalytic />} />
           <Route path="/community" element={<Community />} />
-          <Route path="/analytic" element={<Analytic />} />
+          <Route path="/insights" element={<Analytic />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/explore/:url" element={<FeedByUrl />} />
           <Route path="/:fc_username/:hash" element={<HomeFeedDetail />} />

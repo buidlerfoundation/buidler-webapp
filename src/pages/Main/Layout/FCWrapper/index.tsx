@@ -259,7 +259,7 @@ const FCWrapper = () => {
     [filters, location.pathname]
   );
   const activeAnalytic = useMemo(
-    () => location.pathname === "/analytic",
+    () => location.pathname === "/insights",
     [location.pathname]
   );
   const activeExplore = useMemo(
@@ -307,7 +307,7 @@ const FCWrapper = () => {
           />
           <MenuItemMemo
             title="Insights"
-            to="/analytic"
+            to="/insights"
             icon={
               <IconMenuAnalytic
                 fill={activeAnalytic ? activeColor : inactiveColor}
