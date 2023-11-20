@@ -11,10 +11,9 @@ import useFCUserDataEngagement from "hooks/useFCUserDataEngagement";
 import useFCUserDataActivities from "hooks/useFCUserDataActivities";
 import useDataNonFollowerUser from "hooks/useDataNonFollowerUser";
 import NonFollowerUser from "./NonFollowerUser";
-import useAppDispatch from "hooks/useAppDispatch";
-import { getNonFollowUsers } from "reducers/FCAnalyticReducers";
 import TopInteractions from "./TopInteractions";
 import useDataTopInteraction from "hooks/useDataTopInteraction";
+import { useNavigate } from "react-router-dom";
 
 interface IAnalytics {
   username?: string;
@@ -22,7 +21,7 @@ interface IAnalytics {
 }
 
 const Analytics = ({ username, period }: IAnalytics) => {
-  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const filters = useAppSelector((state) => state.fcAnalytic.filters);
   const fcActivities = useFCActivitiesByName(username, period);
   const dataEngagement = useFCUserDataEngagement(username);
@@ -30,21 +29,15 @@ const Analytics = ({ username, period }: IAnalytics) => {
   const dataNonFollowerUser = useDataNonFollowerUser(username);
   const dataTopInteraction = useDataTopInteraction(username);
   const user = useAppSelector((state) => state.fcUser.data);
-  const onLoadMoreUnFollowUsers = useCallback(() => {
+  const onViewAll = useCallback(() => {
     if (!user) {
       const loginElement = document.getElementById("btn-login");
       loginElement?.click();
       return;
-    } else if (username) {
-      dispatch(
-        getNonFollowUsers({
-          username,
-          page: (dataNonFollowerUser?.currentPage || 1) + 1,
-          limit: 10,
-        })
-      );
+    } else {
+      navigate("non-follower", { state: { goBack: true } });
     }
-  }, [dataNonFollowerUser?.currentPage, dispatch, user, username]);
+  }, [navigate, user]);
   return (
     <div className={styles["analytic-wrap"]}>
       <div className={styles["activity-head"]}>
@@ -68,10 +61,7 @@ const Analytics = ({ username, period }: IAnalytics) => {
         <ActivityChart data={dataActivities?.data} />
       </div>
       <TopInteractions data={dataTopInteraction} />
-      <NonFollowerUser
-        data={dataNonFollowerUser}
-        onLoadMore={onLoadMoreUnFollowUsers}
-      />
+      <NonFollowerUser data={dataNonFollowerUser} onViewAll={onViewAll} />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import styles from "./index.module.scss";
 import { useSearchParams } from "react-router-dom";
 import { ActivityPeriod, IActivityFilter } from "models/FC";
 import { Tooltip } from "@mui/material";
+import { getTimeRange } from "utils/DateUtils";
 
 interface IFilterItem {
   item: IActivityFilter;
@@ -15,11 +16,12 @@ const FilterItem = ({ item }: IFilterItem) => {
     [search]
   );
   const active = useMemo(() => period === item.period, [item.period, period]);
+  const timeRange = useMemo(() => getTimeRange(item.period), [item.period]);
   const onClick = useCallback(() => {
     setSearch({ period: item.period });
   }, [item.period, setSearch]);
   return (
-    <Tooltip title="">
+    <Tooltip title={timeRange}>
       <div
         className={`${styles["filter-item"]} ${active ? styles.active : ""}`}
         onClick={onClick}

@@ -131,3 +131,8 @@ export interface IDataUserEngagement {
   recasts: IDataChart[];
   casts: IDataChart[];
 }
+
+export interface IUserInsightTab {
+  path: "/non-follower" | "/following" | "/follower" | "/cast";
+  label: string;
+}

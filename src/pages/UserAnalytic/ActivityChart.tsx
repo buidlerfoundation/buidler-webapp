@@ -13,6 +13,7 @@ import {
 import ChartTooltip from "./ChartTooltip";
 import { normalizeActivitiesData } from "helpers/ChartHelper";
 import ChartXAxis from "./ChartXAxis";
+import { formatNumber } from "helpers/StringHelper";
 
 interface IActivityChart {
   data?: IDataUserEngagement;
@@ -49,7 +50,7 @@ const ActivityChart = ({ data }: IActivityChart) => {
           <ReferenceLine
             y={dataChart.max}
             label={{
-              value: `${dataChart.max}`,
+              value: formatNumber(dataChart.max),
               position: "top",
               fill: "var(--color-primary-text)",
               fontSize: 12,

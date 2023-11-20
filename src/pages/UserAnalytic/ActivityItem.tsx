@@ -4,6 +4,7 @@ import { IActivity } from "models/FC";
 import IconArrowBack from "shared/SVG/IconArrowBack";
 import IconCaretDown from "shared/SVG/FC/IconCaretDown";
 import { formatNumber } from "helpers/StringHelper";
+import numeral from "numeral";
 
 interface IActivityItem {
   activity?: IActivity;
@@ -21,6 +22,11 @@ const ActivityItem = ({ activity, label, showSuffix }: IActivityItem) => {
     [isIncrease]
   );
   const total = useMemo(() => activity?.total, [activity?.total]);
+  const displayChanged = useMemo(() => {
+    if (!changed) return "0";
+    const absChanged = Math.abs(changed);
+    return `${numeral(absChanged * 100).format("0.[0][0]")}%`;
+  }, [changed]);
   const suffix = useMemo(() => {
     if (!total || !showSuffix) return "";
     if (total > 0) return "+";
@@ -56,7 +62,7 @@ const ActivityItem = ({ activity, label, showSuffix }: IActivityItem) => {
         style={!changed ? { opacity: 0 } : {}}
       >
         {renderChangeIcon()}
-        <span style={{ color }}>{Math.abs(changed)}</span>
+        <span style={{ color }}>{displayChanged}</span>
       </div>
     </div>
   );

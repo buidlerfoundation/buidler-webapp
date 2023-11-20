@@ -42,6 +42,11 @@ const ScrollRestoration = () => {
         }, 0);
       }
       previousPath.current = location.pathname;
+    } else {
+      window?.scrollTo?.({
+        top: 0,
+        behavior: "auto",
+      });
     }
   }, [location.pathname, saveScrollOffset]);
   useEffect(() => {

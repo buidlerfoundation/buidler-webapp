@@ -7,6 +7,7 @@ import {
   IFCUser,
   IFCUserActivity,
   IPagingData,
+  IUserInsightTab,
 } from "models/FC";
 
 interface IFCUserState {
@@ -39,6 +40,7 @@ type FCAnalyticReducerState = {
   nonFollowUserMap: { [username: string]: IPagingData<IFCUser> };
   dataInteractionMap: { [username: string]: IPagingData<IFCUser> };
   filters: IActivityFilter[];
+  userTabs: IUserInsightTab[];
 };
 
 const initialState: FCAnalyticReducerState = {
@@ -54,6 +56,11 @@ const initialState: FCAnalyticReducerState = {
     { label: "14d", period: "14d" },
     { label: "1M", period: "30d" },
     { label: "3M", period: "90d" },
+  ],
+  userTabs: [
+    { path: "/follower", label: "Followers" },
+    { path: "/following", label: "Following" },
+    { path: "/non-follower", label: "Non Followers" },
   ],
 };
 

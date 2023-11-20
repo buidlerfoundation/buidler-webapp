@@ -13,6 +13,7 @@ import {
 import { normalizeEngagementData } from "helpers/ChartHelper";
 import ChartTooltip from "./ChartTooltip";
 import ChartXAxis from "./ChartXAxis";
+import { formatNumber } from "helpers/StringHelper";
 
 interface IEngagementChart {
   data?: IDataUserEngagement;
@@ -50,7 +51,7 @@ const EngagementChart = ({ data }: IEngagementChart) => {
           <ReferenceLine
             y={dataChart.max}
             label={{
-              value: `${dataChart.max}`,
+              value: formatNumber(dataChart.max),
               position: "top",
               fill: "var(--color-primary-text)",
               fontSize: 12,

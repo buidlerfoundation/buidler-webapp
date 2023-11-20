@@ -99,7 +99,7 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
                   hover
                   onClick={(event) => {
                     navigate(`/insights/${row.fid}`, {
-                      state: { fromTopInteraction: true },
+                      state: { goBack: true },
                     });
                   }}
                   key={row.fid}
@@ -152,13 +152,17 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell align="right">{formatNumber(likes)}</TableCell>
-                  <TableCell align="right" padding="none">
-                    {formatNumber(replied_casts)}
+                  <TableCell align="right">
+                    {formatNumber(likes) || "-"}
                   </TableCell>
-                  <TableCell align="right">{formatNumber(recasts)}</TableCell>
                   <TableCell align="right" padding="none">
-                    {formatNumber(total)}
+                    {formatNumber(replied_casts) || "-"}
+                  </TableCell>
+                  <TableCell align="right">
+                    {formatNumber(recasts) || "-"}
+                  </TableCell>
+                  <TableCell align="right" padding="none">
+                    {formatNumber(total) || "-"}
                   </TableCell>
                 </TableRow>
               );

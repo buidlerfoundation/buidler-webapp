@@ -1,5 +1,5 @@
 import { IDataChart, IDataUserEngagement } from "models/FC";
-import { dateFormatted } from "utils/DateUtils";
+import { dateFormatted, getTimeZoneOffsetFormatted } from "utils/DateUtils";
 
 export const normalizeEngagementData = (data: IDataUserEngagement) => {
   const { likes, recasts } = data;
@@ -71,11 +71,7 @@ export const normalizeActivitiesData = (data: IDataUserEngagement) => {
     "22:00": { name: "22:00" },
     "23:00": { name: "23:00" },
   };
-  const currentDate = new Date();
-  const timezoneOffsetInMinutes = currentDate.getTimezoneOffset();
-  const hoursOffset = Math.floor(Math.abs(timezoneOffsetInMinutes) / 60);
-  const formattedOffset =
-    (timezoneOffsetInMinutes < 0 ? "+" : "-") + hoursOffset;
+  const formattedOffset = getTimeZoneOffsetFormatted();
   Object.values(data).forEach((elements: IDataChart[]) => {
     elements.forEach((el) => {
       const time = el.formatted_time.split(":")?.[1] || "";
