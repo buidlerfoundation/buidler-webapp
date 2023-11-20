@@ -14,6 +14,7 @@ import ChartTooltip from "./ChartTooltip";
 import { normalizeActivitiesData } from "helpers/ChartHelper";
 import ChartXAxis from "./ChartXAxis";
 import { formatNumber } from "helpers/StringHelper";
+import { getTimeZoneOffsetFormatted } from "utils/DateUtils";
 
 interface IActivityChart {
   data?: IDataUserEngagement;
@@ -32,6 +33,7 @@ const ActivityChart = ({ data }: IActivityChart) => {
     () => dataChart.max + Math.max(10, dataChart.max * 0.2),
     [dataChart]
   );
+  const formattedOffset = useMemo(() => getTimeZoneOffsetFormatted(), []);
   return (
     <div className={styles["chart-item"]}>
       <span className={styles.label}>Activities by Hours</span>
@@ -43,7 +45,7 @@ const ActivityChart = ({ data }: IActivityChart) => {
           <XAxis dataKey="name" tick={<ChartXAxis />} />
           <YAxis domain={[0, max]} width={1} tick={false} />
           <Tooltip
-            content={<ChartTooltip />}
+            content={<ChartTooltip postFix={` (UTC ${formattedOffset})`} />}
             cursor={{ fill: "var(--color-stroke)" }}
           />
           <Bar dataKey="activities" stackId="a" fill="#7c65c1" />

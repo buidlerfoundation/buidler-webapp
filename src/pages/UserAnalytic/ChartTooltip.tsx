@@ -1,7 +1,7 @@
 import { formatNumber } from "helpers/StringHelper";
 import React, { memo } from "react";
 
-const ChartTooltip = ({ active, payload, label }: any) => {
+const ChartTooltip = ({ active, payload, label, postFix }: any) => {
   if (active && payload && payload.length) {
     return (
       <div
@@ -16,7 +16,10 @@ const ChartTooltip = ({ active, payload, label }: any) => {
           alignItems: "center",
         }}
       >
-        <span>{label}</span>
+        <span>
+          {label}
+          {postFix || ""}
+        </span>
         {payload.map((el: any, index: number) => (
           <span key={index}>
             {formatNumber(el.value)} {el.name}
