@@ -37,6 +37,26 @@
         }
       }
     }
+    .tabs {
+      display: flex;
+      .tab-item {
+        flex-grow: 1;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: var(--color-secondary-text);
+        font-size: 16px;
+        &.active {
+          font-weight: 700;
+          color: var(--color-primary-text);
+        }
+        &:hover {
+          background-color: var(--color-stroke);
+        }
+      }
+    }
   }
 }
 
@@ -44,9 +64,9 @@
   .container {
     .nav {
       padding: 0 15px;
-    }
-    .head {
-      height: 60px;
+      .head {
+        height: 60px;
+      }
     }
   }
 }

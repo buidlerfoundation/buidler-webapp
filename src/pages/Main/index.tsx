@@ -23,7 +23,7 @@ import Community from "pages/Community";
 import UserAnalytic from "pages/UserAnalytic";
 import Analytic from "pages/Analytic";
 import UserInsightWrap from "./Layout/UserInsightWrap";
-import NonFollowers from "pages/NonFollowers";
+import UserFollowers from "pages/UserFollowers";
 
 const Main = () => {
   const filters = useFeedFilters();
@@ -49,7 +49,15 @@ const Main = () => {
             <Route path="/insights/:username" element={<UserAnalytic />} />
             <Route
               path="/insights/:username/non-follower"
-              element={<NonFollowers />}
+              element={<UserFollowers />}
+            />
+            <Route
+              path="/insights/:username/following"
+              element={<UserFollowers />}
+            />
+            <Route
+              path="/insights/:username/follower"
+              element={<UserFollowers />}
             />
           </Route>
           <Route path="/community" element={<Community />} />

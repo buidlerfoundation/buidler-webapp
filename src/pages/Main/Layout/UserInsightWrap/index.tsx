@@ -2,6 +2,7 @@ import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import IconArrowBack from "shared/SVG/IconArrowBack";
 import {
+  Link,
   Outlet,
   useLocation,
   useNavigate,
@@ -26,6 +27,7 @@ const UserInsightWrap = () => {
   const [search] = useSearchParams();
   const location = useLocation();
   const user = useAppSelector((state) => state.fcUser.data);
+  const userTabs = useAppSelector((state) => state.fcAnalytic.userTabs);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const username = useMemo(() => params?.username, [params?.username]);
@@ -33,6 +35,10 @@ const UserInsightWrap = () => {
   const period = useMemo(
     () => (search.get("period") || "7d") as ActivityPeriod,
     [search]
+  );
+  const showTab = useMemo(
+    () => userTabs.find((el) => !!location.pathname.includes(el.path)),
+    [location.pathname, userTabs]
   );
   const goBack = useCallback(() => {
     if (location.state?.goBack) {
@@ -72,6 +78,23 @@ const UserInsightWrap = () => {
             <span>{fcUser?.data?.display_name}</span>
           </div>
         </div>
+        {/* {showTab && (
+          <div className={styles.tabs}>
+            {userTabs.map((el) => (
+              <Link
+                to={`/insights/${username}${el.path}`}
+                key={el.path}
+                className={`${styles["tab-item"]} ${
+                  location.pathname.includes(el.path) ? styles.active : ""
+                }`}
+                replace
+                state={{ goBack: true }}
+              >
+                {el.label}
+              </Link>
+            ))}
+          </div>
+        )} */}
       </nav>
       <Outlet />
     </div>

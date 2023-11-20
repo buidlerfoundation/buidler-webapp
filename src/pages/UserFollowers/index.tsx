@@ -5,7 +5,7 @@ import useDataNonFollowerUser from "hooks/useDataNonFollowerUser";
 import { IFCUser } from "models/FC";
 import UserItem from "shared/UserItem";
 
-const NonFollowers = () => {
+const UserFollowers = () => {
   const params = useParams<{ username: string }>();
   const username = useMemo(() => params?.username, [params?.username]);
   const dataNonFollowerUser = useDataNonFollowerUser(username);
@@ -20,4 +20,4 @@ const NonFollowers = () => {
   return <div className={styles.container}>{users.map(renderUser)}</div>;
 };
 
-export default memo(NonFollowers);
+export default memo(UserFollowers);

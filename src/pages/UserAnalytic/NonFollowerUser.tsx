@@ -27,7 +27,9 @@ const NonFollowerUser = ({ data, onViewAll }: INonFollowerUser) => {
     <div className={styles["non-follow-wrap"]}>
       <div className={styles["non-follow-head"]}>
         <span className={styles.label}>Non-Followers</span>
-        <div className={styles["btn-view-all"]}>View all</div>
+        <div className={styles["btn-view-all"]} onClick={onViewAll}>
+          View all
+        </div>
       </div>
       <div className={styles["list-non-follow"]}>
         {users.map((el) => (
