@@ -2,6 +2,7 @@ import React, { memo, useCallback, useMemo } from "react";
 import styles from "./index.module.scss";
 import { useSearchParams } from "react-router-dom";
 import { ActivityPeriod, IActivityFilter } from "models/FC";
+import { Tooltip } from "@mui/material";
 
 interface IFilterItem {
   item: IActivityFilter;
@@ -18,12 +19,14 @@ const FilterItem = ({ item }: IFilterItem) => {
     setSearch({ period: item.period });
   }, [item.period, setSearch]);
   return (
-    <div
-      className={`${styles["filter-item"]} ${active ? styles.active : ""}`}
-      onClick={onClick}
-    >
-      {item.label}
-    </div>
+    <Tooltip title="">
+      <div
+        className={`${styles["filter-item"]} ${active ? styles.active : ""}`}
+        onClick={onClick}
+      >
+        {item.label}
+      </div>
+    </Tooltip>
   );
 };
 

@@ -1,3 +1,4 @@
+import { formatNumber } from "helpers/StringHelper";
 import React, { memo } from "react";
 
 const ChartTooltip = ({ active, payload, label }: any) => {
@@ -18,7 +19,7 @@ const ChartTooltip = ({ active, payload, label }: any) => {
         <span>{label}</span>
         {payload.map((el: any, index: number) => (
           <span key={index}>
-            {el.value} {el.name}
+            {formatNumber(el.value)} {el.name}
           </span>
         ))}
       </div>

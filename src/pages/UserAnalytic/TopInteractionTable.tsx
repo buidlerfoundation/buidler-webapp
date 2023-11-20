@@ -15,6 +15,7 @@ import React, { memo, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import ImageView from "shared/ImageView";
 import styles from "./index.module.scss";
+import { formatNumber } from "helpers/StringHelper";
 
 interface ITopInteractionTable {
   data: IFCUser[];
@@ -26,7 +27,7 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
   const [order, setOrder] = React.useState<"asc" | "desc">("desc");
   const [orderBy, setOrderBy] = React.useState<string>("total");
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);
   }, []);
@@ -151,13 +152,13 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell align="right">{likes}</TableCell>
+                  <TableCell align="right">{formatNumber(likes)}</TableCell>
                   <TableCell align="right" padding="none">
-                    {replied_casts}
+                    {formatNumber(replied_casts)}
                   </TableCell>
-                  <TableCell align="right">{recasts}</TableCell>
+                  <TableCell align="right">{formatNumber(recasts)}</TableCell>
                   <TableCell align="right" padding="none">
-                    {total}
+                    {formatNumber(total)}
                   </TableCell>
                 </TableRow>
               );

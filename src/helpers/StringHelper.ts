@@ -26,7 +26,7 @@ export const isNotFormat = (number: string | number) => {
 };
 
 export const formatNumber = (
-  number: string | number,
+  number: string | number | undefined,
   removeZero = true,
   decimal = 5
 ) => {

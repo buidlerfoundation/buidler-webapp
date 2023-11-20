@@ -2,6 +2,8 @@ import React, { memo, useCallback, useMemo } from "react";
 import styles from "./index.module.scss";
 import { IActivity } from "models/FC";
 import IconArrowBack from "shared/SVG/IconArrowBack";
+import IconCaretDown from "shared/SVG/FC/IconCaretDown";
+import { formatNumber } from "helpers/StringHelper";
 
 interface IActivityItem {
   activity?: IActivity;
@@ -24,24 +26,21 @@ const ActivityItem = ({ activity, label, showSuffix }: IActivityItem) => {
     if (total > 0) return "+";
     return "-";
   }, [total, showSuffix]);
+  const displayTotal = useMemo(() => {
+    if (!total) return "";
+    const absTotal = Math.abs(total);
+    return formatNumber(absTotal);
+  }, [total]);
   const renderChangeIcon = useCallback(() => {
     if (isEqual) return null;
     if (isDecrease)
-      return (
-        <IconArrowBack
-          style={{ rotate: "270deg" }}
-          fill="var(--color-urgent)"
-          width={20}
-          height={20}
-        />
-      );
+      return <IconCaretDown fill="var(--color-urgent)" size={15} />;
     if (isIncrease)
       return (
-        <IconArrowBack
-          style={{ rotate: "90deg" }}
+        <IconCaretDown
+          style={{ rotate: "180deg" }}
           fill="var(--color-success)"
-          width={20}
-          height={20}
+          size={15}
         />
       );
   }, [isDecrease, isEqual, isIncrease]);
@@ -50,7 +49,7 @@ const ActivityItem = ({ activity, label, showSuffix }: IActivityItem) => {
       <span className={styles["activity-label"]}>{label}</span>
       <div className={styles["activity-total"]}>
         {suffix}
-        {total}
+        {displayTotal}
       </div>
       <div
         className={styles["activity-changed"]}
