@@ -12,6 +12,7 @@ export interface IFCUser {
   fid: string;
   username?: string;
   display_name?: string;
+  is_followed?: boolean;
   pfp: {
     url?: string;
   };
@@ -132,7 +133,13 @@ export interface IDataUserEngagement {
   casts: IDataChart[];
 }
 
+export type IUserTabPath =
+  | "/non-follower"
+  | "/following"
+  | "/follower"
+  | "/cast";
+
 export interface IUserInsightTab {
-  path: "/non-follower" | "/following" | "/follower" | "/cast";
+  path: IUserTabPath;
   label: string;
 }

@@ -564,7 +564,7 @@ html {
     --color-secondary-text: #acacac;
     --color-mute-text: #727272;
     --color-background-1: #000000;
-    --color-background-opacity-1: #000000f7;
+    --color-background-opacity-1: #000000cc;
     --color-background-2: #121212;
     --color-background-3: #363636;
     --color-background-4: #363636;
@@ -641,7 +641,7 @@ html.light {
 
 html.dark {
   --color-darkest-background: #121212;
-  --color-darkest-background80: #121212cc;
+  --color-darkest-background80: #121212d9;
   --color-lighter-background: #191919;
   --color-highlight: #1e1e1e;
   --color-stroke: #242424;
@@ -657,7 +657,7 @@ html.dark {
   --color-secondary-text: #acacac;
   --color-mute-text: #727272;
   --color-background-1: #000000;
-  --color-background-opacity-1: #000000f7;
+  --color-background-opacity-1: #000000d9;
   --color-background-2: #121212;
   --color-background-3: #363636;
   --color-background-4: #363636;

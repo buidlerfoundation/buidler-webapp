@@ -8,6 +8,7 @@ import {
   IFCUserActivity,
   IPagingData,
   IUserInsightTab,
+  IUserTabPath,
 } from "models/FC";
 
 interface IFCUserState {
@@ -20,6 +21,10 @@ interface IFCUserActivityState {
     loading?: boolean;
     data?: IFCUserActivity;
   };
+}
+
+interface IFollowUserState {
+  [key: string]: IPagingData<IFCUser>;
 }
 
 interface IFCUserDataEngagementState {
@@ -37,7 +42,7 @@ type FCAnalyticReducerState = {
   activityMap: { [username: string]: IFCUserActivityState };
   dataEngagementMap: { [username: string]: IFCUserDataEngagementState };
   dataActivityMap: { [username: string]: IFCUserDataActivityState };
-  nonFollowUserMap: { [username: string]: IPagingData<IFCUser> };
+  followUserMap: { [username: string]: IFollowUserState };
   dataInteractionMap: { [username: string]: IPagingData<IFCUser> };
   filters: IActivityFilter[];
   userTabs: IUserInsightTab[];
@@ -48,7 +53,7 @@ const initialState: FCAnalyticReducerState = {
   activityMap: {},
   dataEngagementMap: {},
   dataActivityMap: {},
-  nonFollowUserMap: {},
+  followUserMap: {},
   dataInteractionMap: {},
   filters: [
     { label: "24h", period: "1d" },
@@ -96,10 +101,28 @@ export const getDataActivities = createAsyncThunk(
   }
 );
 
-export const getNonFollowUsers = createAsyncThunk(
-  "fc-analytic/get-non-follow",
-  async (payload: { username: string; page: number; limit: number }) => {
-    const res = api.getNonFollowerUsers(payload);
+export const getDataFollowUsers = createAsyncThunk(
+  "fc-analytic/get-data-follow",
+  async (payload: {
+    username: string;
+    page: number;
+    limit: number;
+    path: IUserTabPath;
+  }) => {
+    let res: any;
+    switch (payload.path) {
+      case "/non-follower":
+        res = await api.getNonFollowerUsers(payload);
+        break;
+      case "/follower":
+        res = await api.getFollowerUsers(payload);
+        break;
+      case "/following":
+        res = await api.getFollowingUsers(payload);
+        break;
+      default:
+        break;
+    }
     return res;
   }
 );
@@ -207,32 +230,36 @@ const fcAnalyticSlice = createSlice({
           loading: false,
         };
       })
-      .addCase(getNonFollowUsers.pending, (state, action) => {
-        const { page, username } = action.meta.arg;
-        const data = state.nonFollowUserMap[username] || {};
+      .addCase(getDataFollowUsers.pending, (state, action) => {
+        const { page, username, path } = action.meta.arg;
+        const data = state.followUserMap?.[username]?.[path] || {};
         if (page === 1) {
           data.loading = true;
         } else {
           data.loadMore = true;
         }
-        state.nonFollowUserMap[username] = data;
+        state.followUserMap[username] = {
+          ...(state.followUserMap?.[username] || {}),
+          [path]: data,
+        };
       })
-      .addCase(getNonFollowUsers.rejected, (state, action) => {
-        const { username } = action.meta.arg;
-        state.nonFollowUserMap[username] = {
-          ...(state.nonFollowUserMap[username] || {}),
+      .addCase(getDataFollowUsers.rejected, (state, action) => {
+        const { username, path } = action.meta.arg;
+        state.followUserMap[username][path] = {
+          ...(state.followUserMap[username][path] || {}),
           loading: false,
           loadMore: false,
         };
       })
-      .addCase(getNonFollowUsers.fulfilled, (state, action) => {
+      .addCase(getDataFollowUsers.fulfilled, (state, action) => {
         const total = action.payload.metadata?.total || 0;
         const limit = action.meta.arg.limit;
+        const path = action.meta.arg.path;
         const username = action.meta.arg.username;
         const totalPage = Math.ceil(total / limit);
         const currentPage = action.meta.arg.page;
         const data = action.payload?.data || [];
-        state.nonFollowUserMap[username] = {
+        state.followUserMap[username][path] = {
           loading: false,
           loadMore: false,
           currentPage,
@@ -241,7 +268,10 @@ const fcAnalyticSlice = createSlice({
           data:
             currentPage === 1
               ? data
-              : [...(state.nonFollowUserMap?.[username]?.data || []), ...data],
+              : [
+                  ...(state.followUserMap?.[username]?.[path]?.data || []),
+                  ...data,
+                ],
         };
       })
       .addCase(getTopInteractions.pending, (state, action) => {

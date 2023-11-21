@@ -24,9 +24,11 @@ import UserAnalytic from "pages/UserAnalytic";
 import Analytic from "pages/Analytic";
 import UserInsightWrap from "./Layout/UserInsightWrap";
 import UserFollowers from "pages/UserFollowers";
+import useUserTabs from "hooks/useUserTabs";
 
 const Main = () => {
   const filters = useFeedFilters();
+  const userTabs = useUserTabs();
   return (
     <div className={styles.container}>
       <Routes>
@@ -47,18 +49,13 @@ const Main = () => {
           </Route>
           <Route element={<UserInsightWrap />}>
             <Route path="/insights/:username" element={<UserAnalytic />} />
-            <Route
-              path="/insights/:username/non-follower"
-              element={<UserFollowers />}
-            />
-            <Route
-              path="/insights/:username/following"
-              element={<UserFollowers />}
-            />
-            <Route
-              path="/insights/:username/follower"
-              element={<UserFollowers />}
-            />
+            {userTabs.map((el) => (
+              <Route
+                key={el.path}
+                path={`/insights/:username${el.path}`}
+                element={<UserFollowers path={el.path} />}
+              />
+            ))}
           </Route>
           <Route path="/community" element={<Community />} />
           <Route path="/insights" element={<Analytic />} />

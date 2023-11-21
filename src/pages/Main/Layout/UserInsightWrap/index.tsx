@@ -15,7 +15,7 @@ import {
   getActivities,
   getDataActivities,
   getDataEngagement,
-  getNonFollowUsers,
+  getDataFollowUsers,
   getTopInteractions,
   getUser,
 } from "reducers/FCAnalyticReducers";
@@ -50,7 +50,14 @@ const UserInsightWrap = () => {
   useEffect(() => {
     if (username) {
       dispatch(getUser({ username }));
-      dispatch(getNonFollowUsers({ username, page: 1, limit: 10 }));
+      dispatch(
+        getDataFollowUsers({
+          username,
+          page: 1,
+          limit: 10,
+          path: "/non-follower",
+        })
+      );
       dispatch(getDataEngagement({ username }));
       dispatch(getDataActivities({ username }));
     }
@@ -78,7 +85,7 @@ const UserInsightWrap = () => {
             <span>{fcUser?.data?.display_name}</span>
           </div>
         </div>
-        {/* {showTab && (
+        {showTab && (
           <div className={styles.tabs}>
             {userTabs.map((el) => (
               <Link
@@ -94,7 +101,7 @@ const UserInsightWrap = () => {
               </Link>
             ))}
           </div>
-        )} */}
+        )}
       </nav>
       <Outlet />
     </div>

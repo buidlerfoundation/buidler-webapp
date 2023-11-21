@@ -42,17 +42,19 @@ interface IMenuItem {
   title: string;
   to: string;
   icon: React.ReactElement;
+  onClick?: () => void;
 }
 
-const MenuItem = ({ active, title, to, icon }: IMenuItem) => {
+const MenuItem = ({ active, title, to, icon, onClick }: IMenuItem) => {
   const onMenuClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+      onClick?.();
       if (active) {
         e.preventDefault();
         window.scrollTo({ top: 0, behavior: "auto" });
       }
     },
-    [active]
+    [active, onClick]
   );
   return (
     <Link className={styles["menu-item"]} to={to} onClick={onMenuClick}>
@@ -76,6 +78,7 @@ const MenuItemMemo = memo(MenuItem);
 
 const FCWrapper = () => {
   const dispatch = useAppDispatch();
+  const [openMenu, setOpenMenu] = useState(false);
   const popupMenuRef = useRef<any>();
   const [loading, setLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
@@ -100,6 +103,11 @@ const FCWrapper = () => {
   const activeColor = useMemo(() => "var(--color-primary-text)", []);
   const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
   const [resultData, setResultData] = useState<any>(null);
+  const showMobileMenu = useMemo(
+    () => location.pathname === "/home" || location.pathname === "/insights",
+    [location.pathname]
+  );
+  const toggleMenu = useCallback(() => setOpenMenu((current) => !current), []);
   const toggleDiscussion = useCallback(
     () => setOpenDiscussion((current) => !current),
     []
@@ -250,6 +258,7 @@ const FCWrapper = () => {
   const onCloseMenu = useCallback(() => {
     popupMenuRef.current?.hide();
   }, []);
+  const onCloseSideMenu = useCallback(() => setOpenMenu(false), []);
   const onLogoutClick = useCallback(() => {
     logout();
     onCloseMenu();
@@ -277,6 +286,80 @@ const FCWrapper = () => {
     }
     toggleDiscussion();
   }, [fcUser, onLoginClick, toggleDiscussion]);
+  const renderMenu = useCallback(
+    () => (
+      <div className={styles.menus}>
+        <MenuItemMemo
+          title="Home"
+          to="/home"
+          icon={
+            <IconMenuHome fill={activeHome ? activeColor : inactiveColor} />
+          }
+          active={activeHome}
+          onClick={onCloseSideMenu}
+        />
+        <MenuItemMemo
+          title="Insights"
+          to="/insights"
+          icon={
+            <IconMenuAnalytic
+              fill={activeAnalytic ? activeColor : inactiveColor}
+            />
+          }
+          active={activeAnalytic}
+          onClick={onCloseSideMenu}
+        />
+        {/* <MenuItemMemo
+          title="Communities"
+          to="/community"
+          icon={
+            <IconMenuCommunity
+              fill={activeCommunity ? activeColor : inactiveColor}
+            />
+          }
+          active={activeCommunity}
+        /> */}
+        {/* <MenuItemMemo
+          title="Explore"
+          to="/explore"
+          icon={
+            <IconMenuExplore
+              fill={activeExplore ? activeColor : inactiveColor}
+            />
+          }
+          active={activeExplore}
+        /> */}
+        <ComposeButton onClick={onOpenDiscussion} />
+        {fcUser && (
+          <div className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}>
+            <ImageView
+              src={fcUser?.pfp.url}
+              className={styles.avatar}
+              alt="avatar"
+            />
+          </div>
+        )}
+      </div>
+    ),
+    [
+      activeAnalytic,
+      activeColor,
+      activeHome,
+      fcUser,
+      inactiveColor,
+      onCloseSideMenu,
+      onOpenDiscussion,
+    ]
+  );
+  const windowScrollListener = useCallback(() => {
+    setOpenMenu(false);
+  }, []);
+  useEffect(() => {
+    window.addEventListener("scroll", windowScrollListener);
+    return () => {
+      window.removeEventListener("scroll", windowScrollListener);
+    };
+  }, [windowScrollListener]);
   return (
     <div className={styles.container}>
       <aside className={styles["left-side"]}>
@@ -296,56 +379,7 @@ const FCWrapper = () => {
           </div>
           <span style={{ margin: "0 10px" }}>Buidler</span>
         </Link>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <MenuItemMemo
-            title="Home"
-            to="/home"
-            icon={
-              <IconMenuHome fill={activeHome ? activeColor : inactiveColor} />
-            }
-            active={activeHome}
-          />
-          <MenuItemMemo
-            title="Insights"
-            to="/insights"
-            icon={
-              <IconMenuAnalytic
-                fill={activeAnalytic ? activeColor : inactiveColor}
-              />
-            }
-            active={activeAnalytic}
-          />
-          {/* <MenuItemMemo
-            title="Communities"
-            to="/community"
-            icon={
-              <IconMenuCommunity
-                fill={activeCommunity ? activeColor : inactiveColor}
-              />
-            }
-            active={activeCommunity}
-          /> */}
-          {/* <MenuItemMemo
-            title="Explore"
-            to="/explore"
-            icon={
-              <IconMenuExplore
-                fill={activeExplore ? activeColor : inactiveColor}
-              />
-            }
-            active={activeExplore}
-          /> */}
-          <ComposeButton onClick={onOpenDiscussion} />
-          {fcUser && (
-            <div className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}>
-              <ImageView
-                src={fcUser?.pfp.url}
-                className={styles.avatar}
-                alt="avatar"
-              />
-            </div>
-          )}
-        </div>
+        {renderMenu()}
         {!isExtensionInstalled && (
           <a
             className={styles["extension-description-container"]}
@@ -367,6 +401,34 @@ const FCWrapper = () => {
         )}
       </aside>
       <main className={styles["page-container"]}>
+        {showMobileMenu && (
+          <div
+            className={`${styles["nav-mobile-wrap"]} ${
+              openMenu ? styles["nav-mobile-wrap-on"] : ""
+            }`}
+          >
+            <div className={styles["nav-mobile"]}>
+              <Link className={styles["mobile-brand-wrap"]} to="/home">
+                <div
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 4,
+                    overflow: "hidden",
+                  }}
+                >
+                  <IconBuidlerLogo size={30} />
+                </div>
+                <span style={{ margin: "0 10px" }}>Buidler</span>
+              </Link>
+              <div className={styles["side-menu"]} onClick={toggleMenu}>
+                <div className={styles["line-1"]} />
+                <div className={styles["line-2"]} />
+              </div>
+            </div>
+            {renderMenu()}
+          </div>
+        )}
         <Outlet />
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>

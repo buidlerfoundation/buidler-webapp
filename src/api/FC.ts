@@ -144,6 +144,30 @@ export const getNonFollowerUsers = (params: {
     })}`
   );
 
+export const getFollowerUsers = (params: {
+  username: string;
+  page: number;
+  limit: number;
+}) =>
+  Caller.get<IFCUser[]>(
+    `links/${params.username}/followers?${new URLSearchParams({
+      page: `${params.page}`,
+      limit: `${params.limit}`,
+    })}`
+  );
+
+export const getFollowingUsers = (params: {
+  username: string;
+  page: number;
+  limit: number;
+}) =>
+  Caller.get<IFCUser[]>(
+    `links/${params.username}/following?${new URLSearchParams({
+      page: `${params.page}`,
+      limit: `${params.limit}`,
+    })}`
+  );
+
 export const getTopInteractions = (params: {
   username: string;
   page: number;

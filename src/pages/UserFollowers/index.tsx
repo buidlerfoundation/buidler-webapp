@@ -1,46 +1,48 @@
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import { useParams } from "react-router-dom";
-import useDataNonFollowerUser from "hooks/useDataNonFollowerUser";
-import { IFCUser } from "models/FC";
+import { IFCUser, IUserTabPath } from "models/FC";
 import UserItem from "shared/UserItem";
 import AppConfig from "common/AppConfig";
 import useAppDispatch from "hooks/useAppDispatch";
-import { getNonFollowUsers } from "reducers/FCAnalyticReducers";
+import { getDataFollowUsers } from "reducers/FCAnalyticReducers";
 import LoadingItem from "shared/LoadingItem";
+import useDataFollowUser from "hooks/useDataFollowUser";
 
-const UserFollowers = () => {
+interface IUserFollowers {
+  path: IUserTabPath;
+}
+
+const UserFollowers = ({ path }: IUserFollowers) => {
   const dispatch = useAppDispatch();
   const params = useParams<{ username: string }>();
   const username = useMemo(() => params?.username, [params?.username]);
-  const dataNonFollowerUser = useDataNonFollowerUser(username);
+  const dataFollowUser = useDataFollowUser(username, path);
   const users = useMemo(
-    () => dataNonFollowerUser?.data || [],
-    [dataNonFollowerUser?.data]
+    () => dataFollowUser?.data || [],
+    [dataFollowUser?.data]
   );
   const renderUser = useCallback(
     (user: IFCUser) => <UserItem user={user} key={user.fid} />,
     []
   );
   const onPageEndReach = useCallback(() => {
-    if (
-      !dataNonFollowerUser?.canMore ||
-      dataNonFollowerUser?.loadMore ||
-      !username
-    )
+    if (!dataFollowUser?.canMore || dataFollowUser?.loadMore || !username)
       return;
     dispatch(
-      getNonFollowUsers({
+      getDataFollowUsers({
         username,
-        page: (dataNonFollowerUser?.currentPage || 1) + 1,
-        limit: 10,
+        page: (dataFollowUser?.currentPage || 1) + 1,
+        limit: 20,
+        path,
       })
     );
   }, [
-    dataNonFollowerUser?.canMore,
-    dataNonFollowerUser?.currentPage,
-    dataNonFollowerUser?.loadMore,
+    dataFollowUser?.canMore,
+    dataFollowUser?.currentPage,
+    dataFollowUser?.loadMore,
     dispatch,
+    path,
     username,
   ]);
   const windowScrollListener = useCallback(() => {
@@ -54,6 +56,18 @@ const UserFollowers = () => {
     }
   }, [onPageEndReach]);
   useEffect(() => {
+    if (username && !dataFollowUser) {
+      dispatch(
+        getDataFollowUsers({
+          username,
+          page: 1,
+          limit: 20,
+          path,
+        })
+      );
+    }
+  }, [dataFollowUser, dispatch, path, username]);
+  useEffect(() => {
     window.addEventListener("scroll", windowScrollListener);
     return () => {
       window.removeEventListener("scroll", windowScrollListener);
@@ -62,7 +76,7 @@ const UserFollowers = () => {
   return (
     <div className={styles.container}>
       {users.map(renderUser)}
-      {dataNonFollowerUser?.loadMore && <LoadingItem />}
+      {dataFollowUser?.loadMore && <LoadingItem />}
     </div>
   );
 };

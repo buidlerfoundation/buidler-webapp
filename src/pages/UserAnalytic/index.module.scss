@@ -42,7 +42,6 @@
         .relate-item {
           display: flex;
           align-items: center;
-          gap: 4px;
           .main-text {
             font-size: 16px;
             font-weight: 600;
@@ -53,6 +52,11 @@
             font-weight: 400;
             color: var(--color-secondary-text);
           }
+        }
+        a:hover {
+          text-decoration-line: underline;
+          text-decoration-color: var(--color-primary-text);
+          text-decoration-thickness: 1px;
         }
       }
     }

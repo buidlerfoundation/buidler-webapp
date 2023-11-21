@@ -9,11 +9,11 @@ import ActivityChart from "./ActivityChart";
 import useFCActivitiesByName from "hooks/useFCActivitiesByName";
 import useFCUserDataEngagement from "hooks/useFCUserDataEngagement";
 import useFCUserDataActivities from "hooks/useFCUserDataActivities";
-import useDataNonFollowerUser from "hooks/useDataNonFollowerUser";
 import NonFollowerUser from "./NonFollowerUser";
 import TopInteractions from "./TopInteractions";
 import useDataTopInteraction from "hooks/useDataTopInteraction";
 import { useNavigate } from "react-router-dom";
+import useDataFollowUser from "hooks/useDataFollowUser";
 
 interface IAnalytics {
   username?: string;
@@ -26,7 +26,7 @@ const Analytics = ({ username, period }: IAnalytics) => {
   const fcActivities = useFCActivitiesByName(username, period);
   const dataEngagement = useFCUserDataEngagement(username);
   const dataActivities = useFCUserDataActivities(username);
-  const dataNonFollowerUser = useDataNonFollowerUser(username);
+  const dataNonFollowerUser = useDataFollowUser(username, "/non-follower");
   const dataTopInteraction = useDataTopInteraction(username);
   const user = useAppSelector((state) => state.fcUser.data);
   const onViewAll = useCallback(() => {

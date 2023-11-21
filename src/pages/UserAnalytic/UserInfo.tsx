@@ -4,6 +4,7 @@ import { IFCUser } from "models/FC";
 import ImageView from "shared/ImageView";
 import { normalizeContentUrl } from "helpers/CastHelper";
 import numeral from "numeral";
+import { Link } from "react-router-dom";
 
 interface IUserInfo {
   user: IFCUser;
@@ -28,23 +29,37 @@ const UserInfo = ({ user }: IUserInfo) => {
             <span className={styles.username}>@{user?.username}</span>
           </div>
           <div className={styles["user-relate-info"]}>
-            <div className={styles["relate-item"]}>
-              <span className={styles["main-text"]}>
-                {numeral(user?.total_following).format("0[.][0]a")}
+            <Link
+              className={styles["relate-item"]}
+              to="following"
+              state={{ goBack: true }}
+            >
+              <span>
+                <span className={styles["main-text"]}>
+                  {numeral(user?.total_following).format("0[.][0]a")}
+                </span>{" "}
+                <span className={styles["sub-text"]}> Following</span>
               </span>
-              <span className={styles["sub-text"]}>Following</span>
-            </div>
-            <div className={styles["relate-item"]}>
-              <span className={styles["main-text"]}>
-                {numeral(user?.total_follower).format("0[.][0]a")}
+            </Link>
+            <Link
+              className={styles["relate-item"]}
+              to="follower"
+              state={{ goBack: true }}
+            >
+              <span>
+                <span className={styles["main-text"]}>
+                  {numeral(user?.total_follower).format("0[.][0]a")}
+                </span>{" "}
+                <span className={styles["sub-text"]}>Followers</span>
               </span>
-              <span className={styles["sub-text"]}>Followers</span>
-            </div>
+            </Link>
             <div className={styles["relate-item"]}>
-              <span className={styles["main-text"]}>
-                {numeral(user?.total_cast).format("0[.][0]a")}
+              <span>
+                <span className={styles["main-text"]}>
+                  {numeral(user?.total_cast).format("0[.][0]a")}
+                </span>{" "}
+                <span className={styles["sub-text"]}>Casts</span>
               </span>
-              <span className={styles["sub-text"]}>Casts</span>
             </div>
           </div>
         </div>
