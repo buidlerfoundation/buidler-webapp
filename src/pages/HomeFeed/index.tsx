@@ -7,6 +7,7 @@ import useFeedData from "hooks/useFeedData";
 import useAppDispatch from "hooks/useAppDispatch";
 import { getFeed } from "reducers/HomeFeedReducers";
 import LoadingItem from "shared/LoadingItem";
+import AppConfig from "common/AppConfig";
 
 interface IHomeFeed {
   filter: string;
@@ -44,7 +45,9 @@ const HomeFeed = ({ filter }: IHomeFeed) => {
   const windowScrollListener = useCallback(() => {
     if (
       Math.ceil(window.innerHeight + document.documentElement.scrollTop) >=
-      Math.ceil(document.documentElement.offsetHeight - 500)
+      Math.ceil(
+        document.documentElement.offsetHeight - AppConfig.loadMoreOffset
+      )
     ) {
       onPageEndReach();
     }

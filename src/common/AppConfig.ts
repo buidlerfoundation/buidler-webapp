@@ -19,6 +19,7 @@ const AppConfig = {
   loginPath: "/started",
   walletConnectProjectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID || "",
   websiteUrl: "https://buidler.app",
+  loadMoreOffset: 500,
 };
 
 export default AppConfig;
