@@ -22,7 +22,7 @@ const ChartTooltip = ({ active, payload, label, postFix }: any) => {
         </span>
         {payload.map((el: any, index: number) => (
           <span key={index}>
-            {formatNumber(el.value)} {el.name}
+            {formatNumber(el.value) || 0} {el.name}
           </span>
         ))}
       </div>

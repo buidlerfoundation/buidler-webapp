@@ -48,6 +48,7 @@ export const AsyncKey = {
   autoOffPlugin: `${Prefix}_auto_off_plugin`,
   signerIdKey: `${Prefix}_signer_id`,
   requestTokenKey: `${Prefix}_request_token`,
+  themeKey: `${Prefix}_theme_key`,
 };
 
 export const ProgressStatus = [

@@ -130,7 +130,23 @@ export const getDataFollowUsers = createAsyncThunk(
 export const getTopInteractions = createAsyncThunk(
   "fc-analytic/get-top-interactions",
   async (payload: { username: string; page: number; limit: number }) => {
-    const res = api.getTopInteractions(payload);
+    const res = await api.getTopInteractions(payload);
+    return res;
+  }
+);
+
+export const followUser = createAsyncThunk(
+  "fc-analytic/follow",
+  async (payload: { username: string }) => {
+    const res = await api.followUser(payload.username);
+    return res;
+  }
+);
+
+export const unfollowUser = createAsyncThunk(
+  "fc-analytic/unfollow",
+  async (payload: { username: string }) => {
+    const res = await api.unfollowUser(payload.username);
     return res;
   }
 );
@@ -313,6 +329,22 @@ const fcAnalyticSlice = createSlice({
                   ...data,
                 ],
         };
+      })
+      .addCase(followUser.fulfilled, (state, action) => {
+        const { username } = action.meta.arg;
+        const userData = state.userMap?.[username]?.data;
+        if (userData) {
+          userData.is_followed = true;
+          state.userMap[username].data = userData;
+        }
+      })
+      .addCase(unfollowUser.fulfilled, (state, action) => {
+        const { username } = action.meta.arg;
+        const userData = state.userMap?.[username]?.data;
+        if (userData) {
+          userData.is_followed = false;
+          state.userMap[username].data = userData;
+        }
       }),
 });
 

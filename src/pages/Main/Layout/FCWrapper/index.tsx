@@ -36,6 +36,7 @@ import ModalReviewResult from "shared/ModalReviewResult";
 import IconMenuCommunity from "shared/SVG/FC/IconMenuCommunity";
 import useQuery from "hooks/useQuery";
 import IconMenuAnalytic from "shared/SVG/FC/IconMenuAnalytic";
+import ModalBugsReport from "shared/ModalBugsReport";
 
 interface IMenuItem {
   active?: boolean;
@@ -86,8 +87,11 @@ const FCWrapper = () => {
   const query = useQuery();
   const querySignerId = useMemo(() => query.get("signer_id"), [query]);
   const [polling, setPolling] = useState(false);
+  const [initialShareUrl, setInitialShareUrl] = useState("");
   const [openDiscussion, setOpenDiscussion] = useState(false);
+  const [openBugsReport, setOpenOpenBugsReport] = useState(false);
   const initialTheme = useMemo(() => query.get("theme"), [query]);
+  const [theme, setTheme] = useState(initialTheme);
   const filters = useFeedFilters();
   const params = useParams<{ url: string }>();
   const exploreUrl = useMemo(() => params?.url, [params?.url]);
@@ -108,6 +112,10 @@ const FCWrapper = () => {
     [location.pathname]
   );
   const toggleMenu = useCallback(() => setOpenMenu((current) => !current), []);
+  const toggleBugsReport = useCallback(
+    () => setOpenOpenBugsReport((current) => !current),
+    []
+  );
   const toggleDiscussion = useCallback(
     () => setOpenDiscussion((current) => !current),
     []
@@ -165,12 +173,17 @@ const FCWrapper = () => {
     setLoading(false);
   }, [checkRequestToken, dispatch, querySignerId]);
   useEffect(() => {
-    if (initialTheme) {
-      document
-        .getElementsByTagName("html")?.[0]
-        ?.setAttribute("class", initialTheme);
+    getCookie(AsyncKey.themeKey).then((res) => {
+      if (res) {
+        setTheme(res);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    if (theme) {
+      document.getElementsByTagName("html")?.[0]?.setAttribute("class", theme);
     }
-  }, [initialTheme]);
+  }, [theme]);
   useEffect(() => {
     checkingAuth();
   }, [checkingAuth]);
@@ -284,6 +297,7 @@ const FCWrapper = () => {
       onLoginClick();
       return;
     }
+    setInitialShareUrl("");
     toggleDiscussion();
   }, [fcUser, onLoginClick, toggleDiscussion]);
   const renderMenu = useCallback(
@@ -351,6 +365,14 @@ const FCWrapper = () => {
       onOpenDiscussion,
     ]
   );
+  const onShareProfileClick = useCallback(() => {
+    if (!fcUser) {
+      onLoginClick();
+      return;
+    }
+    setInitialShareUrl(window.location.origin + window.location.pathname);
+    toggleDiscussion();
+  }, [fcUser, onLoginClick, toggleDiscussion]);
   const windowScrollListener = useCallback(() => {
     setOpenMenu(false);
   }, []);
@@ -461,13 +483,17 @@ const FCWrapper = () => {
         open={openDiscussion}
         handleClose={toggleDiscussion}
         openResult={onOpenResult}
+        initialShareUrl={initialShareUrl}
       />
       <ModalReviewResult
         open={!!resultData}
         resultData={resultData}
         handleClose={onCloseReviewResult}
       />
+      <ModalBugsReport open={openBugsReport} handleClose={toggleBugsReport} />
       <ScrollRestoration />
+      <div id="btn-share-profile" onClick={onShareProfileClick} />
+      <div id="btn-bugs-report" onClick={toggleBugsReport} />
     </div>
   );
 };

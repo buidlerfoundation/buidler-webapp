@@ -179,3 +179,8 @@ export const getTopInteractions = (params: {
       limit: `${params.limit}`,
     })}`
   );
+
+export const followUser = (name: string) => Caller.post(`links/${name}/follow`);
+
+export const unfollowUser = (name: string) =>
+  Caller.delete(`links/${name}/follow`);
