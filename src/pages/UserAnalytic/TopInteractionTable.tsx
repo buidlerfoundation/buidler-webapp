@@ -16,6 +16,9 @@ import { useNavigate } from "react-router-dom";
 import ImageView from "shared/ImageView";
 import styles from "./index.module.scss";
 import { formatNumber } from "helpers/StringHelper";
+import IconLike from "shared/SVG/FC/IconLike";
+import IconReply from "shared/SVG/FC/IconReply";
+import IconRecast from "shared/SVG/FC/IconRecast";
 
 interface ITopInteractionTable {
   data: IFCUser[];
@@ -152,13 +155,22 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell>
+                    <IconLike
+                      style={{ marginBottom: 2, marginRight: 6 }}
+                      size={12}
+                    />
                     {formatNumber(likes) || "-"}
                   </TableCell>
-                  <TableCell align="right" padding="none">
+                  <TableCell padding="none">
+                    <IconReply size={12} style={{ marginRight: 6 }} />
                     {formatNumber(replied_casts) || "-"}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell>
+                    <IconRecast
+                      style={{ marginBottom: 2, marginRight: 6 }}
+                      size={12}
+                    />
                     {formatNumber(recasts) || "-"}
                   </TableCell>
                   <TableCell align="right" padding="none">

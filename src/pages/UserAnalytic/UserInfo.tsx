@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import ModalCheckActiveBadge from "shared/ModalCheckActiveBadge";
 import useFCUserActiveBadgeCheck from "hooks/useFCUserActiveBadgeCheck";
 import IconShare from "shared/SVG/FC/IconShare";
+import IconActiveBadge from "shared/SVG/FC/IconActiveBadge";
 
 interface IUserInfo {
   user?: IFCUser;
@@ -137,7 +138,12 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
             to={`https://warpcast.com/${user?.username}`}
             target="_blank"
           >
-            <span className={styles.name}>{user?.display_name}</span>
+            <span className={styles.name}>
+              {user?.display_name}
+              {user?.has_active_badge && (
+                <IconActiveBadge style={{ marginLeft: 4 }} />
+              )}
+            </span>
             <span className={styles.username}>@{user?.username}</span>
           </Link>
           <div className={styles.actions}>

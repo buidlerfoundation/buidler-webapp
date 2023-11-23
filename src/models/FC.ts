@@ -41,6 +41,7 @@ export interface IFCUser {
     recasts: number;
     replied_casts: number;
   };
+  has_active_badge?: boolean;
 }
 
 export interface ICast {

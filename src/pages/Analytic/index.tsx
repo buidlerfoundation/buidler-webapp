@@ -192,13 +192,6 @@ const Analytic = () => {
         avatar:
           "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_jpg,w_168/https%3A%2F%2Fi.imgur.com%2Fsx6qqM7.jpg",
       },
-      {
-        fid: "4163",
-        name: "KMac🟪⏩",
-        username: "kmacb.eth",
-        avatar:
-          "https://openseauserdata.com/files/12cc9c02bf8d37d0a097745d9e39ae7b.svg",
-      },
     ],
     []
   );
