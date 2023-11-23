@@ -41,6 +41,11 @@ export const getCurrentFCUser = () => Caller.get<IFCUser>("users/me");
 export const getFCUser = (username: string) =>
   Caller.get<IFCUser>(`users/${username}`);
 
+export const getFCUserByUserName = (username: string) =>
+  Caller.get<IFCUser>(
+    `users/user-by-username?${new URLSearchParams({ username })}`
+  );
+
 export const cast = (data: any) => Caller.post<string>("casts", data);
 
 export const listCasts = (params: {

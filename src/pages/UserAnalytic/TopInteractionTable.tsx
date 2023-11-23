@@ -98,7 +98,7 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
                 <TableRow
                   hover
                   onClick={(event) => {
-                    navigate(`/insights/${row.fid}`, {
+                    navigate(`/insights/${row.username}`, {
                       state: { goBack: true },
                     });
                   }}

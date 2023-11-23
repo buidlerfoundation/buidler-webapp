@@ -34,7 +34,7 @@ const NonFollowerUser = ({ data, onViewAll }: INonFollowerUser) => {
       <div className={styles["list-non-follow"]}>
         {users.map((el) => (
           <Tooltip title={el.username} key={el.fid} placement="top">
-            <Link to={`/insights/${el.fid}`} state={{ goBack: true }}>
+            <Link to={`/insights/${el.username}`} state={{ goBack: true }}>
               <ImageView
                 alt="avatar"
                 className={styles.avatar}

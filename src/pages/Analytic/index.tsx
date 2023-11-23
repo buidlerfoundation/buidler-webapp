@@ -123,6 +123,34 @@ const Analytic = () => {
           "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_256/https://lh3.googleusercontent.com/5IBmao06AhDg3PqXjNi1vm6D-HXDGXtkK8qk9vASUqGuJ4AHo2_p23QmyREZJjfzD9MzzAaHSOE2MWGIAwXGZjYnmTwvaDyz57As",
       },
       {
+        fid: "20071",
+        name: "Edric",
+        username: "edricnguyen.eth",
+        avatar:
+          "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_jpg,w_168/https%3A%2F%2Fi.imgur.com%2Ft2mJvYg.jpg",
+      },
+      {
+        fid: "20066",
+        name: "applefather.eth",
+        username: "applefather.eth",
+        avatar:
+          "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_168/https%3A%2F%2Fi.imgur.com%2FO92Tj07.png",
+      },
+      {
+        fid: "20068",
+        name: "Hung Nguyen",
+        username: "baohungnguyen.eth",
+        avatar:
+          "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_jpg,w_168/https%3A%2F%2Fi.imgur.com%2FXFonPpH.jpg",
+      },
+      {
+        fid: "20069",
+        name: "Hoang Tran Minh Tai",
+        username: "taihtm",
+        avatar:
+          "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_jpg,w_168/https%3A%2F%2Fi.imgur.com%2F4tlxX6g.jpg",
+      },
+      {
         fid: "602",
         name: "Jason Goldberg ",
         username: "betashop.eth",
@@ -140,7 +168,8 @@ const Analytic = () => {
         fid: "6806",
         name: "dawufigpt - mid/MAU",
         username: "dawufi",
-        avatar: "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_gif,w_168/https%3A%2F%2Fi.imgur.com%2FE51kh9y.gif",
+        avatar:
+          "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_gif,w_168/https%3A%2F%2Fi.imgur.com%2FE51kh9y.gif",
       },
       {
         fid: "378",
@@ -170,13 +199,6 @@ const Analytic = () => {
         avatar:
           "https://openseauserdata.com/files/12cc9c02bf8d37d0a097745d9e39ae7b.svg",
       },
-      {
-        fid: "20071",
-        name: "Edric",
-        username: "edricnguyen.eth",
-        avatar:
-          "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_jpg,w_168/https%3A%2F%2Fi.imgur.com%2Ft2mJvYg.jpg",
-      },
     ],
     []
   );
@@ -199,7 +221,7 @@ const Analytic = () => {
   const mentionSelected = useCallback(() => {
     const user = dataUsers[selectedMentionIndex];
     setValue("");
-    navigate(`${user.fid}`);
+    navigate(`${user.username}`);
   }, [dataUsers, navigate, selectedMentionIndex]);
   const renderMentionItem = useCallback(
     (item: IFCUser, index: number) => (
@@ -262,7 +284,7 @@ const Analytic = () => {
         <span className={styles.title}>Suggested users</span>
         <div className={styles.list}>
           {suggestedUsers.map((el) => (
-            <Link className={styles["user-item"]} key={el.fid} to={el.fid}>
+            <Link className={styles["user-item"]} key={el.fid} to={el.username}>
               <ImageView
                 alt="avatar"
                 src={el.avatar}

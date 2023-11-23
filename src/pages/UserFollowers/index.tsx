@@ -8,6 +8,7 @@ import useAppDispatch from "hooks/useAppDispatch";
 import { getDataFollowUsers } from "reducers/FCAnalyticReducers";
 import LoadingItem from "shared/LoadingItem";
 import useDataFollowUser from "hooks/useDataFollowUser";
+import useFCUserByName from "hooks/useFCUserByName";
 
 interface IUserFollowers {
   path: IUserTabPath;
@@ -17,7 +18,8 @@ const UserFollowers = ({ path }: IUserFollowers) => {
   const dispatch = useAppDispatch();
   const params = useParams<{ username: string }>();
   const username = useMemo(() => params?.username, [params?.username]);
-  const dataFollowUser = useDataFollowUser(username, path);
+  const fcUser = useFCUserByName(username);
+  const dataFollowUser = useDataFollowUser(fcUser?.data?.fid, path);
   const users = useMemo(
     () => dataFollowUser?.data || [],
     [dataFollowUser?.data]
@@ -27,11 +29,15 @@ const UserFollowers = ({ path }: IUserFollowers) => {
     []
   );
   const onPageEndReach = useCallback(() => {
-    if (!dataFollowUser?.canMore || dataFollowUser?.loadMore || !username)
+    if (
+      !dataFollowUser?.canMore ||
+      dataFollowUser?.loadMore ||
+      !fcUser?.data?.fid
+    )
       return;
     dispatch(
       getDataFollowUsers({
-        username,
+        username: fcUser?.data?.fid,
         page: (dataFollowUser?.currentPage || 1) + 1,
         limit: 20,
         path,
@@ -43,7 +49,7 @@ const UserFollowers = ({ path }: IUserFollowers) => {
     dataFollowUser?.loadMore,
     dispatch,
     path,
-    username,
+    fcUser?.data?.fid,
   ]);
   const windowScrollListener = useCallback(() => {
     if (
@@ -56,17 +62,17 @@ const UserFollowers = ({ path }: IUserFollowers) => {
     }
   }, [onPageEndReach]);
   useEffect(() => {
-    if (username && !dataFollowUser && path !== "/non-follower") {
+    if (fcUser?.data?.fid && !dataFollowUser && path !== "/non-follower") {
       dispatch(
         getDataFollowUsers({
-          username,
+          username: fcUser?.data?.fid,
           page: 1,
           limit: 20,
           path,
         })
       );
     }
-  }, [dataFollowUser, dispatch, path, username]);
+  }, [dataFollowUser, dispatch, path, fcUser?.data?.fid]);
   useEffect(() => {
     window.addEventListener("scroll", windowScrollListener);
     return () => {

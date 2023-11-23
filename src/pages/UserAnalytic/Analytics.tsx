@@ -16,18 +16,18 @@ import { useNavigate } from "react-router-dom";
 import useDataFollowUser from "hooks/useDataFollowUser";
 
 interface IAnalytics {
-  username?: string;
+  fid?: string;
   period: ActivityPeriod;
 }
 
-const Analytics = ({ username, period }: IAnalytics) => {
+const Analytics = ({ fid, period }: IAnalytics) => {
   const navigate = useNavigate();
   const filters = useAppSelector((state) => state.fcAnalytic.filters);
-  const fcActivities = useFCActivitiesByName(username, period);
-  const dataEngagement = useFCUserDataEngagement(username);
-  const dataActivities = useFCUserDataActivities(username);
-  const dataNonFollowerUser = useDataFollowUser(username, "/non-follower");
-  const dataTopInteraction = useDataTopInteraction(username);
+  const fcActivities = useFCActivitiesByName(fid, period);
+  const dataEngagement = useFCUserDataEngagement(fid);
+  const dataActivities = useFCUserDataActivities(fid);
+  const dataNonFollowerUser = useDataFollowUser(fid, "/non-follower");
+  const dataTopInteraction = useDataTopInteraction(fid);
   const user = useAppSelector((state) => state.fcUser.data);
   const onViewAll = useCallback(() => {
     if (!user) {

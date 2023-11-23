@@ -50,32 +50,41 @@ const UserInsightWrap = () => {
   }, [location.state?.goBack, navigate]);
   useEffect(() => {
     if (username) {
-      dispatch(getUser({ username }));
-      dispatch(
-        getDataFollowUsers({
-          username,
-          page: 1,
-          limit: 20,
-          path: "/non-follower",
-        })
-      );
-      dispatch(getDataEngagement({ username }));
-      dispatch(getDataActivities({ username }));
-      dispatch(getDataActiveBadgeCheck({ username }));
+      dispatch(getUser({ username }))
+        .unwrap()
+        .then((res) => {
+          if (res.success && res.data?.fid) {
+            dispatch(
+              getDataFollowUsers({
+                username: res.data?.fid,
+                page: 1,
+                limit: 20,
+                path: "/non-follower",
+              })
+            );
+            dispatch(getDataEngagement({ username: res.data?.fid }));
+            dispatch(getDataActivities({ username: res.data?.fid }));
+            dispatch(getDataActiveBadgeCheck({ username: res.data?.fid }));
+          }
+        });
     }
   }, [dispatch, username]);
   useEffect(() => {
-    if (username) {
-      dispatch(getActivities({ username, type: period }));
+    if (fcUser?.data?.fid) {
+      dispatch(getActivities({ username: fcUser?.data?.fid, type: period }));
     }
-  }, [dispatch, period, username]);
+  }, [dispatch, fcUser?.data?.fid, period]);
   useEffect(() => {
-    if (username) {
+    if (fcUser?.data?.fid) {
       dispatch(
-        getTopInteractions({ username, page: 1, limit: user?.fid ? 50 : 3 })
+        getTopInteractions({
+          username: fcUser?.data?.fid,
+          page: 1,
+          limit: user?.fid ? 50 : 3,
+        })
       );
     }
-  }, [dispatch, user?.fid, username]);
+  }, [dispatch, user?.fid, fcUser?.data?.fid]);
   return (
     <div className={styles.container}>
       <nav className={styles.nav}>

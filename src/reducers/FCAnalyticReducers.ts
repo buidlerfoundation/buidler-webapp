@@ -80,7 +80,8 @@ const initialState: FCAnalyticReducerState = {
 export const getUser = createAsyncThunk(
   "fc-analytic/get-user",
   async (payload: { username: string }) => {
-    const res = await api.getFCUser(payload.username);
+    const resFid = await api.getFCUserByUserName(payload.username);
+    const res = await api.getFCUser(resFid.data?.fid || "");
     return res;
   }
 );

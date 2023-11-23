@@ -18,8 +18,8 @@ const UserAnalytic = () => {
   return (
     <div className={styles.container}>
       <div className={styles.body}>
-        {fcUser?.data && <UserInfo user={fcUser?.data} />}
-        <Analytics username={username} period={period} />
+        <UserInfo user={fcUser?.data} loading={fcUser?.loading} />
+        <Analytics fid={fcUser?.data?.fid} period={period} />
       </div>
     </div>
   );

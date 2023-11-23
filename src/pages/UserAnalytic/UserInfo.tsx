@@ -16,19 +16,20 @@ import useFCUserActiveBadgeCheck from "hooks/useFCUserActiveBadgeCheck";
 import IconShare from "shared/SVG/FC/IconShare";
 
 interface IUserInfo {
-  user: IFCUser;
+  user?: IFCUser;
+  loading?: boolean;
 }
 
-const UserInfo = ({ user }: IUserInfo) => {
+const UserInfo = ({ user, loading }: IUserInfo) => {
   const dispatch = useAppDispatch();
   const [openCheckBadgeActive, setOpenCheckBadgeActive] = useState(false);
   const [requesting, setRequesting] = useState(false);
   const popupMenuRef = useRef<any>();
-  const userActiveBadge = useFCUserActiveBadgeCheck(user.fid);
+  const userActiveBadge = useFCUserActiveBadgeCheck(user?.fid);
   const fcUser = useAppSelector((state) => state.fcUser.data);
   const sameUser = useMemo(
-    () => user.fid === fcUser?.fid,
-    [fcUser?.fid, user.fid]
+    () => user?.fid === fcUser?.fid,
+    [fcUser?.fid, user?.fid]
   );
   const bio = useMemo(
     () => user?.profile?.bio?.text,
@@ -60,8 +61,12 @@ const UserInfo = ({ user }: IUserInfo) => {
     []
   );
   const onShareProfile = useCallback(() => {
-    const shareElement = document.getElementById("btn-share-profile");
-    shareElement?.click();
+    window.open(
+      `https://warpcast.com/~/compose?embeds[]=${encodeURIComponent(
+        window.location.origin + window.location.pathname
+      )}`,
+      "_blank"
+    );
   }, []);
   const onBugsReport = useCallback(() => {
     const reportElement = document.getElementById("btn-bugs-report");
@@ -77,8 +82,8 @@ const UserInfo = ({ user }: IUserInfo) => {
     toast.success("Copied");
   }, []);
   const onViewOnWC = useCallback(() => {
-    window.open(`https://warpcast.com/${user.username}`, "_blank");
-  }, [user.username]);
+    window.open(`https://warpcast.com/${user?.username}`, "_blank");
+  }, [user?.username]);
   const handleSelectedMenu = useCallback(
     async (menu: PopoverItem) => {
       switch (menu.value) {
@@ -101,17 +106,23 @@ const UserInfo = ({ user }: IUserInfo) => {
     [onBugsReport, onCheckActiveBadge, onCopyLinkProfile, onViewOnWC]
   );
   const onUnfollow = useCallback(async () => {
-    if (requesting) return;
+    if (requesting || !user?.fid) return;
     setRequesting(true);
-    await dispatch(unfollowUser({ username: user.fid }));
+    await dispatch(unfollowUser({ username: user?.fid }));
     setRequesting(false);
-  }, [dispatch, requesting, user.fid]);
+  }, [dispatch, requesting, user?.fid]);
   const onFollow = useCallback(async () => {
-    if (requesting) return;
+    if (requesting || !user?.fid) return;
+    if (!fcUser?.fid) {
+      const loginElement = document.getElementById("btn-login");
+      loginElement?.click();
+      return;
+    }
     setRequesting(true);
-    await dispatch(followUser({ username: user.fid }));
+    await dispatch(followUser({ username: user?.fid }));
     setRequesting(false);
-  }, [dispatch, requesting, user.fid]);
+  }, [dispatch, fcUser?.fid, requesting, user?.fid]);
+  if (loading && !user) return null;
   return (
     <div className={styles["user-wrap"]}>
       <div className={styles["user-head"]}>
@@ -121,10 +132,14 @@ const UserInfo = ({ user }: IUserInfo) => {
           className={styles.avatar}
         />
         <div className={styles["user-info"]}>
-          <div className={styles["name-wrap"]}>
+          <Link
+            className={styles["name-wrap"]}
+            to={`https://warpcast.com/${user?.username}`}
+            target="_blank"
+          >
             <span className={styles.name}>{user?.display_name}</span>
             <span className={styles.username}>@{user?.username}</span>
-          </div>
+          </Link>
           <div className={styles.actions}>
             <PopoverButton
               ref={popupMenuRef}
@@ -150,9 +165,9 @@ const UserInfo = ({ user }: IUserInfo) => {
             >
               <IconShare />
             </div>
-            {fcUser?.fid && !sameUser && (
+            {!sameUser && (
               <>
-                {user.is_followed ? (
+                {user?.is_followed ? (
                   <div className={styles["btn-unfollow"]} onClick={onUnfollow}>
                     Unfollow
                   </div>

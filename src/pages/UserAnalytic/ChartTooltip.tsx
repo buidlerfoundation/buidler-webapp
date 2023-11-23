@@ -21,9 +21,20 @@ const ChartTooltip = ({ active, payload, label, postFix }: any) => {
           {postFix || ""}
         </span>
         {payload.map((el: any, index: number) => (
-          <span key={index}>
-            {formatNumber(el.value) || 0} {el.name}
-          </span>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              alignSelf: "flex-start",
+            }}
+            key={index}
+          >
+            <div style={{ backgroundColor: el.fill, width: 10, height: 10 }} />
+            <span style={{ lineHeight: "20px" }}>
+              {formatNumber(el.value) || 0} {el.name}
+            </span>
+          </div>
         ))}
       </div>
     );
