@@ -89,7 +89,7 @@ const FCWrapper = () => {
   const [polling, setPolling] = useState(false);
   const [initialShareUrl, setInitialShareUrl] = useState("");
   const [openDiscussion, setOpenDiscussion] = useState(false);
-  const [openBugsReport, setOpenOpenBugsReport] = useState(false);
+  const [openBugsReport, setOpenBugsReport] = useState(false);
   const initialTheme = useMemo(() => query.get("theme"), [query]);
   const [theme, setTheme] = useState(initialTheme);
   const filters = useFeedFilters();
@@ -113,7 +113,7 @@ const FCWrapper = () => {
   );
   const toggleMenu = useCallback(() => setOpenMenu((current) => !current), []);
   const toggleBugsReport = useCallback(
-    () => setOpenOpenBugsReport((current) => !current),
+    () => setOpenBugsReport((current) => !current),
     []
   );
   const toggleDiscussion = useCallback(

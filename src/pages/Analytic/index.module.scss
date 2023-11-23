@@ -92,7 +92,7 @@
   background-color: var(--color-background-1);
   border-radius: 10px;
   width: 600px;
-  max-height: 250px;
+  max-height: 400px;
   overflow-y: auto;
   box-shadow: 0px 0px 20px 0 var(--color-shadow-popup);
 }
@@ -113,5 +113,6 @@
   }
   .popup-mention__container {
     width: calc(100vw - 30px);
+    max-height: 300px;
   }
 }

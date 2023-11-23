@@ -36,7 +36,10 @@ const ActivityChart = ({ data }: IActivityChart) => {
   const formattedOffset = useMemo(() => getTimeZoneOffsetFormatted(), []);
   return (
     <div className={styles["chart-item"]}>
-      <span className={styles.label}>Activities by Hours</span>
+      <div className={styles["label-wrap"]}>
+        <span className={styles.label}>Activities by Hours</span>
+        <span className={styles["sub-label"]}>Last 30 days</span>
+      </div>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={dataChart.dataChart}

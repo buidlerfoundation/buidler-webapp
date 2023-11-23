@@ -13,6 +13,7 @@ import useFCUserByName from "hooks/useFCUserByName";
 import useAppDispatch from "hooks/useAppDispatch";
 import {
   getActivities,
+  getDataActiveBadgeCheck,
   getDataActivities,
   getDataEngagement,
   getDataFollowUsers,
@@ -54,12 +55,13 @@ const UserInsightWrap = () => {
         getDataFollowUsers({
           username,
           page: 1,
-          limit: 10,
+          limit: 20,
           path: "/non-follower",
         })
       );
       dispatch(getDataEngagement({ username }));
       dispatch(getDataActivities({ username }));
+      dispatch(getDataActiveBadgeCheck({ username }));
     }
   }, [dispatch, username]);
   useEffect(() => {

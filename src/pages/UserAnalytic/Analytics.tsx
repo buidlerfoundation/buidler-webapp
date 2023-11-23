@@ -53,8 +53,13 @@ const Analytics = ({ username, period }: IAnalytics) => {
           label="Followers"
           activity={fcActivities?.data?.follower}
           showSuffix
+          loading={fcActivities?.loading}
         />
-        <ActivityItem label="Casts" activity={fcActivities?.data?.cast} />
+        <ActivityItem
+          label="Casts"
+          activity={fcActivities?.data?.cast}
+          loading={fcActivities?.loading}
+        />
       </div>
       <div className={styles.charts}>
         <EngagementChart data={dataEngagement?.data} />

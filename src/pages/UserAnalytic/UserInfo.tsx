@@ -10,6 +10,10 @@ import PopoverButton, { PopoverItem } from "shared/PopoverButton";
 import useAppSelector from "hooks/useAppSelector";
 import useAppDispatch from "hooks/useAppDispatch";
 import { followUser, unfollowUser } from "reducers/FCAnalyticReducers";
+import toast from "react-hot-toast";
+import ModalCheckActiveBadge from "shared/ModalCheckActiveBadge";
+import useFCUserActiveBadgeCheck from "hooks/useFCUserActiveBadgeCheck";
+import IconShare from "shared/SVG/FC/IconShare";
 
 interface IUserInfo {
   user: IFCUser;
@@ -17,8 +21,10 @@ interface IUserInfo {
 
 const UserInfo = ({ user }: IUserInfo) => {
   const dispatch = useAppDispatch();
+  const [openCheckBadgeActive, setOpenCheckBadgeActive] = useState(false);
   const [requesting, setRequesting] = useState(false);
   const popupMenuRef = useRef<any>();
+  const userActiveBadge = useFCUserActiveBadgeCheck(user.fid);
   const fcUser = useAppSelector((state) => state.fcUser.data);
   const sameUser = useMemo(
     () => user.fid === fcUser?.fid,
@@ -31,15 +37,27 @@ const UserInfo = ({ user }: IUserInfo) => {
   const userMenu = useMemo(
     () => [
       {
-        label: `Share ${sameUser ? "your" : "this"} profile`,
-        value: "share-profile",
+        label: `Check active badge`,
+        value: "active-badge",
+      },
+      {
+        label: `Copy link to profile`,
+        value: "copy-link",
+      },
+      {
+        label: `View on Warpcast`,
+        value: "view-on-wc",
       },
       {
         label: "Report bugs",
         value: "report-bugs",
       },
     ],
-    [sameUser]
+    []
+  );
+  const toggleCheckBadgeActive = useCallback(
+    () => setOpenCheckBadgeActive((current) => !current),
+    []
   );
   const onShareProfile = useCallback(() => {
     const shareElement = document.getElementById("btn-share-profile");
@@ -49,11 +67,29 @@ const UserInfo = ({ user }: IUserInfo) => {
     const reportElement = document.getElementById("btn-bugs-report");
     reportElement?.click();
   }, []);
+  const onCheckActiveBadge = useCallback(() => {
+    toggleCheckBadgeActive();
+  }, [toggleCheckBadgeActive]);
+  const onCopyLinkProfile = useCallback(async () => {
+    await navigator.clipboard.writeText(
+      window.location.origin + window.location.pathname
+    );
+    toast.success("Copied");
+  }, []);
+  const onViewOnWC = useCallback(() => {
+    window.open(`https://warpcast.com/${user.username}`, "_blank");
+  }, [user.username]);
   const handleSelectedMenu = useCallback(
     async (menu: PopoverItem) => {
       switch (menu.value) {
-        case "share-profile":
-          onShareProfile();
+        case "active-badge":
+          onCheckActiveBadge();
+          break;
+        case "copy-link":
+          onCopyLinkProfile();
+          break;
+        case "view-on-wc":
+          onViewOnWC();
           break;
         case "report-bugs":
           onBugsReport();
@@ -62,7 +98,7 @@ const UserInfo = ({ user }: IUserInfo) => {
           break;
       }
     },
-    [onBugsReport, onShareProfile]
+    [onBugsReport, onCheckActiveBadge, onCopyLinkProfile, onViewOnWC]
   );
   const onUnfollow = useCallback(async () => {
     if (requesting) return;
@@ -102,6 +138,18 @@ const UserInfo = ({ user }: IUserInfo) => {
               popupStyle={{ marginTop: 0 }}
               style={{ marginTop: 10 }}
             />
+            <div
+              className={`${styles["btn-share"]} hide-xs`}
+              onClick={onShareProfile}
+            >
+              Share
+            </div>
+            <div
+              className={`${styles["btn-share"]} hide-desktop`}
+              onClick={onShareProfile}
+            >
+              <IconShare />
+            </div>
             {fcUser?.fid && !sameUser && (
               <>
                 {user.is_followed ? (
@@ -160,6 +208,11 @@ const UserInfo = ({ user }: IUserInfo) => {
           </span>
         </div>
       </div>
+      <ModalCheckActiveBadge
+        open={openCheckBadgeActive}
+        handleClose={toggleCheckBadgeActive}
+        userActiveBadge={userActiveBadge?.data}
+      />
     </div>
   );
 };

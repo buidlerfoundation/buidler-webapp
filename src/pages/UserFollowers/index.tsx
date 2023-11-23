@@ -56,7 +56,7 @@ const UserFollowers = ({ path }: IUserFollowers) => {
     }
   }, [onPageEndReach]);
   useEffect(() => {
-    if (username && !dataFollowUser) {
+    if (username && !dataFollowUser && path !== "/non-follower") {
       dispatch(
         getDataFollowUsers({
           username,

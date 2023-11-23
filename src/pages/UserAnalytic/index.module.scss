@@ -60,6 +60,25 @@
             cursor: pointer;
           }
         }
+        .btn-share {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 35px;
+          width: 70px;
+          border-radius: 10px;
+          color: var(--color-secondary-text);
+          font-size: 14px;
+          font-weight: 600;
+          border: 1px solid var(--color-stroke);
+          &:hover {
+            cursor: pointer;
+            background-color: var(--color-highlight-action);
+          }
+          @media only screen and (max-width: 576px) {
+            width: 35px;
+          }
+        }
         .btn-unfollow {
           display: flex;
           align-items: center;
@@ -256,6 +275,15 @@
   font-size: 18px;
   font-weight: 600;
   color: var(--color-primary-text);
+}
+.label-wrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.sub-label {
+  font-size: 14px;
+  color: var(--color-mute-text);
 }
 .btn-view-all {
   font-size: 14px;

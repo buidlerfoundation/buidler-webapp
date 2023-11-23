@@ -10,9 +10,15 @@ interface IActivityItem {
   activity?: IActivity;
   label: string;
   showSuffix?: boolean;
+  loading?: boolean;
 }
 
-const ActivityItem = ({ activity, label, showSuffix }: IActivityItem) => {
+const ActivityItem = ({
+  activity,
+  label,
+  showSuffix,
+  loading,
+}: IActivityItem) => {
   const changed = useMemo(() => activity?.changed || 0, [activity?.changed]);
   const isDecrease = useMemo(() => changed < 0, [changed]);
   const isIncrease = useMemo(() => changed > 0, [changed]);
@@ -21,7 +27,7 @@ const ActivityItem = ({ activity, label, showSuffix }: IActivityItem) => {
     () => (isIncrease ? "var(--color-success)" : "var(--color-urgent)"),
     [isIncrease]
   );
-  const total = useMemo(() => activity?.total, [activity?.total]);
+  const total = useMemo(() => activity?.total || 0, [activity?.total]);
   const displayChanged = useMemo(() => {
     if (!changed) return "0";
     const absChanged = Math.abs(changed);
@@ -33,10 +39,10 @@ const ActivityItem = ({ activity, label, showSuffix }: IActivityItem) => {
     return "-";
   }, [total, showSuffix]);
   const displayTotal = useMemo(() => {
-    if (!total) return "";
+    if (loading) return "";
     const absTotal = Math.abs(total);
-    return formatNumber(absTotal);
-  }, [total]);
+    return formatNumber(absTotal) || "0";
+  }, [loading, total]);
   const renderChangeIcon = useCallback(() => {
     if (isEqual) return null;
     if (isDecrease)

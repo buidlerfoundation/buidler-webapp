@@ -143,3 +143,15 @@ export interface IUserInsightTab {
   path: IUserTabPath;
   label: string;
 }
+
+export interface IActiveBadgeCheck {
+  has_display_name?: boolean;
+  has_bio?: boolean;
+  has_profile_picture?: boolean;
+  verified_ethereum_address?: string;
+  total_followers?: number;
+  total_replied_casts?: number;
+  total_reactions?: number;
+  total_casts?: number;
+  first_cast_created_at?: string;
+}

@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "api";
 import {
   ActivityPeriod,
+  IActiveBadgeCheck,
   IActivityFilter,
   IDataUserEngagement,
   IFCUser,
@@ -37,8 +38,14 @@ interface IFCUserDataActivityState {
   data?: IDataUserEngagement;
 }
 
+interface IFCActiveBadgeCheckState {
+  loading?: boolean;
+  data?: IActiveBadgeCheck;
+}
+
 type FCAnalyticReducerState = {
   userMap: { [username: string]: IFCUserState };
+  activeBadgeCheckMap: { [username: string]: IFCActiveBadgeCheckState };
   activityMap: { [username: string]: IFCUserActivityState };
   dataEngagementMap: { [username: string]: IFCUserDataEngagementState };
   dataActivityMap: { [username: string]: IFCUserDataActivityState };
@@ -55,6 +62,7 @@ const initialState: FCAnalyticReducerState = {
   dataActivityMap: {},
   followUserMap: {},
   dataInteractionMap: {},
+  activeBadgeCheckMap: {},
   filters: [
     { label: "24h", period: "1d" },
     { label: "7d", period: "7d" },
@@ -73,6 +81,14 @@ export const getUser = createAsyncThunk(
   "fc-analytic/get-user",
   async (payload: { username: string }) => {
     const res = await api.getFCUser(payload.username);
+    return res;
+  }
+);
+
+export const getDataActiveBadgeCheck = createAsyncThunk(
+  "fc-analytic/get-active-badge-check",
+  async (payload: { username: string }) => {
+    const res = await api.getActiveBadgeCheck(payload.username);
     return res;
   }
 );
@@ -345,6 +361,26 @@ const fcAnalyticSlice = createSlice({
           userData.is_followed = false;
           state.userMap[username].data = userData;
         }
+      })
+      .addCase(getDataActiveBadgeCheck.pending, (state, action) => {
+        const { username } = action.meta.arg;
+        state.activeBadgeCheckMap[username] = {
+          ...state.activeBadgeCheckMap[username],
+          loading: true,
+        };
+      })
+      .addCase(getDataActiveBadgeCheck.rejected, (state, action) => {
+        const { username } = action.meta.arg;
+        state.activeBadgeCheckMap[username] = {
+          loading: false,
+        };
+      })
+      .addCase(getDataActiveBadgeCheck.fulfilled, (state, action) => {
+        const { username } = action.meta.arg;
+        state.activeBadgeCheckMap[username] = {
+          data: action.payload.data,
+          loading: false,
+        };
       }),
 });
 

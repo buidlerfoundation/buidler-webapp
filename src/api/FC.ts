@@ -1,5 +1,6 @@
 import {
   ActivityPeriod,
+  IActiveBadgeCheck,
   ICast,
   IDataUserEngagement,
   IFCUser,
@@ -184,3 +185,6 @@ export const followUser = (name: string) => Caller.post(`links/${name}/follow`);
 
 export const unfollowUser = (name: string) =>
   Caller.delete(`links/${name}/follow`);
+
+export const getActiveBadgeCheck = (name: string) =>
+  Caller.get<IActiveBadgeCheck>(`users/${name}/active-badge`);
