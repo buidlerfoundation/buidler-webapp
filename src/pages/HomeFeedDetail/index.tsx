@@ -156,7 +156,6 @@ const HomeFeedDetail = () => {
               <CastItem
                 cast={el}
                 key={el.hash}
-                comment
                 homeFeed
                 onLogin={onLogin}
               />
