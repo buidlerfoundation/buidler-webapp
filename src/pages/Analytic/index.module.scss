@@ -1,0 +1,118 @@
+.container {
+  position: relative;
+  flex: 1;
+  .head {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    background-color: var(--color-background-1);
+    position: sticky;
+    top: 0;
+    .search {
+      position: relative;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 19px;
+      width: 100%;
+      .input {
+        border-radius: 10px;
+        background-color: var(--color-highlight-action-high);
+        height: 40px;
+        text-align: center;
+        padding: 0 15px;
+        width: 100%;
+        color: var(--color-primary-text);
+      }
+      .placeholder {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        color: var(--color-mute-text);
+      }
+    }
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-primary-text);
+    }
+    .list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 15px;
+      padding-bottom: 70px;
+      .user-item {
+        width: 292px;
+        border: 1px solid var(--color-stroke);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        padding: 12px 10px;
+        gap: 15px;
+        .avatar {
+          width: 45px;
+          height: 45px;
+          border-radius: 50%;
+        }
+        .user-info {
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+          .name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-primary-text);
+            line-height: 22px;
+          }
+          .username {
+            font-size: 14px;
+            color: var(--color-mute-text);
+            line-height: 19px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.popup-mention__container {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-stroke);
+  background-color: var(--color-background-1);
+  border-radius: 10px;
+  width: 600px;
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow: 0px 0px 20px 0 var(--color-shadow-popup);
+}
+
+@media only screen and (max-width: 659px) {
+  .container {
+    .head {
+      padding: 0 15px;
+      height: 60px;
+      position: relative;
+    }
+    .body {
+      padding: 0 15px;
+      .list .user-item {
+        width: 100%;
+      }
+    }
+  }
+  .popup-mention__container {
+    width: calc(100vw - 30px);
+    max-height: 300px;
+  }
+}

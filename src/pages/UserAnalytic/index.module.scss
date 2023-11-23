@@ -1,0 +1,283 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 70px;
+}
+.user-wrap {
+  display: flex;
+  flex-direction: column;
+  .user-head {
+    display: flex;
+    .avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-left: 15px;
+      flex: 1;
+      .name-wrap {
+        display: flex;
+        flex-direction: column;
+        .name {
+          font-size: 16px;
+          font-weight: 700;
+          color: var(--color-primary-text);
+        }
+        .username {
+          font-size: 15px;
+          color: var(--color-secondary-text);
+        }
+      }
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        .btn-more {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 35px;
+          height: 35px;
+          border-radius: 10px;
+          border: 1px solid var(--color-stroke);
+          &:hover {
+            cursor: pointer;
+            background-color: var(--color-highlight-action);
+          }
+        }
+        .btn-share {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 35px;
+          width: 89px;
+          border-radius: 10px;
+          color: white;
+          font-size: 14px;
+          font-weight: 600;
+          line-height: 21px;
+          background-color: var(--color-mention);
+          gap: 4px;
+          &:hover {
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+  .user-relate-info {
+    display: flex;
+    align-items: center;
+    column-gap: 40px;
+    row-gap: 2px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+    .relate-item {
+      display: flex;
+      align-items: center;
+      .main-text {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--color-primary-text);
+      }
+      .sub-text {
+        font-size: 16px;
+        font-weight: 400;
+        color: var(--color-secondary-text);
+      }
+    }
+    a:hover {
+      text-decoration-line: underline;
+      text-decoration-color: var(--color-primary-text);
+      text-decoration-thickness: 1px;
+    }
+  }
+  .bio {
+    margin-top: 10px;
+    color: var(--color-primary-text);
+    font-size: 16px;
+    :global(.mention-string) {
+      color: var(--color-mention);
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+.analytic-wrap {
+  display: flex;
+  flex-direction: column;
+  margin-top: 40px;
+  .activity-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .filter {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      .filter-item {
+        height: 30px;
+        padding: 0 12px;
+        border-radius: 10px;
+        color: var(--color-secondary-text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        line-height: 19px;
+        font-weight: 600;
+        &:hover {
+          color: var(--color-primary-text);
+          background-color: var(--color-stroke);
+          cursor: pointer;
+        }
+        &.active {
+          color: var(--color-primary-text);
+          background-color: var(--color-stroke);
+        }
+      }
+    }
+  }
+  .activities {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+    .activity-item {
+      width: 138px;
+      padding: 10px;
+      border: 1px solid var(--color-stroke);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      .activity-label {
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 20px;
+        color: var(--color-secondary-text);
+      }
+      .activity-total {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--color-primary-text);
+        line-height: 32px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        min-height: 50px;
+      }
+      .activity-changed {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+      }
+    }
+  }
+  .charts {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+    .chart-item {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 100%;
+      height: 200px;
+    }
+  }
+}
+.top-interaction-wrap {
+  display: flex;
+  flex-direction: column;
+  margin-top: 15px;
+  .sign-in-to-view {
+    height: 53px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--color-secondary-text);
+    font-weight: 600;
+    cursor: pointer;
+  }
+}
+.non-follow-wrap {
+  display: flex;
+  flex-direction: column;
+  margin-top: 15px;
+  .non-follow-head {
+    display: flex;
+    justify-content: space-between;
+  }
+  .list-non-follow {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+    overflow-x: auto;
+    .avatar {
+      width: 45px;
+      min-width: 45px;
+      height: 45px;
+      border-radius: 50%;
+    }
+    .btn-more {
+      background-color: var(--color-background-3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-secondary-text);
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+.label {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-primary-text);
+}
+.label-wrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.sub-label {
+  font-size: 14px;
+  color: var(--color-mute-text);
+}
+.btn-view-all {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-mention);
+  cursor: pointer;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+}
+
+@media only screen and (max-width: 659px) {
+  .body {
+    padding: 0 15px;
+    padding-bottom: 70px;
+  }
+  .analytic-wrap .activity-head {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    row-gap: 15px;
+  }
+  .user-wrap .user-head .user-relate-info {
+    column-gap: 10px;
+  }
+}

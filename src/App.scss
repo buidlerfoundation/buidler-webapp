@@ -138,6 +138,23 @@ a {
   fill: var(--color-primary-text) !important;
 }
 
+.MuiTablePagination-root {
+  color: var(--color-mute-text) !important;
+  .MuiSvgIcon-root {
+    fill: var(--color-mute-text) !important;
+  }
+  .MuiIconButton-root.Mui-disabled {
+    opacity: 0.5;
+  }
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.MuiMenu-list {
+  background-color: var(--color-background-1) !important;
+}
+
 .MuiPickersCalendarHeader-iconButton {
   background-color: var(--color-lighter-background) !important;
   &:hover {
@@ -433,8 +450,39 @@ iframe {
   z-index: 1301 !important;
 }
 
+.MuiTooltip-tooltip {
+  background-color: var(--color-background-3) !important;
+  color: var(--color-primary-text) !important;
+}
+
 code {
   white-space: pre-line;
+}
+
+table,
+thead,
+tr,
+th,
+td {
+  border-color: var(--color-stroke) !important;
+  color: var(--color-mute-text) !important;
+}
+
+th {
+  white-space: nowrap;
+}
+
+td {
+  color: var(--color-secondary-text) !important;
+  white-space: nowrap;
+}
+
+.MuiTableSortLabel-root:hover {
+  color: var(--color-mute-text) !important;
+}
+
+.MuiTableSortLabel-root.Mui-active {
+  color: var(--color-primary-text) !important;
 }
 
 html {
@@ -516,7 +564,7 @@ html {
     --color-secondary-text: #acacac;
     --color-mute-text: #727272;
     --color-background-1: #000000;
-    --color-background-opacity-1: #000000f7;
+    --color-background-opacity-1: #000000cc;
     --color-background-2: #121212;
     --color-background-3: #363636;
     --color-background-4: #363636;
@@ -593,7 +641,7 @@ html.light {
 
 html.dark {
   --color-darkest-background: #121212;
-  --color-darkest-background80: #121212cc;
+  --color-darkest-background80: #121212d9;
   --color-lighter-background: #191919;
   --color-highlight: #1e1e1e;
   --color-stroke: #242424;
@@ -609,7 +657,7 @@ html.dark {
   --color-secondary-text: #acacac;
   --color-mute-text: #727272;
   --color-background-1: #000000;
-  --color-background-opacity-1: #000000f7;
+  --color-background-opacity-1: #000000d9;
   --color-background-2: #121212;
   --color-background-3: #363636;
   --color-background-4: #363636;

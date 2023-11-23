@@ -19,6 +19,7 @@ const AppConfig = {
   loginPath: "/started",
   walletConnectProjectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID || "",
   websiteUrl: "https://buidler.app",
+  loadMoreOffset: 500,
 };
 
 export default AppConfig;
@@ -47,6 +48,7 @@ export const AsyncKey = {
   autoOffPlugin: `${Prefix}_auto_off_plugin`,
   signerIdKey: `${Prefix}_signer_id`,
   requestTokenKey: `${Prefix}_request_token`,
+  themeKey: `${Prefix}_theme_key`,
 };
 
 export const ProgressStatus = [

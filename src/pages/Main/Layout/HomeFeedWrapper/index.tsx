@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo } from "react";
+import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import useFeedFilters from "hooks/useFeedFilters";
 import { IFCFilterType } from "models/FC";
@@ -41,6 +41,11 @@ const HomeFeedWrapper = () => {
     () => filters.find((el) => el.path === location.pathname)?.title,
     [filters, location.pathname]
   );
+  useEffect(() => {
+    if (title) {
+      document.title = `${title} | Buidler`;
+    }
+  }, [title]);
   return (
     <div className={styles.container}>
       <div className={styles.header}>

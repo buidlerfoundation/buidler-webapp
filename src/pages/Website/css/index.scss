@@ -37,8 +37,33 @@ button:focus {
   top: 0;
   z-index: 100;
   transition: all ease-in-out 0.4s;
-  height: 94px;
+  height: 140px;
   background: var(--color-background-light);
+  .cta-banner {
+    height: 60px;
+    width: 100%;
+    background-color: #efe9da;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5e5030;
+    font-size: 18px;
+    font-weight: 600;
+    .mention-string {
+      color: var(--color-mention);
+    }
+    &:hover {
+      .mention-string {
+        text-decoration: underline;
+      }
+    }
+  }
+  @media only screen and (max-width: 576px) {
+    .cta-banner {
+      font-size: 14px;
+      padding: 0 12px;
+    }
+  }
 }
 
 .hide {

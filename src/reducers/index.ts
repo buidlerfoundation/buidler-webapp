@@ -15,6 +15,7 @@ import FCUserReducers from "./FCUserReducers";
 import { combineReducers } from "redux";
 import FCCastReducers from "./FCCastReducers";
 import HomeFeedReducers from "./HomeFeedReducers";
+import FCAnalyticReducers from "./FCAnalyticReducers";
 
 const reducers = combineReducers({
   user: UserReducers,
@@ -33,6 +34,7 @@ const reducers = combineReducers({
   fcUser: FCUserReducers,
   fcCast: FCCastReducers,
   homeFeed: HomeFeedReducers,
+  fcAnalytic: FCAnalyticReducers,
 });
 
 export default reducers;

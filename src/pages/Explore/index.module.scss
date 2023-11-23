@@ -39,34 +39,12 @@
       }
     }
   }
-  .screenshot-container {
-    position: absolute;
-    bottom: 0;
-    .screenshot-wrap {
-      display: inline-block;
-      padding: 30px;
-      .screenshot {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 8px 8px 20px 0 #00000040;
-        border-radius: 10px;
-        width: 300px;
-        height: 300px;
-        background-color: red;
-      }
-    }
-  }
 }
 
 @media only screen and (max-width: 659px) {
   .container {
-    padding-top: 60px;
     .head {
-      position: fixed;
-      top: 60px;
-      left: 0;
-      right: 0;
+      padding: 0 15px;
       height: 60px;
     }
   }

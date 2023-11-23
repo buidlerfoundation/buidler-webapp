@@ -1,10 +1,10 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { ICast, IFCFilterType, IFeedData } from "models/FC";
+import { ICast, IFCFilterType, IPagingData } from "models/FC";
 import api from "api";
 
 interface HomeFeedState {
   feedMap: {
-    [key: string]: IFeedData;
+    [key: string]: IPagingData<ICast>;
   };
   replyCast?: ICast;
   castDetail: {
@@ -12,12 +12,12 @@ interface HomeFeedState {
     loading: boolean;
   };
   castRepliesMap: {
-    [key: string]: IFeedData;
+    [key: string]: IPagingData<ICast>;
   };
   openNewCast: boolean;
   filters: IFCFilterType[];
   currentFilter: IFCFilterType;
-  explore: IFeedData;
+  explore: IPagingData<ICast>;
 }
 
 const initialState: HomeFeedState = {
@@ -47,7 +47,7 @@ const initialState: HomeFeedState = {
       id: "3",
       path: "/top",
       value: "most-liked",
-      title: "Top links on Farcaster",
+      title: "Top links of the week on Farcaster",
     },
   ],
   currentFilter: {
