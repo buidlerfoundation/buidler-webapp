@@ -6,15 +6,19 @@ import { normalizeContentUrl } from "helpers/CastHelper";
 import numeral from "numeral";
 import { Link } from "react-router-dom";
 import IconMore from "shared/SVG/IconMore";
-import PopoverButton, { PopoverItem } from "shared/PopoverButton";
+import PopoverButton from "shared/PopoverButton";
 import useAppSelector from "hooks/useAppSelector";
 import useAppDispatch from "hooks/useAppDispatch";
 import { followUser, unfollowUser } from "reducers/FCAnalyticReducers";
-import toast from "react-hot-toast";
 import ModalCheckActiveBadge from "shared/ModalCheckActiveBadge";
 import useFCUserActiveBadgeCheck from "hooks/useFCUserActiveBadgeCheck";
-import IconShare from "shared/SVG/FC/IconShare";
 import IconActiveBadge from "shared/SVG/FC/IconActiveBadge";
+import IconFC from "shared/SVG/FC/IconFC";
+import IconUnfollow from "shared/SVG/FC/IconUnfollow";
+import IconFollow from "shared/SVG/FC/IconFollow";
+import IconCheckActiveBadge from "shared/SVG/FC/IconCheckActiveBadge";
+import PopupUserInsight from "shared/PopupUserInsight";
+import { Tooltip } from "@mui/material";
 
 interface IUserInfo {
   user?: IFCUser;
@@ -36,27 +40,9 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
     () => user?.profile?.bio?.text,
     [user?.profile?.bio?.text]
   );
-  const userMenu = useMemo(
-    () => [
-      {
-        label: `Check active badge`,
-        value: "active-badge",
-      },
-      {
-        label: `Copy link to profile`,
-        value: "copy-link",
-      },
-      {
-        label: `View on Warpcast`,
-        value: "view-on-wc",
-      },
-      {
-        label: "Report bugs",
-        value: "report-bugs",
-      },
-    ],
-    []
-  );
+  const onCloseMenu = useCallback(() => {
+    popupMenuRef.current?.hide();
+  }, []);
   const toggleCheckBadgeActive = useCallback(
     () => setOpenCheckBadgeActive((current) => !current),
     []
@@ -69,43 +55,9 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
       "_blank"
     );
   }, []);
-  const onBugsReport = useCallback(() => {
-    const reportElement = document.getElementById("btn-bugs-report");
-    reportElement?.click();
-  }, []);
   const onCheckActiveBadge = useCallback(() => {
     toggleCheckBadgeActive();
   }, [toggleCheckBadgeActive]);
-  const onCopyLinkProfile = useCallback(async () => {
-    await navigator.clipboard.writeText(
-      window.location.origin + window.location.pathname
-    );
-    toast.success("Copied");
-  }, []);
-  const onViewOnWC = useCallback(() => {
-    window.open(`https://warpcast.com/${user?.username}`, "_blank");
-  }, [user?.username]);
-  const handleSelectedMenu = useCallback(
-    async (menu: PopoverItem) => {
-      switch (menu.value) {
-        case "active-badge":
-          onCheckActiveBadge();
-          break;
-        case "copy-link":
-          onCopyLinkProfile();
-          break;
-        case "view-on-wc":
-          onViewOnWC();
-          break;
-        case "report-bugs":
-          onBugsReport();
-          break;
-        default:
-          break;
-      }
-    },
-    [onBugsReport, onCheckActiveBadge, onCopyLinkProfile, onViewOnWC]
-  );
   const onUnfollow = useCallback(async () => {
     if (requesting || !user?.fid) return;
     setRequesting(true);
@@ -149,41 +101,43 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
           <div className={styles.actions}>
             <PopoverButton
               ref={popupMenuRef}
-              data={userMenu}
-              onSelected={handleSelectedMenu}
               componentButton={
                 <div className={styles["btn-more"]}>
-                  <IconMore size={30} fill="var(--color-secondary-text)" />
+                  <IconMore size={30} fill="var(--color-primary-text)" />
                 </div>
               }
               popupStyle={{ marginTop: 0 }}
               style={{ marginTop: 10 }}
+              componentPopup={
+                <PopupUserInsight onCloseMenu={onCloseMenu} user={user} />
+              }
             />
-            <div
-              className={`${styles["btn-share"]} hide-xs`}
-              onClick={onShareProfile}
-            >
-              Share
-            </div>
-            <div
-              className={`${styles["btn-share"]} hide-desktop`}
-              onClick={onShareProfile}
-            >
-              <IconShare />
-            </div>
+            <Tooltip title="Check active badge">
+              <div className={styles["btn-more"]} onClick={onCheckActiveBadge}>
+                <IconCheckActiveBadge />
+              </div>
+            </Tooltip>
             {!sameUser && (
               <>
                 {user?.is_followed ? (
-                  <div className={styles["btn-unfollow"]} onClick={onUnfollow}>
-                    Unfollow
-                  </div>
+                  <Tooltip title="Unfollow">
+                    <div className={styles["btn-more"]} onClick={onUnfollow}>
+                      <IconUnfollow />
+                    </div>
+                  </Tooltip>
                 ) : (
-                  <div className={styles["btn-follow"]} onClick={onFollow}>
-                    Follow
-                  </div>
+                  <Tooltip title="Follow">
+                    <div className={styles["btn-more"]} onClick={onFollow}>
+                      <IconFollow />
+                    </div>
+                  </Tooltip>
                 )}
               </>
             )}
+            <div className={styles["btn-share"]} onClick={onShareProfile}>
+              <span>Share</span>
+              <IconFC />
+            </div>
           </div>
         </div>
       </div>
