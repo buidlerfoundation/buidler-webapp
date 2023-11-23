@@ -254,6 +254,9 @@ const Analytic = () => {
       setDataUsers([]);
     }
   }, [value]);
+  useEffect(() => {
+    document.title = "Farcaster Insights | Buidler";
+  }, []);
   return (
     <div className={styles.container}>
       <nav className={styles.head} ref={inputRef}>

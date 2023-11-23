@@ -54,6 +54,7 @@ const UserInsightWrap = () => {
         .unwrap()
         .then((res) => {
           if (res.success && res.data?.fid) {
+            document.title = `${res?.data?.display_name} (${res?.data?.username}) | Buidler`;
             dispatch(
               getDataFollowUsers({
                 username: res.data?.fid,
