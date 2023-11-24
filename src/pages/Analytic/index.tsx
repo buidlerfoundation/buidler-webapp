@@ -14,6 +14,7 @@ import MentionItem from "shared/MentionPicker/MentionItem";
 import { IFCUser } from "models/FC";
 import api from "api";
 import ImageView from "shared/ImageView";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 const Analytic = () => {
   const navigate = useNavigate();
@@ -195,6 +196,9 @@ const Analytic = () => {
     ],
     []
   );
+  const tracking = useCallback((event: string, options = {}) => {
+    GoogleAnalytics.tracking(event, { category: "Insights", ...options });
+  }, []);
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   }, []);
@@ -213,9 +217,13 @@ const Analytic = () => {
   );
   const mentionSelected = useCallback(() => {
     const user = dataUsers[selectedMentionIndex];
+    tracking("Search Insights User", {
+      username: user.username,
+      source: "search",
+    });
     setValue("");
     navigate(`${user.username}`);
-  }, [dataUsers, navigate, selectedMentionIndex]);
+  }, [dataUsers, navigate, selectedMentionIndex, tracking]);
   const renderMentionItem = useCallback(
     (item: IFCUser, index: number) => (
       <MentionItem
@@ -257,6 +265,15 @@ const Analytic = () => {
   useEffect(() => {
     document.title = "Farcaster Insights | Buidler";
   }, []);
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    GoogleAnalytics.tracking("Page Viewed", {
+      category: "Traffic",
+      page_name: "Insights",
+      source: query.get("ref") || "",
+      path: window.location.pathname,
+    });
+  }, []);
   return (
     <div className={styles.container}>
       <nav className={styles.head} ref={inputRef}>
@@ -280,7 +297,17 @@ const Analytic = () => {
         <span className={styles.title}>Suggested users</span>
         <div className={styles.list}>
           {suggestedUsers.map((el) => (
-            <Link className={styles["user-item"]} key={el.fid} to={el.username}>
+            <Link
+              className={styles["user-item"]}
+              key={el.fid}
+              to={el.username}
+              onClick={() => {
+                tracking("Search Insights User", {
+                  username: el.username,
+                  source: "suggested users",
+                });
+              }}
+            >
               <ImageView
                 alt="avatar"
                 src={el.avatar}

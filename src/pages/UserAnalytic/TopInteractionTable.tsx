@@ -19,6 +19,8 @@ import { formatNumber } from "helpers/StringHelper";
 import IconLike from "shared/SVG/FC/IconLike";
 import IconReply from "shared/SVG/FC/IconReply";
 import IconRecast from "shared/SVG/FC/IconRecast";
+import useAppDispatch from "hooks/useAppDispatch";
+import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 
 interface ITopInteractionTable {
   data: IFCUser[];
@@ -26,6 +28,7 @@ interface ITopInteractionTable {
 
 const TopInteractionTable = ({ data }: ITopInteractionTable) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.fcUser.data);
   const [order, setOrder] = React.useState<"asc" | "desc">("desc");
   const [orderBy, setOrderBy] = React.useState<string>("total");
@@ -57,8 +60,9 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
   );
   const onLoginClick = useCallback(() => {
     const loginElement = document.getElementById("btn-login");
+    dispatch(FC_USER_ACTIONS.updateLoginSource("View Top Interaction"));
     loginElement?.click();
-  }, []);
+  }, [dispatch]);
   return (
     <>
       <TableContainer>

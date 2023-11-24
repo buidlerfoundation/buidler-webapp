@@ -6,10 +6,12 @@ import api from "api";
 interface FCUserState {
   data?: IFCUser | null;
   signer_id?: string;
+  loginSource?: string;
 }
 
 const initialState: FCUserState = {
   data: null,
+  loginSource: "",
 };
 
 export const getCurrentFCUser = createAsyncThunk("fc_user/get", async () => {
@@ -25,6 +27,9 @@ const fcUserSlice = createSlice({
   reducers: {
     updateSignerId: (state, action: PayloadAction<string>) => {
       state.signer_id = action.payload;
+    },
+    updateLoginSource: (state, action: PayloadAction<string>) => {
+      state.loginSource = action.payload;
     },
   },
   extraReducers: (builder) => {

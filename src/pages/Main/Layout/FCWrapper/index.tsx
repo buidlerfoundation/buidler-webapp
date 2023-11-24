@@ -37,6 +37,7 @@ import IconMenuCommunity from "shared/SVG/FC/IconMenuCommunity";
 import useQuery from "hooks/useQuery";
 import IconMenuAnalytic from "shared/SVG/FC/IconMenuAnalytic";
 import ModalBugsReport from "shared/ModalBugsReport";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 interface IMenuItem {
   active?: boolean;
@@ -100,6 +101,7 @@ const FCWrapper = () => {
   >(null);
   const isExtensionInstalled = useExtensionInstalled();
   const fcUser = useAppSelector((state) => state.fcUser?.data);
+  const loginSource = useAppSelector((state) => state.fcUser.loginSource);
   const replyCast = useAppSelector((state) => state.homeFeed.replyCast);
   const storeSignerId = useAppSelector((state) => state.fcUser?.signer_id);
   const pollingController = useRef(new AbortController());
@@ -197,6 +199,19 @@ const FCWrapper = () => {
     setSignedKeyRequest(null);
     setOpenLogin(false);
   }, []);
+  const trackingLoginSuccess = useCallback(() => {
+    GoogleAnalytics.tracking("Login Successful", {
+      category: "Login",
+      source: loginSource || "",
+    });
+  }, [loginSource]);
+  const trackingLoginFailed = useCallback((message: string) => {
+    GoogleAnalytics.tracking("Login Failed", {
+      category: "Login",
+      message,
+      time: `${new Date().getTime()}`,
+    });
+  }, []);
   const requestSignerId = useCallback(async () => {
     if (loginLoading) return;
     setLoginLoading(true);
@@ -213,6 +228,7 @@ const FCWrapper = () => {
           pollingController.current
         );
         if (resPolling?.data?.signer_id) {
+          trackingLoginSuccess();
           await setCookie(AsyncKey.signerIdKey, resPolling?.data?.signer_id);
           await removeCookie(AsyncKey.requestTokenKey);
           const fcUser = await dispatch(getCurrentFCUser()).unwrap();
@@ -224,12 +240,15 @@ const FCWrapper = () => {
         }
       } catch (error: any) {
         toast.error(error.message);
+        trackingLoginFailed(error.message);
         setSignedKeyRequest(null);
         setOpenLogin(false);
       }
       setPolling(false);
+    } else {
+      trackingLoginFailed(res.message || "");
     }
-  }, [dispatch, loginLoading]);
+  }, [dispatch, loginLoading, trackingLoginFailed, trackingLoginSuccess]);
   const onLoginClick = useCallback(() => {
     if (signedKeyRequest) return;
     requestSignerId();

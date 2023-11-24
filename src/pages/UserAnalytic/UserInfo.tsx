@@ -19,6 +19,8 @@ import IconFollow from "shared/SVG/FC/IconFollow";
 import IconCheckActiveBadge from "shared/SVG/FC/IconCheckActiveBadge";
 import PopupUserInsight from "shared/PopupUserInsight";
 import { Tooltip } from "@mui/material";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
+import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 
 interface IUserInfo {
   user?: IFCUser;
@@ -40,6 +42,9 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
     () => user?.profile?.bio?.text,
     [user?.profile?.bio?.text]
   );
+  const tracking = useCallback((event: string) => {
+    GoogleAnalytics.tracking(event, { category: "Insights" });
+  }, []);
   const onCloseMenu = useCallback(() => {
     popupMenuRef.current?.hide();
   }, []);
@@ -48,33 +53,38 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
     []
   );
   const onShareProfile = useCallback(() => {
+    tracking("Share Insights To Warpcast");
     window.open(
       `https://warpcast.com/~/compose?embeds[]=${encodeURIComponent(
         window.location.origin + window.location.pathname
       )}`,
       "_blank"
     );
-  }, []);
+  }, [tracking]);
   const onCheckActiveBadge = useCallback(() => {
     toggleCheckBadgeActive();
-  }, [toggleCheckBadgeActive]);
+    tracking("Check Badge Active");
+  }, [toggleCheckBadgeActive, tracking]);
   const onUnfollow = useCallback(async () => {
     if (requesting || !user?.fid) return;
+    tracking("Unfollow User");
     setRequesting(true);
     await dispatch(unfollowUser({ username: user?.fid }));
     setRequesting(false);
-  }, [dispatch, requesting, user?.fid]);
+  }, [dispatch, requesting, tracking, user?.fid]);
   const onFollow = useCallback(async () => {
     if (requesting || !user?.fid) return;
     if (!fcUser?.fid) {
       const loginElement = document.getElementById("btn-login");
+      dispatch(FC_USER_ACTIONS.updateLoginSource("Follow"));
       loginElement?.click();
       return;
     }
+    tracking("Follow User");
     setRequesting(true);
     await dispatch(followUser({ username: user?.fid }));
     setRequesting(false);
-  }, [dispatch, fcUser?.fid, requesting, user?.fid]);
+  }, [dispatch, fcUser?.fid, requesting, tracking, user?.fid]);
   if (loading && !user) return null;
   return (
     <div className={styles["user-wrap"]}>
@@ -86,7 +96,7 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
         />
         <div className={styles["user-info"]}>
           <Link
-            className={styles["name-wrap"]}
+            className={`${styles["name-wrap"]} hide-xs`}
             to={`https://warpcast.com/${user?.username}`}
             target="_blank"
           >
@@ -109,7 +119,11 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
               popupStyle={{ marginTop: 0 }}
               style={{ marginTop: 10 }}
               componentPopup={
-                <PopupUserInsight onCloseMenu={onCloseMenu} user={user} />
+                <PopupUserInsight
+                  onCloseMenu={onCloseMenu}
+                  user={user}
+                  tracking={tracking}
+                />
               }
             />
             <Tooltip title="Check active badge">
@@ -141,6 +155,19 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
           </div>
         </div>
       </div>
+      <Link
+        className={`${styles["name-wrap"]} hide-desktop`}
+        to={`https://warpcast.com/${user?.username}`}
+        target="_blank"
+      >
+        <span className={styles.name}>
+          {user?.display_name}
+          {user?.has_active_badge && (
+            <IconActiveBadge style={{ marginLeft: 4 }} />
+          )}
+        </span>
+        <span className={styles.username}>@{user?.username}</span>
+      </Link>
       {bio && (
         <div
           className={styles.bio}

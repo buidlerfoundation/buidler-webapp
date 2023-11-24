@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useEffect } from "react";
 import styles from "./index.module.scss";
 import { Route, Routes } from "react-router-dom";
 import PageNotFound from "shared/PageNotFound";
