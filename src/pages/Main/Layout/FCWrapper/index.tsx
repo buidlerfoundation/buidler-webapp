@@ -110,7 +110,11 @@ const FCWrapper = () => {
   const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
   const [resultData, setResultData] = useState<any>(null);
   const showMobileMenu = useMemo(
-    () => location.pathname === "/home" || location.pathname === "/insights",
+    () =>
+      location.pathname === "/home" ||
+      location.pathname === "/insights" ||
+      location.pathname === "/active" ||
+      location.pathname === "/top",
     [location.pathname]
   );
   const toggleMenu = useCallback(() => setOpenMenu((current) => !current), []);
