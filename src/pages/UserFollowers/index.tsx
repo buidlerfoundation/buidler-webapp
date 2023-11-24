@@ -33,8 +33,8 @@ const UserFollowers = ({ path }: IUserFollowers) => {
     return false;
   }, [path, user?.fid]);
   const renderUser = useCallback(
-    (user: IFCUser) => <UserItem user={user} key={user.fid} />,
-    []
+    (user: IFCUser) => <UserItem user={user} key={user.fid} path={path} />,
+    [path]
   );
   const onPageEndReach = useCallback(() => {
     if (

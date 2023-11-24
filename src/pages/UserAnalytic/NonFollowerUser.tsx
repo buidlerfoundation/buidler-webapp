@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { Tooltip } from "@mui/material";
 import { humanFormatNumber } from "helpers/StringHelper";
 import useIsMobile from "hooks/useIsMobile";
+import IconInformation from "shared/SVG/IconInformation";
 
 interface INonFollowerUser {
   data?: IPagingData<IFCUser>;
@@ -26,7 +27,17 @@ const NonFollowerUser = ({ data, onViewAll }: INonFollowerUser) => {
   return (
     <div className={styles["non-follow-wrap"]}>
       <div className={styles["non-follow-head"]}>
-        <span className={styles.label}>Non-Followers</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span className={styles.label}>Non-Followers</span>
+          <Tooltip
+            title="Users you are following, but who are not following you back."
+            placement="top"
+          >
+            <div className="center">
+              <IconInformation />
+            </div>
+          </Tooltip>
+        </div>
         <div className={styles["btn-view-all"]} onClick={onViewAll}>
           View all
         </div>
@@ -34,7 +45,10 @@ const NonFollowerUser = ({ data, onViewAll }: INonFollowerUser) => {
       <div className={styles["list-non-follow"]}>
         {users.map((el) => (
           <Tooltip title={el.username} key={el.fid} placement="top">
-            <Link to={`/insights/${el.username}`} state={{ goBack: true }}>
+            <Link
+              to={`/insights/${el.username}`}
+              state={{ goBack: true, from: "/non-follower" }}
+            >
               <ImageView
                 alt="avatar"
                 className={styles.avatar}

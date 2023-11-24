@@ -14,6 +14,8 @@ import TopInteractions from "./TopInteractions";
 import useDataTopInteraction from "hooks/useDataTopInteraction";
 import { useNavigate } from "react-router-dom";
 import useDataFollowUser from "hooks/useDataFollowUser";
+import useAppDispatch from "hooks/useAppDispatch";
+import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 
 interface IAnalytics {
   fid?: string;
@@ -22,6 +24,7 @@ interface IAnalytics {
 
 const Analytics = ({ fid, period }: IAnalytics) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const filters = useAppSelector((state) => state.fcAnalytic.filters);
   const fcActivities = useFCActivitiesByName(fid, period);
   const dataEngagement = useFCUserDataEngagement(fid);
@@ -31,13 +34,14 @@ const Analytics = ({ fid, period }: IAnalytics) => {
   const user = useAppSelector((state) => state.fcUser.data);
   const onViewAll = useCallback(() => {
     if (!user) {
+      dispatch(FC_USER_ACTIONS.updateLoginSource("View Non Follower"));
       const loginElement = document.getElementById("btn-login");
       loginElement?.click();
       return;
     } else {
       navigate("non-follower", { state: { goBack: true } });
     }
-  }, [navigate, user]);
+  }, [dispatch, navigate, user]);
   return (
     <div className={styles["analytic-wrap"]}>
       <div className={styles["activity-head"]}>

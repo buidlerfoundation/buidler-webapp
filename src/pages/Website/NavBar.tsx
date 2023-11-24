@@ -5,19 +5,29 @@ import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 const NavBar = () => {
   const location = useLocation();
+  const tracking = useCallback((event: string, cat = "Header") => {
+    GoogleAnalytics.tracking(event, {
+      category: cat,
+    });
+  }, []);
   const onLogoClick = useCallback(() => {
-    GoogleAnalytics.tracking("Header Logo Clicked", {
-      category: "Header",
-    });
-  }, []);
+    tracking("Header Logo Clicked");
+  }, [tracking]);
   const onInstallClick = useCallback(() => {
-    GoogleAnalytics.tracking("Header Install Extension Clicked", {
-      category: "Header",
-    });
-  }, []);
+    tracking("Header Install Extension Clicked");
+  }, [tracking]);
+  const onInsightClick = useCallback(() => {
+    tracking("Header User Insights Clicked");
+  }, [tracking]);
+  const onNewFeedClick = useCallback(() => {
+    tracking("Header NewsFeed Clicked");
+  }, [tracking]);
+  const onRoadMapClick = useCallback(() => {
+    tracking("Header Roadmap Clicked");
+  }, [tracking]);
   return (
     <div id="my-navbar" className="center" style={{ top: 0 }}>
-      <Link className="cta-banner" to="/insights">
+      <Link className="cta-banner" to="/insights" onClick={onInsightClick}>
         <span>
           Discover how your casts and followers are performing on Farcaster.{" "}
           <span className="mention-string">View your profile now →</span>
@@ -71,7 +81,11 @@ const NavBar = () => {
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className={"nav-link"} to="/home">
+                  <Link
+                    className={"nav-link"}
+                    to="/home"
+                    onClick={onNewFeedClick}
+                  >
                     News Feed
                   </Link>
                 </li>
@@ -81,6 +95,7 @@ const NavBar = () => {
                     href="https://buidler-extension.notion.site/Buidler-Roadmap-https-buidler-app-761e03885290404e875a6dca5282121b"
                     target="_blank"
                     rel="noreferrer"
+                    onClick={onRoadMapClick}
                   >
                     Roadmap
                   </a>

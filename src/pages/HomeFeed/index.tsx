@@ -8,6 +8,9 @@ import useAppDispatch from "hooks/useAppDispatch";
 import { getFeed } from "reducers/HomeFeedReducers";
 import LoadingItem from "shared/LoadingItem";
 import AppConfig from "common/AppConfig";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
+import { useLocation } from "react-router-dom";
+import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 
 interface IHomeFeed {
   filter: string;
@@ -15,16 +18,24 @@ interface IHomeFeed {
 
 const HomeFeed = ({ filter }: IHomeFeed) => {
   const dispatch = useAppDispatch();
+  const location = useLocation();
   const feedData = useFeedData(filter);
   const onLogin = useCallback(() => {
+    dispatch(FC_USER_ACTIONS.updateLoginSource("Home Feed"));
     const loginElement = document.getElementById("btn-login");
     loginElement?.click();
-  }, []);
+  }, [dispatch]);
   const renderFeed = useCallback(
     (cast: ICast) => <FeedItem key={cast.hash} cast={cast} onLogin={onLogin} />,
     [onLogin]
   );
   const feeds = useMemo(() => feedData?.data || [], [feedData?.data]);
+  const eventNameByPath = useMemo(() => {
+    if (location.pathname === "/home") return "Trending Links Viewed";
+    if (location.pathname === "/active") return "Active Links Viewed";
+    if (location.pathname === "/top") return "Top Links Viewed";
+    return "";
+  }, [location.pathname]);
   const onPageEndReach = useCallback(() => {
     if (feedData?.canMore && !feedData?.loadMore) {
       dispatch(
@@ -63,6 +74,20 @@ const HomeFeed = ({ filter }: IHomeFeed) => {
       window.removeEventListener("scroll", windowScrollListener);
     };
   }, [windowScrollListener]);
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    GoogleAnalytics.tracking("Page Viewed", {
+      category: "Traffic",
+      page_name: "NewsFeed",
+      source: query.get("ref") || "",
+      path: window.location.pathname,
+    });
+  }, []);
+  useEffect(() => {
+    if (eventNameByPath) {
+      GoogleAnalytics.tracking(eventNameByPath, { category: "NewsFeed" });
+    }
+  }, [eventNameByPath]);
   return (
     <ol className={styles.list}>
       {feeds.length > 0 ? (

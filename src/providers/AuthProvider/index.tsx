@@ -398,9 +398,6 @@ const AuthProvider = ({ children }: IAuthProps) => {
     }
   }, [dispatch, openAtFirst]);
   useEffect(() => {
-    GoogleAnalytics.init();
-  }, []);
-  useEffect(() => {
     if (user.user_id) {
       GoogleAnalytics.identify(user);
     }

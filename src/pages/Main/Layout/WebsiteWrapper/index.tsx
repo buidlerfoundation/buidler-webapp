@@ -5,13 +5,10 @@ import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 const WebsiteWrapper = () => {
   const location = useLocation();
   useEffect(() => {
-    GoogleAnalytics.init();
-  }, []);
-  useEffect(() => {
     const query = new URLSearchParams(location.search);
     GoogleAnalytics.tracking("Page Viewed", {
       category: "Traffic",
-      page_name: "Home",
+      page_name: "Landing Page",
       source: query.get("ref") || "",
       path: location.pathname,
     });

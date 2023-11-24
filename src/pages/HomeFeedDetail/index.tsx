@@ -13,6 +13,8 @@ import CastItem from "shared/CastItem";
 import LoadingItem from "shared/LoadingItem";
 import { ICast } from "models/FC";
 import api from "api";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
+import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 
 const HomeFeedDetail = () => {
   const dispatch = useAppDispatch();
@@ -64,9 +66,10 @@ const HomeFeedDetail = () => {
     }
   }, [castDetail?.metadata?.url]);
   const onLogin = useCallback(() => {
+    dispatch(FC_USER_ACTIONS.updateLoginSource("Home Feed Detail"));
     const loginElement = document.getElementById("btn-login");
     loginElement?.click();
-  }, []);
+  }, [dispatch]);
   const onPageEndReach = useCallback(() => {
     if (castRepliesData?.canMore && !castRepliesData?.loadMore && hash) {
       dispatch(
@@ -104,6 +107,15 @@ const HomeFeedDetail = () => {
       behavior: "auto",
     });
   }, []);
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    GoogleAnalytics.tracking("Page Viewed", {
+      category: "Traffic",
+      page_name: "News Detail",
+      source: query.get("ref") || "",
+      path: location.pathname,
+    });
+  }, [location.pathname]);
   return (
     <div className={styles.container}>
       <nav className={styles.head}>
@@ -153,12 +165,7 @@ const HomeFeedDetail = () => {
           </span>
           <div className={styles["list-other-cast"]}>
             {otherCastsFiltered?.map((el) => (
-              <CastItem
-                cast={el}
-                key={el.hash}
-                homeFeed
-                onLogin={onLogin}
-              />
+              <CastItem cast={el} key={el.hash} homeFeed onLogin={onLogin} />
             ))}
           </div>
         </>

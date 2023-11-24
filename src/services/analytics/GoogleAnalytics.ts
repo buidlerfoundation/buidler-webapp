@@ -4,24 +4,35 @@ import { UserData } from "models/User";
 import CryptoJS from "crypto-js";
 
 class GoogleAnalytics {
+  initial = false;
   init() {
     mixpanel.init(process.env.REACT_APP_MIXPANEL_TOKEN, {
       debug: process.env.NODE_ENV === "development",
       opt_out_tracking_by_default: false,
     });
+    this.initial = true;
   }
 
   identify(user: UserData) {
+    if (!this.initial) {
+      this.init();
+    }
     mixpanel.identify(CryptoJS.SHA1(user.user_id).toString());
     mixpanel.people.set({ name: CryptoJS.SHA1(user.user_id).toString() });
   }
 
   async identifyByExtensionId(id: string) {
+    if (!this.initial) {
+      this.init();
+    }
     mixpanel.identify(id);
     mixpanel.people.set({ name: id });
   }
 
   tracking(eventName: string, props: { [key: string]: string }) {
+    if (!this.initial) {
+      this.init();
+    }
     mixpanel.track(eventName, props);
   }
 
