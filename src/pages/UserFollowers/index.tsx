@@ -9,6 +9,7 @@ import { getDataFollowUsers } from "reducers/FCAnalyticReducers";
 import LoadingItem from "shared/LoadingItem";
 import useDataFollowUser from "hooks/useDataFollowUser";
 import useFCUserByName from "hooks/useFCUserByName";
+import useAppSelector from "hooks/useAppSelector";
 
 interface IUserFollowers {
   path: IUserTabPath;
@@ -18,12 +19,19 @@ const UserFollowers = ({ path }: IUserFollowers) => {
   const dispatch = useAppDispatch();
   const params = useParams<{ username: string }>();
   const username = useMemo(() => params?.username, [params?.username]);
+  const user = useAppSelector((state) => state.fcUser.data);
   const fcUser = useFCUserByName(username);
   const dataFollowUser = useDataFollowUser(fcUser?.data?.fid, path);
   const users = useMemo(
     () => dataFollowUser?.data || [],
     [dataFollowUser?.data]
   );
+  const disabled = useMemo(() => {
+    if (path === "/non-follower") {
+      return !user?.fid;
+    }
+    return false;
+  }, [path, user?.fid]);
   const renderUser = useCallback(
     (user: IFCUser) => <UserItem user={user} key={user.fid} />,
     []
@@ -79,6 +87,7 @@ const UserFollowers = ({ path }: IUserFollowers) => {
       window.removeEventListener("scroll", windowScrollListener);
     };
   }, [windowScrollListener]);
+  if (disabled) return null;
   return (
     <div className={styles.container}>
       {users.map(renderUser)}

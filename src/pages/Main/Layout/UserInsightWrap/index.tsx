@@ -33,6 +33,10 @@ const UserInsightWrap = () => {
   const navigate = useNavigate();
   const username = useMemo(() => params?.username, [params?.username]);
   const fcUser = useFCUserByName(username);
+  const userTabsFiltered = useMemo(() => {
+    if (user?.fid) return userTabs;
+    return userTabs.filter((el) => el.path !== "/non-follower");
+  }, [user?.fid, userTabs]);
   const period = useMemo(
     () => (search.get("period") || "7d") as ActivityPeriod,
     [search]
@@ -99,7 +103,7 @@ const UserInsightWrap = () => {
         </div>
         {showTab && (
           <div className={styles.tabs}>
-            {userTabs.map((el) => (
+            {userTabsFiltered.map((el) => (
               <Link
                 to={`/insights/${username}${el.path}`}
                 key={el.path}
