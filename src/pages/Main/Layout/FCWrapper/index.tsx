@@ -313,12 +313,13 @@ const FCWrapper = () => {
   );
   const onOpenDiscussion = useCallback(() => {
     if (!fcUser) {
+      dispatch(FC_USER_ACTIONS.updateLoginSource("Post Link"));
       onLoginClick();
       return;
     }
     setInitialShareUrl("");
     toggleDiscussion();
-  }, [fcUser, onLoginClick, toggleDiscussion]);
+  }, [dispatch, fcUser, onLoginClick, toggleDiscussion]);
   const renderMenu = useCallback(
     () => (
       <div className={styles.menus}>
