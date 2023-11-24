@@ -29,7 +29,7 @@ const NavBar = () => {
     <div id="my-navbar" className="center" style={{ top: 0 }}>
       <Link className="cta-banner" to="/insights" onClick={onInsightClick}>
         <span>
-          Discover how your casts and followers are performing on Farcaster.{" "}
+          Get a full overview of your performance on Farcaster.{" "}
           <span className="mention-string">View your profile now →</span>
         </span>
       </Link>
