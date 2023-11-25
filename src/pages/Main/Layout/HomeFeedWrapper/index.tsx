@@ -37,10 +37,7 @@ const HomeFeedWrapper = () => {
     ),
     [location.pathname]
   );
-  const title = useMemo(
-    () => filters.find((el) => el.path === location.pathname)?.title,
-    [filters, location.pathname]
-  );
+  const title = useMemo(() => "Hacker News on Farcaster", []);
   useEffect(() => {
     if (title) {
       document.title = `${title} | Buidler`;
