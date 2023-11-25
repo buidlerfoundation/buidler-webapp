@@ -33,7 +33,7 @@ const initialState: HomeFeedState = {
       path: "/home",
       id: "1",
       value: "trending",
-      title: "Hacker News on Farcaster",
+      title: "Trending links on Farcaster",
     },
     {
       label: "active",
