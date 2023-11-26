@@ -1,16 +1,14 @@
+"use client";
+
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
-import "./css/index.scss";
-import "./css/responsive.scss";
-import "./css/home.scss";
-import "./css/home-responsive.scss";
 import images from "common/images";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 const Website = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [showVideo, setShowVideo] = useState(false);
   const [faqExpand, setFAQExpand] = useState("");
   const previousScrollTop = useRef(0);
@@ -78,10 +76,9 @@ const Website = () => {
   }, []);
   useEffect(() => {
     if ("standalone" in window.navigator && window.navigator.standalone) {
-      navigate("/home", { replace: true });
+      router.replace("/home");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [router]);
   return (
     <div className="home" onScroll={onScroll}>
       <NavBar />

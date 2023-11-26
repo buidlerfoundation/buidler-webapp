@@ -5,19 +5,19 @@ import { Community } from "models/Community";
 const Prefix = "Buidler";
 
 const AppConfig = {
-  apiBaseUrl: process.env.REACT_APP_API_BASE_URL,
+  apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
   maxLengthSpaceDescription: 450,
   maxLengthCommunityDescription: 1000,
   maximumFileSize: 100000000,
   etherscanUrl:
-    process.env.REACT_APP_DEFAULT_CHAIN_ID === "4"
+    process.env.NEXT_PUBLIC_DEFAULT_CHAIN_ID === "4"
       ? "https://rinkeby.etherscan.io"
       : "https://etherscan.io",
   buidlerCommunityId: "c9097f50-9f0b-4e0a-a042-ab7790aff3b0",
   estimateGasRecipientAddress: "0x1908bf9Dae06BB1F6E4C7eE0f7B5D4c82D1Ba6ad",
   buidlerExtensionId: "ldbjeldeabnbghmhakiijnpfggokmhib",
   loginPath: "/started",
-  walletConnectProjectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID || "",
+  walletConnectProjectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "",
   websiteUrl: "https://buidler.app",
   loadMoreOffset: 500,
 };

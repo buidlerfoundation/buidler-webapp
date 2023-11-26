@@ -1,7 +1,8 @@
+"use client";
+
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import IconArrowBack from "shared/SVG/IconArrowBack";
-import { useNavigate, useParams } from "react-router-dom";
 import LoadingItem from "shared/LoadingItem";
 import CastItem from "shared/CastItem";
 import CastDetailItem from "shared/CastDetailItem";
@@ -9,11 +10,12 @@ import useAppDispatch from "hooks/useAppDispatch";
 import useAppSelector from "hooks/useAppSelector";
 import useFeedRepliesData from "hooks/useFeedRepliesData";
 import { getCastDetail, getCastReplies } from "reducers/HomeFeedReducers";
+import { useParams, useRouter } from "next/navigation";
 
 const FCDetail = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const onBack = useCallback(() => navigate(-1), [navigate]);
+  const router = useRouter();
+  const onBack = useCallback(() => router.back(), [router]);
   const params = useParams<{ cast_hash: string }>();
   const castHash = useMemo(() => params?.cast_hash, [params?.cast_hash]);
   const loading = useAppSelector((state) => state.homeFeed.castDetail.loading);

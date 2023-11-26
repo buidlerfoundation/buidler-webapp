@@ -12,7 +12,6 @@ import { interactionHeads, sortDataInteraction } from "helpers/TableHelper";
 import useAppSelector from "hooks/useAppSelector";
 import { IFCUser } from "models/FC";
 import React, { memo, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import ImageView from "shared/ImageView";
 import styles from "./index.module.scss";
 import { formatNumber } from "helpers/StringHelper";
@@ -21,13 +20,14 @@ import IconReply from "shared/SVG/FC/IconReply";
 import IconRecast from "shared/SVG/FC/IconRecast";
 import useAppDispatch from "hooks/useAppDispatch";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
+import { useRouter } from "next/navigation";
 
 interface ITopInteractionTable {
   data: IFCUser[];
 }
 
 const TopInteractionTable = ({ data }: ITopInteractionTable) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.fcUser.data);
   const [order, setOrder] = React.useState<"asc" | "desc">("desc");
@@ -105,9 +105,7 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
                 <TableRow
                   hover
                   onClick={(event) => {
-                    navigate(`/insights/${row.username}`, {
-                      state: { goBack: true },
-                    });
+                    router.push(`/insights/${row.username}`);
                   }}
                   key={row.fid}
                   sx={{ cursor: "pointer" }}

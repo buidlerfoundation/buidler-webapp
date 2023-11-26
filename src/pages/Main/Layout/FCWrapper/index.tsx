@@ -6,7 +6,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 import styles from "./index.module.scss";
 import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
 import IconMenuHome from "shared/SVG/FC/IconMenuHome";
@@ -26,7 +25,6 @@ import IconDownload from "shared/SVG/FC/IconDownload";
 import useExtensionInstalled from "hooks/useExtensionInstalled";
 import { HOME_FEED_ACTIONS, getFeedByUrl } from "reducers/HomeFeedReducers";
 import ModalFCReply from "shared/ModalFCReply";
-import ScrollRestoration from "../ScrollRestoration";
 import PopoverButton from "shared/PopoverButton";
 import PopupUserFCMenu from "shared/PopupUserFCMenu";
 import useFeedFilters from "hooks/useFeedFilters";
@@ -38,6 +36,8 @@ import useQuery from "hooks/useQuery";
 import IconMenuAnalytic from "shared/SVG/FC/IconMenuAnalytic";
 import ModalBugsReport from "shared/ModalBugsReport";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
+import Link from "next/link";
+import { useParams, usePathname } from "next/navigation";
 
 interface IMenuItem {
   active?: boolean;
@@ -59,7 +59,7 @@ const MenuItem = ({ active, title, to, icon, onClick }: IMenuItem) => {
     [active, onClick]
   );
   return (
-    <Link className={styles["menu-item"]} to={to} onClick={onMenuClick}>
+    <Link className={styles["menu-item"]} href={to} onClick={onMenuClick}>
       {icon}
       <span
         style={{
@@ -78,20 +78,24 @@ const MenuItem = ({ active, title, to, icon, onClick }: IMenuItem) => {
 
 const MenuItemMemo = memo(MenuItem);
 
-const FCWrapper = () => {
+interface IFCWrapper {
+  children: React.ReactNode;
+}
+
+const FCWrapper = ({ children }: IFCWrapper) => {
   const dispatch = useAppDispatch();
   const [openMenu, setOpenMenu] = useState(false);
   const popupMenuRef = useRef<any>();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [loginLoading, setLoginLoading] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
   const query = useQuery();
-  const querySignerId = useMemo(() => query.get("signer_id"), [query]);
+  const querySignerId = useMemo(() => query?.get("signer_id"), [query]);
   const [polling, setPolling] = useState(false);
   const [initialShareUrl, setInitialShareUrl] = useState("");
   const [openDiscussion, setOpenDiscussion] = useState(false);
   const [openBugsReport, setOpenBugsReport] = useState(false);
-  const initialTheme = useMemo(() => query.get("theme"), [query]);
+  const initialTheme = useMemo(() => query?.get("theme"), [query]);
   const [theme, setTheme] = useState(initialTheme);
   const filters = useFeedFilters();
   const params = useParams<{ url: string }>();
@@ -105,17 +109,17 @@ const FCWrapper = () => {
   const replyCast = useAppSelector((state) => state.homeFeed.replyCast);
   const storeSignerId = useAppSelector((state) => state.fcUser?.signer_id);
   const pollingController = useRef(new AbortController());
-  const location = useLocation();
+  const pathname = usePathname();
   const activeColor = useMemo(() => "var(--color-primary-text)", []);
   const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
   const [resultData, setResultData] = useState<any>(null);
   const showMobileMenu = useMemo(
     () =>
-      location.pathname === "/home" ||
-      location.pathname === "/insights" ||
-      location.pathname === "/active" ||
-      location.pathname === "/top",
-    [location.pathname]
+      pathname === "/home" ||
+      pathname === "/insights" ||
+      pathname === "/active" ||
+      pathname === "/top",
+    [pathname]
   );
   const toggleMenu = useCallback(() => setOpenMenu((current) => !current), []);
   const toggleBugsReport = useCallback(
@@ -300,20 +304,17 @@ const FCWrapper = () => {
     onCloseMenu();
   }, [logout, onCloseMenu]);
   const activeHome = useMemo(
-    () => !!filters.find((el) => el.path === location.pathname),
-    [filters, location.pathname]
+    () => !!filters.find((el) => el.path === pathname),
+    [filters, pathname]
   );
-  const activeAnalytic = useMemo(
-    () => location.pathname === "/insights",
-    [location.pathname]
-  );
+  const activeAnalytic = useMemo(() => pathname === "/insights", [pathname]);
   const activeExplore = useMemo(
-    () => location.pathname.includes("/explore"),
-    [location.pathname]
+    () => pathname?.includes("/explore"),
+    [pathname]
   );
   const activeCommunity = useMemo(
-    () => location.pathname.includes("/community"),
-    [location.pathname]
+    () => pathname?.includes("/community"),
+    [pathname]
   );
   const onOpenDiscussion = useCallback(() => {
     if (!fcUser) {
@@ -411,7 +412,7 @@ const FCWrapper = () => {
       <aside className={styles["left-side"]}>
         <Link
           className={`${styles["menu-item"]} ${styles["brand-wrap"]}`}
-          to="/home"
+          href="/home"
         >
           <div
             style={{
@@ -454,7 +455,7 @@ const FCWrapper = () => {
             }`}
           >
             <div className={styles["nav-mobile"]}>
-              <Link className={styles["mobile-brand-wrap"]} to="/home">
+              <Link className={styles["mobile-brand-wrap"]} href="/home">
                 <div
                   style={{
                     width: 30,
@@ -475,7 +476,7 @@ const FCWrapper = () => {
             {renderMenu()}
           </div>
         )}
-        <Outlet />
+        {children}
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>
       {!storeSignerId && openLogin && (
@@ -515,7 +516,7 @@ const FCWrapper = () => {
         handleClose={onCloseReviewResult}
       />
       <ModalBugsReport open={openBugsReport} handleClose={toggleBugsReport} />
-      <ScrollRestoration />
+      {/* <ScrollRestoration /> */}
       <div id="btn-share-profile" onClick={onShareProfileClick} />
       <div id="btn-bugs-report" onClick={toggleBugsReport} />
     </div>

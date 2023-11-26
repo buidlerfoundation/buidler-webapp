@@ -84,7 +84,6 @@ import icArrowDown from "../assets/images/ic_arrow_down.svg";
 import icSwap from "../assets/images/ic_swap.svg";
 import icWalletConnect from "../assets/images/ic_wallet_connect.svg";
 import icCameraSolid from "../assets/images/ic_camera_solid.svg";
-import icClearText from "../assets/images/ic_clear_text.png";
 import icStar from "../assets/images/ic_star.svg";
 import icSettingSpaceDisplay from "../assets/images/ic_setting_space_display.svg";
 import icSettingSpaceAccess from "../assets/images/ic_setting_space_access.svg";
@@ -102,19 +101,6 @@ import MetaMaskLogo2 from "../assets/images/metamask_logo_2.svg";
 import IconCircleCheck from "../assets/images/ic_circle_check.svg";
 import iconVideoPlay from "../assets/images/ic_video_play.svg";
 import icExplore from "../assets/images/ic_explore.png";
-import icDefaultAvatar from "../assets/images/ic_default_avatar.svg";
-import icDefaultSiteLogo from "../assets/images/ic_default_site_logo.svg";
-import icDefaultSiteLogoGray from "../assets/images/ic_default_site_logo_gray.svg";
-
-// website
-import logoDark from "../assets/website/nav_logo.svg";
-import logoLight from "../assets/website/nav_logo_light.svg";
-import videoPromo from "../assets/website/img_frame_video.mp4";
-import icPlay from "../assets/website/ic_play_dark.svg";
-import icFAQExpand from "../assets/website/ic_expand.svg";
-import icGH from "../assets/website/ic_gh.svg";
-import icTW from "../assets/website/ic_tw.svg";
-import icYTB from "../assets/website/ic_ytb.svg";
 
 const images = {
   icTeamDefault,
@@ -203,7 +189,7 @@ const images = {
   icSwap,
   icWalletConnect,
   icCameraSolid,
-  icClearText,
+  icClearText: "/images/ic_clear_text.png",
   icStar,
   icSettingSpaceDisplay,
   icSettingSpaceAccess,
@@ -220,18 +206,18 @@ const images = {
   MetaMaskLogo2,
   IconCircleCheck,
   iconVideoPlay,
-  logoDark,
-  logoLight,
-  videoPromo,
-  icPlay,
-  icFAQExpand,
-  icGH,
-  icTW,
-  icYTB,
+  logoDark: "/website/nav_logo.svg",
+  logoLight: "/website/nav_logo_light.svg",
+  icPlay: "/website/ic_play_dark.svg",
+  icFAQExpand: "/website/ic_expand.svg",
+  icGH: "/website/ic_gh.svg",
+  icTW: "/website/ic_tw.svg",
+  icYTB: "/website/ic_ytb.svg",
+  videoPromo: "/website/img_frame_video.mp4",
   icExplore,
-  icDefaultAvatar,
-  icDefaultSiteLogo,
-  icDefaultSiteLogoGray,
+  icDefaultAvatar: "/images/ic_default_avatar.svg",
+  icDefaultSiteLogo: "/images/ic_default_site_logo.svg",
+  icDefaultSiteLogoGray: "/images/ic_default_site_logo_gray.svg",
 };
 
 export default images;

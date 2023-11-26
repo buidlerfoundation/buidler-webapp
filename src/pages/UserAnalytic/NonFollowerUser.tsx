@@ -2,11 +2,11 @@ import React, { memo, useMemo } from "react";
 import styles from "./index.module.scss";
 import { IFCUser, IPagingData } from "models/FC";
 import ImageView from "shared/ImageView";
-import { Link } from "react-router-dom";
 import { Tooltip } from "@mui/material";
 import { humanFormatNumber } from "helpers/StringHelper";
 import useIsMobile from "hooks/useIsMobile";
 import IconInformation from "shared/SVG/IconInformation";
+import Link from "next/link";
 
 interface INonFollowerUser {
   data?: IPagingData<IFCUser>;
@@ -45,10 +45,7 @@ const NonFollowerUser = ({ data, onViewAll }: INonFollowerUser) => {
       <div className={styles["list-non-follow"]}>
         {users.map((el) => (
           <Tooltip title={el.username} key={el.fid} placement="top">
-            <Link
-              to={`/insights/${el.username}`}
-              state={{ goBack: true, from: "/non-follower" }}
-            >
+            <Link href={`/insights/${el.username}`}>
               <ImageView
                 alt="avatar"
                 className={styles.avatar}

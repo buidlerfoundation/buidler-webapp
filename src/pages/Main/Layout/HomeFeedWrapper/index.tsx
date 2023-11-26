@@ -1,8 +1,11 @@
+"use client"
+
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import useFeedFilters from "hooks/useFeedFilters";
 import { IFCFilterType } from "models/FC";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface IFilterItem {
   item: IFCFilterType;
@@ -15,7 +18,7 @@ const FilterItem = ({ item, active }: IFilterItem) => {
       className={`${styles["filter-item"]} ${
         active ? styles["filter-active"] : ""
       }`}
-      to={item.path}
+      href={item.path}
     >
       {item.label}
     </Link>
@@ -24,18 +27,22 @@ const FilterItem = ({ item, active }: IFilterItem) => {
 
 const FilterItemMemo = memo(FilterItem);
 
-const HomeFeedWrapper = () => {
+interface IHomeFeedWrapper {
+  children: React.ReactNode;
+}
+
+const HomeFeedWrapper = ({ children }: IHomeFeedWrapper) => {
   const filters = useFeedFilters();
-  const location = useLocation();
+  const pathname = usePathname();
   const renderFilter = useCallback(
     (item: IFCFilterType) => (
       <FilterItemMemo
         item={item}
         key={item.id}
-        active={location.pathname === item.path}
+        active={pathname === item.path}
       />
     ),
-    [location.pathname]
+    [pathname]
   );
   const title = useMemo(() => "Hacker News on Farcaster", []);
   useEffect(() => {
@@ -49,7 +56,7 @@ const HomeFeedWrapper = () => {
         <div className={styles.title}>{title}</div>
         <nav className={styles["filter-head"]}>{filters.map(renderFilter)}</nav>
       </div>
-      <Outlet />
+      {children}
     </div>
   );
 };

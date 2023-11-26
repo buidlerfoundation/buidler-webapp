@@ -1,3 +1,5 @@
+"use client";
+
 import api from "api";
 import { AsyncKey } from "common/AppConfig";
 import { clearData, getCookie, removeCookie, setCookie } from "common/Cookie";
@@ -14,7 +16,6 @@ import React, {
   useState,
 } from "react";
 import { toast } from "react-hot-toast";
-import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { FC_USER_ACTIONS, getCurrentFCUser } from "reducers/FCUserReducers";
 import styles from "./index.module.scss";
 import LoginFC from "shared/LoginFC";
@@ -34,18 +35,23 @@ import {
   extractContentMessage,
   normalizeContentCastToSubmit,
 } from "helpers/CastHelper";
+import { useParams, useRouter } from "next/navigation";
 
-const FCPluginWrapper = () => {
+interface IFCPluginWrapper {
+  children: React.ReactNode;
+}
+
+const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const router = useRouter();
   const popupMenuRef = useRef<any>();
   const [theme, setTheme] = useState("");
   const query = useQuery();
   const params = useParams<{ cast_hash: string }>();
   const castHash = useMemo(() => params?.cast_hash, [params?.cast_hash]);
-  const initialTheme = useMemo(() => query.get("theme"), [query]);
+  const initialTheme = useMemo(() => query?.get("theme"), [query]);
   const pollingController = useRef(new AbortController());
-  const q = useMemo(() => query.get("q"), [query]);
+  const q = useMemo(() => query?.get("q"), [query]);
   const [loading, setLoading] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
   const [polling, setPolling] = useState(false);
@@ -58,7 +64,7 @@ const FCPluginWrapper = () => {
   const fcUser = useAppSelector((state) => state.fcUser?.data);
   const replyCast = useAppSelector((state) => state.fcCast.replyCast);
   const openNewCast = useAppSelector((state) => state.fcCast.openNewCast);
-  const signerId = useMemo(() => query.get("signer_id"), [query]);
+  const signerId = useMemo(() => query?.get("signer_id"), [query]);
   const logout = useCallback(() => {
     window.top?.postMessage(
       { type: "b-fc-plugin-logout" },
@@ -212,6 +218,10 @@ const FCPluginWrapper = () => {
   const onCloseModalReply = useCallback(() => {
     dispatch(FC_CAST_ACTIONS.updateReplyCast());
   }, [dispatch]);
+  const onLoginClick = useCallback(() => {
+    if (signedKeyRequest) return;
+    requestSignerId();
+  }, [requestSignerId, signedKeyRequest]);
   useEffect(() => {
     if (q) {
       dispatch(FC_CAST_ACTIONS.updateQueryUrl(q));
@@ -276,7 +286,7 @@ const FCPluginWrapper = () => {
         dispatch(FC_CAST_ACTIONS.updateQueryUrl(e?.data?.payload?.url || ""));
         dispatch(FC_CAST_ACTIONS.updateTitleUrl(e?.data?.payload?.title || ""));
         if (castHash) {
-          navigate(-1);
+          router.back();
         }
       }
       if (e?.data?.type === "b-fc-initial-data") {
@@ -302,8 +312,15 @@ const FCPluginWrapper = () => {
     return () => {
       window.removeEventListener("message", messageListener);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [castHash, onCloseModalReply, castToFC, dispatch, initialSignerId]);
+  }, [
+    castHash,
+    onCloseModalReply,
+    castToFC,
+    dispatch,
+    initialSignerId,
+    onLoginClick,
+    router,
+  ]);
   useEffect(() => {
     if (theme) {
       document.getElementsByTagName("html")?.[0]?.setAttribute("class", theme);
@@ -315,10 +332,6 @@ const FCPluginWrapper = () => {
     setSignedKeyRequest(null);
     setOpenLogin(false);
   }, []);
-  const onLoginClick = useCallback(() => {
-    if (signedKeyRequest) return;
-    requestSignerId();
-  }, [requestSignerId, signedKeyRequest]);
   useEffect(() => {
     if (openNewCast && !fcUser) {
       onLoginClick();
@@ -372,7 +385,7 @@ const FCPluginWrapper = () => {
           </div>
         )}
       </div>
-      <Outlet />
+      {children}
       <CopyRight />
       {!storeSignerId && openLogin && (
         <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>

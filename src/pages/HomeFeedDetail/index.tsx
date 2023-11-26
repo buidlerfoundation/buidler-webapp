@@ -1,7 +1,8 @@
+"use client";
+
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./index.module.scss";
 import IconArrowBack from "shared/SVG/IconArrowBack";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import MetadataFeed from "shared/MetadataFeed";
 import useAppSelector from "hooks/useAppSelector";
 import useFeedRepliesData from "hooks/useFeedRepliesData";
@@ -15,11 +16,12 @@ import { ICast } from "models/FC";
 import api from "api";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
+import { useParams, usePathname, useRouter } from "next/navigation";
 
 const HomeFeedDetail = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const pathname = usePathname();
   const loading = useAppSelector((state) => state.homeFeed.castDetail.loading);
   const params = useParams<{ hash: string }>();
   const hash = useMemo(() => params?.hash, [params?.hash]);
@@ -39,25 +41,27 @@ const HomeFeedDetail = () => {
     [castRepliesData.canMore, loading, otherCastsFiltered.length]
   );
   const goBack = useCallback(() => {
-    if (window?.history?.state?.idx > 0) {
-      navigate(-1);
-    } else {
-      navigate("/home", { replace: true });
-    }
-  }, [navigate]);
+    // if (window.history.length > 0) {
+    //   router.back();
+    // } else {
+    //   router.replace("/home");
+    // }
+    router.back();
+  }, [router]);
   useEffect(() => {
     if (hash) {
+      // TODO: cast_author_fid from state
       dispatch(
         getCastDetail({
           hash,
           page: 1,
           limit: 20,
-          cast_author_fid: location.state?.cast_author_fid,
+          // cast_author_fid: location.state?.cast_author_fid,
         })
       );
       setOtherCasts([]);
     }
-  }, [dispatch, hash, location.state?.cast_author_fid]);
+  }, [dispatch, hash]);
   useEffect(() => {
     if (castDetail?.metadata?.url) {
       api
@@ -113,9 +117,9 @@ const HomeFeedDetail = () => {
       category: "Traffic",
       page_name: "News Detail",
       source: query.get("ref") || "",
-      path: location.pathname,
+      path: pathname || "",
     });
-  }, [location.pathname]);
+  }, [pathname]);
   return (
     <div className={styles.container}>
       <nav className={styles.head}>

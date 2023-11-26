@@ -2,8 +2,6 @@ import { getUniqueId } from "helpers/GenerateUUID";
 import { AsyncKey } from "./AppConfig";
 import Cookies from "js-cookie";
 import { ethers } from "ethers";
-import { SESSION_ACTIONS } from "reducers/SessionReducers";
-import store from "store";
 
 export const clearData = (callback = () => {}) => {
   Cookies.remove(AsyncKey.accessTokenKey);
@@ -44,7 +42,6 @@ export const setCookie = (key: string, val: any) => {
       { type: "buidler-plugin-set-cookie", key, value: val },
       { targetOrigin: "*" }
     );
-    store.dispatch(SESSION_ACTIONS.updateSession({ key, value: val }));
     Cookies.set(key, val);
     return resolve();
   });
@@ -53,8 +50,7 @@ export const setCookie = (key: string, val: any) => {
 export const getCookie = async (key: string, ignoreSession?: boolean) => {
   return new Promise<any>((resolve, reject) => {
     const data = Cookies.get(key);
-    if (ignoreSession) return resolve(data);
-    return resolve(data || store.getState().session?.[key]);
+    return resolve(data);
   });
 };
 

@@ -1,14 +1,20 @@
 {
-  "name": "buidler-web-app",
+  "name": "buidler-web",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@metamask/providers": "^11.0.0",
     "@mui/lab": "^5.0.0-alpha.135",
     "@mui/material": "^5.13.4",
-    "@reduxjs/toolkit": "^1.9.5",
+    "@reduxjs/toolkit": "1.9.5",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
@@ -22,80 +28,55 @@
     "@walletconnect/utils": "^2.9.0",
     "@web3auth/modal": "^6.1.7",
     "@web3modal/standalone": "^2.4.3",
+    "bootstrap": "4.1.3",
     "crypto-js": "^4.1.1",
     "eciesjs": "^0.3.17",
     "emoji-mart": "3.0.1",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "5.6.7",
     "firebase": "^9.22.2",
+    "jquery": "^3.7.1",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
     "mixpanel-browser": "^2.47.0",
     "moment": "^2.29.4",
+    "next": "14.0.3",
     "numeral": "^2.0.6",
-    "react": "^18.2.0",
+    "react": "^18",
     "react-beautiful-dnd": "^13.1.1",
     "react-contenteditable": "^3.3.7",
-    "react-dom": "^18.2.0",
+    "react-dom": "^18",
     "react-dropzone": "11.3.2",
     "react-hot-toast": "^2.4.1",
     "react-qr-code": "^2.0.11",
-    "react-redux": "^8.0.7",
-    "react-router-dom": "^6.13.0",
-    "react-scripts": "4.0.3",
+    "react-redux": "8.0.7",
     "react-share-social": "^0.1.55",
-    "recharts": "^2.9.3",
+    "recharts": "^2.10.1",
     "sass": "^1.63.2",
     "socket.io-client": "4.7.2",
-    "typescript": "^4.4.2",
     "use-screenshot-hook": "^1.0.2",
     "uuid": "^9.0.0",
     "web-vitals": "^2.1.0"
   },
-  "scripts": {
-    "start": "react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      "chrome >= 67",
-      "edge >= 79",
-      "firefox >= 68",
-      "opera >= 54",
-      "safari >= 14"
-    ],
-    "development": [
-      "chrome >= 67",
-      "edge >= 79",
-      "firefox >= 68",
-      "opera >= 54",
-      "safari >= 14"
-    ]
-  },
-  "resolutions": {
-    "//": "See https://github.com/facebook/create-react-app/issues/11773",
-    "react-error-overlay": "6.0.9"
-  },
   "devDependencies": {
+    "@types/bootstrap": "4.1.3",
     "@types/crypto-js": "^4.1.1",
     "@types/emoji-mart": "^3.0.9",
     "@types/js-cookie": "^3.0.3",
     "@types/lodash": "^4.14.195",
     "@types/mixpanel-browser": "^2.38.1",
+    "@types/node": "^20",
     "@types/numeral": "^2.0.2",
+    "@types/react": "^18",
     "@types/react-beautiful-dnd": "^13.1.4",
+    "@types/react-dom": "^18",
     "@types/uuid": "^9.0.1",
-    "redux-logger": "^3.0.6"
-  },
-  "browser": {
-    "crypto": false
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.3",
+    "postcss": "^8",
+    "redux-logger": "^3.0.6",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
   }
 }

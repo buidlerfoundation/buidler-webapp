@@ -1,32 +1,32 @@
 @font-face {
   font-family: "Helvetica";
-  src: url("./assets/fonts/Helvetica.otf");
+  src: url("/fonts/Helvetica.otf");
 }
 
 @font-face {
   font-family: "SF-UI-Text";
-  src: url("./assets/fonts/SFUIText-Regular.woff");
+  src: url("/fonts/SFUIText-Regular.woff");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: "SF-UI-Text";
-  src: url("./assets/fonts/SFUIText-Medium.woff");
+  src: url("/fonts/SFUIText-Medium.woff");
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
   font-family: "SF-UI-Text";
-  src: url("./assets/fonts/SFUIText-Semibold.woff");
+  src: url("/fonts/SFUIText-Semibold.woff");
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
   font-family: "SF-UI-Text";
-  src: url("./assets/fonts/SFUIText-Bold.woff");
+  src: url("/fonts/SFUIText-Bold.woff");
   font-weight: 700;
   font-style: normal;
 }
@@ -49,6 +49,12 @@ h2,
 h3,
 h4 {
   color: var(--color-primary-text);
+}
+
+section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 body {

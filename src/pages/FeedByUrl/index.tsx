@@ -1,8 +1,9 @@
+"use client";
+
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./index.module.scss";
 import useAppSelector from "hooks/useAppSelector";
 import IconArrowBack from "shared/SVG/IconArrowBack";
-import { useNavigate, useParams } from "react-router-dom";
 import Spinner from "shared/Spinner";
 import LoadingItem from "shared/LoadingItem";
 import CastItem from "shared/CastItem";
@@ -12,10 +13,11 @@ import api from "api";
 import MetadataFeed from "shared/MetadataFeed";
 import useAppDispatch from "hooks/useAppDispatch";
 import { getFeedByUrl } from "reducers/HomeFeedReducers";
+import { useParams, useRouter } from "next/navigation";
 
 const FeedByUrl = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const router = useRouter();
   const params = useParams<{ url: string }>();
   const exploreUrl = useMemo(() => params?.url, [params?.url]);
   const explore = useAppSelector((state) => state.homeFeed.explore);
@@ -58,8 +60,8 @@ const FeedByUrl = () => {
     );
   }, [explore?.data, explore?.loadMore, explore.loading, metadata, renderFeed]);
   const goBack = useCallback(() => {
-    navigate(-1);
-  }, [navigate]);
+    router.back();
+  }, [router]);
   const onPageEndReach = useCallback(() => {
     if (exploreUrl && explore?.canMore && !explore?.loadMore) {
       dispatch(

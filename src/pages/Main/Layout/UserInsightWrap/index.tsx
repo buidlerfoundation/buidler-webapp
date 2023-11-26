@@ -1,15 +1,19 @@
+"use client";
+
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import IconArrowBack from "shared/SVG/IconArrowBack";
-import {
-  Link,
-  Outlet,
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
 import useFCUserByName from "hooks/useFCUserByName";
+import useAppSelector from "hooks/useAppSelector";
+import { ActivityPeriod } from "models/FC";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
+import Link from "next/link";
+import useUserTabs from "hooks/useUserTabs";
 import useAppDispatch from "hooks/useAppDispatch";
 import {
   getActivities,
@@ -18,47 +22,48 @@ import {
   getDataEngagement,
   getDataFollowUsers,
   getTopInteractions,
-  getUser,
-} from "reducers/FCAnalyticReducers";
-import useAppSelector from "hooks/useAppSelector";
-import { ActivityPeriod } from "models/FC";
+  getUserProfile,
+} from "reducers/InsightReducers";
 
-const UserInsightWrap = () => {
-  const params = useParams<{ username: string }>();
-  const [search] = useSearchParams();
-  const location = useLocation();
-  const user = useAppSelector((state) => state.fcUser.data);
-  const userTabs = useAppSelector((state) => state.fcAnalytic.userTabs);
+interface IUserInsightWrap {
+  children: React.ReactNode;
+}
+
+const UserInsightWrap = ({ children }: IUserInsightWrap) => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const params = useParams<{ username: string }>();
+  const search = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
   const username = useMemo(() => params?.username, [params?.username]);
+  const user = useAppSelector((state) => state.fcUser.data);
+  const userTabs = useUserTabs();
   const fcUser = useFCUserByName(username);
   const userTabsFiltered = useMemo(() => {
     if (user?.fid) return userTabs;
-    return userTabs.filter((el) => el.path !== "/non-follower");
+    return userTabs?.filter((el) => el.path !== "/non-follower");
   }, [user?.fid, userTabs]);
   const period = useMemo(
-    () => (search.get("period") || "7d") as ActivityPeriod,
+    () => (search?.get("period") || "7d") as ActivityPeriod,
     [search]
   );
   const showTab = useMemo(
-    () => userTabs.find((el) => !!location.pathname.includes(el.path)),
-    [location.pathname, userTabs]
+    () => userTabs?.find((el) => !!pathname?.includes(el.path)),
+    [pathname, userTabs]
   );
   const goBack = useCallback(() => {
-    if (location.state?.goBack) {
-      navigate(-1);
+    if (window.history.length > 0) {
+      router.back();
     } else {
-      navigate("/insights", { replace: true });
+      router.replace("/insights");
     }
-  }, [location.state?.goBack, navigate]);
+  }, [router]);
   useEffect(() => {
     if (username) {
-      dispatch(getUser({ username }))
+      dispatch(getUserProfile({ username }))
         .unwrap()
         .then((res) => {
           if (res.success && res.data?.fid) {
-            document.title = `${res?.data?.display_name} (${res?.data?.username}) | Buidler`;
             dispatch(
               getDataFollowUsers({
                 username: res.data?.fid,
@@ -103,15 +108,13 @@ const UserInsightWrap = () => {
         </div>
         {showTab && (
           <div className={styles.tabs}>
-            {userTabsFiltered.map((el) => (
+            {userTabsFiltered?.map((el) => (
               <Link
-                to={`/insights/${username}${el.path}`}
+                href={`/insights/${username}${el.path}`}
                 key={el.path}
                 className={`${styles["tab-item"]} ${
-                  location.pathname.includes(el.path) ? styles.active : ""
+                  pathname?.includes(el.path) ? styles.active : ""
                 }`}
-                replace
-                state={{ goBack: true }}
               >
                 {el.label}
               </Link>
@@ -119,7 +122,7 @@ const UserInsightWrap = () => {
           </div>
         )}
       </nav>
-      <Outlet />
+      {children}
     </div>
   );
 };

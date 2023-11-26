@@ -1,10 +1,11 @@
 import images from "common/images";
 import React, { memo, useCallback } from "react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
+import { usePathname } from "next/navigation";
 
 const NavBar = () => {
-  const location = useLocation();
+  const pathname = usePathname();
   const tracking = useCallback((event: string, cat = "Header") => {
     GoogleAnalytics.tracking(event, {
       category: cat,
@@ -27,7 +28,7 @@ const NavBar = () => {
   }, [tracking]);
   return (
     <div id="my-navbar" className="center" style={{ top: 0 }}>
-      <Link className="cta-banner" to="/insights" onClick={onInsightClick}>
+      <Link className="cta-banner" href="/insights" onClick={onInsightClick}>
         <span>
           Get a full overview of your performance on Farcaster.{" "}
           <span className="mention-string">View your profile now →</span>
@@ -36,7 +37,7 @@ const NavBar = () => {
       <div className="center" style={{ flex: 1, width: "100%" }}>
         <div className="container">
           <nav className="navbar navbar-expand-lg">
-            <Link to="/" className="navbar-brand" onClick={onLogoClick}>
+            <Link href="/" className="navbar-brand" onClick={onLogoClick}>
               <img
                 src={images.logoDark}
                 className="nav-logo-dark"
@@ -72,10 +73,8 @@ const NavBar = () => {
               <ul className="navbar-nav ml-auto">
                 <li className="nav-item">
                   <Link
-                    className={`nav-link ${
-                      location.pathname === "/" ? "active" : ""
-                    }`}
-                    to="/"
+                    className={`nav-link ${pathname === "/" ? "active" : ""}`}
+                    href="/"
                   >
                     Home
                   </Link>
@@ -83,7 +82,7 @@ const NavBar = () => {
                 <li className="nav-item">
                   <Link
                     className={"nav-link"}
-                    to="/home"
+                    href="/home"
                     onClick={onNewFeedClick}
                   >
                     News Feed

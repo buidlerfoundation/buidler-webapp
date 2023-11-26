@@ -1,16 +1,16 @@
 import useFeedFilters from "hooks/useFeedFilters";
+import { usePathname } from "next/navigation";
 import React, { memo, useEffect, useMemo, useRef } from "react";
-import { useLocation } from "react-router-dom";
 
 const ScrollRestoration = () => {
-  const location = useLocation();
+  const pathname = usePathname();
   const timeoutScroll = useRef<any>();
-  const previousPath = useRef(window.location.pathname);
+  const previousPath = useRef("");
   const filters = useFeedFilters();
   const lastScrollOffsetByPath = useRef<{ [path: string]: number }>({});
   const saveScrollOffset = useMemo(
-    () => filters.find((el) => el.path === location.pathname),
-    [filters, location.pathname]
+    () => filters.find((el) => el.path === pathname),
+    [filters, pathname]
   );
   useEffect(() => {
     const scrollEvent = () => {
@@ -28,27 +28,23 @@ const ScrollRestoration = () => {
     };
   }, []);
   useEffect(() => {
-    if (
-      location.pathname &&
-      location.pathname !== previousPath.current &&
-      saveScrollOffset
-    ) {
-      if (lastScrollOffsetByPath.current[location.pathname] >= 0) {
+    if (pathname && pathname !== previousPath.current && saveScrollOffset) {
+      if (lastScrollOffsetByPath.current[pathname] >= 0) {
         setTimeout(() => {
           window?.scrollTo?.({
-            top: lastScrollOffsetByPath.current[location.pathname],
+            top: lastScrollOffsetByPath.current[pathname],
             behavior: "auto",
           });
-        }, 0);
+        }, 1000);
       }
-      previousPath.current = location.pathname;
+      previousPath.current = pathname;
     } else {
       window?.scrollTo?.({
         top: 0,
         behavior: "auto",
       });
     }
-  }, [location.pathname, saveScrollOffset]);
+  }, [pathname, saveScrollOffset]);
   useEffect(() => {
     lastScrollOffsetByPath.current = {};
   }, []);

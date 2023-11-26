@@ -1,6 +1,6 @@
 import images from "common/images";
 import React, { memo, useCallback } from "react";
-import { Link } from "react-router-dom";
+import Link from 'next/link'
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 const Footer = () => {
@@ -128,14 +128,14 @@ const Footer = () => {
                 </a>
                 <Link
                   className="footer-menu-item"
-                  to="/terms"
+                  href="/terms"
                   onClick={onTermsClick}
                 >
                   Terms
                 </Link>
                 <Link
                   className="footer-menu-item"
-                  to="/privacy"
+                  href="/privacy"
                   onClick={onPrivacyClick}
                 >
                   Privacy

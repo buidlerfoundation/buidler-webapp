@@ -82,8 +82,8 @@ const ImageProvider = ({ children }: IImageProps) => {
         return `https://storage.googleapis.com/${imgBucket}/${id}/${name}`;
       }
       const path = buildImagePath(name, id, options, noParams, userAvatar);
-      const message = `${process.env.REACT_APP_IMAGE_SALT}/${path}`;
-      const key = `${process.env.REACT_APP_IMAGE_KEY}`;
+      const message = `${process.env.NEXT_PUBLIC_IMAGE_SALT}/${path}`;
+      const key = `${process.env.NEXT_PUBLIC_IMAGE_KEY}`;
       const signature = CryptoJS.HmacSHA256(message, key)
         .toString(CryptoJS.enc.Base64)
         .replace(/\+/g, "-")

@@ -3,7 +3,7 @@ import useAppSelector from "./useAppSelector";
 
 function useFCUserDataEngagement(username?: string) {
   const dataEngagementMap = useAppSelector(
-    (state) => state.fcAnalytic.dataEngagementMap
+    (state) => state.insights.dataEngagementMap
   );
   return React.useMemo(
     () => dataEngagementMap?.[username || ""],

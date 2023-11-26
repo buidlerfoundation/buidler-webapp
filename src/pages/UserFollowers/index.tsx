@@ -1,15 +1,17 @@
+"use client";
+
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
-import { useParams } from "react-router-dom";
 import { IFCUser, IUserTabPath } from "models/FC";
 import UserItem from "shared/UserItem";
 import AppConfig from "common/AppConfig";
 import useAppDispatch from "hooks/useAppDispatch";
-import { getDataFollowUsers } from "reducers/FCAnalyticReducers";
 import LoadingItem from "shared/LoadingItem";
 import useDataFollowUser from "hooks/useDataFollowUser";
 import useFCUserByName from "hooks/useFCUserByName";
 import useAppSelector from "hooks/useAppSelector";
+import { useParams } from "next/navigation";
+import { getDataFollowUsers } from "reducers/InsightReducers";
 
 interface IUserFollowers {
   path: IUserTabPath;

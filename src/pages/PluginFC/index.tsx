@@ -1,3 +1,5 @@
+"use client";
+
 import React, { memo, useCallback } from "react";
 import styles from "./index.module.scss";
 import useAppDispatch from "hooks/useAppDispatch";

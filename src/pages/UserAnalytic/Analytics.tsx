@@ -12,20 +12,21 @@ import useFCUserDataActivities from "hooks/useFCUserDataActivities";
 import NonFollowerUser from "./NonFollowerUser";
 import TopInteractions from "./TopInteractions";
 import useDataTopInteraction from "hooks/useDataTopInteraction";
-import { useNavigate } from "react-router-dom";
 import useDataFollowUser from "hooks/useDataFollowUser";
 import useAppDispatch from "hooks/useAppDispatch";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
+import { useRouter } from "next/navigation";
 
 interface IAnalytics {
   fid?: string;
   period: ActivityPeriod;
+  username?: string;
 }
 
-const Analytics = ({ fid, period }: IAnalytics) => {
-  const navigate = useNavigate();
+const Analytics = ({ fid, period, username }: IAnalytics) => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
-  const filters = useAppSelector((state) => state.fcAnalytic.filters);
+  const filters = useAppSelector((state) => state.insights.filters);
   const fcActivities = useFCActivitiesByName(fid, period);
   const dataEngagement = useFCUserDataEngagement(fid);
   const dataActivities = useFCUserDataActivities(fid);
@@ -39,15 +40,15 @@ const Analytics = ({ fid, period }: IAnalytics) => {
       loginElement?.click();
       return;
     } else {
-      navigate("non-follower", { state: { goBack: true } });
+      router.push(`/insights/${username}/non-follower`);
     }
-  }, [dispatch, navigate, user]);
+  }, [dispatch, router, user, username]);
   return (
     <div className={styles["analytic-wrap"]}>
       <div className={styles["activity-head"]}>
         <span className={styles.label}>Overview</span>
         <div className={styles.filter}>
-          {filters.map((filter) => (
+          {filters?.map((filter) => (
             <FilterItem item={filter} key={filter.period} />
           ))}
         </div>

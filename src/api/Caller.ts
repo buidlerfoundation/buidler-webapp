@@ -1,5 +1,4 @@
 import toast from "react-hot-toast";
-import store from "store";
 import GlobalVariable from "services/GlobalVariable";
 import AppConfig, {
   AsyncKey,
@@ -32,7 +31,7 @@ const handleClearDataAndReload = () => {
         window.location.reload();
       } else {
         GlobalVariable.sessionExpired = false;
-        store.dispatch(logoutAction());
+        // store.dispatch(logoutAction());
         window.parent.postMessage("session-expired", "*");
       }
     });
@@ -200,12 +199,6 @@ async function requestAPI<T = any>(
     }
   } catch (e: any) {
     console.log(e);
-  }
-
-  const chainId = store.getState().network.chainId;
-
-  if (chainId) {
-    headers["Chain-Id"] = chainId;
   }
 
   if (h) {

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import { ICast } from "models/FC";
@@ -9,8 +11,8 @@ import { getFeed } from "reducers/HomeFeedReducers";
 import LoadingItem from "shared/LoadingItem";
 import AppConfig from "common/AppConfig";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
-import { useLocation } from "react-router-dom";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
+import { usePathname } from "next/navigation";
 
 interface IHomeFeed {
   filter: string;
@@ -18,7 +20,7 @@ interface IHomeFeed {
 
 const HomeFeed = ({ filter }: IHomeFeed) => {
   const dispatch = useAppDispatch();
-  const location = useLocation();
+  const pathname = usePathname();
   const feedData = useFeedData(filter);
   const onLogin = useCallback(() => {
     dispatch(FC_USER_ACTIONS.updateLoginSource("Home Feed"));
@@ -31,11 +33,11 @@ const HomeFeed = ({ filter }: IHomeFeed) => {
   );
   const feeds = useMemo(() => feedData?.data || [], [feedData?.data]);
   const eventNameByPath = useMemo(() => {
-    if (location.pathname === "/home") return "Trending Links Viewed";
-    if (location.pathname === "/active") return "Active Links Viewed";
-    if (location.pathname === "/top") return "Top Links Viewed";
+    if (pathname === "/home") return "Trending Links Viewed";
+    if (pathname === "/active") return "Active Links Viewed";
+    if (pathname === "/top") return "Top Links Viewed";
     return "";
-  }, [location.pathname]);
+  }, [pathname]);
   const onPageEndReach = useCallback(() => {
     if (feedData?.canMore && !feedData?.loadMore) {
       dispatch(

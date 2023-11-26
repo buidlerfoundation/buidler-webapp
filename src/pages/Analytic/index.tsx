@@ -1,3 +1,5 @@
+"use client";
+
 import React, {
   memo,
   useCallback,
@@ -7,7 +9,6 @@ import React, {
   useState,
 } from "react";
 import styles from "./index.module.scss";
-import { Link, useNavigate } from "react-router-dom";
 import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
 import { Popper } from "@mui/material";
 import MentionItem from "shared/MentionPicker/MentionItem";
@@ -15,9 +16,11 @@ import { IFCUser } from "models/FC";
 import api from "api";
 import ImageView from "shared/ImageView";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Analytic = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [loadingDataUser, setLoadingDataUser] = useState(false);
   const timeOutGetUser = useRef<any>();
   const inputRef = useRef<any>();
@@ -222,8 +225,8 @@ const Analytic = () => {
       source: "search",
     });
     setValue("");
-    navigate(`${user.username}`);
-  }, [dataUsers, navigate, selectedMentionIndex, tracking]);
+    router.push(`/insights/${user.username}`);
+  }, [dataUsers, router, selectedMentionIndex, tracking]);
   const renderMentionItem = useCallback(
     (item: IFCUser, index: number) => (
       <MentionItem
@@ -300,7 +303,7 @@ const Analytic = () => {
             <Link
               className={styles["user-item"]}
               key={el.fid}
-              to={el.username}
+              href={`/insights/${el.username}`}
               onClick={() => {
                 tracking("Search Insights User", {
                   username: el.username,

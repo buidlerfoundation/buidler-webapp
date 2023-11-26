@@ -3,7 +3,7 @@ import useAppSelector from "./useAppSelector";
 
 function useFCUserActiveBadgeCheck(username?: string) {
   const activeBadgeCheckMap = useAppSelector(
-    (state) => state.fcAnalytic.activeBadgeCheckMap
+    (state) => state.insights.activeBadgeCheckMap
   );
   return React.useMemo(
     () => activeBadgeCheckMap?.[username || ""],

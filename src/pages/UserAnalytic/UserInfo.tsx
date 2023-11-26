@@ -4,12 +4,10 @@ import { IFCUser } from "models/FC";
 import ImageView from "shared/ImageView";
 import { normalizeContentUrl } from "helpers/CastHelper";
 import numeral from "numeral";
-import { Link } from "react-router-dom";
 import IconMore from "shared/SVG/IconMore";
 import PopoverButton from "shared/PopoverButton";
 import useAppSelector from "hooks/useAppSelector";
 import useAppDispatch from "hooks/useAppDispatch";
-import { followUser, unfollowUser } from "reducers/FCAnalyticReducers";
 import ModalCheckActiveBadge from "shared/ModalCheckActiveBadge";
 import useFCUserActiveBadgeCheck from "hooks/useFCUserActiveBadgeCheck";
 import IconActiveBadge from "shared/SVG/FC/IconActiveBadge";
@@ -21,6 +19,8 @@ import PopupUserInsight from "shared/PopupUserInsight";
 import { Tooltip } from "@mui/material";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
+import Link from "next/link";
+import { followUser, unfollowUser } from "reducers/InsightReducers";
 
 interface IUserInfo {
   user?: IFCUser;
@@ -97,7 +97,7 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
         <div className={styles["user-info"]}>
           <Link
             className={`${styles["name-wrap"]} hide-xs`}
-            to={`https://warpcast.com/${user?.username}`}
+            href={`https://warpcast.com/${user?.username}`}
             target="_blank"
           >
             <span className={styles.name}>
@@ -157,7 +157,7 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
       </div>
       <Link
         className={`${styles["name-wrap"]} hide-desktop`}
-        to={`https://warpcast.com/${user?.username}`}
+        href={`https://warpcast.com/${user?.username}`}
         target="_blank"
       >
         <span className={styles.name}>
@@ -179,8 +179,7 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
       <div className={styles["user-relate-info"]}>
         <Link
           className={styles["relate-item"]}
-          to="following"
-          state={{ goBack: true }}
+          href={`/insights/${user?.username}/following`}
         >
           <span>
             <span className={styles["main-text"]}>
@@ -191,8 +190,7 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
         </Link>
         <Link
           className={styles["relate-item"]}
-          to="follower"
-          state={{ goBack: true }}
+          href={`/insights/${user?.username}/follower`}
         >
           <span>
             <span className={styles["main-text"]}>

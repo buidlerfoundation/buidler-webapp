@@ -6,7 +6,7 @@ import CryptoJS from "crypto-js";
 class GoogleAnalytics {
   initial = false;
   init() {
-    mixpanel.init(process.env.REACT_APP_MIXPANEL_TOKEN, {
+    mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN, {
       debug: process.env.NODE_ENV === "development",
       opt_out_tracking_by_default: false,
     });

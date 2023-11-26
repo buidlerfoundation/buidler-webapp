@@ -14,11 +14,11 @@ class Web3AuthUtils {
 
   async init() {
     this.web3auth = new Web3Auth({
-      clientId: process.env.REACT_APP_WEB3_AUTH_CLIENT_ID || "",
+      clientId: process.env.NEXT_PUBLIC_WEB3_AUTH_CLIENT_ID || "",
       chainConfig: {
         chainNamespace: "eip155",
         chainId: `0x${parseInt(
-          process.env.REACT_APP_DEFAULT_CHAIN_ID || "0"
+          process.env.NEXT_PUBLIC_DEFAULT_CHAIN_ID || "0"
         ).toString(16)}`,
       },
     });
