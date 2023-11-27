@@ -1,3 +1,5 @@
+"use client";
+
 import React, { memo, useCallback, useEffect, useRef } from "react";
 import NavBar from "./NavBar";
 import "./css/index.scss";
