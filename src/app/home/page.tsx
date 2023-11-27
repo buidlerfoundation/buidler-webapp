@@ -1,4 +1,4 @@
-import HomeFeed from "pages/HomeFeed";
+import HomeFeed from "screens/HomeFeed";
 
 export default function Home() {
   return <HomeFeed filter="trending" />;

@@ -1,3 +1,3 @@
-import HomeFeedDetail from "pages/HomeFeedDetail";
+import HomeFeedDetail from "screens/HomeFeedDetail";
 
 export default HomeFeedDetail;

@@ -1,3 +1,3 @@
-import FCDetail from "pages/FCDetail";
+import FCDetail from "screens/FCDetail";
 
 export default FCDetail;

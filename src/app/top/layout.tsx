@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import HomeFeedWrapper from "pages/Main/Layout/HomeFeedWrapper";
+import HomeFeedWrapper from "screens/Main/Layout/HomeFeedWrapper";
 
 export const metadata: Metadata = {};
 

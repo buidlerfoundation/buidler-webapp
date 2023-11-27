@@ -1,3 +1,3 @@
-import Website from "pages/Website";
+import Website from "screens/Website";
 
 export default Website;

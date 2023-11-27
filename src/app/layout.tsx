@@ -1,37 +1,37 @@
 import type { Metadata } from "next";
 import Providers from "providers";
-import BootstrapClient from "pages/BootstrapClient";
+import BootstrapClient from "screens/BootstrapClient";
 import "bootstrap/dist/css/bootstrap.css";
-import "pages/Website/css/index.scss";
-import "pages/Website/css/responsive.scss";
-import "pages/Website/css/home.scss";
-import "pages/Website/css/home-responsive.scss";
+import "screens/Website/css/index.scss";
+import "screens/Website/css/responsive.scss";
+import "screens/Website/css/home.scss";
+import "screens/Website/css/home-responsive.scss";
 import "../index.scss";
 import "../App.scss";
 import "../styles/spacing.scss";
 import "../styles/emoji.scss";
 import "shared/AppToastNotification/index.scss";
-import Layout from "pages/Main/Layout";
-// import moment from "moment";
+import Layout from "screens/Main/Layout";
+import moment from "moment";
 
-// moment.locale("en", {
-//   relativeTime: {
-//     future: "in %s",
-//     past: "%s ago",
-//     s: "seconds",
-//     ss: "%ss",
-//     m: "a minute",
-//     mm: "%dm",
-//     h: "an hour",
-//     hh: "%dh",
-//     d: "a day",
-//     dd: "%dd",
-//     M: "a month",
-//     MM: "%dM",
-//     y: "a year",
-//     yy: "%dY",
-//   },
-// });
+moment.updateLocale("en", {
+  relativeTime: {
+    future: "in %s",
+    past: "%s ago",
+    s: "seconds",
+    ss: "%ss",
+    m: "a minute",
+    mm: "%dm",
+    h: "an hour",
+    hh: "%dh",
+    d: "a day",
+    dd: "%dd",
+    M: "a month",
+    MM: "%dM",
+    y: "a year",
+    yy: "%dY",
+  },
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",

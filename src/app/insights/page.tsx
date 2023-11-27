@@ -1,3 +1,3 @@
-import Analytic from "pages/Analytic";
+import Analytic from "screens/Analytic";
 
 export default Analytic;

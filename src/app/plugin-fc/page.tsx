@@ -1,3 +1,3 @@
-import PluginFC from "pages/PluginFC";
+import PluginFC from "screens/PluginFC";
 
 export default PluginFC;

@@ -29,7 +29,7 @@ import PopupUserFCMenu from "shared/PopupUserFCMenu";
 import ImageView from "shared/ImageView";
 import { logoutAction } from "reducers/actions";
 import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
-import CopyRight from "pages/PluginFC/CopyRight";
+import CopyRight from "screens/PluginFC/CopyRight";
 import { getResultCastByHash } from "reducers/HomeFeedReducers";
 import {
   extractContentMessage,
