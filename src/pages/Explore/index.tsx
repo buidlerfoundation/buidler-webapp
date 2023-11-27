@@ -1,12 +1,12 @@
 import React, { memo, useCallback, useMemo, useState } from "react";
 import styles from "./index.module.scss";
 import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
-import { useNavigate } from "react-router-dom";
 import { isUrlValid } from "helpers/LinkHelper";
 import { insertHttpIfNeed } from "helpers/CastHelper";
+import { useRouter } from "next/navigation";
 
 const Explore = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [value, setValue] = useState("");
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -16,12 +16,12 @@ const Explore = () => {
     (e: any) => {
       e.preventDefault();
       if (isUrlValid(valueSubmit)) {
-        navigate(`${encodeURIComponent(valueSubmit)}`);
+        router.push(`${encodeURIComponent(valueSubmit)}`);
       } else {
         // error
       }
     },
-    [navigate, valueSubmit]
+    [router, valueSubmit]
   );
   return (
     <div className={styles.container}>

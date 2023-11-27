@@ -11,6 +11,7 @@ import useAppSelector from "hooks/useAppSelector";
 import useFeedRepliesData from "hooks/useFeedRepliesData";
 import { getCastDetail, getCastReplies } from "reducers/HomeFeedReducers";
 import { useParams, useRouter } from "next/navigation";
+import useCastDetail from "hooks/useCastDetail";
 
 const FCDetail = () => {
   const dispatch = useAppDispatch();
@@ -18,8 +19,7 @@ const FCDetail = () => {
   const onBack = useCallback(() => router.back(), [router]);
   const params = useParams<{ cast_hash: string }>();
   const castHash = useMemo(() => params?.cast_hash, [params?.cast_hash]);
-  const loading = useAppSelector((state) => state.homeFeed.castDetail.loading);
-  const castDetail = useAppSelector((state) => state.homeFeed.castDetail.data);
+  const castDetail = useCastDetail(castHash);
   const castRepliesData = useFeedRepliesData(castHash);
   const getCast = useCallback(async () => {
     if (castHash) {
@@ -64,13 +64,15 @@ const FCDetail = () => {
           <span>Post</span>
         </div>
       </div>
-      {loading && <LoadingItem />}
-      {!loading && castDetail && (
+      {!castDetail?.data && castDetail?.loading && <LoadingItem />}
+      {castDetail?.data && (
         <div className={styles["cast-detail__wrap"]} onScroll={onScroll}>
           <CastDetailItem
-            cast={castDetail}
+            cast={castDetail?.data}
             replyCount={
-              castDetail?.replies?.count || castRepliesData?.data?.length || 0
+              castDetail?.data?.replies?.count ||
+              castRepliesData?.data?.length ||
+              0
             }
             postMessageOpenImageFullscreen
           />

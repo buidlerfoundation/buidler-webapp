@@ -17,12 +17,12 @@ import api from "api";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 import { useParams, usePathname, useRouter } from "next/navigation";
+import useCastDetail from "hooks/useCastDetail";
 
 const HomeFeedDetail = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
-  const loading = useAppSelector((state) => state.homeFeed.castDetail.loading);
   const params = useParams<{ hash: string }>();
   const hash = useMemo(() => params?.hash, [params?.hash]);
   const [otherCasts, setOtherCasts] = useState<ICast[]>([]);
@@ -30,23 +30,26 @@ const HomeFeedDetail = () => {
     () => otherCasts.filter((el) => el.hash !== hash),
     [hash, otherCasts]
   );
-  const castDetail = useAppSelector((state) => state.homeFeed.castDetail.data);
+  const castDetail = useCastDetail(hash);
   const castRepliesData = useFeedRepliesData(hash);
   const replyCount = useMemo(
-    () => castDetail?.replies?.count || castRepliesData?.data?.length || 0,
-    [castDetail?.replies?.count, castRepliesData?.data?.length]
+    () =>
+      castDetail?.data?.replies?.count || castRepliesData?.data?.length || 0,
+    [castDetail?.data?.replies?.count, castRepliesData?.data?.length]
   );
   const renderOther = useMemo(
-    () => !castRepliesData.canMore && otherCastsFiltered.length > 0 && !loading,
-    [castRepliesData.canMore, loading, otherCastsFiltered.length]
+    () =>
+      !castRepliesData.canMore &&
+      otherCastsFiltered.length > 0 &&
+      !castDetail?.loading,
+    [castRepliesData.canMore, castDetail?.loading, otherCastsFiltered.length]
   );
   const goBack = useCallback(() => {
-    // if (window.history.length > 0) {
-    //   router.back();
-    // } else {
-    //   router.replace("/home");
-    // }
-    router.back();
+    if (window.history.length > 0) {
+      router.back();
+    } else {
+      router.replace("/home");
+    }
   }, [router]);
   useEffect(() => {
     if (hash) {
@@ -63,12 +66,16 @@ const HomeFeedDetail = () => {
     }
   }, [dispatch, hash]);
   useEffect(() => {
-    if (castDetail?.metadata?.url) {
+    if (castDetail?.data?.metadata?.url) {
       api
-        .listCasts({ text: castDetail?.metadata?.url, page: 1, limit: 20 })
+        .listCasts({
+          text: castDetail?.data?.metadata?.url,
+          page: 1,
+          limit: 20,
+        })
         .then((res) => setOtherCasts(res.data || []));
     }
-  }, [castDetail?.metadata?.url]);
+  }, [castDetail?.data?.metadata?.url]);
   const onLogin = useCallback(() => {
     dispatch(FC_USER_ACTIONS.updateLoginSource("Home Feed Detail"));
     const loginElement = document.getElementById("btn-login");
@@ -130,18 +137,18 @@ const HomeFeedDetail = () => {
           <span>Post</span>
         </div>
       </nav>
-      {loading && <Spinner size={30} />}
-      {!loading && castDetail && (
+      {!castDetail?.data && castDetail?.loading && <Spinner size={30} />}
+      {castDetail?.data && (
         <div
           className={styles.body}
           style={{ marginBottom: renderOther ? 0 : 70 }}
         >
           <div className={styles.metadata}>
-            <MetadataFeed metadata={castDetail.metadata} />
+            <MetadataFeed metadata={castDetail?.data?.metadata} />
           </div>
           <div className={styles["list-cast"]}>
             <CastDetailItem
-              cast={castDetail}
+              cast={castDetail?.data}
               replyCount={replyCount}
               homeFeed
               onLogin={onLogin}

@@ -5,7 +5,7 @@ import "./css/responsive.scss";
 import "./css/privacy.scss";
 import "./css/privacy-responsive.scss";
 import Footer from "./Footer";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const Privacy = () => {
   const previousScrollTop = useRef(0);
@@ -33,7 +33,7 @@ const Privacy = () => {
         <h1 className="page-title">Privacy policy</h1>
         <span className="page-content-terms">
           At Buidler, accessible from
-          <Link to="/"> https://buidler.app</Link>, one of our main priorities
+          <Link href="/"> https://buidler.app</Link>, one of our main priorities
           is the privacy of our visitors. This Privacy Policy document contains
           types of information that is collected and recorded by Buidler and how
           we use it.
@@ -170,7 +170,7 @@ const Privacy = () => {
           <br />
           If you make a request, we have one month to respond to you. If you
           would like to exercise any of these rights, please
-          <Link to="#"> contact us.</Link>
+          <Link href="#"> contact us.</Link>
         </span>
         <h2 className="page-content-head">GDPR Data Protection Rights</h2>
         <span className="page-content-terms">
@@ -208,7 +208,7 @@ const Privacy = () => {
           <br />
           If you make a request, we have one month to respond to you. If you
           would like to exercise any of these rights, please{" "}
-          <Link to="#">contact us.</Link>
+          <Link href="#">contact us.</Link>
         </span>
         <h2 className="page-content-head">Children's Information</h2>
         <span className="page-content-terms">

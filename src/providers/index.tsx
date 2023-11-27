@@ -1,20 +1,15 @@
 "use client";
 
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
-import React, { useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import { Provider } from "react-redux";
-import { makeStore, AppStore } from "store";
+import { store } from "../store";
 
 type ProvidersProps = {
   children: React.ReactNode;
 };
 
 const Providers = ({ children }: ProvidersProps) => {
-  const storeRef = useRef<AppStore>();
-  if (!storeRef.current) {
-    // Create the store instance the first time this renders
-    storeRef.current = makeStore();
-  }
   const materialTheme = useMemo(
     () =>
       createTheme({
@@ -33,16 +28,9 @@ const Providers = ({ children }: ProvidersProps) => {
     []
   );
   return (
-    <Provider store={storeRef.current}>
+    <Provider store={store}>
       <ThemeProvider theme={materialTheme}>
         {children}
-        {/* <SocketProvider>
-          <WalletConnectProvider>
-            <AuthProvider>
-              <ImageProvider>{children}</ImageProvider>
-            </AuthProvider>
-          </WalletConnectProvider>
-        </SocketProvider> */}
         <CssBaseline />
       </ThemeProvider>
     </Provider>

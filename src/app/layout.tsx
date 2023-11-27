@@ -10,7 +10,28 @@ import "../index.scss";
 import "../App.scss";
 import "../styles/spacing.scss";
 import "../styles/emoji.scss";
+import "shared/AppToastNotification/index.scss";
 import Layout from "pages/Main/Layout";
+// import moment from "moment";
+
+// moment.locale("en", {
+//   relativeTime: {
+//     future: "in %s",
+//     past: "%s ago",
+//     s: "seconds",
+//     ss: "%ss",
+//     m: "a minute",
+//     mm: "%dm",
+//     h: "an hour",
+//     hh: "%dh",
+//     d: "a day",
+//     dd: "%dd",
+//     M: "a month",
+//     MM: "%dM",
+//     y: "a year",
+//     yy: "%dY",
+//   },
+// });
 
 export const metadata: Metadata = {
   title: "Create Next App",

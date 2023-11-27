@@ -7,9 +7,11 @@ interface HomeFeedState {
     [key: string]: IPagingData<ICast>;
   };
   replyCast?: ICast;
-  castDetail: {
-    data?: ICast;
-    loading: boolean;
+  castDetailMap: {
+    [key: string]: {
+      data?: ICast;
+      loading: boolean;
+    };
   };
   castRepliesMap: {
     [key: string]: IPagingData<ICast>;
@@ -22,9 +24,7 @@ interface HomeFeedState {
 
 const initialState: HomeFeedState = {
   feedMap: {},
-  castDetail: {
-    loading: false,
-  },
+  castDetailMap: {},
   castRepliesMap: {},
   openNewCast: false,
   filters: [
@@ -169,21 +169,25 @@ const homeFeedSlice = createSlice({
         };
       })
       .addCase(getCastDetail.pending, (state, action) => {
-        state.castDetail = {
+        const { hash } = action.meta.arg;
+        state.castDetailMap[hash] = {
+          ...state.castDetailMap[hash],
           loading: true,
         };
       })
       .addCase(getCastDetail.rejected, (state, action) => {
-        state.castDetail = {
+        const { hash } = action.meta.arg;
+        state.castDetailMap[hash] = {
           loading: false,
         };
       })
       .addCase(getCastDetail.fulfilled, (state, action) => {
+        const { hash } = action.meta.arg;
         const total = action.payload?.data?.replies?.count || 0;
         const limit = action.meta.arg.limit;
         const totalPage = Math.ceil(total / limit);
 
-        state.castDetail = {
+        state.castDetailMap[hash] = {
           loading: false,
           data: action.payload.data,
         };
@@ -213,17 +217,16 @@ const homeFeedSlice = createSlice({
       .addCase(getResultCastByHash.fulfilled, (state, action) => {
         const { parent_hash } = action.meta.arg;
         if (parent_hash && action.payload.data) {
-          if (
-            state.castDetail.data &&
-            state.castDetail.data.hash === parent_hash
-          ) {
-            state.castDetail.data.replies = {
-              count: (state.castDetail.data.replies?.count || 0) + 1,
+          const castDetail = state.castDetailMap[parent_hash].data;
+          if (castDetail) {
+            castDetail.replies = {
+              count: (castDetail.replies?.count || 0) + 1,
               casts: [
                 action.payload.data,
-                ...(state.castDetail.data.replies?.casts || []),
+                ...(castDetail.replies?.casts || []),
               ],
             };
+            state.castDetailMap[parent_hash].data = castDetail;
           }
           if (state.castRepliesMap?.[parent_hash]) {
             state.castRepliesMap[parent_hash] = {

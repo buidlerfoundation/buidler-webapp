@@ -5,7 +5,7 @@ import "./css/responsive.scss";
 import "./css/privacy.scss";
 import "./css/privacy-responsive.scss";
 import Footer from "./Footer";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const Terms = () => {
   const previousScrollTop = useRef(0);
@@ -64,7 +64,7 @@ const Terms = () => {
         <span className="page-content-terms">
           Privacy is central to our purpose and mission. For more details,
           please refer to the Buidler
-          <Link to="/privacy"> Privacy Policy.</Link>
+          <Link href="/privacy"> Privacy Policy.</Link>
         </span>
         <h2 className="page-content-head">3. Our Services</h2>
         <span className="page-content-terms">
