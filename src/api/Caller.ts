@@ -31,7 +31,6 @@ const handleClearDataAndReload = () => {
         window.location.reload();
       } else {
         GlobalVariable.sessionExpired = false;
-        // store.dispatch(logoutAction());
         window.parent.postMessage("session-expired", "*");
       }
     });
