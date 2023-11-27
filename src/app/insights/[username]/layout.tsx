@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import UserInsightWrap from "screens/Main/Layout/UserInsightWrap";
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://3518-171-227-252-51.ngrok-free.app"),
-};
+export const metadata: Metadata = {};
 
 export default function RootLayout({
   children,

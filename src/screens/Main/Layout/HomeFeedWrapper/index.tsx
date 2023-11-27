@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
@@ -44,16 +44,10 @@ const HomeFeedWrapper = ({ children }: IHomeFeedWrapper) => {
     ),
     [pathname]
   );
-  const title = useMemo(() => "Hacker News on Farcaster", []);
-  useEffect(() => {
-    if (title) {
-      document.title = `${title} | Buidler`;
-    }
-  }, [title]);
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.title}>{title}</div>
+        <div className={styles.title}>Hacker News on Farcaster</div>
         <nav className={styles["filter-head"]}>{filters.map(renderFilter)}</nav>
       </div>
       {children}

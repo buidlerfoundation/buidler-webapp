@@ -266,9 +266,6 @@ const Analytic = () => {
     }
   }, [value]);
   useEffect(() => {
-    document.title = "Farcaster Insights | Buidler";
-  }, []);
-  useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     GoogleAnalytics.tracking("Page Viewed", {
       category: "Traffic",
