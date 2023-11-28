@@ -13,12 +13,12 @@ RUN yarn build
 FROM node:lts-alpine AS runner
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
-ENV PORT 3003
+ENV PORT 3080
 COPY --from=builder /usr/src/app/next.config.js ./
 COPY --from=builder /usr/src/app/public ./public
 COPY --from=builder /usr/src/app/.next ./.next
 COPY --from=builder /usr/src/app/node_modules ./node_modules
-EXPOSE 3003
+EXPOSE 3080
 CMD ["node_modules/.bin/next", "start"]
 
 # # Stage 1 - build stage
