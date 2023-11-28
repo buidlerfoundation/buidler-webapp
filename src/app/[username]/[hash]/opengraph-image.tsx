@@ -127,7 +127,7 @@ export default async function Image({
           <div
             style={{
               borderRadius: 20,
-              border: "1px solid #242424",
+              border: "2px solid #242424",
               padding: "15px 30px",
               display: "flex",
               flexDirection: "column",
