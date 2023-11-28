@@ -33,29 +33,31 @@ moment.updateLocale("en", {
   },
 });
 
-export const metadata: Metadata = {
-  title: "Buidler - A social web annotation built on Farcaster",
-  description:
-    "Buidler is a social web annotation that enables you to comment and engage in discussions on any webpage. With Buidler, you can share your thoughts, explore different viewpoints, and connect with others, all within the context of the web content you're browsing.",
-  icons: [
-    { rel: "icon", url: "/favicon.ico" },
-    { rel: "apple-touch-icon", url: "/logo192.png" },
-  ],
-  manifest: "/manifest.json",
-  openGraph: {
-    type: "website",
-    url: "https://buidler.app",
-    siteName: "Buidler",
-    images: [{ url: "/img_buidler_large_share.png" }],
+export async function generateMetadata(): Promise<Metadata> {
+  return {
     title: "Buidler - A social web annotation built on Farcaster",
     description:
       "Buidler is a social web annotation that enables you to comment and engage in discussions on any webpage. With Buidler, you can share your thoughts, explore different viewpoints, and connect with others, all within the context of the web content you're browsing.",
-  },
-  twitter: {
-    card: "summary_large_image",
-  },
-  metadataBase: new URL("https://beta.buidler.app"),
-};
+    icons: [
+      { rel: "icon", url: "/favicon.ico" },
+      { rel: "apple-touch-icon", url: "/logo192.png" },
+    ],
+    manifest: "/manifest.json",
+    openGraph: {
+      type: "website",
+      url: "https://buidler.app",
+      siteName: "Buidler",
+      images: [{ url: "/img_buidler_large_share.png" }],
+      title: "Buidler - A social web annotation built on Farcaster",
+      description:
+        "Buidler is a social web annotation that enables you to comment and engage in discussions on any webpage. With Buidler, you can share your thoughts, explore different viewpoints, and connect with others, all within the context of the web content you're browsing.",
+    },
+    twitter: {
+      card: "summary_large_image",
+    },
+    metadataBase: new URL(process.env.NEXT_PUBLIC_URL),
+  };
+}
 
 export default function RootLayout({
   children,
