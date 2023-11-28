@@ -75,8 +75,10 @@ const Website = () => {
     window.open("/communities", "_blank");
   }, []);
   useEffect(() => {
-    if ("standalone" in window.navigator && window.navigator.standalone) {
-      router.replace("/home");
+    if (typeof window !== "undefined") {
+      if ("standalone" in window.navigator && window.navigator.standalone) {
+        router.replace("/home");
+      }
     }
   }, [router]);
   return (
