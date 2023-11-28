@@ -71,10 +71,14 @@ export const getCastDetail = (params: {
     page: `${params.page}`,
     limit: `${params.limit}`,
   });
+  let hash = params.hash;
   if (params.cast_author_fid) {
     query.append("cast_author_fid", params.cast_author_fid);
   }
-  return Caller.get<ICast>(`casts/${params.hash}?${query}`);
+  if (hash.slice(0, 2) === "0x") {
+    hash = hash.slice(2);
+  }
+  return Caller.get<ICast>(`casts/${hash}?${query}`);
 };
 
 export const deleteCast = (hash: string) => Caller.delete(`casts/${hash}`);

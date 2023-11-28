@@ -18,7 +18,6 @@ import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import useCastDetail from "hooks/useCastDetail";
-import useQuery from "hooks/useQuery";
 
 const HomeFeedDetail = () => {
   const dispatch = useAppDispatch();
@@ -26,10 +25,9 @@ const HomeFeedDetail = () => {
   const pathname = usePathname();
   const params = useParams<{ hash: string }>();
   const hash = useMemo(() => params?.hash, [params?.hash]);
-  const query = useQuery();
   const [otherCasts, setOtherCasts] = useState<ICast[]>([]);
   const otherCastsFiltered = useMemo(
-    () => otherCasts.filter((el) => el.hash !== hash),
+    () => otherCasts.filter((el) => `0x${el.hash.slice(0, 6)}` !== hash),
     [hash, otherCasts]
   );
   const castDetail = useCastDetail(hash);
@@ -60,12 +58,11 @@ const HomeFeedDetail = () => {
           hash,
           page: 1,
           limit: 20,
-          cast_author_fid: query?.get("cast_author_fid") || "",
         })
       );
       setOtherCasts([]);
     }
-  }, [dispatch, hash, query]);
+  }, [dispatch, hash]);
   useEffect(() => {
     if (castDetail?.data?.metadata?.url) {
       api

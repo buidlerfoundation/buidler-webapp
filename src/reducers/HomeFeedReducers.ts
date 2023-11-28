@@ -195,34 +195,44 @@ const homeFeedSlice = createSlice({
               total_casts: state.castDetailMap[hash]?.data?.total_casts || 0,
             },
           };
+          state.castRepliesMap = {
+            [action.meta.arg.hash]: {
+              loading: false,
+              loadMore: false,
+              data: action.payload.data?.replies?.casts || [],
+              currentPage: 1,
+              canMore: totalPage > 1,
+              total,
+            },
+          };
+          state.filters.forEach((filter) => {
+            if (state.feedMap?.[filter.value]) {
+              state.feedMap[filter.value].data = state.feedMap[
+                filter.value
+              ].data.map((el) => {
+                if (el.hash === action.meta.arg.hash) {
+                  return action.payload.data || el;
+                }
+                return el;
+              });
+            }
+          });
+        } else {
+          state.castDetailMap[hash].loading = false;
         }
-        state.castRepliesMap = {
-          [action.meta.arg.hash]: {
-            loading: false,
-            loadMore: false,
-            data: action.payload.data?.replies?.casts || [],
-            currentPage: 1,
-            canMore: totalPage > 1,
-            total,
-          },
-        };
-        state.filters.forEach((filter) => {
-          if (state.feedMap?.[filter.value]) {
-            state.feedMap[filter.value].data = state.feedMap[
-              filter.value
-            ].data.map((el) => {
-              if (el.hash === action.meta.arg.hash) {
-                return action.payload.data || el;
-              }
-              return el;
-            });
-          }
-        });
       })
       .addCase(getResultCastByHash.fulfilled, (state, action) => {
-        const { parent_hash } = action.meta.arg;
+        const { parent_hash, hash, cast_author_fid } = action.meta.arg;
+        if (hash && cast_author_fid && action.payload.data) {
+          const key = `0x${hash.slice(0, 6)}`;
+          state.castDetailMap[key] = {
+            loading: false,
+            data: action.payload.data,
+          };
+        }
         if (parent_hash && action.payload.data) {
-          const castDetail = state.castDetailMap[parent_hash].data;
+          const key = `0x${parent_hash.slice(0, 6)}`;
+          const castDetail = state.castDetailMap[key].data;
           if (castDetail) {
             castDetail.replies = {
               count: (castDetail.replies?.count || 0) + 1,
@@ -231,15 +241,15 @@ const homeFeedSlice = createSlice({
                 ...(castDetail.replies?.casts || []),
               ],
             };
-            state.castDetailMap[parent_hash].data = castDetail;
+            state.castDetailMap[key].data = castDetail;
           }
-          if (state.castRepliesMap?.[parent_hash]) {
-            state.castRepliesMap[parent_hash] = {
-              ...state.castRepliesMap[parent_hash],
-              total: (state.castRepliesMap[parent_hash].total || 0) + 1,
+          if (state.castRepliesMap?.[key]) {
+            state.castRepliesMap[key] = {
+              ...state.castRepliesMap[key],
+              total: (state.castRepliesMap[key].total || 0) + 1,
               data: [
                 action.payload.data,
-                ...(state.castRepliesMap[parent_hash].data || []),
+                ...(state.castRepliesMap[key].data || []),
               ],
             };
           }

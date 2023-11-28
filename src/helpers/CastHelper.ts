@@ -31,7 +31,10 @@ export const normalizeContentUrl = (string: string, boldUrl?: string) => {
     .join(" ");
 };
 
-export const normalizeContentCast = (cast: ICast) => {
+export const normalizeContentCast = (
+  cast: ICast,
+  options?: { withoutHtml: boolean }
+) => {
   let res = cast.text;
   const encoder = new TextEncoder();
   const decoder = new TextDecoder("utf-8");
@@ -57,6 +60,9 @@ export const normalizeContentCast = (cast: ICast) => {
       )
     );
     res = decoder.decode(new Uint8Array(outputByteArray));
+  }
+  if (options?.withoutHtml) {
+    return res;
   }
   res = res
     .split("\n")

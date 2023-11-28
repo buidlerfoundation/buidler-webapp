@@ -3,6 +3,8 @@ import { IFCUser } from "models/FC";
 import { ImageResponse } from "next/og";
 import numeral from "numeral";
 import IconActiveBadge from "shared/SVG/FC/IconActiveBadge";
+import IconDefaultAvatar from "shared/SVG/IconDefaultAvatar";
+import IconInsights from "shared/SVG/IconInsights";
 import LogoOG from "shared/SVG/LogoOG";
 
 // Route segment config
@@ -75,14 +77,25 @@ export default async function Image({
           }}
         >
           <div style={{ display: "flex", gap: 30, alignItems: "center" }}>
-            <img
-              src={userRes?.data?.pfp?.url}
-              style={{ width: 90, height: 90, borderRadius: 45 }}
-              width={90}
-              height={90}
-              alt="avatar"
-            />
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {userRes?.data?.pfp?.url ? (
+              <img
+                src={userRes?.data?.pfp?.url}
+                style={{ width: 90, height: 90, borderRadius: 45 }}
+                width={90}
+                height={90}
+                alt="avatar"
+              />
+            ) : (
+              <IconDefaultAvatar size={90} background="#f3f3f3" color="white" />
+            )}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                flex: 1,
+              }}
+            >
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span
                   style={{ fontFamily: '"bold"', fontSize: 32, color: "white" }}
@@ -101,6 +114,30 @@ export default async function Image({
                 }}
               >
                 @{userRes?.data?.username}
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                height: 70,
+                padding: "0 30px",
+                gap: 20,
+                borderRadius: 20,
+                border: "2px solid #242424",
+                marginRight: 10,
+              }}
+            >
+              <IconInsights />
+              <span
+                style={{
+                  fontSize: 32,
+                  fontFamily: '"semibold"',
+                  color: "#acacac",
+                  lineHeight: "48px",
+                }}
+              >
+                Profile Insight
               </span>
             </div>
           </div>
@@ -212,16 +249,25 @@ export default async function Image({
               Top interactions
             </span>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              {interactionRes?.data?.map((el) => (
-                <img
-                  key={el.fid}
-                  alt="avatar"
-                  src={el?.pfp?.url}
-                  style={{ width: 60, height: 60, borderRadius: 30 }}
-                  width={60}
-                  height={60}
-                />
-              ))}
+              {interactionRes?.data?.map((el) =>
+                el?.pfp?.url ? (
+                  <img
+                    key={el.fid}
+                    alt="avatar"
+                    src={el?.pfp?.url}
+                    style={{ width: 60, height: 60, borderRadius: 30 }}
+                    width={60}
+                    height={60}
+                  />
+                ) : (
+                  <IconDefaultAvatar
+                    size={60}
+                    key={el.fid}
+                    background="#f3f3f3"
+                    color="white"
+                  />
+                )
+              )}
             </div>
           </div>
           <div
