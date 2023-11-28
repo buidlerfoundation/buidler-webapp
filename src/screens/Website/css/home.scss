@@ -18,11 +18,11 @@
 
 .btn-launch {
   display: flex;
-  min-width: 180px;
-  height: 48px;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 24px;
+  min-width: 180px !important;
+  height: 48px !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 24px !important;
 }
 .page-actions {
   display: flex;
