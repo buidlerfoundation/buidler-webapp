@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
   },
-  metadataBase: new URL("https://buidler.app"),
+  metadataBase: new URL("https://beta.buidler.app"),
 };
 
 export default function RootLayout({
