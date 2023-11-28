@@ -108,7 +108,7 @@ export default async function Image({
                 <p
                   style={{
                     display: "block",
-                    lineClamp: 3,
+                    lineClamp: 2,
                     color: "white",
                     fontFamily: '"regular"',
                     fontSize: 30,
@@ -128,11 +128,11 @@ export default async function Image({
             style={{
               borderRadius: 20,
               border: "1px solid #242424",
-              padding: 30,
+              padding: "15px 30px",
               display: "flex",
               flexDirection: "column",
-              gap: 20,
-              marginTop: 50,
+              gap: 15,
+              marginTop: 40,
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -179,6 +179,25 @@ export default async function Image({
                 </span>
               </div>
             </div>
+            {metadata?.description && (
+              <p
+                style={{
+                  display: "block",
+                  lineClamp: 2,
+                  width: 1040,
+                  color: "white",
+                  fontFamily: '"semibold"',
+                  fontSize: 32,
+                  lineHeight: "52px",
+                  wordBreak: "break-word",
+                  whiteSpace: "pre-line",
+                  textOverflow: "ellipsis",
+                  margin: 0,
+                }}
+              >
+                {metadata?.description}
+              </p>
+            )}
           </div>
         </div>
         <div
