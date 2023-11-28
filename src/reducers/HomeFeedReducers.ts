@@ -187,10 +187,15 @@ const homeFeedSlice = createSlice({
         const limit = action.meta.arg.limit;
         const totalPage = Math.ceil(total / limit);
 
-        state.castDetailMap[hash] = {
-          loading: false,
-          data: action.payload.data,
-        };
+        if (action.payload.data) {
+          state.castDetailMap[hash] = {
+            loading: false,
+            data: {
+              ...action.payload.data,
+              total_casts: state.castDetailMap[hash]?.data?.total_casts || 0,
+            },
+          };
+        }
         state.castRepliesMap = {
           [action.meta.arg.hash]: {
             loading: false,
