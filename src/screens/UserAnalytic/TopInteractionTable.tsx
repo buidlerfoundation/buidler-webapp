@@ -20,7 +20,7 @@ import IconReply from "shared/SVG/FC/IconReply";
 import IconRecast from "shared/SVG/FC/IconRecast";
 import useAppDispatch from "hooks/useAppDispatch";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface ITopInteractionTable {
   data: IFCUser[];
@@ -30,6 +30,11 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.fcUser.data);
+  const pathname = usePathname();
+  const isPlugin = useMemo(
+    () => pathname.includes("/plugin-fc/insights"),
+    [pathname]
+  );
   const [order, setOrder] = React.useState<"asc" | "desc">("desc");
   const [orderBy, setOrderBy] = React.useState<string>("total");
   const [page, setPage] = React.useState(0);
@@ -105,7 +110,11 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
                 <TableRow
                   hover
                   onClick={(event) => {
-                    router.push(`/insights/${row.username}`);
+                    if (isPlugin) {
+                      window.open(`/insights/${row.username}`, "_blank");
+                    } else {
+                      router.push(`/insights/${row.username}`);
+                    }
                   }}
                   key={row.fid}
                   sx={{ cursor: "pointer" }}

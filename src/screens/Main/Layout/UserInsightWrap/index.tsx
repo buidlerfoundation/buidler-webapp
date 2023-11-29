@@ -27,14 +27,21 @@ import {
 
 interface IUserInsightWrap {
   children: React.ReactNode;
+  plugin?: boolean;
 }
 
-const UserInsightWrap = ({ children }: IUserInsightWrap) => {
+const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
   const dispatch = useAppDispatch();
   const params = useParams<{ username: string }>();
   const search = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
+  const prefixPath = useMemo(() => {
+    if (pathname.includes("/plugin-fc/insights")) {
+      return "/plugin-fc";
+    }
+    return "";
+  }, [pathname]);
   const username = useMemo(() => params?.username, [params?.username]);
   const user = useAppSelector((state) => state.fcUser.data);
   const userTabs = useUserTabs();
@@ -43,6 +50,14 @@ const UserInsightWrap = ({ children }: IUserInsightWrap) => {
     if (user?.fid) return userTabs;
     return userTabs?.filter((el) => el.path !== "/non-follower");
   }, [user?.fid, userTabs]);
+  const showNavbar = useMemo(() => {
+    return (
+      !plugin ||
+      pathname.includes("/non-follower") ||
+      pathname.includes("/follower") ||
+      pathname.includes("/following")
+    );
+  }, [pathname, plugin]);
   const period = useMemo(
     () => (search?.get("period") || "7d") as ActivityPeriod,
     [search]
@@ -98,19 +113,21 @@ const UserInsightWrap = ({ children }: IUserInsightWrap) => {
   return (
     <div className={styles.container}>
       <nav className={styles.nav}>
-        <div className={styles.head}>
-          <div className={styles["btn-back"]} onClick={goBack}>
-            <div className={styles["icon-wrap"]}>
-              <IconArrowBack />
+        {showNavbar && (
+          <div className={styles.head}>
+            <div className={styles["btn-back"]} onClick={goBack}>
+              <div className={styles["icon-wrap"]}>
+                <IconArrowBack />
+              </div>
+              <span>{fcUser?.data?.display_name}</span>
             </div>
-            <span>{fcUser?.data?.display_name}</span>
           </div>
-        </div>
+        )}
         {showTab && (
           <div className={styles.tabs}>
             {userTabsFiltered?.map((el) => (
               <Link
-                href={`/insights/${username}${el.path}`}
+                href={`${prefixPath}/insights/${username}${el.path}`}
                 key={el.path}
                 className={`${styles["tab-item"]} ${
                   pathname?.includes(el.path) ? styles.active : ""

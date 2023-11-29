@@ -7,6 +7,7 @@ import { humanFormatNumber } from "helpers/StringHelper";
 import useIsMobile from "hooks/useIsMobile";
 import IconInformation from "shared/SVG/IconInformation";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface INonFollowerUser {
   data?: IPagingData<IFCUser>;
@@ -15,6 +16,11 @@ interface INonFollowerUser {
 
 const NonFollowerUser = ({ data, onViewAll }: INonFollowerUser) => {
   const isMobile = useIsMobile();
+  const pathname = usePathname();
+  const isPlugin = useMemo(
+    () => pathname.includes("/plugin-fc/insights"),
+    [pathname]
+  );
   const users = useMemo(
     () => data?.data?.slice(0, isMobile ? 5 : 9) || [],
     [data?.data, isMobile]
@@ -45,7 +51,10 @@ const NonFollowerUser = ({ data, onViewAll }: INonFollowerUser) => {
       <div className={styles["list-non-follow"]}>
         {users.map((el) => (
           <Tooltip title={el.username} key={el.fid} placement="top">
-            <Link href={`/insights/${el.username}`}>
+            <Link
+              href={`/insights/${el.username}`}
+              target={isPlugin ? "_blank" : undefined}
+            >
               <ImageView
                 alt="avatar"
                 className={styles.avatar}

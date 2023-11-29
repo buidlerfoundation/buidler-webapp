@@ -15,7 +15,7 @@ import useDataTopInteraction from "hooks/useDataTopInteraction";
 import useDataFollowUser from "hooks/useDataFollowUser";
 import useAppDispatch from "hooks/useAppDispatch";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface IAnalytics {
   fid?: string;
@@ -25,6 +25,7 @@ interface IAnalytics {
 
 const Analytics = ({ fid, period, username }: IAnalytics) => {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useAppDispatch();
   const filters = useAppSelector((state) => state.insights.filters);
   const fcActivities = useFCActivitiesByName(fid, period);
@@ -40,9 +41,9 @@ const Analytics = ({ fid, period, username }: IAnalytics) => {
       loginElement?.click();
       return;
     } else {
-      router.push(`/insights/${username}/non-follower`);
+      router.push(`${pathname}/non-follower`);
     }
-  }, [dispatch, router, user, username]);
+  }, [dispatch, pathname, router, user]);
   return (
     <div className={styles["analytic-wrap"]}>
       <div className={styles["activity-head"]}>

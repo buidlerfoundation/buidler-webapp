@@ -21,6 +21,7 @@ import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 import Link from "next/link";
 import { followUser, unfollowUser } from "reducers/InsightReducers";
+import { usePathname } from "next/navigation";
 
 interface IUserInfo {
   user?: IFCUser;
@@ -29,6 +30,7 @@ interface IUserInfo {
 
 const UserInfo = ({ user, loading }: IUserInfo) => {
   const dispatch = useAppDispatch();
+  const pathname = usePathname();
   const [openCheckBadgeActive, setOpenCheckBadgeActive] = useState(false);
   const [requesting, setRequesting] = useState(false);
   const popupMenuRef = useRef<any>();
@@ -177,10 +179,7 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
         />
       )}
       <div className={styles["user-relate-info"]}>
-        <Link
-          className={styles["relate-item"]}
-          href={`/insights/${user?.username}/following`}
-        >
+        <Link className={styles["relate-item"]} href={`${pathname}/following`}>
           <span>
             <span className={styles["main-text"]}>
               {numeral(user?.total_following).format("0[.][0]a")}
@@ -188,10 +187,7 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
             <span className={styles["sub-text"]}> Following</span>
           </span>
         </Link>
-        <Link
-          className={styles["relate-item"]}
-          href={`/insights/${user?.username}/follower`}
-        >
+        <Link className={styles["relate-item"]} href={`${pathname}/follower`}>
           <span>
             <span className={styles["main-text"]}>
               {numeral(user?.total_follower).format("0[.][0]a")}
