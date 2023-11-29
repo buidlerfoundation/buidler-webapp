@@ -27,6 +27,11 @@ export async function generateMetadata(
     openGraph: {
       title,
       description,
+      url: process.env.NEXT_PUBLIC_URL + `/insights/${params.username}`,
+    },
+    twitter: {
+      title,
+      description,
     },
   };
 }

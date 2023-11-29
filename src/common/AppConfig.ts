@@ -1,6 +1,7 @@
 import { UserData, UserRoleType } from "models/User";
 import images from "./images";
 import { Community } from "models/Community";
+import { Metadata } from "next";
 
 const Prefix = "Buidler";
 
@@ -17,7 +18,8 @@ const AppConfig = {
   estimateGasRecipientAddress: "0x1908bf9Dae06BB1F6E4C7eE0f7B5D4c82D1Ba6ad",
   buidlerExtensionId: "ldbjeldeabnbghmhakiijnpfggokmhib",
   loginPath: "/started",
-  walletConnectProjectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "",
+  walletConnectProjectId:
+    process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "",
   websiteUrl: "https://buidler.app",
   loadMoreOffset: 500,
 };
@@ -184,3 +186,20 @@ export const signTypeData = {
 
 export const pageNames = ["communities", "channels", "panel", "plugin"];
 export const websitePath = ["/landing-page", "/terms", "/privacy"];
+
+const metadataTitle = "Hacker News on Farcaster | Buidler";
+const metadataDes =
+  "Discover Farcaster's best daily links! Stay in the loop with vibrant discussions on your favorite web pages, supercharged by the Farcaster community.";
+
+export const defaultMetadata: Metadata = {
+  title: metadataTitle,
+  description: metadataDes,
+  openGraph: {
+    title: metadataTitle,
+    description: metadataDes,
+  },
+  twitter: {
+    title: metadataTitle,
+    description: metadataDes,
+  },
+};

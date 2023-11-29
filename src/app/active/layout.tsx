@@ -1,9 +1,8 @@
+import { defaultMetadata } from "common/AppConfig";
 import type { Metadata } from "next";
 import HomeFeedWrapper from "screens/Main/Layout/HomeFeedWrapper";
 
-export const metadata: Metadata = {
-  title: "Hacker News on Farcaster | Buidler",
-};
+export const metadata: Metadata = defaultMetadata;
 
 export default function RootLayout({
   children,

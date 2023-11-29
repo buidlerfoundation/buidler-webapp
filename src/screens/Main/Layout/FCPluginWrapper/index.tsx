@@ -273,6 +273,9 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
       if (e?.data?.type === "b-fc-update-tw-theme") {
         setTheme(e.data.payload);
       }
+      if (e?.data?.type === "b-fc-navigate") {
+        router.replace(e.data.payload);
+      }
       if (e?.data?.type === "b-fc-reload-iframe") {
         // reload
       }
