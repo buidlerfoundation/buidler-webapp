@@ -7,12 +7,14 @@ export const metadata: Metadata = {
     title: "Farcaster Insights | Buidler",
     url: process.env.NEXT_PUBLIC_URL + "/insights",
     description:
-      "Gain valuable insights into your Farcaster profile's activities, engagement, and reach. Identify top interactors and unlock insights you never knew about.",
+      "Track your Farcaster profile's pulse in real-time — activities, engagement, and followers. Dive deep into performance and unlock insights you never knew about.",
+    images: [{ url: "/img_buidler_large_share.png" }],
   },
   twitter: {
     title: "Farcaster Insights | Buidler",
     description:
-      "Gain valuable insights into your Farcaster profile's activities, engagement, and reach. Identify top interactors and unlock insights you never knew about.",
+      "Track your Farcaster profile's pulse in real-time — activities, engagement, and followers. Dive deep into performance and unlock insights you never knew about.",
+    images: [{ url: "/img_buidler_large_share.png" }],
   },
 };
 
