@@ -1,27 +1,24 @@
 import React, { memo, useCallback, useMemo } from "react";
 import styles from "./index.module.scss";
-import { ActivityPeriod, IActivityFilter } from "models/FC";
+import { IActivityFilter } from "models/FC";
 import { Tooltip } from "@mui/material";
 import { getTimeRange } from "utils/DateUtils";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import useAppDispatch from "hooks/useAppDispatch";
+import { INSIGHTS_ACTIONS } from "reducers/InsightReducers";
+import useAppSelector from "hooks/useAppSelector";
 
 interface IFilterItem {
   item: IActivityFilter;
 }
 
 const FilterItem = ({ item }: IFilterItem) => {
-  const search = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-  const period = useMemo(
-    () => (search?.get("period") || "7d") as ActivityPeriod,
-    [search]
-  );
+  const dispatch = useAppDispatch();
+  const period = useAppSelector((state) => state.insights.period);
   const active = useMemo(() => period === item.period, [item.period, period]);
   const timeRange = useMemo(() => getTimeRange(item.period), [item.period]);
   const onClick = useCallback(() => {
-    router.replace(`${pathname}?period=${item.period}`);
-  }, [item.period, pathname, router]);
+    dispatch(INSIGHTS_ACTIONS.updatePeriod(item.period));
+  }, [dispatch, item.period]);
   return (
     <Tooltip title={timeRange}>
       <div

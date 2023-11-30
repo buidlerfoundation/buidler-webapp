@@ -39,7 +39,7 @@ const ActivityItem = ({
     return "-";
   }, [total, showSuffix]);
   const displayTotal = useMemo(() => {
-    if (loading) return "";
+    if (loading && !total) return "";
     const absTotal = Math.abs(total);
     return formatNumber(absTotal) || "0";
   }, [loading, total]);

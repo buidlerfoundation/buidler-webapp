@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   ActivityPeriod,
   IActiveBadgeCheck,
@@ -144,6 +144,7 @@ interface InsightsState {
   dataInteractionMap: { [username: string]: IPagingData<IFCUser> };
   filters: IActivityFilter[];
   userTabs: IUserInsightTab[];
+  period: ActivityPeriod;
 }
 
 const initialState: InsightsState = {
@@ -166,12 +167,17 @@ const initialState: InsightsState = {
     { path: "/following", label: "Following" },
     { path: "/non-follower", label: "Non Followers" },
   ],
+  period: "7d",
 };
 
 const insightsSlice = createSlice({
   name: "insights",
   initialState,
-  reducers: {},
+  reducers: {
+    updatePeriod: (state, action: PayloadAction<ActivityPeriod>) => {
+      state.period = action.payload;
+    },
+  },
   extraReducers: (builder) =>
     builder
       .addCase(getUserProfile.pending, (state, action) => {

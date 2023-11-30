@@ -5,13 +5,7 @@ import styles from "./index.module.scss";
 import IconArrowBack from "shared/SVG/IconArrowBack";
 import useFCUserByName from "hooks/useFCUserByName";
 import useAppSelector from "hooks/useAppSelector";
-import { ActivityPeriod } from "models/FC";
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import useUserTabs from "hooks/useUserTabs";
 import useAppDispatch from "hooks/useAppDispatch";
@@ -33,7 +27,6 @@ interface IUserInsightWrap {
 const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
   const dispatch = useAppDispatch();
   const params = useParams<{ username: string }>();
-  const search = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
   const prefixPath = useMemo(() => {
@@ -58,10 +51,7 @@ const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
       pathname.includes("/following")
     );
   }, [pathname, plugin]);
-  const period = useMemo(
-    () => (search?.get("period") || "7d") as ActivityPeriod,
-    [search]
-  );
+  const period = useAppSelector((state) => state.insights.period);
   const showTab = useMemo(
     () => userTabs?.find((el) => !!pathname?.includes(el.path)),
     [pathname, userTabs]

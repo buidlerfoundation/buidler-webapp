@@ -5,20 +5,16 @@ import styles from "./index.module.scss";
 import useFCUserByName from "hooks/useFCUserByName";
 import UserInfo from "./UserInfo";
 import Analytics from "./Analytics";
-import { ActivityPeriod } from "models/FC";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
-import { useParams, usePathname, useSearchParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
+import useAppSelector from "hooks/useAppSelector";
 
 const UserAnalytic = () => {
-  const search = useSearchParams();
   const pathname = usePathname();
   const params = useParams<{ username: string }>();
   const username = useMemo(() => params?.username, [params?.username]);
   const fcUser = useFCUserByName(username);
-  const period = useMemo(
-    () => (search?.get("period") || "7d") as ActivityPeriod,
-    [search]
-  );
+  const period = useAppSelector((state) => state.insights.period);
   const followUserViewEvent = useMemo(() => {
     // if (location.state?.from === "/non-follower") return "Non Follower Viewed";
     // if (location.state?.from === "/follower") return "Follower Viewed";
