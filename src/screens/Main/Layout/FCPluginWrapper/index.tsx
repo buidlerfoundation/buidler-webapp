@@ -200,7 +200,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   }, [dispatch]);
   const checkingSignerId = useCallback(async () => {
     if (signerId) {
-      GlobalVariable.signerId = signerId;
       await setCookie(AsyncKey.signerIdKey, signerId);
       const fcUser = await dispatch(getCurrentFCUser()).unwrap();
       if (fcUser) {
@@ -301,6 +300,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
           GoogleAnalytics.identifyByExtensionId(uniqId);
         }
         if (signerId) {
+          GlobalVariable.signerId = signerId;
           initialSignerId(signerId);
         }
         if (q) {
