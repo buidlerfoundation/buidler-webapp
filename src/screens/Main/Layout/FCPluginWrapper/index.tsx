@@ -383,7 +383,11 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
             )}
           </div>
         ) : (
-          <div className={styles["btn-login"]} onClick={onLoginClick}>
+          <div
+            id="btn-login"
+            className={styles["btn-login"]}
+            onClick={onLoginClick}
+          >
             <span>Login</span>
           </div>
         )}
