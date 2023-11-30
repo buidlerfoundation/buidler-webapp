@@ -187,14 +187,15 @@ async function requestAPI<T = any>(
   // Get access token and attach it to API request's header
   try {
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
-    const signerId = await getCookie(AsyncKey.signerIdKey);
+    let signerId = await getCookie(AsyncKey.signerIdKey);
+    if (!signerId) {
+      signerId = GlobalVariable.signerId;
+    }
     if (signerId != null) {
       headers["Signer-Id"] = signerId;
     }
     if (accessToken != null) {
       headers.Authorization = `Bearer ${accessToken}`;
-    } else {
-      console.log("No token is stored");
     }
   } catch (e: any) {
     console.log(e);

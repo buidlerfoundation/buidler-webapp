@@ -4,6 +4,7 @@ class GlobalVariable {
   loginType = "";
   version = "2.5.11";
   sessionExpired = false;
+  signerId = "";
 }
 
 export default new GlobalVariable();

@@ -36,7 +36,7 @@ moment.updateLocale("en", {
 export const metadata: Metadata = {
   title: "Buidler - A social web annotation built on Farcaster",
   description:
-    "Buidler is a social web annotation that enables you to comment and engage in discussions on any webpage. With Buidler, you can share your thoughts, explore different viewpoints, and connect with others, all within the context of the web content you're browsing.",
+    "Buidler is a social web annotation tool for web explorers. Comment, discuss, and connect with the community behind any webpages, fostering decentralized and open conversations on the Internet.",
   icons: [
     { rel: "icon", url: "/favicon.ico" },
     { rel: "apple-touch-icon", url: "/logo192.png" },
@@ -49,10 +49,13 @@ export const metadata: Metadata = {
     images: [{ url: "/img_buidler_large_promo.png" }],
     title: "Buidler - A social web annotation built on Farcaster",
     description:
-      "Buidler is a social web annotation that enables you to comment and engage in discussions on any webpage. With Buidler, you can share your thoughts, explore different viewpoints, and connect with others, all within the context of the web content you're browsing.",
+      "Buidler is a social web annotation tool for web explorers. Comment, discuss, and connect with the community behind any webpages, fostering decentralized and open conversations on the Internet.",
   },
   twitter: {
     card: "summary_large_image",
+    title: "Buidler - A social web annotation built on Farcaster",
+    description:
+      "Buidler is a social web annotation tool for web explorers. Comment, discuss, and connect with the community behind any webpages, fostering decentralized and open conversations on the Internet.",
   },
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL),
 };

@@ -37,6 +37,7 @@ import {
 } from "helpers/CastHelper";
 import { useParams, useRouter } from "next/navigation";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
+import GlobalVariable from "services/GlobalVariable";
 
 interface IFCPluginWrapper {
   children: React.ReactNode;
@@ -199,6 +200,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   }, [dispatch]);
   const checkingSignerId = useCallback(async () => {
     if (signerId) {
+      GlobalVariable.signerId = signerId;
       await setCookie(AsyncKey.signerIdKey, signerId);
       const fcUser = await dispatch(getCurrentFCUser()).unwrap();
       if (fcUser) {
