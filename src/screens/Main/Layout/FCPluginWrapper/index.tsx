@@ -36,6 +36,7 @@ import {
   normalizeContentCastToSubmit,
 } from "helpers/CastHelper";
 import { useParams, useRouter } from "next/navigation";
+import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 
 interface IFCPluginWrapper {
   children: React.ReactNode;
@@ -293,7 +294,10 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
         }
       }
       if (e?.data?.type === "b-fc-initial-data") {
-        const { signerId, q, theme, title } = e?.data?.payload || {};
+        const { signerId, q, theme, title, uniqId } = e?.data?.payload || {};
+        if (uniqId) {
+          GoogleAnalytics.identifyByExtensionId(uniqId);
+        }
         if (signerId) {
           initialSignerId(signerId);
         }
