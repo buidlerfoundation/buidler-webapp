@@ -112,7 +112,10 @@ const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
   }, [dispatch, user?.fid, fcUser?.data?.fid]);
   return (
     <div className={styles.container}>
-      <nav className={styles.nav}>
+      <nav
+        className={styles.nav}
+        style={plugin && !showNavbar ? { paddingTop: 10 } : {}}
+      >
         {showNavbar && (
           <div className={styles.head}>
             <div className={styles["btn-back"]} onClick={goBack}>

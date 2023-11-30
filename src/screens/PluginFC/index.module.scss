@@ -14,7 +14,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  height: 36px;
+  min-height: 36px;
   border-top: 1px solid var(--color-stroke);
   padding: 0 15px;
   .sub-text {
