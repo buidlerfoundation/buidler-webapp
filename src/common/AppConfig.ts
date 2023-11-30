@@ -197,11 +197,12 @@ export const defaultMetadata: Metadata = {
   openGraph: {
     title: metadataTitle,
     description: metadataDes,
-    images: [{ url: "/img_buidler_large_share.png" }],
+    images: [{ url: "/img_buidler_large_promo.png" }],
   },
   twitter: {
     title: metadataTitle,
     description: metadataDes,
-    images: [{ url: "/img_buidler_large_share.png" }],
+    card: "summary_large_image",
+    images: [{ url: "/img_buidler_large_promo.png" }],
   },
 };

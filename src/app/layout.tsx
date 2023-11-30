@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://buidler.app",
     siteName: "Buidler",
-    images: [{ url: "/img_buidler_large_share.png" }],
+    images: [{ url: "/img_buidler_large_promo.png" }],
     title: "Buidler - A social web annotation built on Farcaster",
     description:
       "Buidler is a social web annotation that enables you to comment and engage in discussions on any webpage. With Buidler, you can share your thoughts, explore different viewpoints, and connect with others, all within the context of the web content you're browsing.",
