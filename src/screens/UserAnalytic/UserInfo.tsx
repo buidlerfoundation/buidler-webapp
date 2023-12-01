@@ -31,10 +31,6 @@ interface IUserInfo {
 const UserInfo = ({ user, loading }: IUserInfo) => {
   const dispatch = useAppDispatch();
   const pathname = usePathname();
-  const isPlugin = useMemo(
-    () => pathname.includes("/plugin-fc/insights"),
-    [pathname]
-  );
   const [openCheckBadgeActive, setOpenCheckBadgeActive] = useState(false);
   const [requesting, setRequesting] = useState(false);
   const popupMenuRef = useRef<any>();

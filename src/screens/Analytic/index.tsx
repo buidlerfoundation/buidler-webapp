@@ -16,17 +16,22 @@ import { IFCUser } from "models/FC";
 import api from "api";
 import ImageView from "shared/ImageView";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
 const Analytic = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const [loadingDataUser, setLoadingDataUser] = useState(false);
   const timeOutGetUser = useRef<any>();
   const inputRef = useRef<any>();
   const [dataUsers, setDataUsers] = useState<IFCUser[]>([]);
   const [anchorPopup, setPopup] = useState<any>(null);
   const [value, setValue] = useState("");
+  const isPlugin = useMemo(
+    () => pathname.includes("/plugin-fc/insights"),
+    [pathname]
+  );
   const suggestedUsers = useMemo(
     () => [
       {
@@ -301,6 +306,7 @@ const Analytic = () => {
               className={styles["user-item"]}
               key={el.fid}
               href={`/insights/${el.username}`}
+              target={isPlugin ? "_blank" : undefined}
               onClick={() => {
                 tracking("Search Insights User", {
                   username: el.username,
