@@ -16,7 +16,12 @@
   justify-content: flex-end;
   min-height: 36px;
   border-top: 1px solid var(--color-stroke);
+  background-color: var(--color-background-1);
   padding: 0 15px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   .sub-text {
     color: var(--color-secondary-text);
     font-weight: 500;
