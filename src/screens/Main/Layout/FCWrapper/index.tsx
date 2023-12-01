@@ -199,7 +199,13 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   }, [checkingAuth]);
   useEffect(() => {
     if (exploreUrl) {
-      dispatch(getFeedByUrl({ text: exploreUrl, page: 1, limit: 20 }));
+      dispatch(
+        getFeedByUrl({
+          text: decodeURIComponent(exploreUrl),
+          page: 1,
+          limit: 20,
+        })
+      );
     }
   }, [dispatch, exploreUrl]);
   const onWithoutLoginClick = useCallback(() => {
