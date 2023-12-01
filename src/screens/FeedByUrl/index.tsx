@@ -19,7 +19,10 @@ const FeedByUrl = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const params = useParams<{ url: string }>();
-  const exploreUrl = useMemo(() => params?.url, [params?.url]);
+  const exploreUrl = useMemo(
+    () => (params?.url ? decodeURIComponent(params?.url) : ""),
+    [params?.url]
+  );
   const explore = useAppSelector((state) => state.homeFeed.explore);
   const [metadata, setMetadata] = useState<undefined | IMetadataUrl>();
   const urlObject = useMemo(() => getURLObject(exploreUrl), [exploreUrl]);
