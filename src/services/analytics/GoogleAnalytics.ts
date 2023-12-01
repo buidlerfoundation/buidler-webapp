@@ -1,12 +1,11 @@
 import mixpanel from "mixpanel-browser";
 import { getCategoryByApi, getEventNameByApi } from "helpers/AnalyticHelper";
 import { UserData } from "models/User";
-import CryptoJS from "crypto-js";
 
 class GoogleAnalytics {
   initial = false;
   init() {
-    mixpanel.init(process.env.REACT_APP_MIXPANEL_TOKEN, {
+    mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN, {
       debug: process.env.NODE_ENV === "development",
       opt_out_tracking_by_default: false,
     });
@@ -17,8 +16,8 @@ class GoogleAnalytics {
     if (!this.initial) {
       this.init();
     }
-    mixpanel.identify(CryptoJS.SHA1(user.user_id).toString());
-    mixpanel.people.set({ name: CryptoJS.SHA1(user.user_id).toString() });
+    mixpanel.identify(user.user_id);
+    mixpanel.people.set({ name: user.user_id });
   }
 
   async identifyByExtensionId(id: string) {

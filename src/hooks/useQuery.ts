@@ -1,10 +1,10 @@
+import { useSearchParams } from "next/navigation";
 import React from "react";
-import { useLocation } from "react-router-dom";
 
 function useQuery() {
-  const { search } = useLocation();
+  const search = useSearchParams();
 
-  return React.useMemo(() => new URLSearchParams(search), [search]);
+  return React.useMemo(() => search, [search]);
 }
 
 export default useQuery;

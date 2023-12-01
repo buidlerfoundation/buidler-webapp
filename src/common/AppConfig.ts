@@ -1,23 +1,25 @@
 import { UserData, UserRoleType } from "models/User";
 import images from "./images";
 import { Community } from "models/Community";
+import { Metadata } from "next";
 
 const Prefix = "Buidler";
 
 const AppConfig = {
-  apiBaseUrl: process.env.REACT_APP_API_BASE_URL,
+  apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
   maxLengthSpaceDescription: 450,
   maxLengthCommunityDescription: 1000,
   maximumFileSize: 100000000,
   etherscanUrl:
-    process.env.REACT_APP_DEFAULT_CHAIN_ID === "4"
+    process.env.NEXT_PUBLIC_DEFAULT_CHAIN_ID === "4"
       ? "https://rinkeby.etherscan.io"
       : "https://etherscan.io",
   buidlerCommunityId: "c9097f50-9f0b-4e0a-a042-ab7790aff3b0",
   estimateGasRecipientAddress: "0x1908bf9Dae06BB1F6E4C7eE0f7B5D4c82D1Ba6ad",
   buidlerExtensionId: "ldbjeldeabnbghmhakiijnpfggokmhib",
   loginPath: "/started",
-  walletConnectProjectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID || "",
+  walletConnectProjectId:
+    process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "",
   websiteUrl: "https://buidler.app",
   loadMoreOffset: 500,
 };
@@ -184,3 +186,23 @@ export const signTypeData = {
 
 export const pageNames = ["communities", "channels", "panel", "plugin"];
 export const websitePath = ["/landing-page", "/terms", "/privacy"];
+
+const metadataTitle = "Hacker News on Farcaster | Buidler";
+const metadataDes =
+  "Discover Farcaster's best daily links! Stay in the loop with vibrant discussions on your favorite web pages, supercharged by the Farcaster community.";
+
+export const defaultMetadata: Metadata = {
+  title: metadataTitle,
+  description: metadataDes,
+  openGraph: {
+    title: metadataTitle,
+    description: metadataDes,
+    images: [{ url: "/img_buidler_large_promo.png" }],
+  },
+  twitter: {
+    title: metadataTitle,
+    description: metadataDes,
+    card: "summary_large_image",
+    images: [{ url: "/img_buidler_large_promo.png" }],
+  },
+};

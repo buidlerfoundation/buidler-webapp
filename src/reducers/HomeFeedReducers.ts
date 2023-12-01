@@ -7,9 +7,11 @@ interface HomeFeedState {
     [key: string]: IPagingData<ICast>;
   };
   replyCast?: ICast;
-  castDetail: {
-    data?: ICast;
-    loading: boolean;
+  castDetailMap: {
+    [key: string]: {
+      data?: ICast;
+      loading: boolean;
+    };
   };
   castRepliesMap: {
     [key: string]: IPagingData<ICast>;
@@ -22,9 +24,7 @@ interface HomeFeedState {
 
 const initialState: HomeFeedState = {
   feedMap: {},
-  castDetail: {
-    loading: false,
-  },
+  castDetailMap: {},
   castRepliesMap: {},
   openNewCast: false,
   filters: [
@@ -169,69 +169,87 @@ const homeFeedSlice = createSlice({
         };
       })
       .addCase(getCastDetail.pending, (state, action) => {
-        state.castDetail = {
+        const { hash } = action.meta.arg;
+        state.castDetailMap[hash] = {
+          ...state.castDetailMap[hash],
           loading: true,
         };
       })
       .addCase(getCastDetail.rejected, (state, action) => {
-        state.castDetail = {
+        const { hash } = action.meta.arg;
+        state.castDetailMap[hash] = {
           loading: false,
         };
       })
       .addCase(getCastDetail.fulfilled, (state, action) => {
+        const { hash } = action.meta.arg;
         const total = action.payload?.data?.replies?.count || 0;
         const limit = action.meta.arg.limit;
         const totalPage = Math.ceil(total / limit);
 
-        state.castDetail = {
-          loading: false,
-          data: action.payload.data,
-        };
-        state.castRepliesMap = {
-          [action.meta.arg.hash]: {
+        if (action.payload.data) {
+          state.castDetailMap[hash] = {
             loading: false,
-            loadMore: false,
-            data: action.payload.data?.replies?.casts || [],
-            currentPage: 1,
-            canMore: totalPage > 1,
-            total,
-          },
-        };
-        state.filters.forEach((filter) => {
-          if (state.feedMap?.[filter.value]) {
-            state.feedMap[filter.value].data = state.feedMap[
-              filter.value
-            ].data.map((el) => {
-              if (el.hash === action.meta.arg.hash) {
-                return action.payload.data || el;
-              }
-              return el;
-            });
-          }
-        });
+            data: {
+              ...action.payload.data,
+              total_casts: state.castDetailMap[hash]?.data?.total_casts || 0,
+            },
+          };
+          state.castRepliesMap = {
+            [action.meta.arg.hash]: {
+              loading: false,
+              loadMore: false,
+              data: action.payload.data?.replies?.casts || [],
+              currentPage: 1,
+              canMore: totalPage > 1,
+              total,
+            },
+          };
+          state.filters.forEach((filter) => {
+            if (state.feedMap?.[filter.value]) {
+              state.feedMap[filter.value].data = state.feedMap[
+                filter.value
+              ].data.map((el) => {
+                if (el.hash === action.meta.arg.hash) {
+                  return action.payload.data || el;
+                }
+                return el;
+              });
+            }
+          });
+        } else {
+          state.castDetailMap[hash].loading = false;
+        }
       })
       .addCase(getResultCastByHash.fulfilled, (state, action) => {
-        const { parent_hash } = action.meta.arg;
+        const { parent_hash, hash, cast_author_fid } = action.meta.arg;
+        if (hash && cast_author_fid && action.payload.data) {
+          const key = `0x${hash.slice(0, 6)}`;
+          state.castDetailMap[key] = {
+            loading: false,
+            data: action.payload.data,
+          };
+        }
         if (parent_hash && action.payload.data) {
-          if (
-            state.castDetail.data &&
-            state.castDetail.data.hash === parent_hash
-          ) {
-            state.castDetail.data.replies = {
-              count: (state.castDetail.data.replies?.count || 0) + 1,
+          const key = `0x${parent_hash.slice(0, 6)}`;
+          const castDetail = state.castDetailMap[key].data;
+          if (castDetail) {
+            castDetail.replies = {
+              count: (castDetail.replies?.count || 0) + 1,
               casts: [
                 action.payload.data,
-                ...(state.castDetail.data.replies?.casts || []),
+                ...(castDetail.replies?.casts || []),
               ],
             };
+            state.castDetailMap[key].data = castDetail;
           }
-          if (state.castRepliesMap?.[parent_hash]) {
-            state.castRepliesMap[parent_hash] = {
-              ...state.castRepliesMap[parent_hash],
-              total: (state.castRepliesMap[parent_hash].total || 0) + 1,
+          if (state.castRepliesMap?.[key]) {
+            state.castRepliesMap[key] = {
+              ...state.castRepliesMap[key],
+              total: (state.castRepliesMap[key].total || 0) + 1,
               data: [
                 action.payload.data,
-                ...(state.castRepliesMap[parent_hash].data || []),
+                ...(state.castRepliesMap[key].data || []),
               ],
             };
           }

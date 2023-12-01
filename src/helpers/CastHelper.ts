@@ -31,7 +31,10 @@ export const normalizeContentUrl = (string: string, boldUrl?: string) => {
     .join(" ");
 };
 
-export const normalizeContentCast = (cast: ICast) => {
+export const normalizeContentCast = (
+  cast: ICast,
+  options?: { withoutHtml: boolean }
+) => {
   let res = cast.text;
   const encoder = new TextEncoder();
   const decoder = new TextDecoder("utf-8");
@@ -57,6 +60,9 @@ export const normalizeContentCast = (cast: ICast) => {
       )
     );
     res = decoder.decode(new Uint8Array(outputByteArray));
+  }
+  if (options?.withoutHtml) {
+    return res;
   }
   res = res
     .split("\n")
@@ -161,17 +167,21 @@ export const getLastIndexOfMention = (s: string) => {
 };
 
 export const extractContentMessage = (content: string) => {
-  const mentionRegex =
-    /<a class="mention-string" data-fid="(.*?)">(.*?)<\/a>/gim;
+  if (typeof document !== "undefined") {
+    const mentionRegex =
+      /<a class="mention-string" data-fid="(.*?)">(.*?)<\/a>/gim;
 
-  const span = document.createElement("span");
-  span.innerHTML = content
-    .replace(/<div><br><\/div>/gim, "\n")
-    .replace(/<div>(.*?)<\/div>/gim, "<br>$1")
-    .replace(mentionRegex, `<$1-$2>`)
-    .replace(/<br>/gim, "\n");
-  const text = span.textContent || span.innerText;
-  return text.trim();
+    const span = document.createElement("span");
+    span.innerHTML = content
+      .replace(/<div><br><\/div>/gim, "\n")
+      .replace(/<div>(.*?)<\/div>/gim, "<br>$1")
+      .replace(mentionRegex, `<$1-$2>`)
+      .replace(/<br>/gim, "\n");
+    const text = span.textContent || span.innerText;
+    return text.trim();
+  } else {
+    return content;
+  }
 };
 
 export const normalizeContentCastToSubmit = (content: string) => {

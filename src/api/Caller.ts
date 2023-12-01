@@ -1,5 +1,4 @@
 import toast from "react-hot-toast";
-import store from "store";
 import GlobalVariable from "services/GlobalVariable";
 import AppConfig, {
   AsyncKey,
@@ -32,7 +31,6 @@ const handleClearDataAndReload = () => {
         window.location.reload();
       } else {
         GlobalVariable.sessionExpired = false;
-        store.dispatch(logoutAction());
         window.parent.postMessage("session-expired", "*");
       }
     });
@@ -189,23 +187,18 @@ async function requestAPI<T = any>(
   // Get access token and attach it to API request's header
   try {
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
-    const signerId = await getCookie(AsyncKey.signerIdKey);
+    let signerId = await getCookie(AsyncKey.signerIdKey);
+    if (!signerId) {
+      signerId = GlobalVariable.signerId;
+    }
     if (signerId != null) {
       headers["Signer-Id"] = signerId;
     }
     if (accessToken != null) {
       headers.Authorization = `Bearer ${accessToken}`;
-    } else {
-      console.log("No token is stored");
     }
   } catch (e: any) {
     console.log(e);
-  }
-
-  const chainId = store.getState().network.chainId;
-
-  if (chainId) {
-    headers["Chain-Id"] = chainId;
   }
 
   if (h) {

@@ -4,7 +4,7 @@ import { IUserTabPath } from "models/FC";
 
 function useDataFollowUser(username?: string, path?: IUserTabPath) {
   const followUserMap = useAppSelector(
-    (state) => state.fcAnalytic.followUserMap
+    (state) => state.insights.followUserMap
   );
   return React.useMemo(
     () => followUserMap?.[username || ""]?.[path || ""],

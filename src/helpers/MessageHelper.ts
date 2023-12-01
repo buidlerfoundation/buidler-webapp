@@ -48,7 +48,8 @@ export const removeTagHTML = (s: string) => {
 };
 
 export const extractContent = (s: string) => {
-  const span = document.createElement("span");
+  if (typeof document === "undefined") return s;
+  const span = document?.createElement("span");
   span.innerHTML = s
     .replace(/<div>(.*?)<\/div>/gim, "<br>$1")
     .replace(/<br>/gim, "\n");

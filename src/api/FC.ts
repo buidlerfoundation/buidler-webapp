@@ -10,11 +10,10 @@ import {
 } from "models/FC";
 import Caller from "./Caller";
 
-export const requestSignedKey = () =>
-  Caller.post<ISignedKeyRequest>("xcaster/signers");
+export const requestSignedKey = () => Caller.post<ISignedKeyRequest>("signers");
 
 export const checkRequestToken = (token: string) =>
-  Caller.get<ISignedKeyRequest>(`xcaster/signers?token=${token}`);
+  Caller.get<ISignedKeyRequest>(`signers?token=${token}`);
 
 export const pollingSignedKey = async (
   token: string,
@@ -23,7 +22,7 @@ export const pollingSignedKey = async (
   while (true) {
     await new Promise((r) => setTimeout(r, 4000));
     const res = await Caller.get<ISignedKeyRequest>(
-      `xcaster/signers?token=${token}`,
+      `signers?token=${token}`,
       undefined,
       controller
     );
@@ -71,25 +70,27 @@ export const getCastDetail = (params: {
     page: `${params.page}`,
     limit: `${params.limit}`,
   });
+  let hash = params.hash;
   if (params.cast_author_fid) {
     query.append("cast_author_fid", params.cast_author_fid);
   }
-  return Caller.get<ICast>(`casts/${params.hash}?${query}`);
+  if (hash.slice(0, 2) === "0x") {
+    hash = hash.slice(2);
+  }
+  return Caller.get<ICast>(`casts/${hash}?${query}`);
 };
 
 export const deleteCast = (hash: string) => Caller.delete(`casts/${hash}`);
 
-export const recast = (hash: string) =>
-  Caller.post(`xcaster/reactions/${hash}/recast`);
+export const recast = (hash: string) => Caller.post(`reactions/${hash}/recast`);
 
-export const like = (hash: string) =>
-  Caller.post(`xcaster/reactions/${hash}/like`);
+export const like = (hash: string) => Caller.post(`reactions/${hash}/like`);
 
 export const removeRecast = (hash: string) =>
-  Caller.delete(`xcaster/reactions/${hash}/recast`);
+  Caller.delete(`reactions/${hash}/recast`);
 
 export const removeLike = (hash: string) =>
-  Caller.delete(`xcaster/reactions/${hash}/like`);
+  Caller.delete(`reactions/${hash}/like`);
 
 export const getEmbeddedMetadata = (url: string) =>
   Caller.get<IMetadataUrl>(

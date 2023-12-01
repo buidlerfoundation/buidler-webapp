@@ -3,7 +3,7 @@ import useAppSelector from "./useAppSelector";
 
 function useFCUserDataActivities(username?: string) {
   const dataActivityMap = useAppSelector(
-    (state) => state.fcAnalytic.dataActivityMap
+    (state) => state.insights.dataActivityMap
   );
   return React.useMemo(
     () => dataActivityMap?.[username || ""],

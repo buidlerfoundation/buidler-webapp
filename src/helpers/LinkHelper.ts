@@ -1,5 +1,3 @@
-import { matchPath } from "react-router-dom";
-
 export const OpenSeaURL = "https://opensea.io";
 
 export const buildLinkOpenSea = (slugName: string) =>
@@ -74,14 +72,9 @@ export const getURLObject = (url: string) => {
 };
 
 export const getParamsFromPath = () => {
-  const match = matchPath(
-    "/:page_name/:match_community_id/:match_channel_id",
-    window.location.pathname
-  );
-  return match?.params;
+  return {};
 };
 
 export const getShareIdFromPath = () => {
-  const match = matchPath("/:share_id", window.location.pathname);
-  return match?.params?.share_id;
+  return {};
 };
