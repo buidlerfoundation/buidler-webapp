@@ -5,5 +5,5 @@ export const isVideo = (name?: string) => {
 
 export const isImage = (url?: string) => {
   if (!url) return false;
-  return /.{0,}(\.png|\.jpg|\.jpeg)$/g.test(url);
+  return /.{0,}(\.png|\.jpg|\.jpeg|\.gif)$/g.test(url);
 };

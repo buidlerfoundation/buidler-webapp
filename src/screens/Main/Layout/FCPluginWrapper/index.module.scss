@@ -13,6 +13,9 @@
     align-items: center;
     justify-content: space-between;
     color: var(--color-primary-text);
+    position: sticky;
+    top: 0;
+    z-index: 1;
     .btn-jump-out {
       display: flex;
       align-items: center;
