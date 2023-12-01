@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import styles from "./index.module.scss";
 import { IFCUser, IPagingData } from "models/FC";
 import ImageView from "shared/ImageView";
@@ -53,7 +53,18 @@ const NonFollowerUser = ({ data, onViewAll }: INonFollowerUser) => {
           <Tooltip title={el.username} key={el.fid} placement="top">
             <Link
               href={`/insights/${el.username}`}
-              target={isPlugin ? "_blank" : undefined}
+              onClick={(e) => {
+                if (isPlugin) {
+                  e.preventDefault();
+                  window.top?.postMessage(
+                    {
+                      type: "b-fc-plugin-update-current-url",
+                      payload: `https://warpcast.com/${el.username}`,
+                    },
+                    { targetOrigin: "*" }
+                  );
+                }
+              }}
             >
               <ImageView
                 alt="avatar"

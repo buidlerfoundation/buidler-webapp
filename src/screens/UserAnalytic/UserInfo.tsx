@@ -31,6 +31,10 @@ interface IUserInfo {
 const UserInfo = ({ user, loading }: IUserInfo) => {
   const dispatch = useAppDispatch();
   const pathname = usePathname();
+  const isPlugin = useMemo(
+    () => pathname.includes("/plugin-fc/insights"),
+    [pathname]
+  );
   const [openCheckBadgeActive, setOpenCheckBadgeActive] = useState(false);
   const [requesting, setRequesting] = useState(false);
   const popupMenuRef = useRef<any>();
@@ -56,13 +60,18 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
   );
   const onShareProfile = useCallback(() => {
     tracking("Share Insights To Warpcast");
-    window.open(
-      `https://warpcast.com/~/compose?embeds[]=${encodeURIComponent(
-        window.location.origin + window.location.pathname
-      )}`,
-      "_blank"
-    );
-  }, [tracking]);
+    const shareUrl = `https://warpcast.com/~/compose?embeds[]=${encodeURIComponent(
+      window.location.origin + window.location.pathname
+    )}`;
+    if (isPlugin) {
+      window.top?.postMessage(
+        { type: "b-fc-plugin-update-current-url", payload: shareUrl },
+        { targetOrigin: "*" }
+      );
+    } else {
+      window.open(shareUrl, "_blank");
+    }
+  }, [isPlugin, tracking]);
   const onCheckActiveBadge = useCallback(() => {
     toggleCheckBadgeActive();
     tracking("Check Badge Active");

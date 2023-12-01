@@ -111,7 +111,13 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
                   hover
                   onClick={(event) => {
                     if (isPlugin) {
-                      window.open(`/insights/${row.username}`, "_blank");
+                      window.top?.postMessage(
+                        {
+                          type: "b-fc-plugin-update-current-url",
+                          payload: `https://warpcast.com/${row.username}`,
+                        },
+                        { targetOrigin: "*" }
+                      );
                     } else {
                       router.push(`/insights/${row.username}`);
                     }
