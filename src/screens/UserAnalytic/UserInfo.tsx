@@ -60,18 +60,13 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
   );
   const onShareProfile = useCallback(() => {
     tracking("Share Insights To Warpcast");
-    const shareUrl = `https://warpcast.com/~/compose?embeds[]=${encodeURIComponent(
-      window.location.origin + window.location.pathname
-    )}`;
-    if (isPlugin) {
-      window.top?.postMessage(
-        { type: "b-fc-plugin-update-current-url", payload: shareUrl },
-        { targetOrigin: "*" }
-      );
-    } else {
-      window.open(shareUrl, "_blank");
-    }
-  }, [isPlugin, tracking]);
+    window.open(
+      `https://warpcast.com/~/compose?embeds[]=${encodeURIComponent(
+        window.location.origin + window.location.pathname
+      )}`,
+      "_blank"
+    );
+  }, [tracking]);
   const onCheckActiveBadge = useCallback(() => {
     toggleCheckBadgeActive();
     tracking("Check Badge Active");
