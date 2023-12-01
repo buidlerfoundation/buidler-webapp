@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useEffect } from "react";
 import styles from "./index.module.scss";
 import useAppDispatch from "hooks/useAppDispatch";
 import useAppSelector from "hooks/useAppSelector";
@@ -10,6 +10,7 @@ import LoadingItem from "shared/LoadingItem";
 import Empty from "./Empty";
 import EmbeddedMain from "shared/EmbeddedMain";
 import Spinner from "shared/Spinner";
+import AppConfig from "common/AppConfig";
 
 const PluginFC = () => {
   const dispatch = useAppDispatch();
@@ -26,20 +27,6 @@ const PluginFC = () => {
       );
     }
   }, [currentPageCast, dispatch, queryUrl]);
-  const onScroll = useCallback(
-    (e: any) => {
-      const { scrollTop, scrollHeight, clientHeight } = e.target;
-      const compare = Math.round(scrollTop + clientHeight);
-      if (
-        (compare === scrollHeight + 1 || compare === scrollHeight) &&
-        canMoreCast &&
-        !loadMoreCast
-      ) {
-        onMoreCast();
-      }
-    },
-    [canMoreCast, loadMoreCast, onMoreCast]
-  );
   const renderBody = useCallback(() => {
     if (loadingCast) {
       return <Spinner size={30} />;
@@ -48,14 +35,35 @@ const PluginFC = () => {
       return <Empty />;
     }
     return (
-      <ol className={styles["list-cast"]} onScroll={onScroll}>
+      <ol className={styles["list-cast"]}>
         {casts.map((el) => (
           <CastItem key={el.hash} cast={el} postMessageOpenImageFullscreen />
         ))}
         {loadMoreCast && <LoadingItem />}
       </ol>
     );
-  }, [casts, loadMoreCast, loadingCast, onScroll]);
+  }, [casts, loadMoreCast, loadingCast]);
+  const onPageEndReach = useCallback(() => {
+    if (canMoreCast && !loadMoreCast) {
+      onMoreCast();
+    }
+  }, [canMoreCast, loadMoreCast, onMoreCast]);
+  const windowScrollListener = useCallback(() => {
+    if (
+      Math.ceil(window.innerHeight + document.documentElement.scrollTop) >=
+      Math.ceil(
+        document.documentElement.offsetHeight - AppConfig.loadMoreOffset
+      )
+    ) {
+      onPageEndReach();
+    }
+  }, [onPageEndReach]);
+  useEffect(() => {
+    window.addEventListener("scroll", windowScrollListener);
+    return () => {
+      window.removeEventListener("scroll", windowScrollListener);
+    };
+  }, [windowScrollListener]);
   return (
     <div className={styles.container}>
       <EmbeddedMain />
