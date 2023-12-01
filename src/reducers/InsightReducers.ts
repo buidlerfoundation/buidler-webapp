@@ -89,16 +89,16 @@ export const getTopInteractions = createAsyncThunk(
 
 export const followUser = createAsyncThunk(
   "insights/follow",
-  async (payload: { username: string }) => {
-    const res = await api.followUser(payload.username);
+  async (payload: { username: string; fid: string }) => {
+    const res = await api.followUser(payload.fid);
     return res;
   }
 );
 
 export const unfollowUser = createAsyncThunk(
   "insights/unfollow",
-  async (payload: { username: string }) => {
-    const res = await api.unfollowUser(payload.username);
+  async (payload: { username: string; fid: string }) => {
+    const res = await api.unfollowUser(payload.fid);
     return res;
   }
 );

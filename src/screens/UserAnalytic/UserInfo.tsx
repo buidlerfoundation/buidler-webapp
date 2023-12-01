@@ -68,14 +68,14 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
     tracking("Check Badge Active");
   }, [toggleCheckBadgeActive, tracking]);
   const onUnfollow = useCallback(async () => {
-    if (requesting || !user?.fid) return;
+    if (requesting || !user?.fid || !user?.username) return;
     tracking("Unfollow User");
     setRequesting(true);
-    await dispatch(unfollowUser({ username: user?.fid }));
+    await dispatch(unfollowUser({ username: user?.username, fid: user?.fid }));
     setRequesting(false);
-  }, [dispatch, requesting, tracking, user?.fid]);
+  }, [dispatch, requesting, tracking, user?.fid, user?.username]);
   const onFollow = useCallback(async () => {
-    if (requesting || !user?.fid) return;
+    if (requesting || !user?.fid || !user?.username) return;
     if (!fcUser?.fid) {
       const loginElement = document.getElementById("btn-login");
       dispatch(FC_USER_ACTIONS.updateLoginSource("Follow"));
@@ -84,9 +84,9 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
     }
     tracking("Follow User");
     setRequesting(true);
-    await dispatch(followUser({ username: user?.fid }));
+    await dispatch(followUser({ username: user?.username, fid: user?.fid }));
     setRequesting(false);
-  }, [dispatch, fcUser?.fid, requesting, tracking, user?.fid]);
+  }, [dispatch, fcUser?.fid, requesting, tracking, user?.fid, user?.username]);
   if (loading && !user) return null;
   return (
     <div className={styles["user-wrap"]}>
