@@ -1,17 +1,19 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { logoutAction } from "./actions";
-import { IFCUser } from "models/FC";
+import { IFCChannel, IFCUser } from "models/FC";
 import api from "api";
 
 interface FCUserState {
   data?: IFCUser | null;
   signer_id?: string;
   loginSource?: string;
+  channels: IFCChannel[];
 }
 
 const initialState: FCUserState = {
   data: null,
   loginSource: "",
+  channels: [],
 };
 
 export const getCurrentFCUser = createAsyncThunk("fc_user/get", async () => {
@@ -20,6 +22,16 @@ export const getCurrentFCUser = createAsyncThunk("fc_user/get", async () => {
     return res.data;
   }
 });
+
+export const getFCChannels = createAsyncThunk(
+  "fc_user/get-channels",
+  async () => {
+    const res = await api.getChannels();
+    if (res.success) {
+      return res.data;
+    }
+  }
+);
 
 const fcUserSlice = createSlice({
   name: "fc_user",
@@ -37,6 +49,9 @@ const fcUserSlice = createSlice({
       .addCase(logoutAction, () => initialState)
       .addCase(getCurrentFCUser.fulfilled, (state, action) => {
         state.data = action.payload;
+      })
+      .addCase(getFCChannels.fulfilled, (state, action) => {
+        state.channels = action.payload || [];
       });
   },
 });

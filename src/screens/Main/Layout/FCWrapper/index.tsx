@@ -13,7 +13,11 @@ import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
 import { clearData, getCookie, removeCookie, setCookie } from "common/Cookie";
 import { AsyncKey } from "common/AppConfig";
 import useAppDispatch from "hooks/useAppDispatch";
-import { FC_USER_ACTIONS, getCurrentFCUser } from "reducers/FCUserReducers";
+import {
+  FC_USER_ACTIONS,
+  getCurrentFCUser,
+  getFCChannels,
+} from "reducers/FCUserReducers";
 import { logoutAction } from "reducers/actions";
 import useAppSelector from "hooks/useAppSelector";
 import ImageView from "shared/ImageView";
@@ -197,6 +201,9 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   useEffect(() => {
     checkingAuth();
   }, [checkingAuth]);
+  useEffect(() => {
+    dispatch(getFCChannels());
+  }, [dispatch]);
   useEffect(() => {
     if (exploreUrl) {
       dispatch(
