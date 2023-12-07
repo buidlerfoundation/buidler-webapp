@@ -158,15 +158,8 @@ export interface IActiveBadgeCheck {
 }
 
 export interface IFCChannel {
-  description: string;
-  descriptionUrl: string;
-  fastImageUrl: string;
-  followerCount: number;
-  imageUrl: string;
-  key: string;
+  channel_id: string;
+  image: string;
   name: string;
-  sectionRank: number;
-  showCastSourceLabels: boolean;
-  showCastTags: boolean;
-  subscribable: boolean;
+  parent_url: string;
 }
