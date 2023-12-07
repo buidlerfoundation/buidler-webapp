@@ -45,7 +45,7 @@ const HomeFeedDetail = () => {
     [castRepliesData.canMore, castDetail?.loading, otherCastsFiltered.length]
   );
   const goBack = useCallback(() => {
-    if (window.history.length > 0) {
+    if (window.history.length > 1) {
       router.back();
     } else {
       router.replace("/home");
