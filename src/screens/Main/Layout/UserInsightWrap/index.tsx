@@ -57,7 +57,7 @@ const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
     [pathname, userTabs]
   );
   const goBack = useCallback(() => {
-    if (window.history.length > 0) {
+    if (window.history.length > 1) {
       router.back();
     } else {
       router.replace("/insights");

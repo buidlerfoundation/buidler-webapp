@@ -3,6 +3,7 @@ import {
   IActiveBadgeCheck,
   ICast,
   IDataUserEngagement,
+  IFCChannel,
   IFCUser,
   IFCUserActivity,
   IMetadataUrl,
@@ -194,3 +195,5 @@ export const unfollowUser = (name: string) =>
 
 export const getActiveBadgeCheck = (name: string) =>
   Caller.get<IActiveBadgeCheck>(`users/${name}/active-badge`);
+
+export const getChannels = () => Caller.get<IFCChannel[]>("channels?limit=50");

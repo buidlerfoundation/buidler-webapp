@@ -156,3 +156,10 @@ export interface IActiveBadgeCheck {
   total_casts?: number;
   first_cast_created_at?: string;
 }
+
+export interface IFCChannel {
+  channel_id: string;
+  image: string;
+  name: string;
+  parent_url: string;
+}
