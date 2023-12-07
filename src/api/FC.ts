@@ -78,7 +78,12 @@ export const getCastDetail = (params: {
   if (hash.slice(0, 2) === "0x") {
     hash = hash.slice(2);
   }
-  return Caller.get<ICast>(`casts/${hash}?${query}`);
+  return Caller.get<ICast>(
+    `casts/${hash}?${query}`,
+    undefined,
+    undefined,
+    true
+  );
 };
 
 export const deleteCast = (hash: string) => Caller.delete(`casts/${hash}`);

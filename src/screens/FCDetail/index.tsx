@@ -7,7 +7,6 @@ import LoadingItem from "shared/LoadingItem";
 import CastItem from "shared/CastItem";
 import CastDetailItem from "shared/CastDetailItem";
 import useAppDispatch from "hooks/useAppDispatch";
-import useAppSelector from "hooks/useAppSelector";
 import useFeedRepliesData from "hooks/useFeedRepliesData";
 import { getCastDetail, getCastReplies } from "reducers/HomeFeedReducers";
 import { useParams, useRouter } from "next/navigation";
