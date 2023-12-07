@@ -41,7 +41,8 @@ import IconMenuAnalytic from "shared/SVG/FC/IconMenuAnalytic";
 import ModalBugsReport from "shared/ModalBugsReport";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import useIsMobile from "hooks/useIsMobile";
 
 interface IMenuItem {
   active?: boolean;
@@ -94,6 +95,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   const [loginLoading, setLoginLoading] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
   const query = useQuery();
+  const router = useRouter();
   const querySignerId = useMemo(() => query?.get("signer_id"), [query]);
   const [polling, setPolling] = useState(false);
   const [initialShareUrl, setInitialShareUrl] = useState("");
@@ -117,6 +119,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   const activeColor = useMemo(() => "var(--color-primary-text)", []);
   const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
   const [resultData, setResultData] = useState<any>(null);
+  const isMobile = useIsMobile();
   const showMobileMenu = useMemo(
     () =>
       pathname === "/home" ||
@@ -236,10 +239,16 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   const requestSignerId = useCallback(async () => {
     if (loginLoading) return;
     setLoginLoading(true);
-    setOpenLogin(true);
+    pollingController.current?.abort?.();
+    if (!isMobile) {
+      setOpenLogin(true);
+    }
     const res = await api.requestSignedKey();
     setLoginLoading(false);
     if (res.data?.token) {
+      if (isMobile && res.data?.deeplinkUrl) {
+        router.push(res.data.deeplinkUrl);
+      }
       setSignedKeyRequest(res.data);
       await setCookie(AsyncKey.requestTokenKey, res.data?.token);
       setPolling(true);
@@ -269,7 +278,14 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     } else {
       trackingLoginFailed(res.message || "");
     }
-  }, [dispatch, loginLoading, trackingLoginFailed, trackingLoginSuccess]);
+  }, [
+    dispatch,
+    isMobile,
+    loginLoading,
+    router,
+    trackingLoginFailed,
+    trackingLoginSuccess,
+  ]);
   const onLoginClick = useCallback(() => {
     if (signedKeyRequest) return;
     requestSignerId();
