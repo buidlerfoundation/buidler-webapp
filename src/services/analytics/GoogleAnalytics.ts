@@ -1,6 +1,7 @@
 import mixpanel from "mixpanel-browser";
 import { getCategoryByApi, getEventNameByApi } from "helpers/AnalyticHelper";
-import { UserData } from "models/User";
+import { IFCUser } from "models/FC";
+import CryptoJS from "crypto-js";
 
 class GoogleAnalytics {
   initial = false;
@@ -12,12 +13,12 @@ class GoogleAnalytics {
     this.initial = true;
   }
 
-  identify(user: UserData) {
+  identify(user: IFCUser) {
     if (!this.initial) {
       this.init();
     }
-    mixpanel.identify(user.user_id);
-    mixpanel.people.set({ name: user.user_id });
+    mixpanel.identify(CryptoJS.SHA1(user.fid).toString());
+    mixpanel.people.set({ name: CryptoJS.SHA1(user.fid).toString() });
   }
 
   async identifyByExtensionId(id: string) {

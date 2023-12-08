@@ -1,9 +1,8 @@
 import CallerServer from "api/CallerServer";
 import { normalizeContentCast, removeProtocol } from "helpers/CastHelper";
-import { ICast, IFCUser } from "models/FC";
+import { ICast } from "models/FC";
 import moment from "moment";
 import { ImageResponse } from "next/og";
-import numeral from "numeral";
 import IconActiveBadge from "shared/SVG/FC/IconActiveBadge";
 import IconDefaultAvatar from "shared/SVG/IconDefaultAvatar";
 import IconGlobalChannel from "shared/SVG/IconGlobalChannel";

@@ -225,6 +225,11 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     requestSignerId();
   }, [requestSignerId, signedKeyRequest]);
   useEffect(() => {
+    if (fcUser) {
+      GoogleAnalytics.identify(fcUser);
+    }
+  }, [fcUser]);
+  useEffect(() => {
     if (q) {
       dispatch(FC_CAST_ACTIONS.updateQueryUrl(q));
     }
@@ -296,7 +301,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
       }
       if (e?.data?.type === "b-fc-initial-data") {
         const { signerId, q, theme, title, uniqId } = e?.data?.payload || {};
-        if (uniqId) {
+        if (uniqId && !signerId) {
           GoogleAnalytics.identifyByExtensionId(uniqId);
         }
         if (signerId) {

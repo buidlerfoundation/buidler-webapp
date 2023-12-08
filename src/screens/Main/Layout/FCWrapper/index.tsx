@@ -431,6 +431,11 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     setOpenMenu(false);
   }, []);
   useEffect(() => {
+    if (fcUser) {
+      GoogleAnalytics.identify(fcUser);
+    }
+  }, [fcUser]);
+  useEffect(() => {
     window.addEventListener("scroll", windowScrollListener);
     return () => {
       window.removeEventListener("scroll", windowScrollListener);
