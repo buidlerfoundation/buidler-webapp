@@ -7,6 +7,7 @@ import {
   IFCUser,
   IFCUserActivity,
   IPagingData,
+  IPastRelationData,
   IUserInsightTab,
   IUserTabPath,
 } from "models/FC";
@@ -17,6 +18,14 @@ export const getUserProfile = createAsyncThunk(
   async (payload: { username: string }) => {
     const resFid = await api.getFCUserByUserName(payload.username);
     const res = await api.getFCUser(resFid.data?.fid || "");
+    return res;
+  }
+);
+
+export const getPastRelation = createAsyncThunk(
+  "insights/get-past-relation",
+  async (payload: { fid: string }) => {
+    const res = await api.getPastRelation(payload.fid);
     return res;
   }
 );
@@ -134,6 +143,11 @@ interface IFCActiveBadgeCheckState {
   data?: IActiveBadgeCheck;
 }
 
+interface IFCPastRelationState {
+  loading?: boolean;
+  data?: IPastRelationData;
+}
+
 interface InsightsState {
   userMap: { [username: string]: IFCUserState };
   activeBadgeCheckMap: { [username: string]: IFCActiveBadgeCheckState };
@@ -145,6 +159,7 @@ interface InsightsState {
   filters: IActivityFilter[];
   userTabs: IUserInsightTab[];
   period: ActivityPeriod;
+  pastRelationMap: { [username: string]: IFCPastRelationState };
 }
 
 const initialState: InsightsState = {
@@ -168,6 +183,7 @@ const initialState: InsightsState = {
     { path: "/non-follower", label: "Non Followers" },
   ],
   period: "7d",
+  pastRelationMap: {},
 };
 
 const insightsSlice = createSlice({
@@ -387,6 +403,25 @@ const insightsSlice = createSlice({
         state.activeBadgeCheckMap[username] = {
           data: action.payload.data,
           loading: false,
+        };
+      })
+      .addCase(getPastRelation.pending, (state, action) => {
+        const { fid } = action.meta.arg;
+        state.pastRelationMap[fid] = {
+          loading: true,
+        };
+      })
+      .addCase(getPastRelation.rejected, (state, action) => {
+        const { fid } = action.meta.arg;
+        state.pastRelationMap[fid] = {
+          loading: false,
+        };
+      })
+      .addCase(getPastRelation.fulfilled, (state, action) => {
+        const { fid } = action.meta.arg;
+        state.pastRelationMap[fid] = {
+          loading: false,
+          data: action.payload.data,
         };
       }),
 });

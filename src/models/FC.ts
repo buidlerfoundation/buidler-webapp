@@ -163,3 +163,11 @@ export interface IFCChannel {
   name: string;
   parent_url: string;
 }
+
+export interface IPastRelationData {
+  first_interacted_at: string;
+  likes: number;
+  mentions: number;
+  recasts: number;
+  replied_casts: number;
+}

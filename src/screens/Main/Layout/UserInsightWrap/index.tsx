@@ -15,6 +15,7 @@ import {
   getDataActivities,
   getDataEngagement,
   getDataFollowUsers,
+  getPastRelation,
   getTopInteractions,
   getUserProfile,
 } from "reducers/InsightReducers";
@@ -98,6 +99,9 @@ const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
           limit: user?.fid ? 50 : 3,
         })
       );
+      if (user?.fid && user?.fid !== fcUser?.data?.fid) {
+        dispatch(getPastRelation({ fid: fcUser?.data?.fid }));
+      }
     }
   }, [dispatch, user?.fid, fcUser?.data?.fid]);
   return (

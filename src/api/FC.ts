@@ -7,6 +7,7 @@ import {
   IFCUser,
   IFCUserActivity,
   IMetadataUrl,
+  IPastRelationData,
   ISignedKeyRequest,
 } from "models/FC";
 import Caller from "./Caller";
@@ -202,3 +203,6 @@ export const getActiveBadgeCheck = (name: string) =>
   Caller.get<IActiveBadgeCheck>(`users/${name}/active-badge`);
 
 export const getChannels = () => Caller.get<IFCChannel[]>("channels?limit=50");
+
+export const getPastRelation = (fid: string) =>
+  Caller.get<IPastRelationData>(`users/${fid}/past-relation/sum`);
