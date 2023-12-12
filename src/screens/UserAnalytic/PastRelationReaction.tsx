@@ -5,9 +5,10 @@ import PastReactionItem from "shared/PastReactionItem";
 
 interface IPastRelationReaction {
   data?: IPagingData<IPastRelationReactionData>;
+  name?: string;
 }
 
-const PastRelationReaction = ({ data }: IPastRelationReaction) => {
+const PastRelationReaction = ({ data, name }: IPastRelationReaction) => {
   if (!data || data.loading || data.data.length === 0) return null;
   return (
     <div
@@ -18,7 +19,11 @@ const PastRelationReaction = ({ data }: IPastRelationReaction) => {
       }}
     >
       {data.data.slice(0, 10).map((el) => (
-        <PastReactionItem item={el} key={`${el.reaction_type}-${el.hash}`} />
+        <PastReactionItem
+          item={el}
+          key={`${el.reaction_type}-${el.hash}`}
+          name={name}
+        />
       ))}
     </div>
   );

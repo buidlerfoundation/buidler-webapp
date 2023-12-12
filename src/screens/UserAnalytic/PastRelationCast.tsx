@@ -18,7 +18,7 @@ const PastRelationCast = ({ data }: IPastRelationCast) => {
       }}
     >
       {data.data.slice(0, 3).map((el) => (
-        <CastItem cast={el} key={el.hash} homeFeed hideAttachment />
+        <CastItem cast={el} key={el.hash} homeFeed hideAttachment openWarpcast />
       ))}
     </div>
   );

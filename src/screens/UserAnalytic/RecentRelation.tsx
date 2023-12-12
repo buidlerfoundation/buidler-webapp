@@ -24,8 +24,8 @@ const RecentRelation = ({
   const renderBody = useCallback(() => {
     if (activeTabIndex === 0) return <PastRelationCast data={dataMention} />;
     if (activeTabIndex === 1) return <PastRelationCast data={dataReply} />;
-    return <PastRelationReaction data={dataReaction} />;
-  }, [activeTabIndex, dataMention, dataReaction, dataReply]);
+    return <PastRelationReaction data={dataReaction} name={name} />;
+  }, [activeTabIndex, dataMention, dataReaction, dataReply, name]);
   if (
     !dataMention ||
     !dataReply ||
@@ -38,11 +38,8 @@ const RecentRelation = ({
   return (
     <div
       className={styles["chart-item"]}
-      style={{ height: "unset", marginTop: 15, gap: "unset" }}
+      style={{ height: "unset", gap: "unset" }}
     >
-      <div className={styles["label-wrap"]}>
-        <span className={styles.label}>Recent interactions with {name}</span>
-      </div>
       <div className={styles.tabs}>
         {tabs.map((el, index) => (
           <div
