@@ -8,6 +8,7 @@ import {
   IFCUserActivity,
   IMetadataUrl,
   IPastRelationData,
+  IPastRelationReactionData,
   ISignedKeyRequest,
 } from "models/FC";
 import Caller from "./Caller";
@@ -206,3 +207,22 @@ export const getChannels = () => Caller.get<IFCChannel[]>("channels?limit=50");
 
 export const getPastRelation = (fid: string) =>
   Caller.get<IPastRelationData>(`users/${fid}/past-relation/sum`);
+
+export const getPastRelationCast = (params: {
+  fid: string;
+  type: "mention" | "reply";
+  page: number;
+  limit: number;
+}) =>
+  Caller.get<ICast[]>(
+    `users/${params.fid}/past-relation/casts?type=${params.type}&page=${params.page}&limit=${params.limit}`
+  );
+
+export const getPastRelationReaction = (params: {
+  fid: string;
+  page: number;
+  limit: number;
+}) =>
+  Caller.get<IPastRelationReactionData[]>(
+    `users/${params.fid}/past-relation/reactions?page=${params.page}&limit=${params.limit}`
+  );

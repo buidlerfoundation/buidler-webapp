@@ -75,6 +75,7 @@ export interface ICast {
   metadata?: IMetadataUrl;
   created_at: string;
   total_casts: number;
+  parent_cast?: ICast;
 }
 
 export interface IMetadataUrl {
@@ -170,4 +171,17 @@ export interface IPastRelationData {
   mentions: number;
   recasts: number;
   replied_casts: number;
+}
+
+export interface IPastRelationReactionData {
+  created_at: string;
+  fid: string;
+  hash: string;
+  reaction_type: 1 | 2;
+  target_fid: string;
+  target_hash: string;
+  timestamp: string;
+  updated_at: string;
+  cast: ICast;
+  user: IFCUser;
 }
