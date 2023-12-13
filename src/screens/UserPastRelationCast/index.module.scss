@@ -3,10 +3,19 @@
   flex-direction: column;
   gap: 15px;
   margin-top: 15px;
+  padding-bottom: 15px;
   :global(.gb-cast-container) {
     border-radius: 10px;
     border: 1px solid var(--color-stroke);
     overflow: hidden;
+    @media only screen and (max-width: 576px) {
+      border: none;
+      border-bottom: 1px solid var(--color-stroke);
+      border-radius: unset;
+      &:last-child {
+        border-bottom: none;
+      }
+    }
   }
 }
 
