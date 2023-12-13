@@ -11,6 +11,8 @@ interface IRecentRelation {
   dataReply?: IPagingData<ICast>;
   dataReaction?: IPagingData<IPastRelationReactionData>;
   name?: string;
+  currentRelationIndex: number;
+  setRelationIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const RecentRelation = ({
@@ -18,18 +20,19 @@ const RecentRelation = ({
   dataReply,
   dataReaction,
   name,
+  currentRelationIndex,
+  setRelationIndex,
 }: IRecentRelation) => {
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const tabs = useMemo(() => ["Mentions", "Replies", "Reactions"], []);
   const renderBody = useCallback(() => {
-    if (activeTabIndex === 0)
+    if (currentRelationIndex === 0)
       return (
         <PastRelationCast
           data={dataMention}
           empty="Seems like you and A haven't had any mentions yet. Let's make some memorable moments together!"
         />
       );
-    if (activeTabIndex === 1)
+    if (currentRelationIndex === 1)
       return (
         <PastRelationCast
           data={dataReply}
@@ -43,7 +46,7 @@ const RecentRelation = ({
         empty="Seems like you and A haven't had any reactions yet. Let's make some memorable moments together!"
       />
     );
-  }, [activeTabIndex, dataMention, dataReaction, dataReply, name]);
+  }, [currentRelationIndex, dataMention, dataReaction, dataReply, name]);
   if (
     !dataMention ||
     !dataReply ||
@@ -62,10 +65,10 @@ const RecentRelation = ({
         {tabs.map((el, index) => (
           <div
             className={`${styles["tab-item"]} ${
-              activeTabIndex === index ? styles["tab-item-active"] : ""
+              currentRelationIndex === index ? styles["tab-item-active"] : ""
             }`}
             key={el}
-            onClick={() => setActiveTabIndex(index)}
+            onClick={() => setRelationIndex(index)}
           >
             {el}
           </div>

@@ -1,0 +1,12 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 15px;
+}
+
+.empty {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--color-secondary-text);
+  font-weight: 500;
+}

@@ -21,6 +21,7 @@ import {
   getTopInteractions,
   getUserProfile,
 } from "reducers/InsightReducers";
+import useUserRelationTabs from "hooks/useUserRelationTabs";
 
 interface IUserInsightWrap {
   children: React.ReactNode;
@@ -41,6 +42,7 @@ const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
   const username = useMemo(() => params?.username, [params?.username]);
   const user = useAppSelector((state) => state.fcUser.data);
   const userTabs = useUserTabs();
+  const userRelationTabs = useUserRelationTabs();
   const fcUser = useFCUserByName(username);
   const userTabsFiltered = useMemo(() => {
     if (user?.fid) return userTabs;
@@ -58,6 +60,10 @@ const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
   const showTab = useMemo(
     () => userTabs?.find((el) => !!pathname?.includes(el.path)),
     [pathname, userTabs]
+  );
+  const showRelationTab = useMemo(
+    () => userRelationTabs?.find((el) => !!pathname?.includes(el.path)),
+    [pathname, userRelationTabs]
   );
   const goBack = useCallback(() => {
     if (window.history.length > 1) {
@@ -148,6 +154,21 @@ const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
         {showTab && (
           <div className={styles.tabs}>
             {userTabsFiltered?.map((el) => (
+              <Link
+                href={`${prefixPath}/insights/${username}${el.path}`}
+                key={el.path}
+                className={`${styles["tab-item"]} ${
+                  pathname?.includes(el.path) ? styles.active : ""
+                }`}
+              >
+                {el.label}
+              </Link>
+            ))}
+          </div>
+        )}
+        {showRelationTab && (
+          <div className={styles.tabs}>
+            {userRelationTabs?.map((el) => (
               <Link
                 href={`${prefixPath}/insights/${username}${el.path}`}
                 key={el.path}

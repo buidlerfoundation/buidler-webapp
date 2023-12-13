@@ -139,6 +139,9 @@ export type IUserTabPath =
   | "/non-follower"
   | "/following"
   | "/follower"
+  | "/relation-mention"
+  | "/relation-reply"
+  | "/relation-reaction"
   | "/cast";
 
 export interface IUserInsightTab {

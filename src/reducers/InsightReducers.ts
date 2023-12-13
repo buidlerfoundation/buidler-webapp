@@ -181,6 +181,7 @@ interface InsightsState {
   dataInteractionMap: { [username: string]: IPagingData<IFCUser> };
   filters: IActivityFilter[];
   userTabs: IUserInsightTab[];
+  userRelationTabs: IUserInsightTab[];
   period: ActivityPeriod;
   pastRelationMap: { [username: string]: IFCPastRelationState };
   pastRelationCastMap: {
@@ -210,6 +211,11 @@ const initialState: InsightsState = {
     { path: "/follower", label: "Followers" },
     { path: "/following", label: "Following" },
     { path: "/non-follower", label: "Non Followers" },
+  ],
+  userRelationTabs: [
+    { path: "/relation-mention", label: "Mentions" },
+    { path: "/relation-reply", label: "Replies" },
+    { path: "/relation-reaction", label: "Reactions" },
   ],
   period: "7d",
   pastRelationMap: {},

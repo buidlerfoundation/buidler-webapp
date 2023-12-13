@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useMemo, useState } from "react";
 import styles from "./index.module.scss";
 import { IPastRelationData } from "models/FC";
 import { dateFormatted } from "utils/DateUtils";
@@ -6,6 +6,9 @@ import { Tooltip } from "@mui/material";
 import RecentRelation from "./RecentRelation";
 import useFCUserPastRelationCast from "hooks/useFCUserPastRelationCast";
 import useFCUserPastRelationReaction from "hooks/useFCUserPastRelationReaction";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import useUserRelationTabs from "hooks/useUserRelationTabs";
 
 interface IPastRelation {
   data?: IPastRelationData;
@@ -14,6 +17,9 @@ interface IPastRelation {
 }
 
 const PastRelation = ({ data, name, fid }: IPastRelation) => {
+  const pathname = usePathname();
+  const [currentRelationIndex, setRelationIndex] = useState(0);
+  const userRelationTabs = useUserRelationTabs();
   const dataPastRelationCastReply = useFCUserPastRelationCast("reply", fid);
   const dataPastRelationCastMention = useFCUserPastRelationCast("mention", fid);
   const dataPastRelationReaction = useFCUserPastRelationReaction(fid);
@@ -45,6 +51,14 @@ const PastRelation = ({ data, name, fid }: IPastRelation) => {
     <div className={styles["chart-item"]} style={{ height: "unset", gap: 10 }}>
       <div className={styles["label-wrap"]}>
         <span className={styles.label}>Memories with @{name}</span>
+        {total > 0 && (
+          <Link
+            className={styles["btn-view-all"]}
+            href={`${pathname}${userRelationTabs[currentRelationIndex].path}`}
+          >
+            View all
+          </Link>
+        )}
       </div>
       {total > 0 ? (
         <>
@@ -84,6 +98,8 @@ const PastRelation = ({ data, name, fid }: IPastRelation) => {
             dataReaction={dataPastRelationReaction}
             dataReply={dataPastRelationCastReply}
             name={name}
+            currentRelationIndex={currentRelationIndex}
+            setRelationIndex={setRelationIndex}
           />
         </>
       ) : (
