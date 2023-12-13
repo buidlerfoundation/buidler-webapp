@@ -75,6 +75,7 @@ export interface ICast {
   metadata?: IMetadataUrl;
   created_at: string;
   total_casts: number;
+  parent_cast?: ICast;
 }
 
 export interface IMetadataUrl {
@@ -138,6 +139,9 @@ export type IUserTabPath =
   | "/non-follower"
   | "/following"
   | "/follower"
+  | "/relation-mention"
+  | "/relation-reply"
+  | "/relation-reaction"
   | "/cast";
 
 export interface IUserInsightTab {
@@ -162,4 +166,25 @@ export interface IFCChannel {
   image: string;
   name: string;
   parent_url: string;
+}
+
+export interface IPastRelationData {
+  first_interacted_at: string;
+  likes: number;
+  mentions: number;
+  recasts: number;
+  replied_casts: number;
+}
+
+export interface IPastRelationReactionData {
+  created_at: string;
+  fid: string;
+  hash: string;
+  reaction_type: 1 | 2;
+  target_fid: string;
+  target_hash: string;
+  timestamp: string;
+  updated_at: string;
+  cast: ICast;
+  user: IFCUser;
 }

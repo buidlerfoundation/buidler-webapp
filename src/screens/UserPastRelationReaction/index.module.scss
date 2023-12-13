@@ -1,0 +1,18 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 15px;
+  padding-bottom: 15px;
+}
+
+.empty {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--color-secondary-text);
+  font-weight: 500;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 20px;
+  font-size: 13px;
+}

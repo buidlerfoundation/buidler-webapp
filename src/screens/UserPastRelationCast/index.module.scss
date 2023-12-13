@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+  padding-bottom: 15px;
+  :global(.gb-cast-container) {
+    border-radius: 10px;
+    border: 1px solid var(--color-stroke);
+    overflow: hidden;
+    @media only screen and (max-width: 576px) {
+      border: none;
+      border-bottom: 1px solid var(--color-stroke);
+      border-radius: unset;
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+}
+
+.empty {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--color-secondary-text);
+  font-weight: 500;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 20px;
+  font-size: 13px;
+}

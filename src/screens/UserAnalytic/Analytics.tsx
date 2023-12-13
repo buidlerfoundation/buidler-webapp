@@ -16,6 +16,8 @@ import useDataFollowUser from "hooks/useDataFollowUser";
 import useAppDispatch from "hooks/useAppDispatch";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 import { usePathname, useRouter } from "next/navigation";
+import PastRelation from "./PastRelation";
+import useFCUserPastRelation from "hooks/useFCUserPastRelation";
 
 interface IAnalytics {
   fid?: string;
@@ -30,6 +32,7 @@ const Analytics = ({ fid, period, username }: IAnalytics) => {
   const filters = useAppSelector((state) => state.insights.filters);
   const fcActivities = useFCActivitiesByName(fid, period);
   const dataEngagement = useFCUserDataEngagement(fid);
+  const dataPastRelation = useFCUserPastRelation(fid);
   const dataActivities = useFCUserDataActivities(fid);
   const dataNonFollowerUser = useDataFollowUser(fid, "/non-follower");
   const dataTopInteraction = useDataTopInteraction(fid);
@@ -70,9 +73,10 @@ const Analytics = ({ fid, period, username }: IAnalytics) => {
       <div className={styles.charts}>
         <EngagementChart data={dataEngagement?.data} />
         <ActivityChart data={dataActivities?.data} />
+        <PastRelation data={dataPastRelation?.data} name={username} fid={fid} />
+        <TopInteractions data={dataTopInteraction} />
+        <NonFollowerUser data={dataNonFollowerUser} onViewAll={onViewAll} />
       </div>
-      <TopInteractions data={dataTopInteraction} />
-      <NonFollowerUser data={dataNonFollowerUser} onViewAll={onViewAll} />
     </div>
   );
 };

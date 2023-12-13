@@ -214,7 +214,7 @@ const TopInteractionTable = ({ data }: ITopInteractionTable) => {
         />
       ) : (
         <div className={styles["sign-in-to-view"]} onClick={onLoginClick}>
-          Sign in to view more
+          Login to view more
         </div>
       )}
     </>

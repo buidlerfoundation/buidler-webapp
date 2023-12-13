@@ -71,7 +71,7 @@ const Analytic = () => {
       {
         fid: "99",
         name: "Jesse Pollak 🔵",
-        username: "jessepollak.eth",
+        username: "jessepollak",
         avatar:
           "https://i.seadn.io/gae/GFkg_668tE-YxTKPt_XcZdL_xKMQ2CitZKR2L7dJoLoMXH4hUFXHv3Tzes-2hZWiyTEACe6AvutNqBpNbN_WS3b25g?w=500&auto=format",
       },

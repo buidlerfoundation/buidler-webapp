@@ -3,10 +3,13 @@ import {
   ActivityPeriod,
   IActiveBadgeCheck,
   IActivityFilter,
+  ICast,
   IDataUserEngagement,
   IFCUser,
   IFCUserActivity,
   IPagingData,
+  IPastRelationData,
+  IPastRelationReactionData,
   IUserInsightTab,
   IUserTabPath,
 } from "models/FC";
@@ -17,6 +20,35 @@ export const getUserProfile = createAsyncThunk(
   async (payload: { username: string }) => {
     const resFid = await api.getFCUserByUserName(payload.username);
     const res = await api.getFCUser(resFid.data?.fid || "");
+    return res;
+  }
+);
+
+export const getPastRelationReaction = createAsyncThunk(
+  "insights/get-past-relation-reaction",
+  async (payload: { fid: string; page: number; limit: number }) => {
+    const res = await api.getPastRelationReaction(payload);
+    return res;
+  }
+);
+
+export const getPastRelationCast = createAsyncThunk(
+  "insights/get-past-relation-cast",
+  async (payload: {
+    fid: string;
+    page: number;
+    limit: number;
+    type: "mention" | "reply";
+  }) => {
+    const res = await api.getPastRelationCast(payload);
+    return res;
+  }
+);
+
+export const getPastRelation = createAsyncThunk(
+  "insights/get-past-relation",
+  async (payload: { fid: string }) => {
+    const res = await api.getPastRelation(payload.fid);
     return res;
   }
 );
@@ -134,6 +166,11 @@ interface IFCActiveBadgeCheckState {
   data?: IActiveBadgeCheck;
 }
 
+interface IFCPastRelationState {
+  loading?: boolean;
+  data?: IPastRelationData;
+}
+
 interface InsightsState {
   userMap: { [username: string]: IFCUserState };
   activeBadgeCheckMap: { [username: string]: IFCActiveBadgeCheckState };
@@ -144,7 +181,15 @@ interface InsightsState {
   dataInteractionMap: { [username: string]: IPagingData<IFCUser> };
   filters: IActivityFilter[];
   userTabs: IUserInsightTab[];
+  userRelationTabs: IUserInsightTab[];
   period: ActivityPeriod;
+  pastRelationMap: { [username: string]: IFCPastRelationState };
+  pastRelationCastMap: {
+    [type: string]: { [username: string]: IPagingData<ICast> };
+  };
+  pastRelationReactionMap: {
+    [username: string]: IPagingData<IPastRelationReactionData>;
+  };
 }
 
 const initialState: InsightsState = {
@@ -167,7 +212,18 @@ const initialState: InsightsState = {
     { path: "/following", label: "Following" },
     { path: "/non-follower", label: "Non Followers" },
   ],
+  userRelationTabs: [
+    { path: "/relation-mention", label: "Mentions" },
+    { path: "/relation-reply", label: "Replies" },
+    { path: "/relation-reaction", label: "Reactions" },
+  ],
   period: "7d",
+  pastRelationMap: {},
+  pastRelationCastMap: {
+    mention: {},
+    reply: {},
+  },
+  pastRelationReactionMap: {},
 };
 
 const insightsSlice = createSlice({
@@ -353,6 +409,87 @@ const insightsSlice = createSlice({
                 ],
         };
       })
+      .addCase(getPastRelationReaction.pending, (state, action) => {
+        const { fid, page } = action.meta.arg;
+        const data = state.pastRelationReactionMap[fid] || {};
+        if (page === 1) {
+          data.loading = true;
+        } else {
+          data.loadMore = true;
+        }
+        state.pastRelationReactionMap[fid] = data;
+      })
+      .addCase(getPastRelationReaction.rejected, (state, action) => {
+        const { fid } = action.meta.arg;
+        state.pastRelationReactionMap[fid] = {
+          ...(state.pastRelationReactionMap[fid] || {}),
+          loading: false,
+          loadMore: false,
+        };
+      })
+      .addCase(getPastRelationReaction.fulfilled, (state, action) => {
+        const total = action.payload.metadata?.total || 0;
+        const limit = action.meta.arg.limit;
+        const fid = action.meta.arg.fid;
+        const totalPage = Math.ceil(total / limit);
+        const currentPage = action.meta.arg.page;
+        const data = action.payload?.data || [];
+        state.pastRelationReactionMap[fid] = {
+          loading: false,
+          loadMore: false,
+          currentPage,
+          total,
+          canMore: totalPage > currentPage,
+          data:
+            currentPage === 1
+              ? data
+              : [
+                  ...(state.pastRelationReactionMap?.[fid]?.data || []),
+                  ...data,
+                ],
+        };
+      })
+      .addCase(getPastRelationCast.pending, (state, action) => {
+        const { fid, page, type } = action.meta.arg;
+        const data = state.pastRelationCastMap[type][fid] || {};
+        if (page === 1) {
+          data.loading = true;
+        } else {
+          data.loadMore = true;
+        }
+        state.pastRelationCastMap[type][fid] = data;
+      })
+      .addCase(getPastRelationCast.rejected, (state, action) => {
+        const { fid, type } = action.meta.arg;
+        state.pastRelationCastMap[type][fid] = {
+          ...(state.pastRelationCastMap[type][fid] || {}),
+          loading: false,
+          loadMore: false,
+        };
+      })
+      .addCase(getPastRelationCast.fulfilled, (state, action) => {
+        const type = action.meta.arg.type;
+        const total = action.payload.metadata?.total || 0;
+        const limit = action.meta.arg.limit;
+        const fid = action.meta.arg.fid;
+        const totalPage = Math.ceil(total / limit);
+        const currentPage = action.meta.arg.page;
+        const data = action.payload?.data || [];
+        state.pastRelationCastMap[type][fid] = {
+          loading: false,
+          loadMore: false,
+          currentPage,
+          total,
+          canMore: totalPage > currentPage,
+          data:
+            currentPage === 1
+              ? data
+              : [
+                  ...(state.pastRelationCastMap?.[type]?.[fid]?.data || []),
+                  ...data,
+                ],
+        };
+      })
       .addCase(followUser.fulfilled, (state, action) => {
         const { username } = action.meta.arg;
         const userData = state.userMap?.[username]?.data;
@@ -387,6 +524,25 @@ const insightsSlice = createSlice({
         state.activeBadgeCheckMap[username] = {
           data: action.payload.data,
           loading: false,
+        };
+      })
+      .addCase(getPastRelation.pending, (state, action) => {
+        const { fid } = action.meta.arg;
+        state.pastRelationMap[fid] = {
+          loading: true,
+        };
+      })
+      .addCase(getPastRelation.rejected, (state, action) => {
+        const { fid } = action.meta.arg;
+        state.pastRelationMap[fid] = {
+          loading: false,
+        };
+      })
+      .addCase(getPastRelation.fulfilled, (state, action) => {
+        const { fid } = action.meta.arg;
+        state.pastRelationMap[fid] = {
+          loading: false,
+          data: action.payload.data,
         };
       }),
 });
