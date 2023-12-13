@@ -103,9 +103,8 @@ const PastRelation = ({ data, name, fid }: IPastRelation) => {
           />
         </>
       ) : (
-        <span className={styles.description}>
-          Seems like you and A haven't had any interactions yet. Let's make some
-          memorable moments together!
+        <span className={styles.description} style={{ fontSize: 13 }}>
+          Seems like you and ${name} haven't had any interactions yet.
         </span>
       )}
     </div>

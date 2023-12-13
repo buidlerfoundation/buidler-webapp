@@ -15,7 +15,12 @@ const PastRelationReaction = ({ data, name, empty }: IPastRelationReaction) => {
     return (
       <span
         className={styles.description}
-        style={{ marginTop: 5, textAlign: "center", padding: "0 20px" }}
+        style={{
+          marginTop: 20,
+          textAlign: "center",
+          padding: "0 20px",
+          fontSize: 13,
+        }}
       >
         {empty}
       </span>
