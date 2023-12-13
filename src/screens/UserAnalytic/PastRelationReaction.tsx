@@ -12,19 +12,7 @@ interface IPastRelationReaction {
 const PastRelationReaction = ({ data, name, empty }: IPastRelationReaction) => {
   if (!data || data.loading) return null;
   if (!data.loading && data.data.length === 0) {
-    return (
-      <span
-        className={styles.description}
-        style={{
-          marginTop: 20,
-          textAlign: "center",
-          padding: "0 20px",
-          fontSize: 13,
-        }}
-      >
-        {empty}
-      </span>
-    );
+    return <div className={styles["empty-box"]}>{empty}</div>;
   }
   return (
     <div

@@ -233,6 +233,24 @@
         }
       }
     }
+    .empty-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      border: 2px dashed var(--color-stroke);
+      padding: 20px;
+      font-size: 14px;
+      color: var(--color-secondary-text);
+      margin-top: 20px;
+      line-height: 22px;
+      border-radius: 10px;
+      .btn-login {
+        color: var(--color-mention);
+        font-weight: 600;
+      }
+    }
     .description {
       color: var(--color-secondary-text);
       font-size: 15px;

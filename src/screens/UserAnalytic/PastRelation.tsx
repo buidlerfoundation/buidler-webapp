@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState } from "react";
+import React, { memo, useCallback, useMemo, useState } from "react";
 import styles from "./index.module.scss";
 import { IPastRelationData } from "models/FC";
 import { dateFormatted } from "utils/DateUtils";
@@ -9,6 +9,9 @@ import useFCUserPastRelationReaction from "hooks/useFCUserPastRelationReaction";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import useUserRelationTabs from "hooks/useUserRelationTabs";
+import useAppSelector from "hooks/useAppSelector";
+import useAppDispatch from "hooks/useAppDispatch";
+import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 
 interface IPastRelation {
   data?: IPastRelationData;
@@ -17,7 +20,9 @@ interface IPastRelation {
 }
 
 const PastRelation = ({ data, name, fid }: IPastRelation) => {
+  const dispatch = useAppDispatch();
   const pathname = usePathname();
+  const user = useAppSelector((state) => state.fcUser.data);
   const [currentRelationIndex, setRelationIndex] = useState(0);
   const userRelationTabs = useUserRelationTabs();
   const dataPastRelationCastReply = useFCUserPastRelationCast("reply", fid);
@@ -46,21 +51,27 @@ const PastRelation = ({ data, name, fid }: IPastRelation) => {
     ],
     [totalLikes, totalMentions, totalRecasts, totalReplyCasts]
   );
-  if (!data) return null;
-  return (
-    <div className={styles["chart-item"]} style={{ height: "unset", gap: 10 }}>
-      <div className={styles["label-wrap"]}>
-        <span className={styles.label}>Memories with @{name}</span>
-        {total > 0 && (
-          <Link
-            className={styles["btn-view-all"]}
-            href={`${pathname}${userRelationTabs[currentRelationIndex].path}`}
-          >
-            View all
-          </Link>
-        )}
-      </div>
-      {total > 0 ? (
+  const onLoginClick = useCallback(() => {
+    const loginElement = document.getElementById("btn-login");
+    dispatch(FC_USER_ACTIONS.updateLoginSource("View Past Interaction"));
+    loginElement?.click();
+  }, [dispatch]);
+  const renderBody = useCallback(() => {
+    if (!user?.fid) {
+      return (
+        <div
+          className={`${styles["empty-box"]} normal-button-clear`}
+          style={{ marginTop: 10 }}
+          onClick={onLoginClick}
+        >
+          <span>Sign in to see memorable moments with @{name}</span>
+          <div className={styles["btn-login"]}>Sign in</div>
+        </div>
+      );
+    }
+    if (!data) return null;
+    if (total > 0) {
+      return (
         <>
           <p className={styles.description}>
             <span className={styles.highlight}>You</span> and{" "}
@@ -102,11 +113,40 @@ const PastRelation = ({ data, name, fid }: IPastRelation) => {
             setRelationIndex={setRelationIndex}
           />
         </>
-      ) : (
-        <span className={styles.description} style={{ fontSize: 13 }}>
-          Seems like you and ${name} haven't had any interactions yet.
-        </span>
-      )}
+      );
+    }
+    return (
+      <div className={styles["empty-box"]} style={{ marginTop: 10 }}>
+        Seems like you and {name} haven't had any interactions yet.
+      </div>
+    );
+  }, [
+    currentRelationIndex,
+    data,
+    dataPastRelation,
+    dataPastRelationCastMention,
+    dataPastRelationCastReply,
+    dataPastRelationReaction,
+    name,
+    onLoginClick,
+    since,
+    total,
+    user?.fid,
+  ]);
+  return (
+    <div className={styles["chart-item"]} style={{ height: "unset", gap: 10 }}>
+      <div className={styles["label-wrap"]}>
+        <span className={styles.label}>Memories with @{name}</span>
+        {total > 0 && (
+          <Link
+            className={styles["btn-view-all"]}
+            href={`${pathname}${userRelationTabs[currentRelationIndex].path}`}
+          >
+            View all
+          </Link>
+        )}
+      </div>
+      {renderBody()}
     </div>
   );
 };
