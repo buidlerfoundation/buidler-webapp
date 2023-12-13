@@ -3,13 +3,20 @@ import styles from "./index.module.scss";
 import { IPastRelationData } from "models/FC";
 import { dateFormatted } from "utils/DateUtils";
 import { Tooltip } from "@mui/material";
+import RecentRelation from "./RecentRelation";
+import useFCUserPastRelationCast from "hooks/useFCUserPastRelationCast";
+import useFCUserPastRelationReaction from "hooks/useFCUserPastRelationReaction";
 
 interface IPastRelation {
   data?: IPastRelationData;
   name?: string;
+  fid?: string;
 }
 
-const PastRelation = ({ data, name }: IPastRelation) => {
+const PastRelation = ({ data, name, fid }: IPastRelation) => {
+  const dataPastRelationCastReply = useFCUserPastRelationCast("reply", fid);
+  const dataPastRelationCastMention = useFCUserPastRelationCast("mention", fid);
+  const dataPastRelationReaction = useFCUserPastRelationReaction(fid);
   const totalLikes = useMemo(() => data?.likes || 0, [data?.likes]);
   const totalRecasts = useMemo(() => data?.recasts || 0, [data?.recasts]);
   const totalReplyCasts = useMemo(
@@ -37,39 +44,54 @@ const PastRelation = ({ data, name }: IPastRelation) => {
   return (
     <div className={styles["chart-item"]} style={{ height: "unset", gap: 10 }}>
       <div className={styles["label-wrap"]}>
-        <span className={styles.label}>Past Interactions</span>
+        <span className={styles.label}>Memories with @{name}</span>
       </div>
-      <p className={styles.description}>
-        <span className={styles.highlight}>You</span> and{" "}
-        <span className={styles.highlight}>{name}</span> have interacted{" "}
-        <span className={styles.highlight}>{total} times</span> since{" "}
-        {dateFormatted(since, "MMMM DD, YYYY")}
-      </p>
-      <div className={styles["past-relation-chart"]}>
-        {dataPastRelation.map((el) => (
-          <Tooltip
-            title={`${el.count} ${el.label}`}
-            key={el.label}
-            placement="top"
-          >
-            <div
-              className={styles["past-relation-item"]}
-              style={{
-                width: `${Math.round((el.count * 1000) / total) / 10}%`,
-                background: el.color,
-              }}
-            />
-          </Tooltip>
-        ))}
-      </div>
-      <div className={styles["past-relation-category"]}>
-        {dataPastRelation.map((el) => (
-          <div className={styles["category-item"]} key={el.label}>
-            <div style={{ width: 10, height: 10, background: el.color }} />
-            <span>{el.label}</span>
+      {total > 0 ? (
+        <>
+          <p className={styles.description}>
+            <span className={styles.highlight}>You</span> and{" "}
+            <span className={styles.highlight}>{name}</span> have interacted{" "}
+            <span className={styles.highlight}>{total} times</span> since{" "}
+            {dateFormatted(since, "MMMM DD, YYYY")}
+          </p>
+          <div className={styles["past-relation-chart"]}>
+            {dataPastRelation.map((el) => (
+              <Tooltip
+                title={`${el.count} ${el.label}`}
+                key={el.label}
+                placement="top"
+              >
+                <div
+                  className={styles["past-relation-item"]}
+                  style={{
+                    width: `${Math.round((el.count * 1000) / total) / 10}%`,
+                    background: el.color,
+                  }}
+                />
+              </Tooltip>
+            ))}
           </div>
-        ))}
-      </div>
+          <div className={styles["past-relation-category"]}>
+            {dataPastRelation.map((el) => (
+              <div className={styles["category-item"]} key={el.label}>
+                <div style={{ width: 10, height: 10, background: el.color }} />
+                <span>{el.label}</span>
+              </div>
+            ))}
+          </div>
+          <RecentRelation
+            dataMention={dataPastRelationCastMention}
+            dataReaction={dataPastRelationReaction}
+            dataReply={dataPastRelationCastReply}
+            name={name}
+          />
+        </>
+      ) : (
+        <span className={styles.description}>
+          Seems like you and A haven't had any interactions yet. Let's make some
+          memorable moments together!
+        </span>
+      )}
     </div>
   );
 };

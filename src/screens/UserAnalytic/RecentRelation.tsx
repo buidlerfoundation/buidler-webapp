@@ -22,9 +22,27 @@ const RecentRelation = ({
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const tabs = useMemo(() => ["Mentions", "Replies", "Reactions"], []);
   const renderBody = useCallback(() => {
-    if (activeTabIndex === 0) return <PastRelationCast data={dataMention} />;
-    if (activeTabIndex === 1) return <PastRelationCast data={dataReply} />;
-    return <PastRelationReaction data={dataReaction} name={name} />;
+    if (activeTabIndex === 0)
+      return (
+        <PastRelationCast
+          data={dataMention}
+          empty="Seems like you and A haven't had any mentions yet. Let's make some memorable moments together!"
+        />
+      );
+    if (activeTabIndex === 1)
+      return (
+        <PastRelationCast
+          data={dataReply}
+          empty="Seems like you and A haven't had any replies yet. Let's make some memorable moments together!"
+        />
+      );
+    return (
+      <PastRelationReaction
+        data={dataReaction}
+        name={name}
+        empty="Seems like you and A haven't had any reactions yet. Let's make some memorable moments together!"
+      />
+    );
   }, [activeTabIndex, dataMention, dataReaction, dataReply, name]);
   if (
     !dataMention ||

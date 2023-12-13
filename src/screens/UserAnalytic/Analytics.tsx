@@ -18,9 +18,6 @@ import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 import { usePathname, useRouter } from "next/navigation";
 import PastRelation from "./PastRelation";
 import useFCUserPastRelation from "hooks/useFCUserPastRelation";
-import useFCUserPastRelationCast from "hooks/useFCUserPastRelationCast";
-import useFCUserPastRelationReaction from "hooks/useFCUserPastRelationReaction";
-import RecentRelation from "./RecentRelation";
 
 interface IAnalytics {
   fid?: string;
@@ -39,9 +36,6 @@ const Analytics = ({ fid, period, username }: IAnalytics) => {
   const dataActivities = useFCUserDataActivities(fid);
   const dataNonFollowerUser = useDataFollowUser(fid, "/non-follower");
   const dataTopInteraction = useDataTopInteraction(fid);
-  const dataPastRelationCastReply = useFCUserPastRelationCast("reply", fid);
-  const dataPastRelationCastMention = useFCUserPastRelationCast("mention", fid);
-  const dataPastRelationReaction = useFCUserPastRelationReaction(fid);
   const user = useAppSelector((state) => state.fcUser.data);
   const onViewAll = useCallback(() => {
     if (!user) {
@@ -79,13 +73,7 @@ const Analytics = ({ fid, period, username }: IAnalytics) => {
       <div className={styles.charts}>
         <EngagementChart data={dataEngagement?.data} />
         <ActivityChart data={dataActivities?.data} />
-        <PastRelation data={dataPastRelation?.data} name={username} />
-        <RecentRelation
-          dataMention={dataPastRelationCastMention}
-          dataReaction={dataPastRelationReaction}
-          dataReply={dataPastRelationCastReply}
-          name={username}
-        />
+        <PastRelation data={dataPastRelation?.data} name={username} fid={fid} />
       </div>
       <TopInteractions data={dataTopInteraction} />
       <NonFollowerUser data={dataNonFollowerUser} onViewAll={onViewAll} />

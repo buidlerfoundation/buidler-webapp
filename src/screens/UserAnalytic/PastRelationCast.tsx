@@ -1,13 +1,22 @@
 import { ICast, IPagingData } from "models/FC";
 import React, { memo } from "react";
 import CastItem from "shared/CastItem";
+import styles from "./index.module.scss";
 
 interface IPastRelationCast {
   data?: IPagingData<ICast>;
+  empty: string;
 }
 
-const PastRelationCast = ({ data }: IPastRelationCast) => {
-  if (!data || data.loading || data.data.length === 0) return null;
+const PastRelationCast = ({ data, empty }: IPastRelationCast) => {
+  if (!data || data.loading) return null;
+  if (!data.loading && data.data.length === 0) {
+    return (
+      <span className={styles.description} style={{ marginTop: 15 }}>
+        {empty}
+      </span>
+    );
+  }
   return (
     <div
       style={{
@@ -18,7 +27,13 @@ const PastRelationCast = ({ data }: IPastRelationCast) => {
       }}
     >
       {data.data.slice(0, 3).map((el) => (
-        <CastItem cast={el} key={el.hash} homeFeed hideAttachment openWarpcast />
+        <CastItem
+          cast={el}
+          key={el.hash}
+          homeFeed
+          hideAttachment
+          openWarpcast
+        />
       ))}
     </div>
   );
