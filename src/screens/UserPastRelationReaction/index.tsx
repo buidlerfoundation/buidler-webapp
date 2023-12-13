@@ -97,8 +97,7 @@ const UserPastRelationReaction = () => {
   if (isEmpty) {
     return (
       <div className={`${styles.container} ${styles.empty}`}>
-        Seems like you and A haven't had any reactions yet. Let's make some
-        memorable moments together!
+        Seems like you and {username} haven't had any reactions yet.
       </div>
     );
   }

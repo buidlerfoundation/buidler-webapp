@@ -42,7 +42,10 @@ const UserPastRelationCast = ({ path }: IUserPastRelationCast) => {
     return !user?.fid;
   }, [user?.fid]);
   const isEmpty = useMemo(
-    () => dataPastRelationCast && !dataPastRelationCast?.loading && data.length === 0,
+    () =>
+      dataPastRelationCast &&
+      !dataPastRelationCast?.loading &&
+      data.length === 0,
     [data.length, dataPastRelationCast]
   );
   const renderCast = useCallback(
@@ -112,8 +115,7 @@ const UserPastRelationCast = ({ path }: IUserPastRelationCast) => {
   if (isEmpty) {
     return (
       <div className={`${styles.container} ${styles.empty}`}>
-        Seems like you and A haven't had any {emptyType} yet. Let's make some
-        memorable moments together!
+        Seems like you and {username} haven't had any {emptyType} yet.
       </div>
     );
   }

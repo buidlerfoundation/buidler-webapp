@@ -13,7 +13,10 @@ const PastRelationReaction = ({ data, name, empty }: IPastRelationReaction) => {
   if (!data || data.loading) return null;
   if (!data.loading && data.data.length === 0) {
     return (
-      <span className={styles.description} style={{ marginTop: 15 }}>
+      <span
+        className={styles.description}
+        style={{ marginTop: 5, textAlign: "center", padding: "0 20px" }}
+      >
         {empty}
       </span>
     );

@@ -196,8 +196,8 @@
   .charts {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-top: 15px;
+    gap: 35px;
+    margin-top: 35px;
     .chart-item {
       display: flex;
       flex-direction: column;
@@ -269,7 +269,6 @@
 .top-interaction-wrap {
   display: flex;
   flex-direction: column;
-  margin-top: 15px;
   .sign-in-to-view {
     height: 53px;
     display: flex;
@@ -284,7 +283,6 @@
 .non-follow-wrap {
   display: flex;
   flex-direction: column;
-  margin-top: 15px;
   .non-follow-head {
     display: flex;
     justify-content: space-between;

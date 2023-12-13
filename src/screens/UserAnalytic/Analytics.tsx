@@ -74,9 +74,9 @@ const Analytics = ({ fid, period, username }: IAnalytics) => {
         <EngagementChart data={dataEngagement?.data} />
         <ActivityChart data={dataActivities?.data} />
         <PastRelation data={dataPastRelation?.data} name={username} fid={fid} />
+        <TopInteractions data={dataTopInteraction} />
+        <NonFollowerUser data={dataNonFollowerUser} onViewAll={onViewAll} />
       </div>
-      <TopInteractions data={dataTopInteraction} />
-      <NonFollowerUser data={dataNonFollowerUser} onViewAll={onViewAll} />
     </div>
   );
 };

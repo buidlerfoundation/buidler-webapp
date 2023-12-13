@@ -29,21 +29,21 @@ const RecentRelation = ({
       return (
         <PastRelationCast
           data={dataMention}
-          empty="Seems like you and A haven't had any mentions yet. Let's make some memorable moments together!"
+          empty={`Seems like you and ${name} haven't had any mentions yet.`}
         />
       );
     if (currentRelationIndex === 1)
       return (
         <PastRelationCast
           data={dataReply}
-          empty="Seems like you and A haven't had any replies yet. Let's make some memorable moments together!"
+          empty={`Seems like you and ${name} haven't had any replies yet.`}
         />
       );
     return (
       <PastRelationReaction
         data={dataReaction}
         name={name}
-        empty="Seems like you and A haven't had any reactions yet. Let's make some memorable moments together!"
+        empty={`Seems like you and ${name} haven't had any reactions yet.`}
       />
     );
   }, [currentRelationIndex, dataMention, dataReaction, dataReply, name]);
