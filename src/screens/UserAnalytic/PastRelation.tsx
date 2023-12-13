@@ -64,7 +64,10 @@ const PastRelation = ({ data, name, fid }: IPastRelation) => {
           style={{ marginTop: 10 }}
           onClick={onLoginClick}
         >
-          <span>Sign in to see memorable moments with @{name}</span>
+          <span style={{ textAlign: "center" }}>
+            See your past moments with this person (likes, replies, mentions,
+            recasts, etc.)
+          </span>
           <div className={styles["btn-login"]}>Sign in</div>
         </div>
       );
