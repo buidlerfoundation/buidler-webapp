@@ -53,7 +53,10 @@ const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
       !plugin ||
       pathname.includes("/non-follower") ||
       pathname.includes("/follower") ||
-      pathname.includes("/following")
+      pathname.includes("/following") ||
+      pathname.includes("/relation-mention") ||
+      pathname.includes("/relation-reply") ||
+      pathname.includes("/relation-reaction")
     );
   }, [pathname, plugin]);
   const period = useAppSelector((state) => state.insights.period);
@@ -160,6 +163,7 @@ const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
                 className={`${styles["tab-item"]} ${
                   pathname?.includes(el.path) ? styles.active : ""
                 }`}
+                replace
               >
                 {el.label}
               </Link>
@@ -175,6 +179,7 @@ const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
                 className={`${styles["tab-item"]} ${
                   pathname?.includes(el.path) ? styles.active : ""
                 }`}
+                replace
               >
                 {el.label}
               </Link>
