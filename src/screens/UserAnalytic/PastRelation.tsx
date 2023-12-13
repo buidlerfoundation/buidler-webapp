@@ -68,7 +68,7 @@ const PastRelation = ({ data, name, fid }: IPastRelation) => {
             See your past moments with this person (likes, replies, mentions,
             recasts, etc.)
           </span>
-          <div className={styles["btn-login"]}>Sign in</div>
+          <div className={styles["btn-login"]}>Login</div>
         </div>
       );
     }
