@@ -78,5 +78,6 @@
     "redux-logger": "^3.0.6",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
-  }
+  },
+  "license": "MIT"
 }

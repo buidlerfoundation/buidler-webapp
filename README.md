@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Buidler
 
-## Getting Started
+## Overview
+Buidler is a web annotation that enables you to comment and engage in decentralized discussions on any webpage.
 
-First, run the development server:
+By building on top of Farcaster, an open protocol for decentralized social networks, Buidler has the opportunity to build a transparent, public platform. This gives the community a tool to share your thoughts, discover what people are saying about the websites you are visiting.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Our extension is available:  [https://chrome.google.com/webstore/detail/buidler-a-web-annotation/omhbdacaeafhladkifficmjmpeaijlfc](https://chrome.google.com/webstore/detail/buidler-a-web-annotation/omhbdacaeafhladkifficmjmpeaijlfc)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### For more information about us
+- Website:  [https://buidler.app](https://buidler.app/)
+- Farcaster:  [https://warpcast.com/buidler](https://warpcast.com/buidler)
+- Twitter:  [https://twitter.com/buidler_app](https://twitter.com/buidler_app)
+## Features
+### Farcaster Trending Links
+A place to discover Farcaster's best daily links! Stay in the loop with vibrant discussions on your favorite web pages, supercharged by the Farcaster community
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Check out: [https:buidler.app/home](https://buidler.app/home)
+[![Trending Links Screen Shot][trending-links-screenshot]](https://ipfs.backend.prop.house/ipfs/QmdWRhQxNUH4ySwtXCQcGNR6yLYnywwsJfyHEkiDD3rtyq)
+### Farcaster Profile Insights
+A web annotation provides additional information about web content, particularly on Warpcast. It tracks a Farcaster profile's real-time pulse, including activities, engagement, and followers. Unlock insights you never knew about, discover your top interactors, and see your past moments with your friends.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+  
 
-## Learn More
+Besides the extension, you can access your insights directly at  [https://buidler.app/insights](https://buidler.app/insights).
 
-To learn more about Next.js, take a look at the following resources:
+[![Profile Insights Screen Shot 1][profile-insigts-screenshot-1]](https://ipfs.backend.prop.house/ipfs/QmW9SsjwMVcP273o9ookVQKwUuFGCrAsZeccZiwDviXc2D)
+[![Profile Insights Screen Shot 2][profile-insigts-screenshot-2]](https://ipfs.backend.prop.house/ipfs/Qmf2sesyTPE7jWb66iHzY7CcRYWbMrkrmyDyugNhjV9sU3)
+[![Profile Insights Screen Shot 3][profile-insigts-screenshot-3]](https://ipfs.backend.prop.house/ipfs/QmQirq8MqfPZf9mMSbexygBb4KGRVXqDrPMkHbKk56XEMP)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## What's next?
+Builder will transform into a community notes platform that allows everyone to contribute useful information to any corner of the Internet. Stay tuned for our future updates!🔥
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Authors
+- [@applefather.eth](https://warpcast.com/applefather.eth)
+- [@taihtm](https://warpcast.com/taihtm)
+- [@baohungnguyen.eth](https://warpcast.com/baohungnguyen.eth)
+- [@edricnguyen.eth](https://warpcast.com/edricnguyen.eth)
 
-## Deploy on Vercel
+## License
+Distributed under the MIT License. See `LICENSE.txt` for more information.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Contact
+-   Email: [buidlerfoundation@gmail.com](mailto:your.email@example.com)
+-   Twitter: [@buidler_app](https://twitter.com/your_twitter_handle)
