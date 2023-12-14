@@ -16,7 +16,9 @@ Our extension is available:  [https://chrome.google.com/webstore/detail/buidler-
 A place to discover Farcaster's best daily links! Stay in the loop with vibrant discussions on your favorite web pages, supercharged by the Farcaster community
 
 Check out: [https:buidler.app/home](https://buidler.app/home)
+
 [![Trending Links Screen Shot][product-screenshot]](https://ipfs.backend.prop.house/ipfs/QmdWRhQxNUH4ySwtXCQcGNR6yLYnywwsJfyHEkiDD3rtyq)
+
 ### Farcaster Profile Insights
 A web annotation provides additional information about web content, particularly on Warpcast. It tracks a Farcaster profile's real-time pulse, including activities, engagement, and followers. Unlock insights you never knew about, discover your top interactors, and see your past moments with your friends.
 
@@ -25,7 +27,9 @@ A web annotation provides additional information about web content, particularly
 Besides the extension, you can access your insights directly at  [https://buidler.app/insights](https://buidler.app/insights).
 
 [![Profile Insights Screen Shot 1][product-screenshot]](https://ipfs.backend.prop.house/ipfs/QmW9SsjwMVcP273o9ookVQKwUuFGCrAsZeccZiwDviXc2D)
+
 [![Profile Insights Screen Shot 2][product-screenshot]](https://ipfs.backend.prop.house/ipfs/Qmf2sesyTPE7jWb66iHzY7CcRYWbMrkrmyDyugNhjV9sU3)
+
 [![Profile Insights Screen Shot 3][product-screenshot]](https://ipfs.backend.prop.house/ipfs/QmQirq8MqfPZf9mMSbexygBb4KGRVXqDrPMkHbKk56XEMP)
 
 ## What's next?
