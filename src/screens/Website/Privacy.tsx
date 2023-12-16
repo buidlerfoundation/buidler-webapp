@@ -16,10 +16,10 @@ const Privacy = () => {
     const navBar = document.getElementById("my-navbar");
     if (!navBar) return;
     if (scrollTop > previousScrollTop.current && navBar.style.top === "0px") {
-      navBar.style.top = "-100px";
+      navBar.style.top = "-140px";
     } else if (
       scrollTop < previousScrollTop.current &&
-      navBar.style.top === "-100px"
+      navBar.style.top === "-140px"
     ) {
       navBar.style.top = "0px";
     }

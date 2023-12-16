@@ -11,7 +11,7 @@ interface ILayout {
 
 const Layout = ({ children }: ILayout) => {
   const pathname = usePathname();
-  if (pathname === "/") return children;
+  if (pathname === "/" || pathname === "/terms" || pathname === "/privacy") return children;
   if (pathname?.includes("/plugin-fc")) {
     return <FCPluginWrapper>{children}</FCPluginWrapper>;
   }
