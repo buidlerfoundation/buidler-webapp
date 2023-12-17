@@ -136,6 +136,7 @@ const PastRelation = ({ data, name, fid }: IPastRelation) => {
     total,
     user?.fid,
   ]);
+  if (user?.fid === fid) return null;
   return (
     <div className={styles["chart-item"]} style={{ height: "unset", gap: 10 }}>
       <div className={styles["label-wrap"]}>
