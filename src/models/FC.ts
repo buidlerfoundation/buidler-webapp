@@ -92,7 +92,13 @@ export interface IFCFilterType {
   label: string;
   id: string;
   path: string;
-  value: "trending" | "newest" | "by domain" | "most-commented" | "most-liked";
+  value:
+    | "trending"
+    | "newest"
+    | "by domain"
+    | "most-commented"
+    | "most-liked"
+    | "helpful";
   title: string;
 }
 
@@ -135,6 +141,8 @@ export interface IDataUserEngagement {
   casts: IDataChart[];
 }
 
+export type ICommunityNotePath = "/community-notes" | "/community-notes/new"
+
 export type IUserTabPath =
   | "/non-follower"
   | "/following"
@@ -144,8 +152,8 @@ export type IUserTabPath =
   | "/relation-reaction"
   | "/cast";
 
-export interface IUserInsightTab {
-  path: IUserTabPath;
+export interface IUserInsightTab<T> {
+  path: T;
   label: string;
 }
 

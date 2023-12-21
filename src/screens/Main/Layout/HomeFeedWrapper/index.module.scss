@@ -25,30 +25,7 @@
       display: flex;
       align-items: center;
       column-gap: 15px;
-      .filter-item {
-        display: flex;
-        align-items: center;
-        height: 30px;
-        padding: 0 12px;
-        border-radius: 10px;
-        color: var(--color-secondary-text);
-        font-weight: 600;
-        font-size: 14px;
-        line-height: 19px;
-        text-transform: capitalize;
-        cursor: pointer;
-      }
-      .filter-item:hover,
-      .filter-active {
-        background-color: var(--color-stroke);
-        color: var(--color-primary-text);
-      }
     }
-  }
-  .list {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
   }
 }
 

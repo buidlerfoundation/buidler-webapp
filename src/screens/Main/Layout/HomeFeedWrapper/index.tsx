@@ -1,31 +1,11 @@
 "use client";
 
-import React, { memo, useCallback, useEffect, useMemo } from "react";
+import React, { memo, useCallback } from "react";
 import styles from "./index.module.scss";
 import useFeedFilters from "hooks/useFeedFilters";
 import { IFCFilterType } from "models/FC";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-interface IFilterItem {
-  item: IFCFilterType;
-  active: boolean;
-}
-
-const FilterItem = ({ item, active }: IFilterItem) => {
-  return (
-    <Link
-      className={`${styles["filter-item"]} ${
-        active ? styles["filter-active"] : ""
-      }`}
-      href={item.path}
-    >
-      {item.label}
-    </Link>
-  );
-};
-
-const FilterItemMemo = memo(FilterItem);
+import FilterItem from "shared/FilterItem";
 
 interface IHomeFeedWrapper {
   children: React.ReactNode;
@@ -36,11 +16,7 @@ const HomeFeedWrapper = ({ children }: IHomeFeedWrapper) => {
   const pathname = usePathname();
   const renderFilter = useCallback(
     (item: IFCFilterType) => (
-      <FilterItemMemo
-        item={item}
-        key={item.id}
-        active={pathname === item.path}
-      />
+      <FilterItem item={item} key={item.id} active={pathname === item.path} />
     ),
     [pathname]
   );

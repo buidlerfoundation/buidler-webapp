@@ -180,8 +180,8 @@ interface InsightsState {
   followUserMap: { [username: string]: IFollowUserState };
   dataInteractionMap: { [username: string]: IPagingData<IFCUser> };
   filters: IActivityFilter[];
-  userTabs: IUserInsightTab[];
-  userRelationTabs: IUserInsightTab[];
+  userTabs: IUserInsightTab<IUserTabPath>[];
+  userRelationTabs: IUserInsightTab<IUserTabPath>[];
   period: ActivityPeriod;
   pastRelationMap: { [username: string]: IFCPastRelationState };
   pastRelationCastMap: {
