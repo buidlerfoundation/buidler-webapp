@@ -103,6 +103,15 @@ export interface IFCFilterType {
 }
 
 export interface IPagingData<T> {
+  data: T[];
+  total?: number;
+  currentPage?: number;
+  canMore?: boolean;
+  loading?: boolean;
+  loadMore?: boolean;
+}
+
+export interface IPagingDataOptional<T> {
   data?: T[];
   total?: number;
   currentPage?: number;

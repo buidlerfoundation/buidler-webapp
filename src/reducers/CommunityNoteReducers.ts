@@ -1,11 +1,15 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "api";
 import { INote } from "models/CommunityNote";
-import { ICommunityNotePath, IPagingData, IUserInsightTab } from "models/FC";
+import {
+  ICommunityNotePath,
+  IPagingDataOptional,
+  IUserInsightTab,
+} from "models/FC";
 
 interface communityNoteState {
   filters: IUserInsightTab<ICommunityNotePath>[];
-  feed: IPagingData<INote>;
+  feed: IPagingDataOptional<INote>;
 }
 
 const initialState: communityNoteState = {
