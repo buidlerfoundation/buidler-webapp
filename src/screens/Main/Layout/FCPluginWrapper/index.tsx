@@ -35,9 +35,10 @@ import {
   extractContentMessage,
   normalizeContentCastToSubmit,
 } from "helpers/CastHelper";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import GlobalVariable from "services/GlobalVariable";
+import { getNotesByUrl } from "reducers/CommunityNoteReducers";
 
 interface IFCPluginWrapper {
   children: React.ReactNode;
@@ -46,6 +47,7 @@ interface IFCPluginWrapper {
 const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const pathname = usePathname();
   const popupMenuRef = useRef<any>();
   const [theme, setTheme] = useState("");
   const query = useQuery();
@@ -67,6 +69,10 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   const replyCast = useAppSelector((state) => state.fcCast.replyCast);
   const openNewCast = useAppSelector((state) => state.fcCast.openNewCast);
   const signerId = useMemo(() => query?.get("signer_id"), [query]);
+  const isCommunityNote = useMemo(
+    () => pathname.includes("/community-note"),
+    [pathname]
+  );
   const logout = useCallback(() => {
     window.top?.postMessage(
       { type: "b-fc-plugin-logout" },
@@ -238,6 +244,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     if (queryUrl) {
       dispatch(getCastsByUrl({ text: queryUrl, page: 1, limit: 20 }));
       dispatch(getMainMetadata(queryUrl));
+      dispatch(getNotesByUrl({ url: queryUrl, page: 1, limit: 20 }));
     }
   }, [dispatch, queryUrl]);
   useEffect(() => {
@@ -404,7 +411,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
         )}
       </div>
       {children}
-      <CopyRight />
+      {!isCommunityNote && <CopyRight />}
       {!storeSignerId && openLogin && (
         <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>
           <LoginFC
