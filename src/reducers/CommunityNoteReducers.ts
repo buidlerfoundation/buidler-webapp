@@ -44,8 +44,10 @@ export const submitNote = createAsyncThunk(
 
 export const ratingNote = createAsyncThunk(
   "community-note/rating-note",
-  async (payload: { noteId: string; body: any }) => {
-    const res = await api.submitRating(payload.noteId, payload.body);
+  async (payload: { noteId: string; body: any; isEdit: boolean }) => {
+    const res = payload.isEdit
+      ? await api.updateRating(payload.noteId, payload.body)
+      : await api.submitRating(payload.noteId, payload.body);
     return res;
   }
 );

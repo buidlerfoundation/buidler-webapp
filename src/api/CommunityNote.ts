@@ -20,5 +20,8 @@ export const submitNote = (payload: any) =>
 export const submitRating = (noteId: string, body: any) =>
   Caller.post<IRating>(`community-notes/${noteId}/ratings`, body);
 
+export const updateRating = (noteId: string, body: any) =>
+  Caller.put<IRating>(`community-notes/${noteId}/ratings`, body);
+
 export const deleteRating = (noteId: string) =>
   Caller.delete(`community-notes/${noteId}/ratings`);

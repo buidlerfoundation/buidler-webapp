@@ -36,3 +36,24 @@ export const unhelpfulTag: ITag[] = [
   { label: "Harassment or abuse", key: "not_helpful_spam_harassment_or_abuse" },
   { label: "Other", key: "not_helpful_other" },
 ];
+
+export const emptyRating = {
+  agree: 0,
+  disagree: 0,
+  helpful_other: 0,
+  helpful_clear: 0,
+  helpful_good_sources: 0,
+  helpful_addresses_claim: 0,
+  helpful_important_context: 0,
+  helpful_unbiased_language: 0,
+  not_helpful_other: 0,
+  not_helpful_incorrect: 0,
+  not_helpful_sources_missing_or_unreliable: 0,
+  not_helpful_missing_key_points: 0,
+  not_helpful_hard_to_understand: 0,
+  not_helpful_argumentative_or_biased: 0,
+  not_helpful_spam_harassment_or_abuse: 0,
+  not_helpful_irrelevant_sources: 0,
+  not_helpful_opinion_speculation: 0,
+  not_helpful_note_not_needed: 0,
+};
