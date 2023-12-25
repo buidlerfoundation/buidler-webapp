@@ -14,6 +14,9 @@ export const getListNotesByUrl = (params: {
     })}`
   );
 
+export const submitNote = (payload: any) =>
+  Caller.post<INote>(`community-notes`, payload);
+
 export const submitRating = (noteId: string, body: any) =>
   Caller.post<IRating>(`community-notes/${noteId}/ratings`, body);
 

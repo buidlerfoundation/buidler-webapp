@@ -34,6 +34,14 @@ export const getNotesByUrl = createAsyncThunk(
   }
 );
 
+export const submitNote = createAsyncThunk(
+  "community-note/submit",
+  async (payload: any) => {
+    const res = await api.submitNote(payload);
+    return res;
+  }
+);
+
 export const ratingNote = createAsyncThunk(
   "community-note/rating-note",
   async (payload: { noteId: string; body: any }) => {
@@ -105,6 +113,11 @@ const communityNoteSlice = createSlice({
             }
             return el;
           });
+        }
+      })
+      .addCase(submitNote.fulfilled, (state, action) => {
+        if (action.payload.data) {
+          state.feed.data = [action.payload.data, ...(state.feed.data || [])];
         }
       });
   },

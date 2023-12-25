@@ -38,7 +38,7 @@ import {
 import { useParams, usePathname, useRouter } from "next/navigation";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import GlobalVariable from "services/GlobalVariable";
-import { getNotesByUrl } from "reducers/CommunityNoteReducers";
+import { getNotesByUrl, submitNote } from "reducers/CommunityNoteReducers";
 
 interface IFCPluginWrapper {
   children: React.ReactNode;
@@ -103,6 +103,13 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
       };
     }
   }, []);
+  const createNote = useCallback(
+    async (payload: any) => {
+      payload.summary = extractContentMessage(payload.summary);
+      dispatch(submitNote(payload));
+    },
+    [dispatch]
+  );
   const castToFC = useCallback(
     async (payload: any) => {
       payload.text = extractContentMessage(payload.text);
@@ -294,7 +301,11 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
         // reload
       }
       if (e?.data?.type === "tw-cast") {
-        castToFC(e.data.payload);
+        if (e.data.payload?.classification) {
+          createNote(e.data.payload);
+        } else {
+          castToFC(e.data.payload);
+        }
       }
       if (e?.data?.type === "tw-cast-queue") {
         setCastQueue(e.data.payload);
@@ -340,6 +351,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     dispatch,
     initialSignerId,
     onLoginClick,
+    createNote,
     router,
   ]);
   useEffect(() => {
