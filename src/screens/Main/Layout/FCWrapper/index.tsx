@@ -11,7 +11,11 @@ import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
 import IconMenuHome from "shared/SVG/FC/IconMenuHome";
 import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
 import { clearData, getCookie, removeCookie, setCookie } from "common/Cookie";
-import { AsyncKey } from "common/AppConfig";
+import {
+  AsyncKey,
+  signTypeDataLinkFC,
+  signTypeDataMagicLink,
+} from "common/AppConfig";
 import useAppDispatch from "hooks/useAppDispatch";
 import {
   FC_USER_ACTIONS,
@@ -43,6 +47,11 @@ import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import useIsMobile from "hooks/useIsMobile";
+import magic, { magicProvider } from "services/magic";
+import { IDataToken } from "models/User";
+import MagicLogin from "shared/MagicLogin";
+import { MagicUserMetadata } from "magic-sdk";
+import { CircularProgress } from "@mui/material";
 
 interface IMenuItem {
   active?: boolean;
@@ -94,9 +103,14 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   const [loading, setLoading] = useState(true);
   const [loginLoading, setLoginLoading] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
+  const [magicLoading, setMagicLoading] = useState(false);
+  const [gettingMagicUserRedirect, setGettingMagicUserRedirect] =
+    useState(false);
+  const [magicLoginToken, setMagicLoginToken] = useState<
+    IDataToken | undefined
+  >();
   const query = useQuery();
   const router = useRouter();
-  const querySignerId = useMemo(() => query?.get("signer_id"), [query]);
   const [polling, setPolling] = useState(false);
   const [initialShareUrl, setInitialShareUrl] = useState("");
   const [openDiscussion, setOpenDiscussion] = useState(false);
@@ -113,7 +127,6 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   const fcUser = useAppSelector((state) => state.fcUser?.data);
   const loginSource = useAppSelector((state) => state.fcUser.loginSource);
   const replyCast = useAppSelector((state) => state.homeFeed.replyCast);
-  const storeSignerId = useAppSelector((state) => state.fcUser?.signer_id);
   const pollingController = useRef(new AbortController());
   const pathname = usePathname();
   const activeColor = useMemo(() => "var(--color-primary-text)", []);
@@ -156,39 +169,82 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   const onCloseReply = useCallback(() => {
     dispatch(HOME_FEED_ACTIONS.updateReplyCast());
   }, [dispatch]);
-  const checkRequestToken = useCallback(async () => {
-    const reqToken = await getCookie(AsyncKey.requestTokenKey);
-    if (!reqToken) return;
-    const res = await api.checkRequestToken(reqToken);
-    if (res.data?.state === "completed" && res.data?.signer_id) {
-      await setCookie(AsyncKey.signerIdKey, res?.data?.signer_id);
-      await removeCookie(AsyncKey.requestTokenKey);
-      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
-      if (fcUser) {
-        dispatch(FC_USER_ACTIONS.updateSignerId(res?.data?.signer_id));
+  const trackingLoginSuccess = useCallback(() => {
+    GoogleAnalytics.tracking("Login Successful", {
+      category: "Login",
+      source: loginSource || "",
+    });
+  }, [loginSource]);
+  const trackingLoginFailed = useCallback((message: string) => {
+    GoogleAnalytics.tracking("Login Failed", {
+      category: "Login",
+      message,
+      time: `${new Date().getTime()}`,
+    });
+  }, []);
+  const saveTokenCookie = useCallback(async (data?: IDataToken) => {
+    await setCookie(AsyncKey.accessTokenKey, data?.token);
+    await setCookie(AsyncKey.tokenExpire, data?.token_expire_at);
+    await setCookie(AsyncKey.refreshTokenKey, data?.refresh_token);
+    await setCookie(AsyncKey.refreshTokenExpire, data?.refresh_token_expire_at);
+  }, []);
+  const linkWithFCAccount = useCallback(
+    async (signerId: string, accessToken?: string) => {
+      if (magicProvider && accessToken) {
+        const signer = magicProvider.getSigner();
+        const message = {
+          signer_id: signerId,
+        };
+        const signature = await signer?._signTypedData(
+          signTypeDataLinkFC.domain,
+          signTypeDataLinkFC.types,
+          message
+        );
+        const res = await api.linkWithFarcasterAccount(accessToken, {
+          ...signTypeDataLinkFC,
+          value: message,
+          signature,
+        });
+        if (res.success) {
+          trackingLoginSuccess();
+          await removeCookie(AsyncKey.requestTokenKey);
+          await dispatch(getCurrentFCUser());
+        } else {
+          trackingLoginFailed(res.message || "");
+        }
+      }
+      setOpenLogin(false);
+      setGettingMagicUserRedirect(false);
+    },
+    [dispatch, trackingLoginFailed, trackingLoginSuccess]
+  );
+  const handleRefresh = useCallback(async () => {
+    const refreshToken = await getCookie(AsyncKey.refreshTokenKey);
+    if (refreshToken) {
+      const res = await api.refreshToken(refreshToken);
+      if (res.success) {
+        await saveTokenCookie(res.data);
       }
     }
-  }, [dispatch]);
+  }, [saveTokenCookie]);
   const checkingAuth = useCallback(async () => {
     setLoading(true);
-    const signerId = await getCookie(AsyncKey.signerIdKey);
-    if (signerId) {
-      setCookie(AsyncKey.signerIdKey, signerId);
-      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
-      if (fcUser) {
-        dispatch(FC_USER_ACTIONS.updateSignerId(signerId));
+    await handleRefresh();
+    const reqToken = await getCookie(AsyncKey.requestTokenKey);
+    const accessToken = await getCookie(AsyncKey.accessTokenKey);
+    if (accessToken) {
+      if (reqToken) {
+        const res = await api.checkRequestToken(reqToken);
+        if (res.data?.state === "completed" && res.data?.signer_id) {
+          await setCookie(AsyncKey.signerIdKey, res?.data?.signer_id);
+          await linkWithFCAccount(res.data?.signer_id, accessToken);
+        }
+      } else {
+        await dispatch(getCurrentFCUser()).unwrap();
       }
-    } else if (querySignerId) {
-      await setCookie(AsyncKey.signerIdKey, querySignerId);
-      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
-      if (fcUser) {
-        dispatch(FC_USER_ACTIONS.updateSignerId(querySignerId));
-      }
-    } else {
-      await checkRequestToken();
     }
     setLoading(false);
-  }, [checkRequestToken, dispatch, querySignerId]);
+  }, [handleRefresh, linkWithFCAccount, dispatch]);
   useEffect(() => {
     getCookie(AsyncKey.themeKey).then((res) => {
       if (res) {
@@ -223,26 +279,11 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     setSignedKeyRequest(null);
     setOpenLogin(false);
   }, []);
-  const trackingLoginSuccess = useCallback(() => {
-    GoogleAnalytics.tracking("Login Successful", {
-      category: "Login",
-      source: loginSource || "",
-    });
-  }, [loginSource]);
-  const trackingLoginFailed = useCallback((message: string) => {
-    GoogleAnalytics.tracking("Login Failed", {
-      category: "Login",
-      message,
-      time: `${new Date().getTime()}`,
-    });
-  }, []);
+
   const requestSignerId = useCallback(async () => {
     if (loginLoading) return;
     setLoginLoading(true);
     pollingController.current?.abort?.();
-    if (!isMobile) {
-      setOpenLogin(true);
-    }
     const res = await api.requestSignedKey();
     setLoginLoading(false);
     if (res.data?.token) {
@@ -258,15 +299,11 @@ const FCWrapper = ({ children }: IFCWrapper) => {
           pollingController.current
         );
         if (resPolling?.data?.signer_id) {
-          trackingLoginSuccess();
           await setCookie(AsyncKey.signerIdKey, resPolling?.data?.signer_id);
-          await removeCookie(AsyncKey.requestTokenKey);
-          const fcUser = await dispatch(getCurrentFCUser()).unwrap();
-          if (fcUser) {
-            dispatch(
-              FC_USER_ACTIONS.updateSignerId(resPolling?.data?.signer_id)
-            );
-          }
+          await linkWithFCAccount(
+            resPolling?.data?.signer_id,
+            magicLoginToken?.token
+          );
         }
       } catch (error: any) {
         toast.error(error.message);
@@ -279,17 +316,75 @@ const FCWrapper = ({ children }: IFCWrapper) => {
       trackingLoginFailed(res.message || "");
     }
   }, [
-    dispatch,
     isMobile,
+    linkWithFCAccount,
     loginLoading,
+    magicLoginToken,
     router,
     trackingLoginFailed,
-    trackingLoginSuccess,
   ]);
-  const onLoginClick = useCallback(() => {
-    if (signedKeyRequest) return;
-    requestSignerId();
-  }, [requestSignerId, signedKeyRequest]);
+  const onGetMagicUserMetadata = useCallback(
+    async (magicUserMetadata: MagicUserMetadata) => {
+      if (magicProvider) {
+        const signer = magicProvider.getSigner();
+        const message = {
+          address: magicUserMetadata.publicAddress,
+        };
+        const signature = await signer?._signTypedData(
+          signTypeDataMagicLink.domain,
+          signTypeDataMagicLink.types,
+          message
+        );
+        const res = await api.loginWithMagicLink({
+          ...signTypeDataMagicLink,
+          value: message,
+          signature,
+        });
+        await saveTokenCookie(res.data);
+        const linkedSignerId = res.data?.signer_id;
+        if (linkedSignerId) {
+          await setCookie(AsyncKey.signerIdKey, linkedSignerId);
+          trackingLoginSuccess();
+          await dispatch(getCurrentFCUser());
+          setOpenLogin(false);
+          setGettingMagicUserRedirect(false);
+        } else {
+          const signerId = await getCookie(AsyncKey.signerIdKey);
+          if (signerId) {
+            await linkWithFCAccount(signerId, res.data?.token);
+          } else {
+            setMagicLoginToken(res.data);
+            requestSignerId();
+          }
+        }
+      }
+      setMagicLoading(false);
+    },
+    [
+      dispatch,
+      linkWithFCAccount,
+      requestSignerId,
+      saveTokenCookie,
+      trackingLoginSuccess,
+    ]
+  );
+  const onCloseMagicLogin = useCallback(() => {
+    setOpenLogin(false);
+  }, []);
+  const onLoginClick = useCallback(async () => {
+    setOpenLogin(true);
+  }, []);
+  const finishSocialLogin = useCallback(async () => {
+    if (magic) {
+      try {
+        setGettingMagicUserRedirect(true);
+        const result = await magic.oauth.getRedirectResult();
+        onGetMagicUserMetadata(result.magic.userMetadata);
+      } catch (err) {
+        setGettingMagicUserRedirect(false);
+      }
+    }
+  }, [onGetMagicUserMetadata]);
   const onMenuClick = useCallback(
     async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       e.stopPropagation();
@@ -300,6 +395,20 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   );
   const renderRight = useCallback(() => {
     if (loading) return null;
+    if (gettingMagicUserRedirect)
+      return (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 65,
+            height: 60,
+          }}
+        >
+          {<CircularProgress color="inherit" size={20} />}
+        </div>
+      );
     if (fcUser) {
       return (
         <div className={styles["user-info"]} onClick={onMenuClick}>
@@ -323,7 +432,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
         Login
       </div>
     );
-  }, [fcUser, loading, onLoginClick, onMenuClick]);
+  }, [fcUser, gettingMagicUserRedirect, loading, onLoginClick, onMenuClick]);
   const onCloseMenu = useCallback(() => {
     popupMenuRef.current?.hide();
   }, []);
@@ -441,6 +550,9 @@ const FCWrapper = ({ children }: IFCWrapper) => {
       window.removeEventListener("scroll", windowScrollListener);
     };
   }, [windowScrollListener]);
+  useEffect(() => {
+    finishSocialLogin();
+  }, [finishSocialLogin]);
   return (
     <div className={styles.container}>
       <aside className={styles["left-side"]}>
@@ -513,12 +625,21 @@ const FCWrapper = ({ children }: IFCWrapper) => {
         {children}
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>
-      {!storeSignerId && openLogin && (
+      {!fcUser && openLogin && (
         <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>
-          <LoginFC
-            deepLink={signedKeyRequest?.deeplinkUrl}
-            onWithoutLoginClick={onWithoutLoginClick}
-          />
+          {!magicLoginToken ? (
+            <MagicLogin
+              handleClose={onCloseMagicLogin}
+              onLogged={onGetMagicUserMetadata}
+              setMagicLoading={setMagicLoading}
+              magicLoading={magicLoading}
+            />
+          ) : (
+            <LoginFC
+              deepLink={signedKeyRequest?.deeplinkUrl}
+              onWithoutLoginClick={onWithoutLoginClick}
+            />
+          )}
         </div>
       )}
       {fcUser && (

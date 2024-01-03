@@ -1,6 +1,7 @@
 import {
   BalanceApiData,
   Contract,
+  IDataToken,
   IUserAsset,
   InitialApiData,
   LoginApiData,
@@ -12,6 +13,7 @@ import {
 } from "models/User";
 import Caller from "./Caller";
 import { Channel, Community } from "models/Community";
+import { IFCUser } from "models/FC";
 
 export const getInitial = () => Caller.get<InitialApiData>(`initial`);
 
@@ -35,14 +37,15 @@ export const findDirectChannel = (
 };
 
 export const refreshToken = (token: string) => {
-  return Caller.post<{
-    token: string;
-    token_expire_at: number;
-    refresh_token: string;
-    refresh_token_expire_at: number;
-  }>("user/refresh", undefined, undefined, undefined, {
-    "Refresh-Token": token,
-  });
+  return Caller.post<IDataToken>(
+    "users/auth/refresh",
+    undefined,
+    undefined,
+    undefined,
+    {
+      "Refresh-Token": token,
+    }
+  );
 };
 
 export const generateTokenFromOTT = (ott: string) =>
@@ -144,3 +147,11 @@ export const updateMobileDeviceToken = (
   deviceToken: string,
   platform: string
 ) => Caller.put("user/devices", { device_token: deviceToken, platform });
+
+export const loginWithMagicLink = (body: any) =>
+  Caller.post<IDataToken>("users/auth/signin", body);
+
+export const linkWithFarcasterAccount = (accessToken: string, body: any) =>
+  Caller.post<IFCUser>("users/auth/link", body, undefined, undefined, {
+    Authorization: `Bearer ${accessToken}`,
+  });

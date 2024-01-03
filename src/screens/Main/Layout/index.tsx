@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import FCWrapper from "./FCWrapper";
 import FCPluginWrapper from "./FCPluginWrapper";
 import AppToastNotification from "shared/AppToastNotification";
@@ -11,7 +11,11 @@ interface ILayout {
 
 const Layout = ({ children }: ILayout) => {
   const pathname = usePathname();
-  if (pathname === "/" || pathname === "/terms" || pathname === "/privacy") return children;
+  const pathsWithoutLayout = useMemo(
+    () => ["/", "/terms", "/privacy", "/login"],
+    []
+  );
+  if (pathsWithoutLayout.includes(pathname)) return children;
   if (pathname?.includes("/plugin-fc")) {
     return <FCPluginWrapper>{children}</FCPluginWrapper>;
   }

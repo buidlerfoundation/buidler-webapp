@@ -94,13 +94,20 @@ export interface GroupSettingItem {
 
 export type UserRoleType = "owner" | "admin" | "member";
 
-export interface BaseDataApi<T> {
+export interface IDataToken {
+  token?: string;
+  refresh_token?: string;
+  token_expire_at?: number;
+  refresh_token_expire_at?: number;
+  signer_id?: string;
+}
+
+export interface BaseDataApi<T> extends IDataToken {
   success: boolean;
   data?: T;
   statusCode: number;
   message?: string;
   total?: number;
-  token?: string;
   metadata?: {
     total?: number;
     total_pages?: number;
@@ -110,9 +117,6 @@ export interface BaseDataApi<T> {
     is_new_team_member?: boolean;
     current_page?: number;
   };
-  refresh_token?: string;
-  token_expire_at?: number;
-  refresh_token_expire_at?: number;
 }
 
 export interface NFTCollectionDataApi {
