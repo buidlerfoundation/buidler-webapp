@@ -1,7 +1,11 @@
 "use client";
 
 import api from "api";
-import { AsyncKey } from "common/AppConfig";
+import {
+  AsyncKey,
+  signTypeDataLinkFC,
+  signTypeDataMagicLink,
+} from "common/AppConfig";
 import { clearData, getCookie, removeCookie, setCookie } from "common/Cookie";
 import useAppDispatch from "hooks/useAppDispatch";
 import useAppSelector from "hooks/useAppSelector";
@@ -39,6 +43,11 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import GlobalVariable from "services/GlobalVariable";
 import { getNotesByUrl, submitNote } from "reducers/CommunityNoteReducers";
+import { IDataToken } from "models/User";
+import { CircularProgress } from "@mui/material";
+import magic, { magicProvider } from "services/magic";
+import MagicLogin from "shared/MagicLogin";
+import { MagicUserMetadata } from "magic-sdk";
 
 interface IFCPluginWrapper {
   children: React.ReactNode;
@@ -58,17 +67,21 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   const q = useMemo(() => query?.get("q"), [query]);
   const [loading, setLoading] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
+  const [magicLoading, setMagicLoading] = useState(false);
+  const [gettingMagicUserRedirect, setGettingMagicUserRedirect] =
+    useState(false);
+  const [magicLoginToken, setMagicLoginToken] = useState<
+    IDataToken | undefined
+  >();
   const [polling, setPolling] = useState(false);
   const [castQueue, setCastQueue] = useState<any>(null);
   const [signedKeyRequest, setSignedKeyRequest] = useState<
     ISignedKeyRequest | undefined | null
   >(null);
-  const storeSignerId = useAppSelector((state) => state.fcUser?.signer_id);
   const queryUrl = useAppSelector((state) => state.fcCast.queryUrl);
   const fcUser = useAppSelector((state) => state.fcUser?.data);
   const replyCast = useAppSelector((state) => state.fcCast.replyCast);
   const openNewCast = useAppSelector((state) => state.fcCast.openNewCast);
-  const signerId = useMemo(() => query?.get("signer_id"), [query]);
   const isCommunityNote = useMemo(
     () => pathname.includes("/community-note"),
     [pathname]
@@ -110,6 +123,48 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     },
     [dispatch]
   );
+  const saveTokenCookie = useCallback(async (data?: IDataToken) => {
+    await setCookie(AsyncKey.accessTokenKey, data?.token);
+    await setCookie(AsyncKey.tokenExpire, data?.token_expire_at);
+    await setCookie(AsyncKey.refreshTokenKey, data?.refresh_token);
+    await setCookie(AsyncKey.refreshTokenExpire, data?.refresh_token_expire_at);
+  }, []);
+  const linkWithFCAccount = useCallback(
+    async (signerId: string, accessToken?: string) => {
+      if (magicProvider && accessToken) {
+        const signer = magicProvider.getSigner();
+        const message = {
+          signer_id: signerId,
+        };
+        const signature = await signer?._signTypedData(
+          signTypeDataLinkFC.domain,
+          signTypeDataLinkFC.types,
+          message
+        );
+        const res = await api.linkWithFarcasterAccount(accessToken, {
+          ...signTypeDataLinkFC,
+          value: message,
+          signature,
+        });
+        if (res.success) {
+          await removeCookie(AsyncKey.requestTokenKey);
+          await dispatch(getCurrentFCUser());
+        }
+      }
+      setOpenLogin(false);
+      setGettingMagicUserRedirect(false);
+    },
+    [dispatch]
+  );
+  const handleRefresh = useCallback(async () => {
+    const refreshToken = await getCookie(AsyncKey.refreshTokenKey);
+    if (refreshToken) {
+      const res = await api.refreshToken(refreshToken);
+      if (res.success) {
+        await saveTokenCookie(res.data);
+      }
+    }
+  }, [saveTokenCookie]);
   const castToFC = useCallback(
     async (payload: any) => {
       payload.text = extractContentMessage(payload.text);
@@ -188,55 +243,126 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
       setPolling(false);
     }
   }, [dispatch, loading]);
-  const initialSignerId = useCallback(
-    async (id: string) => {
-      await setCookie(AsyncKey.signerIdKey, id);
-      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
-      if (fcUser) {
-        dispatch(FC_USER_ACTIONS.updateSignerId(id));
-      }
-    },
-    [dispatch]
-  );
-  const checkRequestToken = useCallback(async () => {
+  const checkingAuth = useCallback(async () => {
+    await handleRefresh();
     const reqToken = await getCookie(AsyncKey.requestTokenKey);
-    if (!reqToken) return;
-    const res = await api.checkRequestToken(reqToken);
-    if (res.data?.state === "completed" && res.data?.signer_id) {
-      await setCookie(AsyncKey.signerIdKey, res?.data?.signer_id);
-      await removeCookie(AsyncKey.requestTokenKey);
-      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
-      if (fcUser) {
-        dispatch(FC_USER_ACTIONS.updateSignerId(res?.data?.signer_id));
-      }
-    }
-  }, [dispatch]);
-  const checkingSignerId = useCallback(async () => {
-    if (signerId) {
-      await setCookie(AsyncKey.signerIdKey, signerId);
-      const fcUser = await dispatch(getCurrentFCUser()).unwrap();
-      if (fcUser) {
-        dispatch(FC_USER_ACTIONS.updateSignerId(signerId));
-      }
-    } else {
-      const signerIdFromCookie = await getCookie(AsyncKey.signerIdKey);
-      if (signerIdFromCookie) {
-        const fcUser = await dispatch(getCurrentFCUser()).unwrap();
-        if (fcUser) {
-          dispatch(FC_USER_ACTIONS.updateSignerId(signerIdFromCookie));
+    const accessToken = await getCookie(AsyncKey.accessTokenKey);
+    if (accessToken) {
+      if (reqToken) {
+        const res = await api.checkRequestToken(reqToken);
+        if (res.data?.state === "completed" && res.data?.signer_id) {
+          await setCookie(AsyncKey.signerIdKey, res?.data?.signer_id);
+          await linkWithFCAccount(res.data?.signer_id, accessToken);
         }
       } else {
-        checkRequestToken();
+        await dispatch(getCurrentFCUser()).unwrap();
       }
     }
-  }, [checkRequestToken, dispatch, signerId]);
+  }, [dispatch, handleRefresh, linkWithFCAccount]);
   const onCloseModalReply = useCallback(() => {
     dispatch(FC_CAST_ACTIONS.updateReplyCast());
   }, [dispatch]);
-  const onLoginClick = useCallback(() => {
-    if (signedKeyRequest) return;
-    requestSignerId();
-  }, [requestSignerId, signedKeyRequest]);
+  const onGetMagicUserMetadata = useCallback(
+    async (magicUserMetadata: MagicUserMetadata) => {
+      if (magicProvider) {
+        const signer = magicProvider.getSigner();
+        const message = {
+          address: magicUserMetadata.publicAddress,
+        };
+        const signature = await signer?._signTypedData(
+          signTypeDataMagicLink.domain,
+          signTypeDataMagicLink.types,
+          message
+        );
+        const res = await api.loginWithMagicLink({
+          ...signTypeDataMagicLink,
+          value: message,
+          signature,
+        });
+        await saveTokenCookie(res.data);
+        const linkedSignerId = res.data?.signer_id;
+        if (linkedSignerId) {
+          await setCookie(AsyncKey.signerIdKey, linkedSignerId);
+          await dispatch(getCurrentFCUser());
+          setOpenLogin(false);
+          setGettingMagicUserRedirect(false);
+        } else {
+          const signerId = await getCookie(AsyncKey.signerIdKey);
+          if (signerId) {
+            await linkWithFCAccount(signerId, res.data?.token);
+          } else {
+            setMagicLoginToken(res.data);
+            requestSignerId();
+          }
+        }
+      }
+      setMagicLoading(false);
+    },
+    [dispatch, linkWithFCAccount, requestSignerId, saveTokenCookie]
+  );
+  const onCloseMagicLogin = useCallback(() => {
+    setOpenLogin(false);
+  }, []);
+  const onLoginClick = useCallback(async () => {
+    setOpenLogin(true);
+  }, []);
+  const finishSocialLogin = useCallback(async () => {
+    if (magic) {
+      try {
+        setGettingMagicUserRedirect(true);
+        const result = await magic.oauth.getRedirectResult();
+        onGetMagicUserMetadata(result.magic.userMetadata);
+      } catch (err) {
+        setGettingMagicUserRedirect(false);
+      }
+    }
+  }, [onGetMagicUserMetadata]);
+  const onMenuClick = useCallback(
+    async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      e.stopPropagation();
+      const target = e.currentTarget;
+      popupMenuRef.current.show(target);
+    },
+    []
+  );
+  const renderUser = useCallback(() => {
+    if (gettingMagicUserRedirect)
+      return (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 55,
+            height: 45,
+          }}
+        >
+          {<CircularProgress color="inherit" size={20} />}
+        </div>
+      );
+    if (fcUser) {
+      return (
+        <div className={styles["user-info"]} onClick={onMenuClick}>
+          {fcUser.pfp?.url && (
+            <ImageView
+              src={fcUser.pfp?.url}
+              alt="fc-user-avatar"
+              className={styles.avatar}
+            />
+          )}
+        </div>
+      );
+    }
+    return (
+      <div
+        id="btn-login"
+        className={styles["btn-login"]}
+        onClick={onLoginClick}
+      >
+        <span>Login</span>
+      </div>
+    );
+  }, [fcUser, gettingMagicUserRedirect, onLoginClick, onMenuClick]);
   useEffect(() => {
     if (fcUser) {
       GoogleAnalytics.identify(fcUser);
@@ -255,16 +381,16 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     }
   }, [dispatch, queryUrl]);
   useEffect(() => {
-    checkingSignerId();
-  }, [checkingSignerId]);
+    checkingAuth();
+  }, [checkingAuth]);
   useEffect(() => {
-    if (storeSignerId) {
+    if (fcUser?.fid) {
       window.top?.postMessage(
-        { type: "b-fc-plugin-logged", signerId: storeSignerId },
+        { type: "b-fc-plugin-logged", user: JSON.stringify(fcUser) },
         { targetOrigin: "*" }
       );
     }
-  }, [storeSignerId]);
+  }, [fcUser]);
   useEffect(() => {
     let timeout: any = null;
     if (fcUser?.username && castQueue) {
@@ -318,13 +444,19 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
         }
       }
       if (e?.data?.type === "b-fc-initial-data") {
-        const { signerId, q, theme, title, uniqId } = e?.data?.payload || {};
+        const { signerId, accessToken, refreshToken, q, theme, title, uniqId } =
+          e?.data?.payload || {};
         if (uniqId && !signerId) {
           GoogleAnalytics.identifyByExtensionId(uniqId);
         }
         if (signerId) {
-          GlobalVariable.signerId = signerId;
-          initialSignerId(signerId);
+          setCookie(AsyncKey.signerIdKey, signerId);
+        }
+        if (accessToken) {
+          setCookie(AsyncKey.accessTokenKey, accessToken);
+        }
+        if (refreshToken) {
+          setCookie(AsyncKey.refreshTokenKey, refreshToken);
         }
         if (q) {
           dispatch(FC_CAST_ACTIONS.updateQueryUrl(q));
@@ -349,7 +481,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     onCloseModalReply,
     castToFC,
     dispatch,
-    initialSignerId,
     onLoginClick,
     createNote,
     router,
@@ -370,14 +501,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
       onLoginClick();
     }
   }, [fcUser, onLoginClick, openNewCast]);
-  const onMenuClick = useCallback(
-    async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      e.stopPropagation();
-      const target = e.currentTarget;
-      popupMenuRef.current.show(target);
-    },
-    []
-  );
   useEffect(() => {
     if (replyCast) {
       window.top?.postMessage(
@@ -386,6 +509,9 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
       );
     }
   }, [replyCast]);
+  useEffect(() => {
+    finishSocialLogin();
+  }, [finishSocialLogin]);
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -402,34 +528,25 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
           </div>
           <span style={{ margin: "0 10px" }}>Buidler</span>
         </a>
-        {fcUser ? (
-          <div className={styles["user-info"]} onClick={onMenuClick}>
-            {fcUser.pfp?.url && (
-              <ImageView
-                src={fcUser.pfp?.url}
-                alt="fc-user-avatar"
-                className={styles.avatar}
-              />
-            )}
-          </div>
-        ) : (
-          <div
-            id="btn-login"
-            className={styles["btn-login"]}
-            onClick={onLoginClick}
-          >
-            <span>Login</span>
-          </div>
-        )}
+        {renderUser()}
       </div>
       {children}
       {!isCommunityNote && <CopyRight />}
-      {!storeSignerId && openLogin && (
+      {!fcUser && openLogin && (
         <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>
-          <LoginFC
-            deepLink={signedKeyRequest?.deeplinkUrl}
-            onWithoutLoginClick={onWithoutLoginClick}
-          />
+          {!magicLoginToken ? (
+            <MagicLogin
+              handleClose={onCloseMagicLogin}
+              onLogged={onGetMagicUserMetadata}
+              setMagicLoading={setMagicLoading}
+              magicLoading={magicLoading}
+            />
+          ) : (
+            <LoginFC
+              deepLink={signedKeyRequest?.deeplinkUrl}
+              onWithoutLoginClick={onWithoutLoginClick}
+            />
+          )}
         </div>
       )}
       <PopoverButton

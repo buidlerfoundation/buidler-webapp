@@ -1,0 +1,103 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  .body {
+    width: 24rem;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: var(--color-background-2);
+    border-radius: 10px;
+    border: 1px solid var(--color-stroke);
+    padding: 2.5rem 2rem 1rem 2rem;
+    display: flex;
+    flex-direction: column;
+    margin-top: -5rem;
+    align-items: center;
+    .logo {
+      margin-top: -2rem;
+      width: 11rem;
+      height: 6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .form-input-email {
+      display: flex;
+      flex-direction: column;
+      margin-top: 1rem;
+      width: 100%;
+      gap: 1rem;
+      .input-email {
+        border: 1px solid var(--color-stroke);
+        border-radius: 10px;
+        height: 40px;
+        padding: 0 15px;
+        font-size: 14px;
+      }
+      .btn-submit {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        background-color: var(--color-mention);
+        border: none;
+        cursor: pointer;
+      }
+    }
+    .title {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-primary-text);
+      line-height: 28px;
+    }
+    .description {
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 24px;
+      color: var(--color-secondary-text);
+    }
+    .separate {
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      .line {
+        flex: 1;
+        height: 1px;
+        background-color: var(--color-stroke);
+      }
+      span {
+        margin: 0 1rem;
+        font-size: 14px;
+        color: var(--color-mute-text);
+      }
+    }
+    .btn-login-google {
+      width: 100%;
+      margin-top: 1rem;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1px solid var(--color-stroke);
+      cursor: pointer;
+      gap: 8px;
+      font-weight: 600;
+    }
+    .btn-back {
+      padding: 8px;
+      cursor: pointer;
+      margin-top: 6rem;
+      font-size: 14px;
+      color: var(--color-mute-text);
+    }
+  }
+}

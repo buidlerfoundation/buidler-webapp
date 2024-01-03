@@ -14,5 +14,6 @@ namespace NodeJS {
     NEXT_PUBLIC_WEB3_AUTH_CLIENT_ID: string;
     NEXT_PUBLIC_PROFILE_URL: string;
     NEXT_PUBLIC_URL: string;
+    NEXT_PUBLIC_MAGIC_API_KEY: string;
   }
 }

@@ -206,3 +206,23 @@ export const defaultMetadata: Metadata = {
     images: [{ url: "/img_buidler_large_promo.png" }],
   },
 };
+
+export const signTypeDataMagicLink = {
+  domain: {
+    name: "buidler",
+    version: "1",
+  },
+  types: {
+    User: [{ name: "address", type: "address" }],
+  },
+};
+
+export const signTypeDataLinkFC = {
+  domain: {
+    name: "buidler",
+    version: "1",
+  },
+  types: {
+    Signer: [{ name: "signer_id", type: "string" }],
+  },
+};
