@@ -284,7 +284,6 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   const requestSignerId = useCallback(async () => {
     if (loginLoading) return;
     setLoginLoading(true);
-    pollingController.current?.abort?.();
     const res = await api.requestSignedKey();
     setLoginLoading(false);
     if (res.data?.token) {
