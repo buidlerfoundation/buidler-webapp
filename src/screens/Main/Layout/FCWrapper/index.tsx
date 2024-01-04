@@ -117,10 +117,16 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   const [openDiscussion, setOpenDiscussion] = useState(false);
   const [openBugsReport, setOpenBugsReport] = useState(false);
   const initialTheme = useMemo(() => query?.get("theme"), [query]);
+  const action = useMemo(() => query?.get("action"), [query]);
+  const redirect = useMemo(() => query?.get("redirect"), [query]);
   const [theme, setTheme] = useState(initialTheme);
   const filters = useFeedFilters();
-  const params = useParams<{ url: string }>();
+  const params = useParams<{ url: string; redirect_url: string }>();
   const exploreUrl = useMemo(() => params?.url, [params?.url]);
+  const redirectUrl = useMemo(
+    () => params?.redirect_url,
+    [params?.redirect_url]
+  );
   const [signedKeyRequest, setSignedKeyRequest] = useState<
     ISignedKeyRequest | undefined | null
   >(null);
@@ -210,6 +216,9 @@ const FCWrapper = ({ children }: IFCWrapper) => {
           trackingLoginSuccess();
           await removeCookie(AsyncKey.requestTokenKey);
           await dispatch(getCurrentFCUser());
+          if (redirectUrl) {
+            router.push(decodeURIComponent(redirectUrl));
+          }
         } else {
           trackingLoginFailed(res.message || "");
         }
@@ -217,7 +226,14 @@ const FCWrapper = ({ children }: IFCWrapper) => {
       setOpenLogin(false);
       setGettingMagicUserRedirect(false);
     },
-    [dispatch, magicProvider, trackingLoginFailed, trackingLoginSuccess]
+    [
+      dispatch,
+      magicProvider,
+      redirectUrl,
+      router,
+      trackingLoginFailed,
+      trackingLoginSuccess,
+    ]
   );
   const handleRefresh = useCallback(async () => {
     const refreshToken = await getCookie(AsyncKey.refreshTokenKey);
@@ -260,7 +276,8 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   }, [theme]);
   useEffect(() => {
     checkingAuth();
-  }, [checkingAuth]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     dispatch(getFCChannels());
   }, [dispatch]);
@@ -347,6 +364,9 @@ const FCWrapper = ({ children }: IFCWrapper) => {
           await dispatch(getCurrentFCUser());
           setOpenLogin(false);
           setGettingMagicUserRedirect(false);
+          if (redirectUrl) {
+            router.push(decodeURIComponent(redirectUrl));
+          }
         } else {
           const signerId = await getCookie(AsyncKey.signerIdKey);
           if (signerId) {
@@ -364,7 +384,9 @@ const FCWrapper = ({ children }: IFCWrapper) => {
       dispatch,
       linkWithFCAccount,
       magicProvider,
+      redirectUrl,
       requestSignerId,
+      router,
       saveTokenCookie,
       trackingLoginSuccess,
     ]
@@ -554,6 +576,11 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   useEffect(() => {
     finishSocialLogin();
   }, [finishSocialLogin]);
+  useEffect(() => {
+    if (action === "login") {
+      setOpenLogin(true);
+    }
+  }, [action]);
   return (
     <div className={styles.container}>
       <aside className={styles["left-side"]}>
@@ -634,6 +661,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
               onLogged={onGetMagicUserMetadata}
               setMagicLoading={setMagicLoading}
               magicLoading={magicLoading}
+              redirect={redirect}
             />
           ) : (
             <LoginFC

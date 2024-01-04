@@ -311,7 +311,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     setOpenLogin(false);
   }, []);
   const onLoginClick = useCallback(async () => {
-    setOpenLogin(true);
+    window.top?.postMessage({ type: "b-fc-open-login" }, { targetOrigin: "*" });
   }, []);
   const finishSocialLogin = useCallback(async () => {
     if (magic) {
