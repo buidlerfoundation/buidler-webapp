@@ -1,16 +1,11 @@
 "use client";
 
 import api from "api";
-import {
-  AsyncKey,
-  signTypeDataLinkFC,
-  signTypeDataMagicLink,
-} from "common/AppConfig";
+import { AsyncKey, signTypeDataLinkFC } from "common/AppConfig";
 import { clearData, getCookie, removeCookie, setCookie } from "common/Cookie";
 import useAppDispatch from "hooks/useAppDispatch";
 import useAppSelector from "hooks/useAppSelector";
 import useQuery from "hooks/useQuery";
-import { ISignedKeyRequest } from "models/FC";
 import React, {
   memo,
   useCallback,
@@ -19,10 +14,8 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { toast } from "react-hot-toast";
-import { FC_USER_ACTIONS, getCurrentFCUser } from "reducers/FCUserReducers";
+import { getCurrentFCUser } from "reducers/FCUserReducers";
 import styles from "./index.module.scss";
-import LoginFC from "shared/LoginFC";
 import {
   FC_CAST_ACTIONS,
   getCastsByUrl,
@@ -41,12 +34,8 @@ import {
 } from "helpers/CastHelper";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
-import GlobalVariable from "services/GlobalVariable";
 import { getNotesByUrl, submitNote } from "reducers/CommunityNoteReducers";
 import { IDataToken } from "models/User";
-import { CircularProgress } from "@mui/material";
-import MagicLogin from "shared/MagicLogin";
-import { MagicUserMetadata } from "magic-sdk";
 import { useMagic } from "providers/MagicProvider";
 
 interface IFCPluginWrapper {
@@ -55,7 +44,7 @@ interface IFCPluginWrapper {
 
 const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   const dispatch = useAppDispatch();
-  const { magic, magicProvider } = useMagic();
+  const { magicProvider } = useMagic();
   const router = useRouter();
   const pathname = usePathname();
   const popupMenuRef = useRef<any>();
@@ -64,21 +53,8 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   const params = useParams<{ cast_hash: string }>();
   const castHash = useMemo(() => params?.cast_hash, [params?.cast_hash]);
   const initialTheme = useMemo(() => query?.get("theme"), [query]);
-  const pollingController = useRef(new AbortController());
   const q = useMemo(() => query?.get("q"), [query]);
-  const [loading, setLoading] = useState(false);
-  const [openLogin, setOpenLogin] = useState(false);
-  const [magicLoading, setMagicLoading] = useState(false);
-  const [gettingMagicUserRedirect, setGettingMagicUserRedirect] =
-    useState(false);
-  const [magicLoginToken, setMagicLoginToken] = useState<
-    IDataToken | undefined
-  >();
-  const [polling, setPolling] = useState(false);
   const [castQueue, setCastQueue] = useState<any>(null);
-  const [signedKeyRequest, setSignedKeyRequest] = useState<
-    ISignedKeyRequest | undefined | null
-  >(null);
   const queryUrl = useAppSelector((state) => state.fcCast.queryUrl);
   const fcUser = useAppSelector((state) => state.fcUser?.data);
   const replyCast = useAppSelector((state) => state.fcCast.replyCast);
@@ -94,8 +70,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     );
     clearData();
     dispatch(logoutAction());
-    setOpenLogin(false);
-    setSignedKeyRequest(null);
   }, [dispatch]);
   const onCloseMenu = useCallback(() => {
     popupMenuRef.current?.hide();
@@ -152,8 +126,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
           await dispatch(getCurrentFCUser());
         }
       }
-      setOpenLogin(false);
-      setGettingMagicUserRedirect(false);
     },
     [dispatch, magicProvider]
   );
@@ -211,39 +183,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     },
     [dispatch, fcUser?.fid, fcUser?.username, getPayloadToSubmit, queryUrl]
   );
-  const requestSignerId = useCallback(async () => {
-    if (loading) return;
-    setLoading(true);
-    setOpenLogin(true);
-    const res = await api.requestSignedKey();
-    setLoading(false);
-    if (res.data?.token) {
-      setSignedKeyRequest(res.data);
-      setPolling(true);
-      await setCookie(AsyncKey.requestTokenKey, res.data?.token);
-      try {
-        const resPolling = await api.pollingSignedKey(
-          res.data?.token,
-          pollingController.current
-        );
-        if (resPolling?.data?.signer_id) {
-          await setCookie(AsyncKey.signerIdKey, resPolling?.data?.signer_id);
-          await removeCookie(AsyncKey.requestTokenKey);
-          const fcUser = await dispatch(getCurrentFCUser()).unwrap();
-          if (fcUser) {
-            dispatch(
-              FC_USER_ACTIONS.updateSignerId(resPolling?.data?.signer_id)
-            );
-          }
-        }
-      } catch (error: any) {
-        toast.error(error.message);
-        setSignedKeyRequest(null);
-        setOpenLogin(false);
-      }
-      setPolling(false);
-    }
-  }, [dispatch, loading]);
   const checkingAuth = useCallback(async () => {
     await handleRefresh();
     const reqToken = await getCookie(AsyncKey.requestTokenKey);
@@ -263,67 +202,9 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   const onCloseModalReply = useCallback(() => {
     dispatch(FC_CAST_ACTIONS.updateReplyCast());
   }, [dispatch]);
-  const onGetMagicUserMetadata = useCallback(
-    async (magicUserMetadata: MagicUserMetadata) => {
-      if (magicProvider) {
-        const signer = magicProvider.getSigner();
-        const message = {
-          address: magicUserMetadata.publicAddress,
-        };
-        const signature = await signer?._signTypedData(
-          signTypeDataMagicLink.domain,
-          signTypeDataMagicLink.types,
-          message
-        );
-        const res = await api.loginWithMagicLink({
-          ...signTypeDataMagicLink,
-          value: message,
-          signature,
-        });
-        await saveTokenCookie(res.data);
-        const linkedSignerId = res.data?.signer_id;
-        if (linkedSignerId) {
-          await setCookie(AsyncKey.signerIdKey, linkedSignerId);
-          await dispatch(getCurrentFCUser());
-          setOpenLogin(false);
-          setGettingMagicUserRedirect(false);
-        } else {
-          const signerId = await getCookie(AsyncKey.signerIdKey);
-          if (signerId) {
-            await linkWithFCAccount(signerId, res.data?.token);
-          } else {
-            setMagicLoginToken(res.data);
-            requestSignerId();
-          }
-        }
-      }
-      setMagicLoading(false);
-    },
-    [
-      dispatch,
-      linkWithFCAccount,
-      magicProvider,
-      requestSignerId,
-      saveTokenCookie,
-    ]
-  );
-  const onCloseMagicLogin = useCallback(() => {
-    setOpenLogin(false);
-  }, []);
   const onLoginClick = useCallback(async () => {
     window.top?.postMessage({ type: "b-fc-open-login" }, { targetOrigin: "*" });
   }, []);
-  const finishSocialLogin = useCallback(async () => {
-    if (magic) {
-      try {
-        setGettingMagicUserRedirect(true);
-        const result = await magic.oauth.getRedirectResult();
-        onGetMagicUserMetadata(result.magic.userMetadata);
-      } catch (err) {
-        setGettingMagicUserRedirect(false);
-      }
-    }
-  }, [magic, onGetMagicUserMetadata]);
   const onMenuClick = useCallback(
     async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       e.stopPropagation();
@@ -333,20 +214,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     []
   );
   const renderUser = useCallback(() => {
-    if (gettingMagicUserRedirect)
-      return (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 55,
-            height: 45,
-          }}
-        >
-          {<CircularProgress color="inherit" size={20} />}
-        </div>
-      );
     if (fcUser) {
       return (
         <div className={styles["user-info"]} onClick={onMenuClick}>
@@ -369,7 +236,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
         <span>Login</span>
       </div>
     );
-  }, [fcUser, gettingMagicUserRedirect, onLoginClick, onMenuClick]);
+  }, [fcUser, onLoginClick, onMenuClick]);
   useEffect(() => {
     if (fcUser) {
       GoogleAnalytics.identify(fcUser);
@@ -497,10 +364,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
       setTheme(theme);
     }
   }, [theme]);
-  const onWithoutLoginClick = useCallback(() => {
-    pollingController.current.abort();
-    setOpenLogin(false);
-  }, []);
   useEffect(() => {
     if (openNewCast && !fcUser) {
       onLoginClick();
@@ -514,9 +377,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
       );
     }
   }, [replyCast]);
-  useEffect(() => {
-    finishSocialLogin();
-  }, [finishSocialLogin]);
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -537,23 +397,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
       </div>
       {children}
       {!isCommunityNote && <CopyRight />}
-      {!fcUser && openLogin && (
-        <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>
-          {!magicLoginToken ? (
-            <MagicLogin
-              handleClose={onCloseMagicLogin}
-              onLogged={onGetMagicUserMetadata}
-              setMagicLoading={setMagicLoading}
-              magicLoading={magicLoading}
-            />
-          ) : (
-            <LoginFC
-              deepLink={signedKeyRequest?.deeplinkUrl}
-              onWithoutLoginClick={onWithoutLoginClick}
-            />
-          )}
-        </div>
-      )}
       <PopoverButton
         ref={popupMenuRef}
         popupOnly
