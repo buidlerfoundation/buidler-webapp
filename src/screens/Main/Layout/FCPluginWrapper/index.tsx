@@ -499,7 +499,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   }, [theme]);
   const onWithoutLoginClick = useCallback(() => {
     pollingController.current.abort();
-    setSignedKeyRequest(null);
     setOpenLogin(false);
   }, []);
   useEffect(() => {
