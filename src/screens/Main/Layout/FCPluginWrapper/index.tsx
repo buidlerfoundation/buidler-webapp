@@ -45,9 +45,9 @@ import GlobalVariable from "services/GlobalVariable";
 import { getNotesByUrl, submitNote } from "reducers/CommunityNoteReducers";
 import { IDataToken } from "models/User";
 import { CircularProgress } from "@mui/material";
-import magic, { magicProvider } from "services/magic";
 import MagicLogin from "shared/MagicLogin";
 import { MagicUserMetadata } from "magic-sdk";
+import { useMagic } from "providers/MagicProvider";
 
 interface IFCPluginWrapper {
   children: React.ReactNode;
@@ -55,6 +55,7 @@ interface IFCPluginWrapper {
 
 const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   const dispatch = useAppDispatch();
+  const { magic, magicProvider } = useMagic();
   const router = useRouter();
   const pathname = usePathname();
   const popupMenuRef = useRef<any>();
@@ -154,7 +155,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
       setOpenLogin(false);
       setGettingMagicUserRedirect(false);
     },
-    [dispatch]
+    [dispatch, magicProvider]
   );
   const handleRefresh = useCallback(async () => {
     const refreshToken = await getCookie(AsyncKey.refreshTokenKey);
@@ -298,7 +299,13 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
       }
       setMagicLoading(false);
     },
-    [dispatch, linkWithFCAccount, requestSignerId, saveTokenCookie]
+    [
+      dispatch,
+      linkWithFCAccount,
+      magicProvider,
+      requestSignerId,
+      saveTokenCookie,
+    ]
   );
   const onCloseMagicLogin = useCallback(() => {
     setOpenLogin(false);
@@ -316,7 +323,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
         setGettingMagicUserRedirect(false);
       }
     }
-  }, [onGetMagicUserMetadata]);
+  }, [magic, onGetMagicUserMetadata]);
   const onMenuClick = useCallback(
     async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       e.stopPropagation();

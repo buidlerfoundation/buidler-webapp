@@ -47,11 +47,11 @@ import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import useIsMobile from "hooks/useIsMobile";
-import magic, { magicProvider } from "services/magic";
 import { IDataToken } from "models/User";
 import MagicLogin from "shared/MagicLogin";
 import { MagicUserMetadata } from "magic-sdk";
 import { CircularProgress } from "@mui/material";
+import { useMagic } from "providers/MagicProvider";
 
 interface IMenuItem {
   active?: boolean;
@@ -98,6 +98,7 @@ interface IFCWrapper {
 
 const FCWrapper = ({ children }: IFCWrapper) => {
   const dispatch = useAppDispatch();
+  const { magic, magicProvider } = useMagic();
   const [openMenu, setOpenMenu] = useState(false);
   const popupMenuRef = useRef<any>();
   const [loading, setLoading] = useState(true);
@@ -216,7 +217,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
       setOpenLogin(false);
       setGettingMagicUserRedirect(false);
     },
-    [dispatch, trackingLoginFailed, trackingLoginSuccess]
+    [dispatch, magicProvider, trackingLoginFailed, trackingLoginSuccess]
   );
   const handleRefresh = useCallback(async () => {
     const refreshToken = await getCookie(AsyncKey.refreshTokenKey);
@@ -363,6 +364,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     [
       dispatch,
       linkWithFCAccount,
+      magicProvider,
       requestSignerId,
       saveTokenCookie,
       trackingLoginSuccess,
@@ -384,7 +386,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
         setGettingMagicUserRedirect(false);
       }
     }
-  }, [onGetMagicUserMetadata]);
+  }, [magic, onGetMagicUserMetadata]);
   const onMenuClick = useCallback(
     async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       e.stopPropagation();

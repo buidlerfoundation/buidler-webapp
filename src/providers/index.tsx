@@ -4,6 +4,7 @@ import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import React, { useMemo } from "react";
 import { Provider } from "react-redux";
 import { store } from "../store";
+import MagicProvider from "./MagicProvider";
 
 type ProvidersProps = {
   children: React.ReactNode;
@@ -29,10 +30,12 @@ const Providers = ({ children }: ProvidersProps) => {
   );
   return (
     <Provider store={store}>
-      <ThemeProvider theme={materialTheme}>
-        {children}
-        <CssBaseline />
-      </ThemeProvider>
+      <MagicProvider>
+        <ThemeProvider theme={materialTheme}>
+          {children}
+          <CssBaseline />
+        </ThemeProvider>
+      </MagicProvider>
     </Provider>
   );
 };
