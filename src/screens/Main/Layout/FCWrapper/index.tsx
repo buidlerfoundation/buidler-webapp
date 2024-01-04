@@ -355,6 +355,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
             await linkWithFCAccount(signerId, res.data?.token);
           } else {
             setMagicLoginToken(res.data);
+            setOpenLogin(true);
             requestSignerId();
           }
         }
