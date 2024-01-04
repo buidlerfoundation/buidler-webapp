@@ -381,9 +381,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     }
   }, [dispatch, queryUrl]);
   useEffect(() => {
-    checkingAuth();
-  }, [checkingAuth]);
-  useEffect(() => {
     if (fcUser?.fid) {
       window.top?.postMessage(
         { type: "b-fc-plugin-logged", user: JSON.stringify(fcUser) },
@@ -450,14 +447,15 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
           GoogleAnalytics.identifyByExtensionId(uniqId);
         }
         if (signerId) {
-          setCookie(AsyncKey.signerIdKey, signerId);
+          await setCookie(AsyncKey.signerIdKey, signerId);
         }
         if (accessToken) {
-          setCookie(AsyncKey.accessTokenKey, accessToken);
+          await setCookie(AsyncKey.accessTokenKey, accessToken);
         }
         if (refreshToken) {
-          setCookie(AsyncKey.refreshTokenKey, refreshToken);
+          await setCookie(AsyncKey.refreshTokenKey, refreshToken);
         }
+        checkingAuth();
         if (q) {
           dispatch(FC_CAST_ACTIONS.updateQueryUrl(q));
         }
@@ -484,6 +482,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     onLoginClick,
     createNote,
     router,
+    checkingAuth,
   ]);
   useEffect(() => {
     if (theme) {
