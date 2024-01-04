@@ -1,5 +1,3 @@
-"use client";
-
 import { Magic } from "magic-sdk";
 import { OAuthExtension } from "@magic-ext/oauth";
 import { ethers } from "ethers";
