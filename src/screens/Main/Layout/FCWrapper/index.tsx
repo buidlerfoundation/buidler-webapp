@@ -315,11 +315,9 @@ const FCWrapper = ({ children }: IFCWrapper) => {
           pollingController.current
         );
         if (resPolling?.data?.signer_id) {
+          const accessToken = await getCookie(AsyncKey.accessTokenKey);
           await setCookie(AsyncKey.signerIdKey, resPolling?.data?.signer_id);
-          await linkWithFCAccount(
-            resPolling?.data?.signer_id,
-            magicLoginToken?.token
-          );
+          await linkWithFCAccount(resPolling?.data?.signer_id, accessToken);
         }
       } catch (error: any) {
         toast.error(error.message);
@@ -331,14 +329,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     } else {
       trackingLoginFailed(res.message || "");
     }
-  }, [
-    isMobile,
-    linkWithFCAccount,
-    loginLoading,
-    magicLoginToken,
-    router,
-    trackingLoginFailed,
-  ]);
+  }, [isMobile, linkWithFCAccount, loginLoading, router, trackingLoginFailed]);
   const onGetMagicUserMetadata = useCallback(
     async (magicUserMetadata: MagicUserMetadata) => {
       if (magicProvider) {
