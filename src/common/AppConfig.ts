@@ -213,7 +213,10 @@ export const signTypeDataMagicLink = {
     version: "1",
   },
   types: {
-    User: [{ name: "address", type: "address" }],
+    User: [
+      { name: "address", type: "address" },
+      { name: "email", type: "string" },
+    ],
   },
 };
 

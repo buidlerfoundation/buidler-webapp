@@ -336,6 +336,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
         const signer = magicProvider.getSigner();
         const message = {
           address: magicUserMetadata.publicAddress,
+          email: magicUserMetadata.email,
         };
         const signature = await signer?._signTypedData(
           signTypeDataMagicLink.domain,
