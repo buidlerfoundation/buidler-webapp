@@ -353,6 +353,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
           await setCookie(AsyncKey.signerIdKey, linkedSignerId);
           trackingLoginSuccess();
           await dispatch(getCurrentFCUser());
+          await removeCookie(AsyncKey.requestTokenKey);
           setOpenLogin(false);
           setGettingMagicUserRedirect(false);
           if (redirectUrl) {
