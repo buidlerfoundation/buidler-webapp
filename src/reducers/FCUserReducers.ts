@@ -33,6 +33,14 @@ export const getFCChannels = createAsyncThunk(
   }
 );
 
+export const loginWithMagicLink = createAsyncThunk(
+  "fc_user/login-with-magic-link",
+  async (payload: any) => {
+    const res = await api.loginWithMagicLink(payload);
+    return res;
+  }
+);
+
 const fcUserSlice = createSlice({
   name: "fc_user",
   initialState,
@@ -47,8 +55,19 @@ const fcUserSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(logoutAction, () => initialState)
+      .addCase(loginWithMagicLink.fulfilled, (state, action) => {
+        if (action.payload.success) {
+          state.data = action.payload.data?.user;
+          if (state.data && !state.data.display_name) {
+            state.data.display_name = state.data.address?.slice(0, 7);
+          }
+        }
+      })
       .addCase(getCurrentFCUser.fulfilled, (state, action) => {
         state.data = action.payload;
+        if (state.data && !state.data.display_name) {
+          state.data.display_name = state.data.address?.slice(0, 7);
+        }
       })
       .addCase(getFCChannels.fulfilled, (state, action) => {
         state.channels = action.payload || [];

@@ -9,7 +9,10 @@ export interface ISignedKeyRequest {
 }
 
 export interface IFCUser {
-  fid: string;
+  user_id?: string;
+  address?: string;
+  email?: string;
+  fid?: string;
   username?: string;
   display_name?: string;
   is_followed?: boolean;
@@ -42,6 +45,7 @@ export interface IFCUser {
     replied_casts: number;
   };
   has_active_badge?: boolean;
+  is_whitelisted?: boolean;
 }
 
 export interface ICast {
@@ -150,7 +154,10 @@ export interface IDataUserEngagement {
   casts: IDataChart[];
 }
 
-export type ICommunityNotePath = "/community-notes" | "/community-notes/new"
+export type ICommunityNotePath =
+  | "/community-notes"
+  | "/community-notes/new"
+  | "/community-notes/nmr";
 
 export type IUserTabPath =
   | "/non-follower"

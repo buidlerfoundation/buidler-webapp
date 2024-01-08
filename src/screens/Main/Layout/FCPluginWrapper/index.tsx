@@ -37,6 +37,10 @@ import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import { getNotesByUrl, submitNote } from "reducers/CommunityNoteReducers";
 import { IDataToken } from "models/User";
 import { useMagic } from "providers/MagicProvider";
+import makeBlockie from "ethereum-blockies-base64";
+import LoginFC from "shared/LoginFC";
+import { ISignedKeyRequest } from "models/FC";
+import toast from "react-hot-toast";
 
 interface IFCPluginWrapper {
   children: React.ReactNode;
@@ -45,10 +49,17 @@ interface IFCPluginWrapper {
 const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   const dispatch = useAppDispatch();
   const { magicProvider } = useMagic();
+  const pollingController = useRef(new AbortController());
   const router = useRouter();
   const pathname = usePathname();
   const popupMenuRef = useRef<any>();
   const [theme, setTheme] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [signedKeyRequest, setSignedKeyRequest] = useState<
+    ISignedKeyRequest | undefined | null
+  >(null);
+  const [openLinkWithFarcaster, setOpenLinkWithFarcaster] = useState(false);
+  const [polling, setPolling] = useState(false);
   const query = useQuery();
   const params = useParams<{ cast_hash: string }>();
   const castHash = useMemo(() => params?.cast_hash, [params?.cast_hash]);
@@ -57,6 +68,12 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   const [castQueue, setCastQueue] = useState<any>(null);
   const queryUrl = useAppSelector((state) => state.fcCast.queryUrl);
   const fcUser = useAppSelector((state) => state.fcUser?.data);
+  const userAvatar = useMemo(
+    () =>
+      fcUser?.pfp?.url ||
+      (fcUser?.address ? makeBlockie(fcUser.address) : undefined),
+    [fcUser?.address, fcUser?.pfp?.url]
+  );
   const replyCast = useAppSelector((state) => state.fcCast.replyCast);
   const openNewCast = useAppSelector((state) => state.fcCast.openNewCast);
   const isCommunityNote = useMemo(
@@ -71,13 +88,6 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     clearData();
     dispatch(logoutAction());
   }, [dispatch]);
-  const onCloseMenu = useCallback(() => {
-    popupMenuRef.current?.hide();
-  }, []);
-  const onLogoutClick = useCallback(() => {
-    logout();
-    onCloseMenu();
-  }, [logout, onCloseMenu]);
   const getPayloadToSubmit = useCallback((payload: any) => {
     if (payload.onlyLink) {
       return payload;
@@ -188,17 +198,70 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     const reqToken = await getCookie(AsyncKey.requestTokenKey);
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     if (accessToken) {
+      let alreadyGetUser = false;
       if (reqToken) {
         const res = await api.checkRequestToken(reqToken);
         if (res.data?.state === "completed" && res.data?.signer_id) {
           await setCookie(AsyncKey.signerIdKey, res?.data?.signer_id);
           await linkWithFCAccount(res.data?.signer_id, accessToken);
+          alreadyGetUser = true;
         }
-      } else {
-        await dispatch(getCurrentFCUser()).unwrap();
+      }
+      if (!alreadyGetUser) {
+        await dispatch(getCurrentFCUser());
       }
     }
   }, [dispatch, handleRefresh, linkWithFCAccount]);
+  const onWithoutLoginClick = useCallback(() => {
+    pollingController.current.abort();
+    setSignedKeyRequest(null);
+    setOpenLinkWithFarcaster(false);
+  }, []);
+
+  const requestSignerId = useCallback(async () => {
+    if (loginLoading) return;
+    setLoginLoading(true);
+    let _signedKeyRequest = signedKeyRequest;
+    if (!_signedKeyRequest) {
+      const res = await api.requestSignedKey();
+      _signedKeyRequest = res.data;
+      setSignedKeyRequest(_signedKeyRequest);
+    }
+    setLoginLoading(false);
+    if (_signedKeyRequest?.token) {
+      await setCookie(AsyncKey.requestTokenKey, _signedKeyRequest?.token);
+      setPolling(true);
+      pollingController.current = new AbortController();
+      try {
+        const resPolling = await api.pollingSignedKey(
+          _signedKeyRequest?.token,
+          pollingController.current
+        );
+        if (resPolling?.data?.signer_id) {
+          const accessToken = await getCookie(AsyncKey.accessTokenKey);
+          await setCookie(AsyncKey.signerIdKey, resPolling?.data?.signer_id);
+          await linkWithFCAccount(resPolling?.data?.signer_id, accessToken);
+        }
+      } catch (error: any) {
+        toast.error(error.message);
+
+        setSignedKeyRequest(null);
+      }
+      setPolling(false);
+    }
+  }, [linkWithFCAccount, loginLoading, signedKeyRequest]);
+  const onCloseMenu = useCallback(() => {
+    popupMenuRef.current?.hide();
+  }, []);
+  const onLogoutClick = useCallback(() => {
+    logout();
+    onCloseMenu();
+  }, [logout, onCloseMenu]);
+  const onLinkWithFarcaster = useCallback(() => {
+    setOpenLinkWithFarcaster(true);
+    requestSignerId();
+    onCloseMenu();
+  }, [onCloseMenu, requestSignerId]);
   const onCloseModalReply = useCallback(() => {
     dispatch(FC_CAST_ACTIONS.updateReplyCast());
   }, [dispatch]);
@@ -216,15 +279,22 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   const renderUser = useCallback(() => {
     if (fcUser) {
       return (
-        <div className={styles["user-info"]} onClick={onMenuClick}>
-          {fcUser.pfp?.url && (
+        <>
+          <div className={styles["user-info"]} onClick={onMenuClick}>
             <ImageView
-              src={fcUser.pfp?.url}
+              src={userAvatar}
               alt="fc-user-avatar"
               className={styles.avatar}
             />
+          </div>
+          {!fcUser.fid && (
+            <div
+              id="btn-login"
+              className={styles["btn-login"]}
+              onClick={onLinkWithFarcaster}
+            />
           )}
-        </div>
+        </>
       );
     }
     return (
@@ -236,7 +306,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
         <span>Login</span>
       </div>
     );
-  }, [fcUser, onLoginClick, onMenuClick]);
+  }, [fcUser, onLinkWithFarcaster, onLoginClick, onMenuClick, userAvatar]);
   useEffect(() => {
     if (fcUser) {
       GoogleAnalytics.identify(fcUser);
@@ -404,11 +474,19 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
         componentPopup={
           <PopupUserFCMenu
             onCloseMenu={onCloseMenu}
-            theme={theme}
             onLogoutClick={onLogoutClick}
+            onLinkWithFarcaster={onLinkWithFarcaster}
           />
         }
       />
+      {openLinkWithFarcaster && (
+        <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>
+          <LoginFC
+            deepLink={signedKeyRequest?.deeplinkUrl}
+            onWithoutLoginClick={onWithoutLoginClick}
+          />
+        </div>
+      )}
     </div>
   );
 };

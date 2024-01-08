@@ -9,7 +9,7 @@ import React, {
 import styles from "./index.module.scss";
 import IconBuidlerLogo from "shared/SVG/IconBuidlerLogo";
 import IconMenuHome from "shared/SVG/FC/IconMenuHome";
-import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
+import makeBlockie from "ethereum-blockies-base64";
 import { clearData, getCookie, removeCookie, setCookie } from "common/Cookie";
 import {
   AsyncKey,
@@ -21,6 +21,7 @@ import {
   FC_USER_ACTIONS,
   getCurrentFCUser,
   getFCChannels,
+  loginWithMagicLink,
 } from "reducers/FCUserReducers";
 import { logoutAction } from "reducers/actions";
 import useAppSelector from "hooks/useAppSelector";
@@ -52,6 +53,8 @@ import MagicLogin from "shared/MagicLogin";
 import { MagicUserMetadata } from "magic-sdk";
 import { CircularProgress } from "@mui/material";
 import { useMagic } from "providers/MagicProvider";
+import IconMenuCommunityNote from "shared/SVG/FC/IconMenuCommunityNote";
+import WhiteListedModal from "shared/WhiteListedModal";
 
 interface IMenuItem {
   active?: boolean;
@@ -104,12 +107,11 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   const [loading, setLoading] = useState(true);
   const [loginLoading, setLoginLoading] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
+  const [openLinkWithFarcaster, setOpenLinkWithFarcaster] = useState(false);
   const [magicLoading, setMagicLoading] = useState(false);
+  const [openModalWhiteListed, setOpenModalWhiteListed] = useState(false);
   const [gettingMagicUserRedirect, setGettingMagicUserRedirect] =
     useState(false);
-  const [magicLoginToken, setMagicLoginToken] = useState<
-    IDataToken | undefined
-  >();
   const query = useQuery();
   const router = useRouter();
   const [polling, setPolling] = useState(false);
@@ -132,6 +134,12 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   >(null);
   const isExtensionInstalled = useExtensionInstalled();
   const fcUser = useAppSelector((state) => state.fcUser?.data);
+  const userAvatar = useMemo(
+    () =>
+      fcUser?.pfp?.url ||
+      (fcUser?.address ? makeBlockie(fcUser.address) : undefined),
+    [fcUser?.address, fcUser?.pfp?.url]
+  );
   const loginSource = useAppSelector((state) => state.fcUser.loginSource);
   const replyCast = useAppSelector((state) => state.homeFeed.replyCast);
   const pollingController = useRef(new AbortController());
@@ -147,6 +155,10 @@ const FCWrapper = ({ children }: IFCWrapper) => {
       pathname === "/active" ||
       pathname === "/top",
     [pathname]
+  );
+  const toggleModalWhiteListed = useCallback(
+    () => setOpenModalWhiteListed((current) => !current),
+    []
   );
   const toggleMenu = useCallback(() => setOpenMenu((current) => !current), []);
   const toggleBugsReport = useCallback(
@@ -225,12 +237,14 @@ const FCWrapper = ({ children }: IFCWrapper) => {
       }
       setOpenLogin(false);
       setGettingMagicUserRedirect(false);
+      toggleModalWhiteListed();
     },
     [
       dispatch,
       magicProvider,
       redirectUrl,
       router,
+      toggleModalWhiteListed,
       trackingLoginFailed,
       trackingLoginSuccess,
     ]
@@ -250,14 +264,17 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     const reqToken = await getCookie(AsyncKey.requestTokenKey);
     const accessToken = await getCookie(AsyncKey.accessTokenKey);
     if (accessToken) {
+      let alreadyGetUser = false;
       if (reqToken) {
         const res = await api.checkRequestToken(reqToken);
         if (res.data?.state === "completed" && res.data?.signer_id) {
           await setCookie(AsyncKey.signerIdKey, res?.data?.signer_id);
           await linkWithFCAccount(res.data?.signer_id, accessToken);
+          alreadyGetUser = true;
         }
-      } else {
-        await dispatch(getCurrentFCUser()).unwrap();
+      }
+      if (!alreadyGetUser) {
+        await dispatch(getCurrentFCUser());
       }
     }
     setLoading(false);
@@ -300,18 +317,25 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   const requestSignerId = useCallback(async () => {
     if (loginLoading) return;
     setLoginLoading(true);
-    const res = await api.requestSignedKey();
+    let _signedKeyRequest = signedKeyRequest;
+    let errorMsg = "";
+    if (!_signedKeyRequest) {
+      const res = await api.requestSignedKey();
+      errorMsg = res.message || "";
+      _signedKeyRequest = res.data;
+      setSignedKeyRequest(_signedKeyRequest);
+    }
     setLoginLoading(false);
-    if (res.data?.token) {
-      if (isMobile && res.data?.deeplinkUrl) {
-        router.push(res.data.deeplinkUrl);
+    if (_signedKeyRequest?.token) {
+      if (isMobile && _signedKeyRequest?.deeplinkUrl) {
+        router.push(_signedKeyRequest.deeplinkUrl);
       }
-      setSignedKeyRequest(res.data);
-      await setCookie(AsyncKey.requestTokenKey, res.data?.token);
+      await setCookie(AsyncKey.requestTokenKey, _signedKeyRequest?.token);
       setPolling(true);
+      pollingController.current = new AbortController();
       try {
         const resPolling = await api.pollingSignedKey(
-          res.data?.token,
+          _signedKeyRequest?.token,
           pollingController.current
         );
         if (resPolling?.data?.signer_id) {
@@ -327,9 +351,25 @@ const FCWrapper = ({ children }: IFCWrapper) => {
       }
       setPolling(false);
     } else {
-      trackingLoginFailed(res.message || "");
+      trackingLoginFailed(errorMsg);
     }
-  }, [isMobile, linkWithFCAccount, loginLoading, router, trackingLoginFailed]);
+  }, [
+    isMobile,
+    linkWithFCAccount,
+    loginLoading,
+    router,
+    signedKeyRequest,
+    trackingLoginFailed,
+  ]);
+  const onCloseMenu = useCallback(() => {
+    popupMenuRef.current?.hide();
+  }, []);
+  const onLinkWithFarcaster = useCallback(() => {
+    setOpenLogin(true);
+    setOpenLinkWithFarcaster(true);
+    requestSignerId();
+    onCloseMenu();
+  }, [onCloseMenu, requestSignerId]);
   const onGetMagicUserMetadata = useCallback(
     async (magicUserMetadata: MagicUserMetadata) => {
       if (magicProvider) {
@@ -343,11 +383,13 @@ const FCWrapper = ({ children }: IFCWrapper) => {
           signTypeDataMagicLink.types,
           message
         );
-        const res = await api.loginWithMagicLink({
-          ...signTypeDataMagicLink,
-          value: message,
-          signature,
-        });
+        const res = await dispatch(
+          loginWithMagicLink({
+            ...signTypeDataMagicLink,
+            value: message,
+            signature,
+          })
+        ).unwrap();
         await saveTokenCookie(res.data);
         const linkedSignerId = res.data?.signer_id;
         if (linkedSignerId) {
@@ -360,14 +402,13 @@ const FCWrapper = ({ children }: IFCWrapper) => {
           if (redirectUrl) {
             router.push(decodeURIComponent(redirectUrl));
           }
+          toggleModalWhiteListed();
         } else {
           const signerId = await getCookie(AsyncKey.signerIdKey);
           if (signerId) {
             await linkWithFCAccount(signerId, res.data?.token);
           } else {
-            setMagicLoginToken(res.data);
-            setOpenLogin(true);
-            requestSignerId();
+            onLinkWithFarcaster();
           }
         }
       }
@@ -377,10 +418,11 @@ const FCWrapper = ({ children }: IFCWrapper) => {
       dispatch,
       linkWithFCAccount,
       magicProvider,
+      onLinkWithFarcaster,
       redirectUrl,
-      requestSignerId,
       router,
       saveTokenCookie,
+      toggleModalWhiteListed,
       trackingLoginSuccess,
     ]
   );
@@ -427,16 +469,28 @@ const FCWrapper = ({ children }: IFCWrapper) => {
       );
     if (fcUser) {
       return (
-        <div className={styles["user-info"]} onClick={onMenuClick}>
-          <span className="truncate" style={{ marginRight: 10, maxWidth: 170 }}>
-            {fcUser.display_name}
-          </span>
-          <ImageView
-            src={fcUser.pfp.url}
-            className={styles.avatar}
-            alt="avatar"
-          />
-        </div>
+        <>
+          <div className={styles["user-info"]} onClick={onMenuClick}>
+            <span
+              className="truncate"
+              style={{ marginRight: 10, maxWidth: 170 }}
+            >
+              {fcUser.display_name}
+            </span>
+            <ImageView
+              src={userAvatar}
+              className={styles.avatar}
+              alt="avatar"
+            />
+          </div>
+          {!fcUser.fid && (
+            <div
+              id="btn-login"
+              className={styles["btn-login"]}
+              onClick={onLinkWithFarcaster}
+            />
+          )}
+        </>
       );
     }
     return (
@@ -448,10 +502,15 @@ const FCWrapper = ({ children }: IFCWrapper) => {
         Login
       </div>
     );
-  }, [fcUser, gettingMagicUserRedirect, loading, onLoginClick, onMenuClick]);
-  const onCloseMenu = useCallback(() => {
-    popupMenuRef.current?.hide();
-  }, []);
+  }, [
+    fcUser,
+    gettingMagicUserRedirect,
+    loading,
+    onLinkWithFarcaster,
+    onLoginClick,
+    onMenuClick,
+    userAvatar,
+  ]);
   const onCloseSideMenu = useCallback(() => setOpenMenu(false), []);
   const onLogoutClick = useCallback(() => {
     logout();
@@ -462,6 +521,10 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     [filters, pathname]
   );
   const activeAnalytic = useMemo(() => pathname === "/insights", [pathname]);
+  const activeCommunityNotes = useMemo(
+    () => pathname?.includes("/community-notes"),
+    [pathname]
+  );
   const activeExplore = useMemo(
     () => pathname?.includes("/explore"),
     [pathname]
@@ -502,6 +565,18 @@ const FCWrapper = ({ children }: IFCWrapper) => {
           active={activeAnalytic}
           onClick={onCloseSideMenu}
         />
+        <MenuItemMemo
+          title="Community Notes"
+          to="/community-notes"
+          icon={
+            <IconMenuCommunityNote
+              fill={activeCommunityNotes ? activeColor : inactiveColor}
+              style={{ padding: 4 }}
+            />
+          }
+          active={activeCommunityNotes}
+          onClick={onCloseSideMenu}
+        />
         {/* <MenuItemMemo
           title="Communities"
           to="/community"
@@ -526,7 +601,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
         {fcUser && (
           <div className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}>
             <ImageView
-              src={fcUser?.pfp.url}
+              src={userAvatar}
               className={styles.avatar}
               alt="avatar"
             />
@@ -537,11 +612,13 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     [
       activeAnalytic,
       activeColor,
+      activeCommunityNotes,
       activeHome,
       fcUser,
       inactiveColor,
       onCloseSideMenu,
       onOpenDiscussion,
+      userAvatar,
     ]
   );
   const onShareProfileClick = useCallback(() => {
@@ -646,9 +723,9 @@ const FCWrapper = ({ children }: IFCWrapper) => {
         {children}
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>
-      {!fcUser && openLogin && (
+      {!fcUser?.fid && openLogin && (
         <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>
-          {!magicLoginToken ? (
+          {!openLinkWithFarcaster ? (
             <MagicLogin
               handleClose={onCloseMagicLogin}
               onLogged={onGetMagicUserMetadata}
@@ -664,7 +741,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
           )}
         </div>
       )}
-      {fcUser && (
+      {fcUser?.fid && (
         <ModalFCReply
           open={!!replyCast}
           handleClose={onCloseReply}
@@ -678,6 +755,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
           <PopupUserFCMenu
             onCloseMenu={onCloseMenu}
             onLogoutClick={onLogoutClick}
+            onLinkWithFarcaster={onLinkWithFarcaster}
           />
         }
       />
@@ -693,6 +771,11 @@ const FCWrapper = ({ children }: IFCWrapper) => {
         handleClose={onCloseReviewResult}
       />
       <ModalBugsReport open={openBugsReport} handleClose={toggleBugsReport} />
+      <WhiteListedModal
+        open={openModalWhiteListed}
+        handleClose={toggleModalWhiteListed}
+        isWhiteListed={fcUser?.is_whitelisted}
+      />
       {/* <ScrollRestoration /> */}
       <div id="btn-share-profile" onClick={onShareProfileClick} />
       <div id="btn-bugs-report" onClick={toggleBugsReport} />

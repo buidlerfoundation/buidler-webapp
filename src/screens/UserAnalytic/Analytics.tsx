@@ -38,7 +38,7 @@ const Analytics = ({ fid, period, username }: IAnalytics) => {
   const dataTopInteraction = useDataTopInteraction(fid);
   const user = useAppSelector((state) => state.fcUser.data);
   const onViewAll = useCallback(() => {
-    if (!user) {
+    if (!user?.fid) {
       dispatch(FC_USER_ACTIONS.updateLoginSource("View Non Follower"));
       const loginElement = document.getElementById("btn-login");
       loginElement?.click();

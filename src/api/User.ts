@@ -2,6 +2,7 @@ import {
   BalanceApiData,
   Contract,
   IDataToken,
+  IMagicLoginData,
   IUserAsset,
   InitialApiData,
   LoginApiData,
@@ -149,7 +150,7 @@ export const updateMobileDeviceToken = (
 ) => Caller.put("user/devices", { device_token: deviceToken, platform });
 
 export const loginWithMagicLink = (body: any) =>
-  Caller.post<IDataToken>("users/auth/signin", body);
+  Caller.post<IMagicLoginData>("users/auth/signin", body);
 
 export const linkWithFarcasterAccount = (accessToken: string, body: any) =>
   Caller.post<IFCUser>("users/auth/link", body, undefined, undefined, {

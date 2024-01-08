@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { IFCUser } from "./FC";
 
 export interface TransactionApiData {
   block_number: string;
@@ -339,4 +340,8 @@ export interface IOnlineUsers {
   user_ids?: string[];
   remove_user_id?: string;
   add_user_id?: string;
+}
+
+export interface IMagicLoginData extends IDataToken {
+  user?: IFCUser;
 }

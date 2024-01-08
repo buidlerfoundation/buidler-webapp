@@ -1,3 +1,5 @@
+import { IFCUser, IMetadataUrl } from "./FC";
+
 export interface INote {
   id: string;
   participant_id: string;
@@ -52,4 +54,20 @@ export interface IRating {
 export interface ITag {
   label: string;
   key: string;
+}
+
+export interface IReport {
+  id: string;
+  user?: IFCUser;
+  url: string;
+  content?: string;
+  created_at: string;
+  updated_at: string;
+  metadata: {
+    metadata_id: string;
+    url: string;
+    domain: string;
+    hostname: string;
+    data: IMetadataUrl;
+  };
 }

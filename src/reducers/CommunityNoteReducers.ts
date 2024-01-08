@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "api";
-import { INote } from "models/CommunityNote";
+import { INote, IReport } from "models/CommunityNote";
 import {
   ICommunityNotePath,
   IPagingDataOptional,
@@ -10,6 +10,9 @@ import {
 interface communityNoteState {
   filters: IUserInsightTab<ICommunityNotePath>[];
   feed: IPagingDataOptional<INote>;
+  reportMap: {
+    [key: string]: IPagingDataOptional<IReport>;
+  };
 }
 
 const initialState: communityNoteState = {
@@ -19,12 +22,25 @@ const initialState: communityNoteState = {
       path: "/community-notes",
     },
     {
-      label: "New",
+      label: "Need more ratings",
+      path: "/community-notes/nmr",
+    },
+    {
+      label: "New Report",
       path: "/community-notes/new",
     },
   ],
   feed: {},
+  reportMap: {},
 };
+
+export const getReports = createAsyncThunk(
+  "community-note/get-report",
+  async (payload: { type: string; page: number; limit: number }) => {
+    const res = await api.getReports();
+    return res;
+  }
+);
 
 export const getNotesByUrl = createAsyncThunk(
   "community-note/get-by-url",
@@ -65,13 +81,47 @@ const communityNoteSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getNotesByUrl.pending, (state, action) => {
-      if (action.meta.arg.page === 1) {
-        state.feed.loading = true;
-      } else {
-        state.feed.loadMore = true;
-      }
-    });
+    builder
+      .addCase(getReports.pending, (state, action) => {
+        const { page, type } = action.meta.arg;
+        if (page === 1) {
+          state.reportMap[type] = {
+            ...(state.reportMap[type] || {}),
+            loading: true,
+          };
+        } else {
+          state.reportMap[type] = {
+            ...(state.reportMap[type] || {}),
+            loadMore: true,
+          };
+        }
+      })
+      .addCase(getReports.fulfilled, (state, action) => {
+        const total = action.payload.metadata?.total || 0;
+        const limit = action.meta.arg.limit;
+        const type = action.meta.arg.type;
+        const totalPage = Math.ceil(total / limit);
+        const currentPage = action.meta.arg.page;
+        const data = action.payload?.data || [];
+        state.reportMap[type] = {
+          loading: false,
+          loadMore: false,
+          currentPage,
+          total,
+          canMore: totalPage > currentPage,
+          data:
+            currentPage === 1
+              ? data
+              : [...(state.reportMap?.[type]?.data || []), ...data],
+        };
+      })
+      .addCase(getNotesByUrl.pending, (state, action) => {
+        if (action.meta.arg.page === 1) {
+          state.feed.loading = true;
+        } else {
+          state.feed.loadMore = true;
+        }
+      });
     builder.addCase(getNotesByUrl.rejected, (state, action) => {
       state.feed.loading = false;
       state.feed.loadMore = false;

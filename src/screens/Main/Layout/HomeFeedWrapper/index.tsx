@@ -16,7 +16,12 @@ const HomeFeedWrapper = ({ children }: IHomeFeedWrapper) => {
   const pathname = usePathname();
   const renderFilter = useCallback(
     (item: IFCFilterType) => (
-      <FilterItem item={item} key={item.id} active={pathname === item.path} />
+      <FilterItem
+        path={item.path}
+        label={item.label}
+        key={item.id}
+        active={pathname === item.path}
+      />
     ),
     [pathname]
   );
