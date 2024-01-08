@@ -17,8 +17,11 @@ class GoogleAnalytics {
     if (!this.initial) {
       this.init();
     }
-    mixpanel.identify(CryptoJS.SHA1(user.fid).toString());
-    mixpanel.people.set({ name: CryptoJS.SHA1(user.fid).toString() });
+    const id = user.user_id || user.fid;
+    if (id) {
+      mixpanel.identify(CryptoJS.SHA1(id).toString());
+      mixpanel.people.set({ name: CryptoJS.SHA1(id).toString() });
+    }
   }
 
   async identifyByExtensionId(id: string) {
