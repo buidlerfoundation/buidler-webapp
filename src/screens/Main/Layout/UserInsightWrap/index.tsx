@@ -22,6 +22,7 @@ import {
   getUserProfile,
 } from "reducers/InsightReducers";
 import useUserRelationTabs from "hooks/useUserRelationTabs";
+import { Route } from "next";
 
 interface IUserInsightWrap {
   children: React.ReactNode;
@@ -158,7 +159,7 @@ const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
           <div className={styles.tabs}>
             {userTabsFiltered?.map((el) => (
               <Link
-                href={`${prefixPath}/insights/${username}${el.path}`}
+                href={`${prefixPath}/insights/${username}${el.path}` as Route}
                 key={el.path}
                 className={`${styles["tab-item"]} ${
                   pathname?.includes(el.path) ? styles.active : ""
@@ -174,7 +175,7 @@ const UserInsightWrap = ({ children, plugin }: IUserInsightWrap) => {
           <div className={styles.tabs}>
             {userRelationTabs?.map((el) => (
               <Link
-                href={`${prefixPath}/insights/${username}${el.path}`}
+                href={`${prefixPath}/insights/${username}${el.path}` as Route}
                 key={el.path}
                 className={`${styles["tab-item"]} ${
                   pathname?.includes(el.path) ? styles.active : ""

@@ -4,6 +4,7 @@ import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
 import { isUrlValid } from "helpers/LinkHelper";
 import { insertHttpIfNeed } from "helpers/CastHelper";
 import { useRouter } from "next/navigation";
+import { Route } from "next";
 
 const Explore = () => {
   const router = useRouter();
@@ -16,7 +17,7 @@ const Explore = () => {
     (e: any) => {
       e.preventDefault();
       if (isUrlValid(valueSubmit)) {
-        router.push(`${encodeURIComponent(valueSubmit)}`);
+        router.push(`${encodeURIComponent(valueSubmit)}` as Route);
       } else {
         // error
       }

@@ -35,7 +35,7 @@ const NoteFeedWrapper = ({ children }: INoteFeedWrapper) => {
           {filters.map(renderFilter)}
           <div className={styles["btn-report"]} onClick={onCreateReport}>
             <IconPlus fill="white" style={{ marginRight: 10 }} />
-            <span>New note</span>
+            <span>New report</span>
           </div>
         </nav>
       </div>

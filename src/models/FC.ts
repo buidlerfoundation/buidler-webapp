@@ -1,3 +1,5 @@
+import { Route } from "next";
+
 export interface ISignedKeyRequest {
   token?: string;
   deeplinkUrl?: string;
@@ -95,7 +97,7 @@ export interface IMetadataUrl {
 export interface IFCFilterType {
   label: string;
   id: string;
-  path: string;
+  path: Route;
   value:
     | "trending"
     | "newest"

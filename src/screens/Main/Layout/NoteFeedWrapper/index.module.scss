@@ -26,6 +26,20 @@
       align-items: center;
       column-gap: 15px;
     }
+    .btn-report {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      border-radius: 10px;
+      padding: 0 15px;
+      color: white;
+      background-color: #1159d5;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 22px;
+      margin-left: auto;
+      cursor: pointer;
+    }
   }
 }
 

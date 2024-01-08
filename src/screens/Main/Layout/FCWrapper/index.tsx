@@ -55,11 +55,12 @@ import { CircularProgress } from "@mui/material";
 import { useMagic } from "providers/MagicProvider";
 import IconMenuCommunityNote from "shared/SVG/FC/IconMenuCommunityNote";
 import WhiteListedModal from "shared/WhiteListedModal";
+import { Route } from "next";
 
 interface IMenuItem {
   active?: boolean;
   title: string;
-  to: string;
+  to: Route;
   icon: React.ReactElement;
   onClick?: () => void;
 }
@@ -229,7 +230,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
           await removeCookie(AsyncKey.requestTokenKey);
           await dispatch(getCurrentFCUser());
           if (redirectUrl) {
-            router.push(decodeURIComponent(redirectUrl));
+            router.push(decodeURIComponent(redirectUrl) as Route);
           }
         } else {
           trackingLoginFailed(res.message || "");
@@ -329,7 +330,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     setLoginLoading(false);
     if (_signedKeyRequest?.token) {
       if (isMobile && _signedKeyRequest?.deeplinkUrl) {
-        router.push(_signedKeyRequest.deeplinkUrl);
+        router.push(_signedKeyRequest.deeplinkUrl as Route);
       }
       await setCookie(AsyncKey.requestTokenKey, _signedKeyRequest?.token);
       setPolling(true);
@@ -401,7 +402,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
           setOpenLogin(false);
           setGettingMagicUserRedirect(false);
           if (redirectUrl) {
-            router.push(decodeURIComponent(redirectUrl));
+            router.push(decodeURIComponent(redirectUrl) as Route);
           }
           toggleModalWhiteListed();
         } else {

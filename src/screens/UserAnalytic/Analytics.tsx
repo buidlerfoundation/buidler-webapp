@@ -18,6 +18,7 @@ import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 import { usePathname, useRouter } from "next/navigation";
 import PastRelation from "./PastRelation";
 import useFCUserPastRelation from "hooks/useFCUserPastRelation";
+import { Route } from "next";
 
 interface IAnalytics {
   fid?: string;
@@ -44,7 +45,7 @@ const Analytics = ({ fid, period, username }: IAnalytics) => {
       loginElement?.click();
       return;
     } else {
-      router.push(`${pathname}/non-follower`);
+      router.push(`${pathname}/non-follower` as Route);
     }
   }, [dispatch, pathname, router, user]);
   return (

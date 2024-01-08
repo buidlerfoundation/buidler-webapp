@@ -22,6 +22,7 @@ import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 import Link from "next/link";
 import { followUser, unfollowUser } from "reducers/InsightReducers";
 import { usePathname } from "next/navigation";
+import { Route } from "next";
 
 interface IUserInfo {
   user?: IFCUser;
@@ -179,7 +180,10 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
         />
       )}
       <div className={styles["user-relate-info"]}>
-        <Link className={styles["relate-item"]} href={`${pathname}/following`}>
+        <Link
+          className={styles["relate-item"]}
+          href={`${pathname}/following` as Route}
+        >
           <span>
             <span className={styles["main-text"]}>
               {numeral(user?.total_following).format("0[.][0]a")}
@@ -187,7 +191,10 @@ const UserInfo = ({ user, loading }: IUserInfo) => {
             <span className={styles["sub-text"]}> Following</span>
           </span>
         </Link>
-        <Link className={styles["relate-item"]} href={`${pathname}/follower`}>
+        <Link
+          className={styles["relate-item"]}
+          href={`${pathname}/follower` as Route}
+        >
           <span>
             <span className={styles["main-text"]}>
               {numeral(user?.total_follower).format("0[.][0]a")}

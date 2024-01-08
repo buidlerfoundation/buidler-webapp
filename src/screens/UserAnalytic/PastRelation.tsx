@@ -12,6 +12,7 @@ import useUserRelationTabs from "hooks/useUserRelationTabs";
 import useAppSelector from "hooks/useAppSelector";
 import useAppDispatch from "hooks/useAppDispatch";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
+import { Route } from "next";
 
 interface IPastRelation {
   data?: IPastRelationData;
@@ -144,7 +145,9 @@ const PastRelation = ({ data, name, fid }: IPastRelation) => {
         {total > 0 && (
           <Link
             className={styles["btn-view-all"]}
-            href={`${pathname}${userRelationTabs[currentRelationIndex].path}`}
+            href={
+              `${pathname}${userRelationTabs[currentRelationIndex].path}` as Route
+            }
           >
             View all
           </Link>
