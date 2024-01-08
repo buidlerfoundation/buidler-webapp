@@ -292,6 +292,7 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
               id="btn-login"
               className={styles["btn-login"]}
               onClick={onLinkWithFarcaster}
+              style={{ position: "absolute" }}
             />
           )}
         </>

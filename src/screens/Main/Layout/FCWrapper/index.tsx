@@ -311,6 +311,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   }, [dispatch, exploreUrl]);
   const onWithoutLoginClick = useCallback(() => {
     pollingController.current.abort();
+    setOpenLinkWithFarcaster(false);
     setOpenLogin(false);
   }, []);
 
