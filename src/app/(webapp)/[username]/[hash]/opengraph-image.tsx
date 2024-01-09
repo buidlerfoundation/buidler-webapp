@@ -32,19 +32,19 @@ export default async function Image({
   );
   const [fontBold, fontSemibold, fontMedium, fontRegular] = await Promise.all([
     fetch(
-      new URL("../../../../public/fonts/SFUIText-Bold.woff", import.meta.url)
+      new URL("../../../../../public/fonts/SFUIText-Bold.woff", import.meta.url)
     ).then((res) => res.arrayBuffer()),
     fetch(
       new URL(
-        "../../../../public/fonts/SFUIText-Semibold.woff",
+        "../../../../../public/fonts/SFUIText-Semibold.woff",
         import.meta.url
       )
     ).then((res) => res.arrayBuffer()),
     fetch(
-      new URL("../../../../public/fonts/SFUIText-Medium.woff", import.meta.url)
+      new URL("../../../../../public/fonts/SFUIText-Medium.woff", import.meta.url)
     ).then((res) => res.arrayBuffer()),
     fetch(
-      new URL("../../../../public/fonts/SFUIText-Regular.woff", import.meta.url)
+      new URL("../../../../../public/fonts/SFUIText-Regular.woff", import.meta.url)
     ).then((res) => res.arrayBuffer()),
   ]);
   const author = castRes.data?.author;

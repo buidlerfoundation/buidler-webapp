@@ -11,7 +11,6 @@ import "screens/Website/css/responsive.scss";
 import "screens/Website/css/home.scss";
 import "screens/Website/css/home-responsive.scss";
 import "shared/AppToastNotification/index.scss";
-import Layout from "screens/Main/Layout";
 import moment from "moment";
 
 moment.updateLocale("en", {
@@ -71,7 +70,7 @@ export default function RootLayout({
         <Providers>
           <>
             <BootstrapClient />
-            <Layout>{children}</Layout>
+            {children}
           </>
         </Providers>
       </body>
