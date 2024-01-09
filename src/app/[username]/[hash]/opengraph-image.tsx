@@ -1,4 +1,5 @@
 import CallerServer from "api/CallerServer";
+import AppConfig from "common/AppConfig";
 import { normalizeContentCast, removeProtocol } from "helpers/CastHelper";
 import { ICast } from "models/FC";
 import moment from "moment";
@@ -226,7 +227,7 @@ export default async function Image({
                 fontFamily: "medium",
               }}
             >
-              buidler.app/{params.username}/0x{params.hash.slice(0, 6)}
+              buidler.app/{params.username}/0x{params.hash.slice(0, AppConfig.castDetailHashLength)}
             </span>
           </div>
         </div>

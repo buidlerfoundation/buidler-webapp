@@ -18,6 +18,7 @@ import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import { FC_USER_ACTIONS } from "reducers/FCUserReducers";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import useCastDetail from "hooks/useCastDetail";
+import AppConfig from "common/AppConfig";
 
 const HomeFeedDetail = () => {
   const dispatch = useAppDispatch();
@@ -27,7 +28,10 @@ const HomeFeedDetail = () => {
   const hash = useMemo(() => params?.hash, [params?.hash]);
   const [otherCasts, setOtherCasts] = useState<ICast[]>([]);
   const otherCastsFiltered = useMemo(
-    () => otherCasts.filter((el) => `0x${el.hash.slice(0, 6)}` !== hash),
+    () =>
+      otherCasts.filter(
+        (el) => `0x${el.hash.slice(0, AppConfig.castDetailHashLength)}` !== hash
+      ),
     [hash, otherCasts]
   );
   const castDetail = useCastDetail(hash);
