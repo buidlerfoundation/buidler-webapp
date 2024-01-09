@@ -22,6 +22,7 @@ const AppConfig = {
     process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "",
   websiteUrl: "https://buidler.app",
   loadMoreOffset: 500,
+  castDetailHashLength: 8,
 };
 
 export default AppConfig;

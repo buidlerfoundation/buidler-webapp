@@ -1,6 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ICast, IFCFilterType, IPagingData } from "models/FC";
 import api from "api";
+import AppConfig from "common/AppConfig";
 
 interface HomeFeedState {
   feedMap: {
@@ -224,14 +225,17 @@ const homeFeedSlice = createSlice({
       .addCase(getResultCastByHash.fulfilled, (state, action) => {
         const { parent_hash, hash, cast_author_fid } = action.meta.arg;
         if (hash && cast_author_fid && action.payload.data) {
-          const key = `0x${hash.slice(0, 6)}`;
+          const key = `0x${hash.slice(0, AppConfig.castDetailHashLength)}`;
           state.castDetailMap[key] = {
             loading: false,
             data: action.payload.data,
           };
         }
         if (parent_hash && action.payload.data) {
-          const key = `0x${parent_hash.slice(0, 6)}`;
+          const key = `0x${parent_hash.slice(
+            0,
+            AppConfig.castDetailHashLength
+          )}`;
           const castDetail = state.castDetailMap[key].data;
           if (castDetail) {
             castDetail.replies = {
