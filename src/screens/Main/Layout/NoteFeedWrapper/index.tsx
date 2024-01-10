@@ -1,20 +1,26 @@
 "use client";
 
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useState } from "react";
 import styles from "./index.module.scss";
 import { ICommunityNotePath, IUserInsightTab } from "models/FC";
 import { usePathname } from "next/navigation";
 import FilterItem from "shared/FilterItem";
 import useCommunityNoteFilters from "hooks/useCommunityNoteFilters";
 import IconPlus from "shared/SVG/IconPlus";
+import ModalSubmitReport from "shared/ModalSubmitReport";
 
 interface INoteFeedWrapper {
   children: React.ReactNode;
 }
 
 const NoteFeedWrapper = ({ children }: INoteFeedWrapper) => {
+  const [openReport, setOpenReport] = useState(false);
   const filters = useCommunityNoteFilters();
   const pathname = usePathname();
+  const toggleReport = useCallback(
+    () => setOpenReport((current) => !current),
+    []
+  );
   const renderFilter = useCallback(
     (item: IUserInsightTab<ICommunityNotePath>) => (
       <FilterItem
@@ -26,7 +32,9 @@ const NoteFeedWrapper = ({ children }: INoteFeedWrapper) => {
     ),
     [pathname]
   );
-  const onCreateReport = useCallback(() => {}, []);
+  const onCreateReport = useCallback(() => {
+    toggleReport();
+  }, [toggleReport]);
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -40,6 +48,7 @@ const NoteFeedWrapper = ({ children }: INoteFeedWrapper) => {
         </nav>
       </div>
       {children}
+      <ModalSubmitReport open={openReport} handleClose={toggleReport} />
     </div>
   );
 };

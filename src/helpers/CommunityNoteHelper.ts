@@ -57,3 +57,11 @@ export const emptyRating = {
   not_helpful_opinion_speculation: 0,
   not_helpful_note_not_needed: 0,
 };
+
+export const reportTypes = [
+  { label: "Misinformation" },
+  { label: "Phishing or Malware" },
+  { label: "Exploits or Hacked" },
+  { label: "Impersonation" },
+  { label: "Abuse or Violation" },
+];
