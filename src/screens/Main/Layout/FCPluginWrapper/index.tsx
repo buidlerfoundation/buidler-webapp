@@ -48,7 +48,7 @@ interface IFCPluginWrapper {
 
 const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
   const dispatch = useAppDispatch();
-  const { magicProvider } = useMagic();
+  const { magicProvider, magic } = useMagic();
   const pollingController = useRef(new AbortController());
   const router = useRouter();
   const pathname = usePathname();
@@ -80,14 +80,15 @@ const FCPluginWrapper = ({ children }: IFCPluginWrapper) => {
     () => pathname.includes("/community-note"),
     [pathname]
   );
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await magic?.user.logout();
     window.top?.postMessage(
       { type: "b-fc-plugin-logout" },
       { targetOrigin: "*" }
     );
     clearData();
     dispatch(logoutAction());
-  }, [dispatch]);
+  }, [dispatch, magic?.user]);
   const getPayloadToSubmit = useCallback((payload: any) => {
     if (payload.onlyLink) {
       return payload;

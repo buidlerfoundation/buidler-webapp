@@ -178,7 +178,8 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   const onCloseReviewResult = useCallback(() => {
     setResultData(null);
   }, []);
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await magic?.user.logout();
     window.top?.postMessage(
       { type: "b-fc-plugin-logout" },
       { targetOrigin: "*" }
@@ -187,7 +188,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     setOpenLogin(false);
     clearData();
     dispatch(logoutAction());
-  }, [dispatch]);
+  }, [dispatch, magic?.user]);
   const onCloseReply = useCallback(() => {
     dispatch(HOME_FEED_ACTIONS.updateReplyCast());
   }, [dispatch]);
@@ -295,9 +296,11 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     }
   }, [theme]);
   useEffect(() => {
-    checkingAuth();
+    if (magic) {
+      checkingAuth();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [magic]);
   useEffect(() => {
     dispatch(getFCChannels());
   }, [dispatch]);
