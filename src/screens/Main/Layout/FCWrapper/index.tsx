@@ -648,8 +648,10 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     };
   }, [windowScrollListener]);
   useEffect(() => {
-    finishSocialLogin();
-  }, [finishSocialLogin]);
+    if (query.get("provider")) {
+      finishSocialLogin();
+    }
+  }, [finishSocialLogin, query]);
   useEffect(() => {
     if (action === "login") {
       setOpenLogin(true);
