@@ -15,23 +15,6 @@ if (process.env.NODE_ENV === "development") {
   );
 }
 
-// export const makeStore = () =>
-//   configureStore({
-//     reducer: reducers,
-//     middleware: (getDefaultMiddleware) =>
-//       getDefaultMiddleware({
-//         thunk: {
-//           extraArgument: {
-//             api,
-//           },
-//         },
-//       }).concat(...logs),
-//   });
-
-// export type AppStore = ReturnType<typeof makeStore>;
-// export type AppRootState = ReturnType<AppStore["getState"]>;
-// export type AppDispatch = AppStore["dispatch"];
-
 export const store = configureStore({
   reducer: reducers,
   middleware: (getDefaultMiddleware) =>
@@ -44,5 +27,23 @@ export const store = configureStore({
     }).concat(...logs),
 });
 
+export const setupStore = (preloadedState?: Partial<RootState>) => {
+  return configureStore({
+    reducer: reducers,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        thunk: {
+          extraArgument: {
+            api,
+          },
+        },
+      }).concat(...logs),
+    preloadedState,
+  });
+};
+
+
+export type RootState = ReturnType<typeof reducers>
 export type AppRootState = ReturnType<typeof store.getState>;
+export type AppStore = ReturnType<typeof setupStore>
 export type AppDispatch = typeof store.dispatch;

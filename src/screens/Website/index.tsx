@@ -87,7 +87,7 @@ const Website = () => {
       <div className="container page-1">
         <h1 className="page-content">
           <span style={{ color: "var(--color-branding-secondary)" }}>
-            A web annotation
+            A web annotation{" "}
           </span>
           <br />
           built on top of Farcaster
