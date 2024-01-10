@@ -58,10 +58,10 @@ export const emptyRating = {
   not_helpful_note_not_needed: 0,
 };
 
-export const reportTypes = [
-  { label: "Misinformation" },
-  { label: "Phishing or Malware" },
-  { label: "Exploits or Hacked" },
-  { label: "Impersonation" },
-  { label: "Abuse or Violation" },
+export const reportTypes: ITag[] = [
+  { label: "Misinformation", key: "misinformation" },
+  { label: "Phishing or Malware", key: "phishing_or_malware" },
+  { label: "Exploits or Hacked", key: "exploits_or_hacked" },
+  { label: "Impersonation", key: "impersonation" },
+  { label: "Abuse or Violation", key: "abuse_or_violation" },
 ];
