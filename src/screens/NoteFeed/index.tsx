@@ -2,13 +2,13 @@
 
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
-import useReportFeedData from "hooks/useReportFeedData";
 import useAppDispatch from "hooks/useAppDispatch";
-import { getReports } from "reducers/CommunityNoteReducers";
+import { getDashboardLinks } from "reducers/CommunityNoteReducers";
 import LoadingItem from "shared/LoadingItem";
 import Spinner from "shared/Spinner";
-import { IReport } from "models/CommunityNote";
-import ReportItem from "shared/ReportItem";
+import { IDashboardLink, IReport } from "models/CommunityNote";
+import useDashboardLinkData from "hooks/useDashboardLinkData";
+import DashboardLinkItem from "shared/DashboardLinkItem";
 
 interface INoteFeed {
   filter: string;
@@ -16,17 +16,22 @@ interface INoteFeed {
 
 const NoteFeed = ({ filter }: INoteFeed) => {
   const dispatch = useAppDispatch();
-  const feedData = useReportFeedData(filter);
+  const feedData = useDashboardLinkData(filter);
   const feeds = useMemo(() => feedData?.data || [], [feedData?.data]);
 
   const renderFeed = useCallback(
-    (report: IReport) => <ReportItem key={report.id} report={report} />,
+    (dashboardLink: IDashboardLink) => (
+      <DashboardLinkItem
+        key={dashboardLink.url}
+        dashboardLink={dashboardLink}
+      />
+    ),
     []
   );
 
   useEffect(() => {
     if (!feedData) {
-      dispatch(getReports({ type: filter, page: 1, limit: 20 }));
+      dispatch(getDashboardLinks({ type: filter, page: 1, limit: 20 }));
     }
   }, [dispatch, feedData, filter]);
   return (

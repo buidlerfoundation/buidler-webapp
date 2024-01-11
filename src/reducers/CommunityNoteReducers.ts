@@ -1,6 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "api";
-import { INote, IReport } from "models/CommunityNote";
+import {
+  IDashboardLink,
+  INote,
+  IReport,
+  IReportCategory,
+} from "models/CommunityNote";
 import {
   ICommunityNotePath,
   IPagingDataOptional,
@@ -8,14 +13,16 @@ import {
 } from "models/FC";
 
 interface communityNoteState {
+  reportCategories: IReportCategory[];
   filters: IUserInsightTab<ICommunityNotePath>[];
   feed: IPagingDataOptional<INote>;
-  reportMap: {
-    [key: string]: IPagingDataOptional<IReport>;
+  dashboardLinkMap: {
+    [key: string]: IPagingDataOptional<IDashboardLink>;
   };
 }
 
 const initialState: communityNoteState = {
+  reportCategories: [],
   filters: [
     {
       label: "Rated helpful",
@@ -31,13 +38,21 @@ const initialState: communityNoteState = {
     },
   ],
   feed: {},
-  reportMap: {},
+  dashboardLinkMap: {},
 };
 
-export const getReports = createAsyncThunk(
-  "community-note/get-report",
+export const getReportCategories = createAsyncThunk(
+  "community-note/get-report-category",
+  async () => {
+    const res = await api.getReportCategories();
+    return res;
+  }
+);
+
+export const getDashboardLinks = createAsyncThunk(
+  "community-note/get-dashboard-links",
   async (payload: { type: string; page: number; limit: number }) => {
-    const res = await api.getReports();
+    const res = await api.getDashboardLinks();
     return res;
   }
 );
@@ -82,28 +97,31 @@ const communityNoteSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getReports.pending, (state, action) => {
+      .addCase(getReportCategories.fulfilled, (state, action) => {
+        state.reportCategories = action.payload.data || [];
+      })
+      .addCase(getDashboardLinks.pending, (state, action) => {
         const { page, type } = action.meta.arg;
         if (page === 1) {
-          state.reportMap[type] = {
-            ...(state.reportMap[type] || {}),
+          state.dashboardLinkMap[type] = {
+            ...(state.dashboardLinkMap[type] || {}),
             loading: true,
           };
         } else {
-          state.reportMap[type] = {
-            ...(state.reportMap[type] || {}),
+          state.dashboardLinkMap[type] = {
+            ...(state.dashboardLinkMap[type] || {}),
             loadMore: true,
           };
         }
       })
-      .addCase(getReports.fulfilled, (state, action) => {
+      .addCase(getDashboardLinks.fulfilled, (state, action) => {
         const total = action.payload.metadata?.total || 0;
         const limit = action.meta.arg.limit;
         const type = action.meta.arg.type;
         const totalPage = Math.ceil(total / limit);
         const currentPage = action.meta.arg.page;
         const data = action.payload?.data || [];
-        state.reportMap[type] = {
+        state.dashboardLinkMap[type] = {
           loading: false,
           loadMore: false,
           currentPage,
@@ -112,7 +130,7 @@ const communityNoteSlice = createSlice({
           data:
             currentPage === 1
               ? data
-              : [...(state.reportMap?.[type]?.data || []), ...data],
+              : [...(state.dashboardLinkMap?.[type]?.data || []), ...data],
         };
       })
       .addCase(getNotesByUrl.pending, (state, action) => {

@@ -1,4 +1,10 @@
-import { INote, IRating, IReport } from "models/CommunityNote";
+import {
+  IDashboardLink,
+  INote,
+  IRating,
+  IReport,
+  IReportCategory,
+} from "models/CommunityNote";
 import Caller from "./Caller";
 
 export const getListNotesByUrl = (params: {
@@ -28,3 +34,9 @@ export const deleteRating = (noteId: string) =>
 
 export const getReports = () =>
   Caller.get<IReport[]>("community-notes/reports");
+
+export const getReportCategories = () =>
+  Caller.get<IReportCategory[]>("community-notes/report-categories");
+
+export const getDashboardLinks = () =>
+  Caller.get<IDashboardLink[]>("community-notes/dashboard/notes");

@@ -42,7 +42,6 @@ import useFeedFilters from "hooks/useFeedFilters";
 import ComposeButton from "shared/ComposeButton";
 import ModalCompose from "shared/ModalCompose";
 import ModalReviewResult from "shared/ModalReviewResult";
-import IconMenuCommunity from "shared/SVG/FC/IconMenuCommunity";
 import useQuery from "hooks/useQuery";
 import IconMenuAnalytic from "shared/SVG/FC/IconMenuAnalytic";
 import ModalBugsReport from "shared/ModalBugsReport";
@@ -58,6 +57,9 @@ import { useMagic } from "providers/MagicProvider";
 import IconMenuCommunityNote from "shared/SVG/FC/IconMenuCommunityNote";
 import WhiteListedModal from "shared/WhiteListedModal";
 import { Route } from "next";
+import ModalSubmitReport from "shared/ModalSubmitReport";
+import IconDot from "shared/SVG/IconDot";
+import { getReportCategories } from "reducers/CommunityNoteReducers";
 
 interface IMenuItem {
   active?: boolean;
@@ -100,9 +102,10 @@ const MenuItemMemo = memo(MenuItem);
 
 interface IFCWrapper {
   children: React.ReactNode;
+  communityNote?: boolean;
 }
 
-const FCWrapper = ({ children }: IFCWrapper) => {
+const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const dispatch = useAppDispatch();
   const { magic, magicProvider } = useMagic();
   const [openMenu, setOpenMenu] = useState(false);
@@ -119,6 +122,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
   const router = useRouter();
   const [polling, setPolling] = useState(false);
   const [initialShareUrl, setInitialShareUrl] = useState("");
+  const [openReport, setOpenReport] = useState(false);
   const [openDiscussion, setOpenDiscussion] = useState(false);
   const [openBugsReport, setOpenBugsReport] = useState(false);
   const initialTheme = useMemo(() => query?.get("theme"), [query]);
@@ -158,6 +162,10 @@ const FCWrapper = ({ children }: IFCWrapper) => {
       pathname === "/active" ||
       pathname === "/top",
     [pathname]
+  );
+  const toggleReport = useCallback(
+    () => setOpenReport((current) => !current),
+    []
   );
   const toggleModalWhiteListed = useCallback(
     () => setOpenModalWhiteListed((current) => !current),
@@ -283,6 +291,11 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     }
     setLoading(false);
   }, [handleRefresh, linkWithFCAccount, dispatch]);
+  useEffect(() => {
+    if (communityNote) {
+      dispatch(getReportCategories());
+    }
+  }, [communityNote, dispatch]);
   useEffect(() => {
     getCookie(AsyncKey.themeKey).then((res) => {
       if (res) {
@@ -528,16 +541,16 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     [filters, pathname]
   );
   const activeAnalytic = useMemo(() => pathname === "/insights", [pathname]);
-  const activeCommunityNotes = useMemo(
-    () => pathname?.includes("/community-notes"),
+  const activeCommunityNoteHelpful = useMemo(
+    () => pathname === "/community-notes/helpful",
     [pathname]
   );
-  const activeExplore = useMemo(
-    () => pathname?.includes("/explore"),
+  const activeCommunityNoteNMR = useMemo(
+    () => pathname === "/community-notes/need-rating",
     [pathname]
   );
-  const activeCommunity = useMemo(
-    () => pathname?.includes("/community"),
+  const activeCommunityNoteNeedContext = useMemo(
+    () => pathname === "/community-notes/need-context",
     [pathname]
   );
   const onOpenDiscussion = useCallback(() => {
@@ -549,62 +562,68 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     setInitialShareUrl("");
     toggleDiscussion();
   }, [dispatch, fcUser, onLoginClick, toggleDiscussion]);
+  const onOpenModalReport = useCallback(() => {
+    if (!fcUser) {
+      dispatch(FC_USER_ACTIONS.updateLoginSource("Post Link"));
+      onLoginClick();
+      return;
+    }
+    toggleReport();
+  }, [dispatch, fcUser, onLoginClick, toggleReport]);
   const renderMenu = useCallback(
     () => (
       <div className={styles.menus}>
-        <MenuItemMemo
-          title="Home"
-          to="/home"
-          icon={
-            <IconMenuHome fill={activeHome ? activeColor : inactiveColor} />
-          }
-          active={activeHome}
-          onClick={onCloseSideMenu}
+        {!communityNote ? (
+          <>
+            <MenuItemMemo
+              title="Home"
+              to="/home"
+              icon={
+                <IconMenuHome fill={activeHome ? activeColor : inactiveColor} />
+              }
+              active={activeHome}
+              onClick={onCloseSideMenu}
+            />
+            <MenuItemMemo
+              title="Insights"
+              to="/insights"
+              icon={
+                <IconMenuAnalytic
+                  fill={activeAnalytic ? activeColor : inactiveColor}
+                />
+              }
+              active={activeAnalytic}
+              onClick={onCloseSideMenu}
+            />
+          </>
+        ) : (
+          <>
+            <MenuItemMemo
+              title="Helpful context"
+              to="/community-notes/helpful"
+              icon={<IconDot fill="var(--accent-blue)" />}
+              active={activeCommunityNoteHelpful}
+              onClick={onCloseSideMenu}
+            />
+            <MenuItemMemo
+              title="Need more rating"
+              to="/community-notes/need-rating"
+              icon={<IconDot fill="var(--accent-yellow)" />}
+              active={activeCommunityNoteNMR}
+              onClick={onCloseSideMenu}
+            />
+            <MenuItemMemo
+              title="Need add context"
+              to="/community-notes/need-context"
+              icon={<IconDot />}
+              active={activeCommunityNoteNeedContext}
+              onClick={onCloseSideMenu}
+            />
+          </>
+        )}
+        <ComposeButton
+          onClick={communityNote ? onOpenModalReport : onOpenDiscussion}
         />
-        <MenuItemMemo
-          title="Insights"
-          to="/insights"
-          icon={
-            <IconMenuAnalytic
-              fill={activeAnalytic ? activeColor : inactiveColor}
-            />
-          }
-          active={activeAnalytic}
-          onClick={onCloseSideMenu}
-        />
-        <MenuItemMemo
-          title="Community Notes"
-          to="/community-notes"
-          icon={
-            <IconMenuCommunityNote
-              fill={activeCommunityNotes ? activeColor : inactiveColor}
-              style={{ padding: 4 }}
-            />
-          }
-          active={activeCommunityNotes}
-          onClick={onCloseSideMenu}
-        />
-        {/* <MenuItemMemo
-          title="Communities"
-          to="/community"
-          icon={
-            <IconMenuCommunity
-              fill={activeCommunity ? activeColor : inactiveColor}
-            />
-          }
-          active={activeCommunity}
-        /> */}
-        {/* <MenuItemMemo
-          title="Explore"
-          to="/explore"
-          icon={
-            <IconMenuExplore
-              fill={activeExplore ? activeColor : inactiveColor}
-            />
-          }
-          active={activeExplore}
-        /> */}
-        <ComposeButton onClick={onOpenDiscussion} />
         {fcUser && (
           <div
             className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}
@@ -622,13 +641,17 @@ const FCWrapper = ({ children }: IFCWrapper) => {
     [
       activeAnalytic,
       activeColor,
-      activeCommunityNotes,
+      activeCommunityNoteHelpful,
+      activeCommunityNoteNMR,
+      activeCommunityNoteNeedContext,
       activeHome,
+      communityNote,
       fcUser,
       inactiveColor,
       onCloseSideMenu,
       onMenuClick,
       onOpenDiscussion,
+      onOpenModalReport,
       userAvatar,
     ]
   );
@@ -682,6 +705,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
             <IconBuidlerLogo size={30} />
           </div>
           <span style={{ margin: "0 10px" }}>Buidler</span>
+          {communityNote && <div className={styles["beta-tag"]}>beta</div>}
         </Link>
         {renderMenu()}
         {!isExtensionInstalled && (
@@ -789,7 +813,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
         handleClose={toggleModalWhiteListed}
         isWhiteListed={fcUser?.is_whitelisted}
       />
-      {/* <ScrollRestoration /> */}
+      <ModalSubmitReport open={openReport} handleClose={toggleReport} />
       <div id="btn-share-profile" onClick={onShareProfileClick} />
       <div id="btn-bugs-report" onClick={toggleBugsReport} />
     </div>

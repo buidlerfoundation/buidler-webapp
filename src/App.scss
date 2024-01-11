@@ -509,6 +509,8 @@ html {
   --color-light-text: #acacac;
   --color-muted-text: #616164;
   --color-shadow-popup: #00000040;
+  --accent-blue: #2563eb;
+  --accent-yellow: #fcb828;
 
   // Website
   --color-background-light: #fffbf2;
@@ -530,7 +532,7 @@ html {
   --color-bright-text: #ffffff;
   --color-primary-text: #000000;
   --color-secondary-text: #666666;
-  --color-mute-text: #949494;
+  --color-mute-text: #848484;
   --color-background-1: #ffffff;
   --color-background-opacity-1: #fffffff7;
   --color-background-2: #f8f8f8;
@@ -544,6 +546,8 @@ html {
   --color-recast: rgb(66, 183, 72);
   --color-like: rgb(213, 19, 56);
   --color-highlight-action-high: #f3f3f3;
+  --color-bg-blue: #e9effd;
+  --color-bg-yellow: #fef7e9;
 
   @media (prefers-color-scheme: dark) {
     --color-darkest-background: #121212;
@@ -577,6 +581,8 @@ html {
     --color-recast: rgb(66, 183, 72);
     --color-like: rgb(213, 19, 56);
     --color-highlight-action-high: #1e1e1e;
+    --color-bg-blue: #1b2438;
+    --color-bg-yellow: #191204;
   }
 }
 
@@ -638,6 +644,8 @@ html.light {
   --color-recast: rgb(66, 183, 72);
   --color-like: rgb(213, 19, 56);
   --color-highlight-action-high: #f3f3f3;
+  --color-bg-blue: #e9effd;
+  --color-bg-yellow: #fef7e9;
 }
 
 html.dark {
@@ -670,6 +678,8 @@ html.dark {
   --color-recast: rgb(66, 183, 72);
   --color-like: rgb(213, 19, 56);
   --color-highlight-action-high: #1e1e1e;
+  --color-bg-blue: #1b2438;
+  --color-bg-yellow: #191204;
 }
 
 html {

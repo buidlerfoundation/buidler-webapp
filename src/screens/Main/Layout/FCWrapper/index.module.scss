@@ -80,6 +80,17 @@
     }
   }
 
+  .beta-tag {
+    padding: 4px 8px;
+    background-color: var(--color-bg-blue);
+    border-radius: 3px;
+    color: var(--accent-blue);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 12px;
+    text-transform: uppercase;
+  }
+
   .side-border {
     border-left: 1px solid var(--color-stroke);
     border-right: 1px solid var(--color-stroke);

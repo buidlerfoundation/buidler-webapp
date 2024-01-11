@@ -19,7 +19,8 @@ export interface INote {
   not_misleading_personal_opinion: number;
   trustworthy_sources: number;
   summary?: string;
-  is_media_note: number;
+  is_media_note?: number;
+  final_rating_status?: string;
   created_at: string;
   updated_at: string;
   rating?: IRating;
@@ -56,18 +57,35 @@ export interface ITag {
   key: string;
 }
 
+export interface IReportCategory {
+  id: string;
+  name: string;
+  code: string;
+}
+
+export interface ILinkMetadata {
+  metadata_id: string;
+  url: string;
+  domain: string;
+  hostname: string;
+  data: IMetadataUrl;
+}
+
 export interface IReport {
   id: string;
-  user?: IFCUser;
   url: string;
   content?: string;
   created_at: string;
   updated_at: string;
-  metadata: {
-    metadata_id: string;
-    url: string;
-    domain: string;
-    hostname: string;
-    data: IMetadataUrl;
-  };
+  metadata: ILinkMetadata;
+  relation_categories: IReportCategory[];
+}
+
+export interface IDashboardLink {
+  url: string;
+  metadata: ILinkMetadata;
+  note?: INote;
+  report_categories?: IReportCategory[];
+  total_notes?: number;
+  total_reports?: number;
 }
