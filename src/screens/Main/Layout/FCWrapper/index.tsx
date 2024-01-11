@@ -606,7 +606,10 @@ const FCWrapper = ({ children }: IFCWrapper) => {
         /> */}
         <ComposeButton onClick={onOpenDiscussion} />
         {fcUser && (
-          <div className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}>
+          <div
+            className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}
+            onClick={onMenuClick}
+          >
             <ImageView
               src={userAvatar}
               className={styles.avatar}
@@ -624,6 +627,7 @@ const FCWrapper = ({ children }: IFCWrapper) => {
       fcUser,
       inactiveColor,
       onCloseSideMenu,
+      onMenuClick,
       onOpenDiscussion,
       userAvatar,
     ]
