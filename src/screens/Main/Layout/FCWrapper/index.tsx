@@ -61,11 +61,13 @@ import ModalSubmitReport from "shared/ModalSubmitReport";
 import IconDot from "shared/SVG/IconDot";
 import { getReportCategories } from "reducers/CommunityNoteReducers";
 import ModalSubmitNote from "shared/ModalSubmitNote";
+import IconPlus from "shared/SVG/IconPlus";
+import IconMenuReport from "shared/SVG/IconMenuReport";
 
 interface IMenuItem {
   active?: boolean;
   title: string;
-  to: Route;
+  to?: Route;
   icon: React.ReactElement;
   onClick?: () => void;
 }
@@ -81,20 +83,35 @@ const MenuItem = ({ active, title, to, icon, onClick }: IMenuItem) => {
     },
     [active, onClick]
   );
+  const renderBody = useCallback(
+    () => (
+      <>
+        {icon}
+        <span
+          style={{
+            marginLeft: 10,
+            color: active
+              ? "var(--color-primary-text)"
+              : "var(--color-secondary-text)",
+            fontWeight: active ? 700 : 600,
+          }}
+        >
+          {title}
+        </span>
+      </>
+    ),
+    [active, icon, title]
+  );
+  if (!to) {
+    return (
+      <div className={styles["menu-item"]} onClick={onClick}>
+        {renderBody()}
+      </div>
+    );
+  }
   return (
     <Link className={styles["menu-item"]} href={to} onClick={onMenuClick}>
-      {icon}
-      <span
-        style={{
-          marginLeft: 10,
-          color: active
-            ? "var(--color-primary-text)"
-            : "var(--color-secondary-text)",
-          fontWeight: active ? 700 : 600,
-        }}
-      >
-        {title}
-      </span>
+      {renderBody()}
     </Link>
   );
 };
@@ -154,7 +171,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const pollingController = useRef(new AbortController());
   const pathname = usePathname();
   const activeColor = useMemo(() => "var(--color-primary-text)", []);
-  const inactiveColor = useMemo(() => "var(--color-secondary-text)", []);
+  const inactiveColor = useMemo(() => "var(--color-mute-text)", []);
   const [resultData, setResultData] = useState<any>(null);
   const isMobile = useIsMobile();
   const showMobileMenu = useMemo(
@@ -609,6 +626,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
               active={activeAnalytic}
               onClick={onCloseSideMenu}
             />
+            <ComposeButton onClick={onOpenDiscussion} />
           </>
         ) : (
           <>
@@ -633,11 +651,32 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
               active={activeCommunityNoteNeedContext}
               onClick={onCloseSideMenu}
             />
+            <div
+              style={{
+                margin: "14px 25px 0 25px",
+                height: 2,
+                borderRadius: 1,
+                backgroundColor: "var(--color-highlight-action-high)",
+              }}
+            />
+            <MenuItemMemo
+              title="Add a note"
+              icon={
+                <IconPlus
+                  size={20}
+                  fill={inactiveColor}
+                  style={{ padding: 3 }}
+                />
+              }
+              onClick={onOpenModalAddNote}
+            />
+            <MenuItemMemo
+              title="Report a link"
+              icon={<IconMenuReport />}
+              onClick={onOpenModalReport}
+            />
           </>
         )}
-        <ComposeButton
-          onClick={communityNote ? onOpenModalAddNote : onOpenDiscussion}
-        />
         {fcUser && (
           <div
             className={`${styles["menu-item"]} ${styles["avatar-wrap"]}`}
@@ -666,6 +705,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
       onMenuClick,
       onOpenDiscussion,
       onOpenModalAddNote,
+      onOpenModalReport,
       userAvatar,
     ]
   );
@@ -706,7 +746,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
       <aside className={styles["left-side"]}>
         <Link
           className={`${styles["menu-item"]} ${styles["brand-wrap"]}`}
-          href="/home"
+          href={communityNote ? "/community-notes" : "/home"}
         >
           <div
             style={{
