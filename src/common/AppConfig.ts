@@ -23,6 +23,7 @@ const AppConfig = {
   websiteUrl: "https://buidler.app",
   loadMoreOffset: 500,
   castDetailHashLength: 8,
+  MAXIMUM_COMMUNITY_NOTE_LENGTH: 250,
 };
 
 export default AppConfig;

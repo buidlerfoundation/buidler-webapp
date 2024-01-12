@@ -65,3 +65,65 @@ export const reportTypes: ITag[] = [
   { label: "Impersonation", key: "impersonation" },
   { label: "Abuse or Violation", key: "abuse_or_violation" },
 ];
+
+export const notMisleadingTags: ITag[] = [
+  {
+    label: "It expresses a personal opinion",
+    key: "not_misleading_personal_opinion",
+  },
+  {
+    label: "It is clearly satirical/joking",
+    key: "not_misleading_clearly_satire",
+  },
+  {
+    label: "This Tweet was correct when written, but is out of date now",
+    key: "not_misleading_outdated_but_not_when_written",
+  },
+  {
+    label: "It expresses a factually correct claim",
+    key: "not_misleading_factually_correct",
+  },
+  {
+    label: "Other",
+    key: "not_misleading_other",
+  },
+];
+
+export const misleadingTags: ITag[] = [
+  {
+    label: "It is a joke or satire that might be misinterpreted as a fact",
+    key: "misleading_satire",
+  },
+  {
+    label: "It presents an unverified claim as a fact",
+    key: "misleading_unverified_claim_as_fact",
+  },
+  {
+    label: "It is a misrepresentation or missing important context",
+    key: "misleading_missing_important_context",
+  },
+  {
+    label: "It contains outdated information that may be misleading",
+    key: "misleading_outdated_information",
+  },
+  {
+    label: "It contains a digitally altered photo or video",
+    key: "misleading_manipulated_media",
+  },
+  {
+    label: "It contains a factual error",
+    key: "misleading_factual_error",
+  },
+  {
+    label: "Other",
+    key: "misleading_other",
+  },
+];
+
+export const otherTags: ITag[] = [
+  {
+    label:
+      "Did you link to sources you believe most people would consider trustworthy",
+    key: "trustworthy_sources",
+  },
+];

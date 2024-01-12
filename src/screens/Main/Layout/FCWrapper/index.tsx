@@ -60,6 +60,7 @@ import { Route } from "next";
 import ModalSubmitReport from "shared/ModalSubmitReport";
 import IconDot from "shared/SVG/IconDot";
 import { getReportCategories } from "reducers/CommunityNoteReducers";
+import ModalSubmitNote from "shared/ModalSubmitNote";
 
 interface IMenuItem {
   active?: boolean;
@@ -123,6 +124,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const [polling, setPolling] = useState(false);
   const [initialShareUrl, setInitialShareUrl] = useState("");
   const [openReport, setOpenReport] = useState(false);
+  const [openAddNote, setOpenAddNote] = useState(false);
   const [openDiscussion, setOpenDiscussion] = useState(false);
   const [openBugsReport, setOpenBugsReport] = useState(false);
   const initialTheme = useMemo(() => query?.get("theme"), [query]);
@@ -165,6 +167,10 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   );
   const toggleReport = useCallback(
     () => setOpenReport((current) => !current),
+    []
+  );
+  const toggleAddNote = useCallback(
+    () => setOpenAddNote((current) => !current),
     []
   );
   const toggleModalWhiteListed = useCallback(
@@ -570,6 +576,14 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     }
     toggleReport();
   }, [dispatch, fcUser, onLoginClick, toggleReport]);
+  const onOpenModalAddNote = useCallback(() => {
+    if (!fcUser) {
+      dispatch(FC_USER_ACTIONS.updateLoginSource("Post Link"));
+      onLoginClick();
+      return;
+    }
+    toggleAddNote();
+  }, [dispatch, fcUser, onLoginClick, toggleAddNote]);
   const renderMenu = useCallback(
     () => (
       <div className={styles.menus}>
@@ -622,7 +636,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           </>
         )}
         <ComposeButton
-          onClick={communityNote ? onOpenModalReport : onOpenDiscussion}
+          onClick={communityNote ? onOpenModalAddNote : onOpenDiscussion}
         />
         {fcUser && (
           <div
@@ -651,7 +665,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
       onCloseSideMenu,
       onMenuClick,
       onOpenDiscussion,
-      onOpenModalReport,
+      onOpenModalAddNote,
       userAvatar,
     ]
   );
@@ -814,6 +828,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         isWhiteListed={fcUser?.is_whitelisted}
       />
       <ModalSubmitReport open={openReport} handleClose={toggleReport} />
+      <ModalSubmitNote open={openAddNote} handleClose={toggleAddNote} />
       <div id="btn-share-profile" onClick={onShareProfileClick} />
       <div id="btn-bugs-report" onClick={toggleBugsReport} />
     </div>
