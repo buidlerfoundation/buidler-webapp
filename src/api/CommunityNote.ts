@@ -40,3 +40,9 @@ export const getReportCategories = () =>
 
 export const getDashboardLinks = () =>
   Caller.get<IDashboardLink[]>("community-notes/dashboard/notes");
+
+export const getDashboardLinksReportOnly = () =>
+  Caller.get<IDashboardLink[]>("community-notes/dashboard/reports");
+
+export const createReport = (body: any) =>
+  Caller.post("community-notes/reports", body);

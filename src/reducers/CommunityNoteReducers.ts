@@ -1,9 +1,9 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "api";
 import {
   IDashboardLink,
+  ILinkMetadata,
   INote,
-  IReport,
   IReportCategory,
 } from "models/CommunityNote";
 import {
@@ -12,6 +12,11 @@ import {
   IUserInsightTab,
 } from "models/FC";
 
+interface IOpenRateNote {
+  note?: INote;
+  metadata?: ILinkMetadata;
+}
+
 interface communityNoteState {
   reportCategories: IReportCategory[];
   filters: IUserInsightTab<ICommunityNotePath>[];
@@ -19,6 +24,7 @@ interface communityNoteState {
   dashboardLinkMap: {
     [key: string]: IPagingDataOptional<IDashboardLink>;
   };
+  openRateNote?: IOpenRateNote;
 }
 
 const initialState: communityNoteState = {
@@ -52,7 +58,12 @@ export const getReportCategories = createAsyncThunk(
 export const getDashboardLinks = createAsyncThunk(
   "community-note/get-dashboard-links",
   async (payload: { type: string; page: number; limit: number }) => {
-    const res = await api.getDashboardLinks();
+    let res;
+    if (payload.type === "new") {
+      res = await api.getDashboardLinksReportOnly();
+    } else {
+      res = await api.getDashboardLinks();
+    }
     return res;
   }
 );
@@ -94,7 +105,14 @@ export const deleteRating = createAsyncThunk(
 const communityNoteSlice = createSlice({
   name: "community-note",
   initialState,
-  reducers: {},
+  reducers: {
+    updateModalRateNote: (
+      state,
+      action: PayloadAction<IOpenRateNote | undefined>
+    ) => {
+      state.openRateNote = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getReportCategories.fulfilled, (state, action) => {

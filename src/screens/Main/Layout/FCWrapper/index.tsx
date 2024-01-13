@@ -59,10 +59,14 @@ import WhiteListedModal from "shared/WhiteListedModal";
 import { Route } from "next";
 import ModalSubmitReport from "shared/ModalSubmitReport";
 import IconDot from "shared/SVG/IconDot";
-import { getReportCategories } from "reducers/CommunityNoteReducers";
+import {
+  COMMUNITY_NOTE_ACTION,
+  getReportCategories,
+} from "reducers/CommunityNoteReducers";
 import ModalSubmitNote from "shared/ModalSubmitNote";
 import IconPlus from "shared/SVG/IconPlus";
 import IconMenuReport from "shared/SVG/IconMenuReport";
+import ModalRateNote from "shared/ModalRateNote";
 
 interface IMenuItem {
   active?: boolean;
@@ -160,6 +164,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   >(null);
   const isExtensionInstalled = useExtensionInstalled();
   const fcUser = useAppSelector((state) => state.fcUser?.data);
+  const rateNote = useAppSelector((state) => state.communityNote.openRateNote);
   const userAvatar = useMemo(
     () =>
       fcUser?.pfp?.url ||
@@ -190,6 +195,9 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     () => setOpenAddNote((current) => !current),
     []
   );
+  const onCloseModalRateNote = useCallback(() => {
+    dispatch(COMMUNITY_NOTE_ACTION.updateModalRateNote());
+  }, [dispatch]);
   const toggleModalWhiteListed = useCallback(
     () => setOpenModalWhiteListed((current) => !current),
     []
@@ -869,6 +877,12 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
       />
       <ModalSubmitReport open={openReport} handleClose={toggleReport} />
       <ModalSubmitNote open={openAddNote} handleClose={toggleAddNote} />
+      <ModalRateNote
+        open={!!rateNote}
+        handleClose={onCloseModalRateNote}
+        note={rateNote?.note}
+        metadata={rateNote?.metadata}
+      />
       <div id="btn-share-profile" onClick={onShareProfileClick} />
       <div id="btn-bugs-report" onClick={toggleBugsReport} />
     </div>
