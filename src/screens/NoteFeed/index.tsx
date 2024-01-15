@@ -18,6 +18,12 @@ const NoteFeed = ({ filter }: INoteFeed) => {
   const dispatch = useAppDispatch();
   const feedData = useDashboardLinkData(filter);
   const feeds = useMemo(() => feedData?.data || [], [feedData?.data]);
+  const feedsWithFiltered = useMemo(() => {
+    if (filter === "new") {
+      return feeds.filter((el) => !el.total_notes);
+    }
+    return feeds;
+  }, [feeds, filter]);
 
   const renderFeed = useCallback(
     (dashboardLink: IDashboardLink) => (
@@ -36,9 +42,9 @@ const NoteFeed = ({ filter }: INoteFeed) => {
   }, [dispatch, feedData, filter]);
   return (
     <ol className={styles.list}>
-      {feeds.length > 0 ? (
+      {feedsWithFiltered.length > 0 ? (
         <>
-          {feeds.map(renderFeed)}
+          {feedsWithFiltered.map(renderFeed)}
           {feedData?.loadMore && <LoadingItem />}
         </>
       ) : feedData?.loading ? (

@@ -67,6 +67,7 @@ import ModalSubmitNote from "shared/ModalSubmitNote";
 import IconPlus from "shared/SVG/IconPlus";
 import IconMenuReport from "shared/SVG/IconMenuReport";
 import ModalRateNote from "shared/ModalRateNote";
+import IconMenuUserRole from "shared/SVG/IconMenuUserRole";
 
 interface IMenuItem {
   active?: boolean;
@@ -579,6 +580,10 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     [filters, pathname]
   );
   const activeAnalytic = useMemo(() => pathname === "/insights", [pathname]);
+  const activeMyContributor = useMemo(
+    () => pathname === "/community-notes/contribute",
+    [pathname]
+  );
   const activeCommunityNoteHelpful = useMemo(
     () => pathname === "/community-notes/helpful",
     [pathname]
@@ -675,6 +680,17 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
               }}
             />
             <MenuItemMemo
+              title="My Contribution"
+              to="/community-notes/contribute"
+              icon={
+                <IconMenuUserRole
+                  fill={activeMyContributor ? activeColor : inactiveColor}
+                />
+              }
+              active={activeMyContributor}
+              onClick={onCloseSideMenu}
+            />
+            <MenuItemMemo
               title="Add a note"
               icon={
                 <IconPlus
@@ -713,6 +729,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
       activeCommunityNoteNMR,
       activeCommunityNoteNeedContext,
       activeHome,
+      activeMyContributor,
       communityNote,
       fcUser,
       inactiveColor,
