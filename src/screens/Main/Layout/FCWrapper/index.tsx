@@ -97,7 +97,7 @@ const MenuItem = ({ active, title, to, icon, onClick }: IMenuItem) => {
             color: active
               ? "var(--color-primary-text)"
               : "var(--color-secondary-text)",
-            fontWeight: active ? 700 : 600,
+            fontWeight: 600,
           }}
         >
           {title}
@@ -764,7 +764,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
               overflow: "hidden",
             }}
           >
-            <IconBuidlerLogo size={30} />
+            <IconBuidlerLogo size={30} style={{ borderRadius: 15 }} />
           </div>
           <span style={{ margin: "0 10px" }}>Buidler</span>
           {communityNote && <div className={styles["beta-tag"]}>beta</div>}

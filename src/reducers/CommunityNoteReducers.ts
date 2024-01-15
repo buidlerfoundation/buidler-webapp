@@ -4,6 +4,7 @@ import {
   IDashboardLink,
   ILinkMetadata,
   INote,
+  IReport,
   IReportCategory,
 } from "models/CommunityNote";
 import {
@@ -20,11 +21,22 @@ interface IOpenRateNote {
 interface communityNoteState {
   reportCategories: IReportCategory[];
   filters: IUserInsightTab<ICommunityNotePath>[];
-  feed: IPagingDataOptional<INote>;
+  feedMap: {
+    [key: string]: IPagingDataOptional<INote>;
+  };
   dashboardLinkMap: {
     [key: string]: IPagingDataOptional<IDashboardLink>;
   };
   openRateNote?: IOpenRateNote;
+  reportsMap: {
+    [key: string]: IPagingDataOptional<IReport>;
+  };
+  dashboardLinkDetailMap: {
+    [key: string]: {
+      data?: IDashboardLink;
+      loading?: boolean;
+    };
+  };
 }
 
 const initialState: communityNoteState = {
@@ -43,9 +55,27 @@ const initialState: communityNoteState = {
       path: "/community-notes/new",
     },
   ],
-  feed: {},
+  feedMap: {},
   dashboardLinkMap: {},
+  reportsMap: {},
+  dashboardLinkDetailMap: {},
 };
+
+export const getDashboardLinkByUrl = createAsyncThunk(
+  "community-note/get-dashboard-link-by-url",
+  async (payload: { url: string }) => {
+    const res = await api.getDashboardLinkDetail(payload.url);
+    return res;
+  }
+);
+
+export const getReportsByUrl = createAsyncThunk(
+  "community-note/get-report-by-url",
+  async (payload: { url: string; page: number; limit: number }) => {
+    const res = await api.getReportsByUrl(payload.url);
+    return res;
+  }
+);
 
 export const getReportCategories = createAsyncThunk(
   "community-note/get-report-category",
@@ -62,7 +92,11 @@ export const getDashboardLinks = createAsyncThunk(
     if (payload.type === "new") {
       res = await api.getDashboardLinksReportOnly();
     } else {
-      res = await api.getDashboardLinks();
+      const status =
+        payload.type === "helpful"
+          ? "currently_rated_helpful"
+          : "needs_more_ratings";
+      res = await api.getDashboardLinks(status);
     }
     return res;
   }
@@ -96,11 +130,66 @@ export const ratingNote = createAsyncThunk(
 
 export const deleteRating = createAsyncThunk(
   "community-note/delete-rating",
-  async (payload: { noteId: string }) => {
+  async (payload: { noteId: string; url: string }) => {
     const res = await api.deleteRating(payload.noteId);
     return res;
   }
 );
+
+const updateStatePendingMapKey = (
+  state: any,
+  keyMap: keyof communityNoteState,
+  page: number,
+  key: string
+) => {
+  if (page === 1) {
+    state[keyMap][key] = {
+      ...(state[keyMap][key] || {}),
+      loading: true,
+    };
+  } else {
+    state[keyMap][key] = {
+      ...(state[keyMap][key] || {}),
+      loadMore: true,
+    };
+  }
+};
+
+const updateStateRejectMapKey = (
+  state: any,
+  keyMap: keyof communityNoteState,
+  key: string
+) => {
+  state[keyMap][key] = {
+    ...(state[keyMap][key] || {}),
+    loading: false,
+    loadMore: false,
+  };
+};
+
+const updateStateFulFilled = (
+  state: any,
+  action: any,
+  keyMap: keyof communityNoteState,
+  key: string
+) => {
+  const total = action.payload.metadata?.total || 0;
+  const limit = action.meta.arg.limit;
+  const totalPage = Math.ceil(total / limit);
+  const currentPage = action.meta.arg.page;
+  const data = action.payload?.data || [];
+  state[keyMap][key] = {
+    loading: false,
+    loadMore: false,
+    currentPage,
+    total,
+    canMore: totalPage > currentPage,
+    data:
+      currentPage === 1
+        ? data
+        : [...(state[keyMap]?.[key]?.data || []), ...data],
+  };
+};
 
 const communityNoteSlice = createSlice({
   name: "community-note",
@@ -120,93 +209,114 @@ const communityNoteSlice = createSlice({
       })
       .addCase(getDashboardLinks.pending, (state, action) => {
         const { page, type } = action.meta.arg;
-        if (page === 1) {
-          state.dashboardLinkMap[type] = {
-            ...(state.dashboardLinkMap[type] || {}),
-            loading: true,
-          };
-        } else {
-          state.dashboardLinkMap[type] = {
-            ...(state.dashboardLinkMap[type] || {}),
-            loadMore: true,
-          };
-        }
+        updateStatePendingMapKey(state, "dashboardLinkMap", page, type);
+      })
+      .addCase(getDashboardLinks.rejected, (state, action) => {
+        const { type } = action.meta.arg;
+        updateStateRejectMapKey(state, "dashboardLinkMap", type);
       })
       .addCase(getDashboardLinks.fulfilled, (state, action) => {
-        const total = action.payload.metadata?.total || 0;
-        const limit = action.meta.arg.limit;
         const type = action.meta.arg.type;
-        const totalPage = Math.ceil(total / limit);
-        const currentPage = action.meta.arg.page;
-        const data = action.payload?.data || [];
-        state.dashboardLinkMap[type] = {
-          loading: false,
-          loadMore: false,
-          currentPage,
-          total,
-          canMore: totalPage > currentPage,
-          data:
-            currentPage === 1
-              ? data
-              : [...(state.dashboardLinkMap?.[type]?.data || []), ...data],
-        };
+        updateStateFulFilled(state, action, "dashboardLinkMap", type);
+      })
+      .addCase(getReportsByUrl.pending, (state, action) => {
+        const { page, url } = action.meta.arg;
+        updateStatePendingMapKey(state, "reportsMap", page, url);
+      })
+      .addCase(getReportsByUrl.rejected, (state, action) => {
+        const { url } = action.meta.arg;
+        updateStateRejectMapKey(state, "reportsMap", url);
+      })
+      .addCase(getReportsByUrl.fulfilled, (state, action) => {
+        const { url } = action.meta.arg;
+        updateStateFulFilled(state, action, "reportsMap", url);
       })
       .addCase(getNotesByUrl.pending, (state, action) => {
-        if (action.meta.arg.page === 1) {
-          state.feed.loading = true;
-        } else {
-          state.feed.loadMore = true;
-        }
-      });
-    builder.addCase(getNotesByUrl.rejected, (state, action) => {
-      state.feed.loading = false;
-      state.feed.loadMore = false;
-    });
-    builder
+        const { page, url } = action.meta.arg;
+        updateStatePendingMapKey(state, "feedMap", page, url);
+      })
+      .addCase(getNotesByUrl.rejected, (state, action) => {
+        const { url } = action.meta.arg;
+        updateStateRejectMapKey(state, "feedMap", url);
+      })
       .addCase(getNotesByUrl.fulfilled, (state, action) => {
-        const total = action.payload.metadata?.total || 0;
-        const limit = action.meta.arg.limit;
-        const totalPage = Math.ceil(total / limit);
-        const currentPage = action.meta.arg.page;
-        const data = action.payload?.data || [];
-        state.feed.data =
-          currentPage === 1 ? data : [...(state.feed.data || []), ...data];
-        state.feed.loadMore = false;
-        state.feed.loading = false;
-        state.feed.total = total;
-        state.feed.canMore = totalPage > currentPage;
-        state.feed.currentPage = currentPage;
+        const { url } = action.meta.arg;
+        updateStateFulFilled(state, action, "feedMap", url);
       })
       .addCase(ratingNote.fulfilled, (state, action) => {
-        if (action.payload.data && state.feed.data) {
-          state.feed.data = state.feed.data.map((el) => {
-            if (el.id === action.meta.arg.noteId) {
-              return {
-                ...el,
-                rating: action.payload.data,
-              };
-            }
-            return el;
-          });
+        if (action.payload.data) {
+          const url = action.payload.data.url;
+          const feed = { ...state.feedMap[url] };
+          const detail = { ...state.dashboardLinkDetailMap[url] };
+          if (feed.data) {
+            feed.data = feed.data.map((el) => {
+              if (el.id === action.meta.arg.noteId) {
+                return {
+                  ...el,
+                  rating: action.payload.data,
+                };
+              }
+              return el;
+            });
+            state.feedMap[url] = feed;
+          }
+          if (detail?.data?.note?.id === action.payload.data.note_id) {
+            detail.data.note.rating = action.payload.data;
+            state.dashboardLinkDetailMap[url] = detail;
+          }
         }
       })
       .addCase(deleteRating.fulfilled, (state, action) => {
-        if (action.payload.success && state.feed.data) {
-          state.feed.data = state.feed.data.map((el) => {
-            if (el.id === action.meta.arg.noteId) {
-              return {
-                ...el,
-                rating: undefined,
-              };
-            }
-            return el;
-          });
+        const url = action.meta.arg.url;
+        const feed = { ...state.feedMap[url] };
+        const detail = { ...state.dashboardLinkDetailMap[url] };
+        if (action.payload.success) {
+          if (feed.data) {
+            feed.data = feed.data.map((el) => {
+              if (el.id === action.meta.arg.noteId) {
+                return {
+                  ...el,
+                  rating: undefined,
+                };
+              }
+              return el;
+            });
+            state.feedMap[url] = feed;
+          }
+          if (detail?.data?.note?.id === action.meta.arg.noteId) {
+            detail.data.note.rating = undefined;
+            state.dashboardLinkDetailMap[url] = detail;
+          }
         }
       })
       .addCase(submitNote.fulfilled, (state, action) => {
         if (action.payload.data) {
-          state.feed.data = [action.payload.data, ...(state.feed.data || [])];
+          const url = action.payload.data.url;
+          const feed = { ...state.feedMap[url] };
+          feed.data = [action.payload.data, ...(feed.data || [])];
+          state.feedMap[url] = feed;
         }
+      })
+      .addCase(getDashboardLinkByUrl.pending, (state, action) => {
+        const url = action.meta.arg.url;
+        state.dashboardLinkDetailMap[url] = {
+          ...state.dashboardLinkDetailMap[url],
+          loading: true,
+        };
+      })
+      .addCase(getDashboardLinkByUrl.rejected, (state, action) => {
+        const url = action.meta.arg.url;
+        state.dashboardLinkDetailMap[url] = {
+          ...state.dashboardLinkDetailMap[url],
+          loading: false,
+        };
+      })
+      .addCase(getDashboardLinkByUrl.fulfilled, (state, action) => {
+        const url = action.meta.arg.url;
+        state.dashboardLinkDetailMap[url] = {
+          data: action.payload.data,
+          loading: false,
+        };
       });
   },
 });

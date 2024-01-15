@@ -38,11 +38,26 @@ export const getReports = () =>
 export const getReportCategories = () =>
   Caller.get<IReportCategory[]>("community-notes/report-categories");
 
-export const getDashboardLinks = () =>
-  Caller.get<IDashboardLink[]>("community-notes/dashboard/notes");
+export const getDashboardLinks = (status: string) =>
+  Caller.get<IDashboardLink[]>(
+    `community-notes/dashboard/notes?note_status=${status}`
+  );
 
 export const getDashboardLinksReportOnly = () =>
   Caller.get<IDashboardLink[]>("community-notes/dashboard/reports");
 
 export const createReport = (body: any) =>
   Caller.post("community-notes/reports", body);
+
+export const getReportsByUrl = (url: string) =>
+  Caller.get<IReport[]>(
+    `community-notes/reports?${new URLSearchParams({ url })}`
+  );
+
+export const getNotesByUrl = (url: string) =>
+  Caller.get<INote[]>(`community-notes/notes?${new URLSearchParams({ url })}`);
+
+export const getDashboardLinkDetail = (url: string) =>
+  Caller.get<IDashboardLink>(
+    `community-notes/dashboard?${new URLSearchParams({ url })}`
+  );

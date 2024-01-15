@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+  padding: 0 20px;
+  .report-category-item {
+    margin-top: 15px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--color-primary-text);
+    line-height: 26px;
+    border-bottom: 1px solid var(--color-highlight-action-high);
+  }
+}
+
+@media only screen and (max-width: 659px) {
+  .container {
+  }
+}

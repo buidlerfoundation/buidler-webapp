@@ -1,5 +1,7 @@
 import { IFCUser, IMetadataUrl } from "./FC";
 
+export type IRatingType = "helpful" | "somewhat_helpful" | "not_helpful" | undefined;
+
 export interface INote {
   id: string;
   participant_id: string;
@@ -28,10 +30,11 @@ export interface INote {
 
 export interface IRating {
   note_id: string;
+  url: string;
   participant_id: string;
   agree: number;
   disagree: number;
-  helpfulness_level?: string;
+  helpfulness_level?: IRatingType;
   helpful_other: number;
   helpful_clear: number;
   helpful_good_sources: number;
@@ -78,7 +81,7 @@ export interface IReport {
   created_at: string;
   updated_at: string;
   metadata: ILinkMetadata;
-  relation_categories: IReportCategory[];
+  category: IReportCategory;
 }
 
 export interface IDashboardLink {

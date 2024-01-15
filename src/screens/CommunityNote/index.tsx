@@ -1,5 +1,5 @@
 "use client";
-import React, { memo, useCallback, useEffect } from "react";
+import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import CommunityNoteItem from "shared/CommunityNoteItem";
 import useAppDispatch from "hooks/useAppDispatch";
@@ -9,16 +9,19 @@ import Spinner from "shared/Spinner";
 import Empty from "./Empty";
 import LoadingItem from "shared/LoadingItem";
 import AppConfig from "common/AppConfig";
+import useNotesData from "hooks/useNotesData";
 
 const CommunityNote = () => {
   const dispatch = useAppDispatch();
   const queryUrl = useAppSelector((state) => state.fcCast.queryUrl);
-  const notes = useAppSelector((state) => state.communityNote.feed.data);
-  const canMore = useAppSelector((state) => state.communityNote.feed.canMore);
-  const loading = useAppSelector((state) => state.communityNote.feed.loading);
-  const loadMore = useAppSelector((state) => state.communityNote.feed.loadMore);
-  const currentPage = useAppSelector(
-    (state) => state.communityNote.feed.currentPage
+  const notesData = useNotesData(queryUrl);
+  const notes = useMemo(() => notesData?.data, [notesData?.data]);
+  const canMore = useMemo(() => notesData?.canMore, [notesData?.canMore]);
+  const loading = useMemo(() => notesData?.loading, [notesData?.loading]);
+  const loadMore = useMemo(() => notesData?.loadMore, [notesData?.loadMore]);
+  const currentPage = useMemo(
+    () => notesData?.currentPage,
+    [notesData?.currentPage]
   );
   const onLogin = useCallback(() => {
     const loginElement = document.getElementById("btn-login");
