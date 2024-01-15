@@ -86,6 +86,7 @@ const CommunityNoteByUrlWrapper = ({
             <NoteItem
               note={dashboardDetail?.data?.note}
               onOpenRateNote={onOpenRateNote}
+              metadata={dashboardDetail?.data?.metadata}
             />
           )}
         </div>

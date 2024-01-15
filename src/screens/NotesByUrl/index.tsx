@@ -36,9 +36,14 @@ const NotesByUrl = () => {
   );
   const renderNote = useCallback(
     (note: INote) => (
-      <NoteItem key={note.id} note={note} onOpenRateNote={onOpenRateNote} />
+      <NoteItem
+        key={note.id}
+        note={note}
+        onOpenRateNote={onOpenRateNote}
+        metadata={dashboardDetail?.data?.metadata}
+      />
     ),
-    [onOpenRateNote]
+    [dashboardDetail?.data?.metadata, onOpenRateNote]
   );
   return (
     <div className={styles.container}>

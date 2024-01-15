@@ -165,6 +165,9 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const isExtensionInstalled = useExtensionInstalled();
   const fcUser = useAppSelector((state) => state.fcUser?.data);
   const rateNote = useAppSelector((state) => state.communityNote.openRateNote);
+  const metadataCreateNote = useAppSelector(
+    (state) => state.communityNote.openNoteMetadata
+  );
   const userAvatar = useMemo(
     () =>
       fcUser?.pfp?.url ||
@@ -191,10 +194,14 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     () => setOpenReport((current) => !current),
     []
   );
-  const toggleAddNote = useCallback(
-    () => setOpenAddNote((current) => !current),
-    []
-  );
+  const toggleAddNote = useCallback(() => {
+    if (metadataCreateNote) {
+      dispatch(COMMUNITY_NOTE_ACTION.updateModalNote());
+      setOpenAddNote(false);
+    } else {
+      setOpenAddNote((current) => !current);
+    }
+  }, [dispatch, metadataCreateNote]);
   const onCloseModalRateNote = useCallback(() => {
     dispatch(COMMUNITY_NOTE_ACTION.updateModalRateNote());
   }, [dispatch]);
@@ -876,7 +883,11 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         isWhiteListed={fcUser?.is_whitelisted}
       />
       <ModalSubmitReport open={openReport} handleClose={toggleReport} />
-      <ModalSubmitNote open={openAddNote} handleClose={toggleAddNote} />
+      <ModalSubmitNote
+        open={openAddNote || !!metadataCreateNote}
+        handleClose={toggleAddNote}
+        initialMetadata={metadataCreateNote}
+      />
       <ModalRateNote
         open={!!rateNote}
         handleClose={onCloseModalRateNote}

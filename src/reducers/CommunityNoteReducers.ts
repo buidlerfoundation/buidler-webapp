@@ -9,6 +9,7 @@ import {
 } from "models/CommunityNote";
 import {
   ICommunityNotePath,
+  IMetadataUrl,
   IPagingDataOptional,
   IUserInsightTab,
 } from "models/FC";
@@ -28,6 +29,7 @@ interface communityNoteState {
     [key: string]: IPagingDataOptional<IDashboardLink>;
   };
   openRateNote?: IOpenRateNote;
+  openNoteMetadata?: IMetadataUrl;
   reportsMap: {
     [key: string]: IPagingDataOptional<IReport>;
   };
@@ -200,6 +202,12 @@ const communityNoteSlice = createSlice({
       action: PayloadAction<IOpenRateNote | undefined>
     ) => {
       state.openRateNote = action.payload;
+    },
+    updateModalNote: (
+      state,
+      action: PayloadAction<IMetadataUrl | undefined>
+    ) => {
+      state.openNoteMetadata = action.payload;
     },
   },
   extraReducers: (builder) => {
