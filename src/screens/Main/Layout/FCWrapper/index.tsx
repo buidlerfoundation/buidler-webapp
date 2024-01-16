@@ -97,7 +97,7 @@ const MenuItem = ({ active, title, to, icon, onClick }: IMenuItem) => {
             marginLeft: 10,
             color: active
               ? "var(--color-primary-text)"
-              : "var(--color-secondary-text)",
+              : "var(--color-mute-text)",
             fontWeight: 600,
           }}
         >
