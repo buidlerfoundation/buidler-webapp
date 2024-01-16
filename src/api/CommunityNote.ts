@@ -38,13 +38,29 @@ export const getReports = () =>
 export const getReportCategories = () =>
   Caller.get<IReportCategory[]>("community-notes/report-categories");
 
-export const getDashboardLinks = (status: string) =>
+export const getDashboardLinks = (params: {
+  status: string;
+  page: number;
+  limit: number;
+}) =>
   Caller.get<IDashboardLink[]>(
-    `community-notes/dashboard/notes?note_status=${status}`
+    `community-notes/dashboard/notes?${new URLSearchParams({
+      note_status: params.status,
+      page: `${params.page}`,
+      limit: `${params.limit}`,
+    })}`
   );
 
-export const getDashboardLinksReportOnly = () =>
-  Caller.get<IDashboardLink[]>("community-notes/dashboard/reports");
+export const getDashboardLinksReportOnly = (params: {
+  page: number;
+  limit: number;
+}) =>
+  Caller.get<IDashboardLink[]>(
+    `community-notes/dashboard/reports?${new URLSearchParams({
+      page: `${params.page}`,
+      limit: `${params.limit}`,
+    })}`
+  );
 
 export const createReport = (body: any) =>
   Caller.post("community-notes/reports", body);

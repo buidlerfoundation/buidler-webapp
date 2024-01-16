@@ -92,13 +92,13 @@ export const getDashboardLinks = createAsyncThunk(
   async (payload: { type: string; page: number; limit: number }) => {
     let res;
     if (payload.type === "new") {
-      res = await api.getDashboardLinksReportOnly();
+      res = await api.getDashboardLinksReportOnly(payload);
     } else {
       const status =
         payload.type === "helpful"
           ? "currently_rated_helpful"
           : "needs_more_ratings";
-      res = await api.getDashboardLinks(status);
+      res = await api.getDashboardLinks({ status, ...payload });
     }
     return res;
   }
@@ -272,6 +272,28 @@ const communityNoteSlice = createSlice({
             detail.data.note.rating = action.payload.data;
             state.dashboardLinkDetailMap[url] = detail;
           }
+          for (const k in state.dashboardLinkMap) {
+            if (state.dashboardLinkMap[k]?.data) {
+              state.dashboardLinkMap[k].data = state.dashboardLinkMap[
+                k
+              ].data?.map((link) => {
+                if (
+                  link.url === url &&
+                  link.note &&
+                  link.note?.id === action.payload.data?.note_id
+                ) {
+                  return {
+                    ...link,
+                    note: {
+                      ...link.note,
+                      rating: action.payload.data,
+                    },
+                  };
+                }
+                return link;
+              });
+            }
+          }
         }
       })
       .addCase(deleteRating.fulfilled, (state, action) => {
@@ -295,6 +317,28 @@ const communityNoteSlice = createSlice({
             detail.data.note.rating = undefined;
             state.dashboardLinkDetailMap[url] = detail;
           }
+          for (const k in state.dashboardLinkMap) {
+            if (state.dashboardLinkMap[k]?.data) {
+              state.dashboardLinkMap[k].data = state.dashboardLinkMap[
+                k
+              ].data?.map((link) => {
+                if (
+                  link.url === url &&
+                  link.note &&
+                  link.note?.id === action.meta.arg.noteId
+                ) {
+                  return {
+                    ...link,
+                    note: {
+                      ...link.note,
+                      rating: undefined,
+                    },
+                  };
+                }
+                return link;
+              });
+            }
+          }
         }
       })
       .addCase(submitNote.fulfilled, (state, action) => {
@@ -303,6 +347,12 @@ const communityNoteSlice = createSlice({
           const feed = { ...state.feedMap[url] };
           feed.data = [action.payload.data, ...(feed.data || [])];
           state.feedMap[url] = feed;
+          if (state.dashboardLinkMap.new.data) {
+            state.dashboardLinkMap.new.data =
+              state.dashboardLinkMap.new.data.filter(
+                (link) => link.url !== url
+              );
+          }
         }
       })
       .addCase(getDashboardLinkByUrl.pending, (state, action) => {
