@@ -41,6 +41,14 @@ export const loginWithMagicLink = createAsyncThunk(
   }
 );
 
+export const requestCommunityNoteWriter = createAsyncThunk(
+  "fc_user/request-invitation",
+  async () => {
+    const res = await api.requestCommunityNoteWriter();
+    return res;
+  }
+);
+
 const fcUserSlice = createSlice({
   name: "fc_user",
   initialState,
@@ -71,6 +79,11 @@ const fcUserSlice = createSlice({
       })
       .addCase(getFCChannels.fulfilled, (state, action) => {
         state.channels = action.payload || [];
+      })
+      .addCase(requestCommunityNoteWriter.fulfilled, (state, action) => {
+        if (state.data && action.payload.data) {
+          state.data.community_note_invitation = action.payload.data;
+        }
       });
   },
 });

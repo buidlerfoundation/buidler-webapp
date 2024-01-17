@@ -10,6 +10,14 @@ export interface ISignedKeyRequest {
   signer_id?: string;
 }
 
+export interface ICommunityNoteInvitation {
+  id: string;
+  fid: string;
+  status: "approved" | "requested";
+  created_at: string;
+  updated_at: string;
+}
+
 export interface IFCUser {
   user_id?: string;
   address?: string;
@@ -48,6 +56,7 @@ export interface IFCUser {
   };
   has_active_badge?: boolean;
   is_whitelisted?: boolean;
+  community_note_invitation?: ICommunityNoteInvitation;
 }
 
 export interface ICast {

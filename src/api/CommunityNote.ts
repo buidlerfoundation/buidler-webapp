@@ -6,6 +6,7 @@ import {
   IReportCategory,
 } from "models/CommunityNote";
 import Caller from "./Caller";
+import { ICommunityNoteInvitation } from "models/FC";
 
 export const getListNotesByUrl = (params: {
   url: string;
@@ -45,7 +46,7 @@ export const getDashboardLinks = (params: {
 }) =>
   Caller.get<IDashboardLink[]>(
     `community-notes/dashboard/notes?${new URLSearchParams({
-      note_status: params.status,
+      "note_status[]": params.status,
       page: `${params.page}`,
       limit: `${params.limit}`,
     })}`
@@ -77,3 +78,6 @@ export const getDashboardLinkDetail = (url: string) =>
   Caller.get<IDashboardLink>(
     `community-notes/dashboard?${new URLSearchParams({ url })}`
   );
+
+export const requestCommunityNoteWriter = () =>
+  Caller.post<ICommunityNoteInvitation>("community-notes/invitations");

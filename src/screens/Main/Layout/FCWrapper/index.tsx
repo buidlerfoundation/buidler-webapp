@@ -28,7 +28,6 @@ import {
 import { logoutAction } from "reducers/actions";
 import useAppSelector from "hooks/useAppSelector";
 import ImageView from "shared/ImageView";
-import LoginFC from "shared/LoginFC";
 import { ISignedKeyRequest } from "models/FC";
 import api from "api";
 import toast from "react-hot-toast";
@@ -50,11 +49,9 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import useIsMobile from "hooks/useIsMobile";
 import { IDataToken } from "models/User";
-import MagicLogin from "shared/MagicLogin";
 import { MagicUserMetadata } from "magic-sdk";
 import { CircularProgress } from "@mui/material";
 import { useMagic } from "providers/MagicProvider";
-import IconMenuCommunityNote from "shared/SVG/FC/IconMenuCommunityNote";
 import WhiteListedModal from "shared/WhiteListedModal";
 import { Route } from "next";
 import ModalSubmitReport from "shared/ModalSubmitReport";
@@ -68,6 +65,8 @@ import IconPlus from "shared/SVG/IconPlus";
 import IconMenuReport from "shared/SVG/IconMenuReport";
 import ModalRateNote from "shared/ModalRateNote";
 import IconMenuUserRole from "shared/SVG/IconMenuUserRole";
+import PopupSignIn from "shared/PopupSignIn";
+import ModalJoinAsContributor from "shared/ModalJoinAsContributor";
 
 interface IMenuItem {
   active?: boolean;
@@ -133,12 +132,12 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const { magic, magicProvider } = useMagic();
   const [openMenu, setOpenMenu] = useState(false);
   const popupMenuRef = useRef<any>();
+  const popupLoginRef = useRef<any>();
+  const btnLoginRef = useRef<any>();
   const [loading, setLoading] = useState(true);
   const [loginLoading, setLoginLoading] = useState(false);
-  const [openLogin, setOpenLogin] = useState(false);
   const [openLinkWithFarcaster, setOpenLinkWithFarcaster] = useState(false);
   const [magicLoading, setMagicLoading] = useState(false);
-  const [openModalWhiteListed, setOpenModalWhiteListed] = useState(false);
   const [gettingMagicUserRedirect, setGettingMagicUserRedirect] =
     useState(false);
   const query = useQuery();
@@ -206,10 +205,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const onCloseModalRateNote = useCallback(() => {
     dispatch(COMMUNITY_NOTE_ACTION.updateModalRateNote());
   }, [dispatch]);
-  const toggleModalWhiteListed = useCallback(
-    () => setOpenModalWhiteListed((current) => !current),
-    []
-  );
   const toggleMenu = useCallback(() => setOpenMenu((current) => !current), []);
   const toggleBugsReport = useCallback(
     () => setOpenBugsReport((current) => !current),
@@ -232,7 +227,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
       { targetOrigin: "*" }
     );
     setSignedKeyRequest(null);
-    setOpenLogin(false);
     clearData();
     dispatch(logoutAction());
   }, [dispatch, magic?.user]);
@@ -286,16 +280,13 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           trackingLoginFailed(res.message || "");
         }
       }
-      setOpenLogin(false);
       setGettingMagicUserRedirect(false);
-      toggleModalWhiteListed();
     },
     [
       dispatch,
       magicProvider,
       redirectUrl,
       router,
-      toggleModalWhiteListed,
       trackingLoginFailed,
       trackingLoginSuccess,
     ]
@@ -367,10 +358,9 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
       );
     }
   }, [dispatch, exploreUrl]);
-  const onWithoutLoginClick = useCallback(() => {
+  const handleCloseLinkWithFarcaster = useCallback(() => {
     pollingController.current.abort();
     setOpenLinkWithFarcaster(false);
-    setOpenLogin(false);
   }, []);
 
   const requestSignerId = useCallback(async () => {
@@ -406,7 +396,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         toast.error(error.message);
         trackingLoginFailed(error.message);
         setSignedKeyRequest(null);
-        setOpenLogin(false);
+        setOpenLinkWithFarcaster(false);
       }
       setPolling(false);
     } else {
@@ -423,12 +413,16 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const onCloseMenu = useCallback(() => {
     popupMenuRef.current?.hide();
   }, []);
+  const onCloseMenuLogin = useCallback(() => {
+    popupLoginRef.current?.hide();
+  }, []);
   const onLinkWithFarcaster = useCallback(() => {
-    setOpenLogin(true);
     setOpenLinkWithFarcaster(true);
-    requestSignerId();
+    if (!fcUser?.fid) {
+      requestSignerId();
+    }
     onCloseMenu();
-  }, [onCloseMenu, requestSignerId]);
+  }, [fcUser?.fid, onCloseMenu, requestSignerId]);
   const onGetMagicUserMetadata = useCallback(
     async (magicUserMetadata: MagicUserMetadata) => {
       if (magicProvider) {
@@ -456,12 +450,10 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           trackingLoginSuccess();
           await dispatch(getCurrentFCUser());
           await removeCookie(AsyncKey.requestTokenKey);
-          setOpenLogin(false);
           setGettingMagicUserRedirect(false);
           if (redirectUrl) {
             router.push(decodeURIComponent(redirectUrl) as Route);
           }
-          toggleModalWhiteListed();
         } else {
           const signerId = await getCookie(AsyncKey.signerIdKey);
           if (signerId) {
@@ -481,15 +473,12 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
       redirectUrl,
       router,
       saveTokenCookie,
-      toggleModalWhiteListed,
       trackingLoginSuccess,
     ]
   );
-  const onCloseMagicLogin = useCallback(() => {
-    setOpenLogin(false);
-  }, []);
   const onLoginClick = useCallback(async () => {
-    setOpenLogin(true);
+    // setOpenLogin(true);
+    popupLoginRef.current.show(btnLoginRef.current);
   }, []);
   const finishSocialLogin = useCallback(async () => {
     if (magic) {
@@ -545,6 +534,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           {!fcUser.fid && (
             <div
               id="btn-login"
+              ref={btnLoginRef}
               className={styles["btn-login"]}
               onClick={onLinkWithFarcaster}
             />
@@ -555,6 +545,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     return (
       <div
         id="btn-login"
+        ref={btnLoginRef}
         className={styles["btn-login"]}
         onClick={onLoginClick}
       >
@@ -673,7 +664,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
             />
             <div
               style={{
-                margin: "14px 25px 0 25px",
+                margin: "24px 25px 4px 25px",
                 height: 2,
                 borderRadius: 1,
                 backgroundColor: "var(--color-highlight-action-high)",
@@ -770,7 +761,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   }, [finishSocialLogin, query]);
   useEffect(() => {
     if (action === "login") {
-      setOpenLogin(true);
+      btnLoginRef.current?.click?.();
     }
   }, [action]);
   return (
@@ -846,24 +837,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         {children}
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>
-      {!fcUser?.fid && openLogin && (
-        <div className={styles["login__wrap"]} onClick={onWithoutLoginClick}>
-          {!openLinkWithFarcaster ? (
-            <MagicLogin
-              handleClose={onCloseMagicLogin}
-              onLogged={onGetMagicUserMetadata}
-              setMagicLoading={setMagicLoading}
-              magicLoading={magicLoading}
-              redirect={redirect}
-            />
-          ) : (
-            <LoginFC
-              deepLink={signedKeyRequest?.deeplinkUrl}
-              onWithoutLoginClick={onWithoutLoginClick}
-            />
-          )}
-        </div>
-      )}
       {fcUser?.fid && (
         <ModalFCReply
           open={!!replyCast}
@@ -882,6 +855,13 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           />
         }
       />
+      <PopoverButton
+        ref={popupLoginRef}
+        popupOnly
+        componentPopup={
+          <PopupSignIn onClose={onCloseMenuLogin} redirect={redirect} />
+        }
+      />
       <ModalCompose
         open={openDiscussion}
         handleClose={toggleDiscussion}
@@ -894,11 +874,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         handleClose={onCloseReviewResult}
       />
       <ModalBugsReport open={openBugsReport} handleClose={toggleBugsReport} />
-      <WhiteListedModal
-        open={openModalWhiteListed}
-        handleClose={toggleModalWhiteListed}
-        isWhiteListed={fcUser?.is_whitelisted}
-      />
       <ModalSubmitReport open={openReport} handleClose={toggleReport} />
       <ModalSubmitNote
         open={openAddNote || !!metadataCreateNote}
@@ -910,6 +885,11 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         handleClose={onCloseModalRateNote}
         note={rateNote?.note}
         metadata={rateNote?.metadata}
+      />
+      <ModalJoinAsContributor
+        open={openLinkWithFarcaster}
+        handleClose={handleCloseLinkWithFarcaster}
+        deepLink={signedKeyRequest?.deeplinkUrl}
       />
       <div id="btn-share-profile" onClick={onShareProfileClick} />
       <div id="btn-bugs-report" onClick={toggleBugsReport} />
