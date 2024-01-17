@@ -67,6 +67,7 @@ import ModalRateNote from "shared/ModalRateNote";
 import IconMenuUserRole from "shared/SVG/IconMenuUserRole";
 import PopupSignIn from "shared/PopupSignIn";
 import ModalJoinAsContributor from "shared/ModalJoinAsContributor";
+import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
 
 interface IMenuItem {
   active?: boolean;
@@ -168,6 +169,9 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const metadataCreateNote = useAppSelector(
     (state) => state.communityNote.openNoteMetadata
   );
+  const metadataCreateReport = useAppSelector(
+    (state) => state.communityNote.openReportMetadata
+  );
   const userAvatar = useMemo(
     () =>
       fcUser?.pfp?.url ||
@@ -190,10 +194,14 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
       pathname === "/top",
     [pathname]
   );
-  const toggleReport = useCallback(
-    () => setOpenReport((current) => !current),
-    []
-  );
+  const toggleReport = useCallback(() => {
+    if (metadataCreateReport) {
+      dispatch(COMMUNITY_NOTE_ACTION.updateModalReport());
+      setOpenReport(false);
+    } else {
+      setOpenReport((current) => !current);
+    }
+  }, [dispatch, metadataCreateReport]);
   const toggleAddNote = useCallback(() => {
     if (metadataCreateNote) {
       dispatch(COMMUNITY_NOTE_ACTION.updateModalNote());
@@ -641,6 +649,13 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           </>
         ) : (
           <>
+            <Link
+              href="/community-notes/explore"
+              className={styles["search-box"]}
+            >
+              <IconMenuExplore fill="var(--color-mute-text)" />
+              Search
+            </Link>
             <MenuItemMemo
               title="Helpful context"
               to="/community-notes/helpful"
@@ -876,7 +891,11 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         handleClose={onCloseReviewResult}
       />
       <ModalBugsReport open={openBugsReport} handleClose={toggleBugsReport} />
-      <ModalSubmitReport open={openReport} handleClose={toggleReport} />
+      <ModalSubmitReport
+        open={openReport || !!metadataCreateReport}
+        handleClose={toggleReport}
+        initialMetadata={metadataCreateReport}
+      />
       <ModalSubmitNote
         open={openAddNote || !!metadataCreateNote}
         handleClose={toggleAddNote}

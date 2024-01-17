@@ -29,7 +29,8 @@ interface communityNoteState {
     [key: string]: IPagingDataOptional<IDashboardLink>;
   };
   openRateNote?: IOpenRateNote;
-  openNoteMetadata?: IMetadataUrl;
+  openNoteMetadata?: IMetadataUrl | null;
+  openReportMetadata?: IMetadataUrl | null;
   reportsMap: {
     [key: string]: IPagingDataOptional<IReport>;
   };
@@ -205,9 +206,15 @@ const communityNoteSlice = createSlice({
     },
     updateModalNote: (
       state,
-      action: PayloadAction<IMetadataUrl | undefined>
+      action: PayloadAction<IMetadataUrl | undefined | null>
     ) => {
       state.openNoteMetadata = action.payload;
+    },
+    updateModalReport: (
+      state,
+      action: PayloadAction<IMetadataUrl | undefined | null>
+    ) => {
+      state.openReportMetadata = action.payload;
     },
   },
   extraReducers: (builder) => {

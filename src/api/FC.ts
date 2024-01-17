@@ -100,11 +100,14 @@ export const removeRecast = (hash: string) =>
 export const removeLike = (hash: string) =>
   Caller.delete(`reactions/${hash}/like`);
 
-export const getEmbeddedMetadata = (url: string) =>
+export const getEmbeddedMetadata = (
+  url: string,
+  controller?: AbortController
+) =>
   Caller.get<IMetadataUrl>(
     `external/metadata?${new URLSearchParams({ url })}`,
     undefined,
-    undefined,
+    controller,
     true
   );
 

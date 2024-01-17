@@ -12,14 +12,19 @@ import useAppDispatch from "hooks/useAppDispatch";
 import { COMMUNITY_NOTE_ACTION } from "reducers/CommunityNoteReducers";
 import useDashboardLinkDetailData from "hooks/useDashboardLinkDetailData";
 
-const NotesByUrl = () => {
+interface INotesByUrl {
+  searchUrl?: string;
+}
+
+const NotesByUrl = ({ searchUrl }: INotesByUrl) => {
   const dispatch = useAppDispatch();
   const query = useQuery();
   const exploreUrl = useMemo(() => {
+    if (searchUrl !== undefined) return searchUrl;
     const url = query.get("url");
     if (!url) return "";
     return decodeURIComponent(url);
-  }, [query]);
+  }, [query, searchUrl]);
   const notesData = useNotesData(exploreUrl);
   const dashboardDetail = useDashboardLinkDetailData(exploreUrl);
   const notes = useMemo(() => notesData?.data || [], [notesData?.data]);
@@ -46,7 +51,7 @@ const NotesByUrl = () => {
     [dashboardDetail?.data?.metadata, onOpenRateNote]
   );
   return (
-    <div className={styles.container}>
+    <div className="page-container">
       {notes.length > 0 ? (
         <>
           {notes.map(renderNote)}

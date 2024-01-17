@@ -8,13 +8,18 @@ import { IReport } from "models/CommunityNote";
 import LoadingItem from "shared/LoadingItem";
 import Spinner from "shared/Spinner";
 
-const ReportsByUrl = () => {
+interface IReportsByUrl {
+  searchUrl?: string;
+}
+
+const ReportsByUrl = ({ searchUrl }: IReportsByUrl) => {
   const query = useQuery();
   const exploreUrl = useMemo(() => {
+    if (searchUrl !== undefined) return searchUrl;
     const url = query.get("url");
     if (!url) return "";
     return decodeURIComponent(url);
-  }, [query]);
+  }, [query, searchUrl]);
   const reportsData = useReportsData(exploreUrl);
   const reports = useMemo(() => reportsData?.data || [], [reportsData?.data]);
   const renderReport = useCallback(
@@ -26,7 +31,7 @@ const ReportsByUrl = () => {
     []
   );
   return (
-    <div className={styles.container}>
+    <div className="page-container">
       {reports.length > 0 ? (
         <>
           {reports.map(renderReport)}

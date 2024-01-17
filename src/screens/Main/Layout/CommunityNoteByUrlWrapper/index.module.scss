@@ -66,6 +66,34 @@
     display: flex;
     flex-direction: column;
   }
+  .empty-description {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 26px;
+    color: var(--color-mute-text);
+    padding: 0 20px 20px 20px;
+  }
+  .btn-empty {
+    display: flex;
+    align-items: center;
+    margin: 5px 10px;
+    height: 40px;
+    gap: 10px;
+    padding: 0 20px 0 15px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 22px;
+    color: var(--color-mute-text);
+    align-self: flex-start;
+    &:hover {
+      border-radius: 10px;
+      background-color: var(--color-lighter-background);
+      cursor: pointer;
+    }
+  }
+  :global(.domain-input) {
+    margin: 0 20px 40px 20px;
+  }
 }
 
 @media only screen and (max-width: 659px) {
