@@ -761,7 +761,9 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   }, [finishSocialLogin, query]);
   useEffect(() => {
     if (action === "login") {
-      btnLoginRef.current?.click?.();
+      setTimeout(() => {
+        btnLoginRef.current?.click?.();
+      }, 500);
     }
   }, [action]);
   return (

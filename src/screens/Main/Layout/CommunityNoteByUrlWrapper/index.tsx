@@ -100,6 +100,7 @@ const CommunityNoteByUrlWrapper = ({
             className={`${styles["btn-tab"]} ${
               activeNote ? styles["btn-active"] : ""
             }`}
+            replace
           >
             {totalNotes} Notes
           </Link>
@@ -112,6 +113,7 @@ const CommunityNoteByUrlWrapper = ({
             className={`${styles["btn-tab"]} ${
               activeReport ? styles["btn-active"] : ""
             }`}
+            replace
           >
             {totalReports} Reports
           </Link>
