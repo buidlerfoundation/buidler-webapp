@@ -354,7 +354,7 @@ const communityNoteSlice = createSlice({
           const feed = { ...state.feedMap[url] };
           feed.data = [action.payload.data, ...(feed.data || [])];
           state.feedMap[url] = feed;
-          if (state.dashboardLinkMap.new.data) {
+          if (state.dashboardLinkMap?.new?.data) {
             state.dashboardLinkMap.new.data =
               state.dashboardLinkMap.new.data.filter(
                 (link) => link.url !== url
