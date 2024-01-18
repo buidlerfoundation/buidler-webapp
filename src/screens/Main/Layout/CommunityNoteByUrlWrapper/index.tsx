@@ -148,6 +148,10 @@ const CommunityNoteByUrlWrapper = ({
                     metadata={dashboardDetail?.data?.metadata}
                   />
                 )}
+                <NoteItem
+                  onOpenRateNote={onOpenRateNote}
+                  metadata={dashboardDetail?.data?.metadata}
+                />
               </div>
             )}
             {!isExplore && (
