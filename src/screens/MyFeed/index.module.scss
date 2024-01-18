@@ -1,0 +1,11 @@
+.list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+@media only screen and (max-width: 659px) {
+  .list {
+  }
+}

@@ -13,6 +13,7 @@ import {
   IPagingDataOptional,
   IUserInsightTab,
 } from "models/FC";
+import { IPagingParams } from "models/User";
 
 interface IOpenRateNote {
   note?: INote;
@@ -40,6 +41,10 @@ interface communityNoteState {
       loading?: boolean;
     };
   };
+  myDashboardLink: {
+    notes?: IPagingDataOptional<IDashboardLink>;
+    ratings?: IPagingDataOptional<IDashboardLink>;
+  };
 }
 
 const initialState: communityNoteState = {
@@ -62,7 +67,24 @@ const initialState: communityNoteState = {
   dashboardLinkMap: {},
   reportsMap: {},
   dashboardLinkDetailMap: {},
+  myDashboardLink: {},
 };
+
+export const getMyDashboardLinkNotes = createAsyncThunk(
+  "community-note/get-my-dashboard-link-notes",
+  async (payload: IPagingParams) => {
+    const res = await api.getMyDashboardLinkNotes(payload);
+    return res;
+  }
+);
+
+export const getMyDashboardLinkRatings = createAsyncThunk(
+  "community-note/get-my-dashboard-link-rates",
+  async (payload: IPagingParams) => {
+    const res = await api.getMyDashboardLinkRatings(payload);
+    return res;
+  }
+);
 
 export const getDashboardLinkByUrl = createAsyncThunk(
   "community-note/get-dashboard-link-by-url",
@@ -221,6 +243,26 @@ const communityNoteSlice = createSlice({
     builder
       .addCase(getReportCategories.fulfilled, (state, action) => {
         state.reportCategories = action.payload.data || [];
+      })
+      .addCase(getMyDashboardLinkNotes.pending, (state, action) => {
+        const { page } = action.meta.arg;
+        updateStatePendingMapKey(state, "myDashboardLink", page, "notes");
+      })
+      .addCase(getMyDashboardLinkNotes.rejected, (state) => {
+        updateStateRejectMapKey(state, "myDashboardLink", "notes");
+      })
+      .addCase(getMyDashboardLinkNotes.fulfilled, (state, action) => {
+        updateStateFulFilled(state, action, "myDashboardLink", "notes");
+      })
+      .addCase(getMyDashboardLinkRatings.pending, (state, action) => {
+        const { page } = action.meta.arg;
+        updateStatePendingMapKey(state, "myDashboardLink", page, "ratings");
+      })
+      .addCase(getMyDashboardLinkRatings.rejected, (state) => {
+        updateStateRejectMapKey(state, "myDashboardLink", "ratings");
+      })
+      .addCase(getMyDashboardLinkRatings.fulfilled, (state, action) => {
+        updateStateFulFilled(state, action, "myDashboardLink", "ratings");
       })
       .addCase(getDashboardLinks.pending, (state, action) => {
         const { page, type } = action.meta.arg;

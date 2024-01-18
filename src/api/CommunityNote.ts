@@ -7,6 +7,7 @@ import {
 } from "models/CommunityNote";
 import Caller from "./Caller";
 import { ICommunityNoteInvitation } from "models/FC";
+import { IPagingParams } from "models/User";
 
 export const getListNotesByUrl = (params: {
   url: string;
@@ -81,3 +82,19 @@ export const getDashboardLinkDetail = (url: string) =>
 
 export const requestCommunityNoteWriter = () =>
   Caller.post<ICommunityNoteInvitation>("community-notes/invitations");
+
+export const getMyDashboardLinkNotes = (params: IPagingParams) =>
+  Caller.get<IDashboardLink[]>(
+    `community-notes/contributors/notes?${new URLSearchParams({
+      page: `${params.page}`,
+      limit: `${params.limit}`,
+    })}`
+  );
+
+export const getMyDashboardLinkRatings = (params: IPagingParams) =>
+  Caller.get<IDashboardLink[]>(
+    `community-notes/contributors/ratings?${new URLSearchParams({
+      page: `${params.page}`,
+      limit: `${params.limit}`,
+    })}`
+  );

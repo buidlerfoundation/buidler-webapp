@@ -573,7 +573,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   );
   const activeAnalytic = useMemo(() => pathname === "/insights", [pathname]);
   const activeMyContributor = useMemo(
-    () => pathname === "/community-notes/contribute",
+    () => pathname.includes("/community-notes/contribute"),
     [pathname]
   );
   const activeCommunityNoteHelpful = useMemo(

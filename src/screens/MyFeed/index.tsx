@@ -3,33 +3,30 @@
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 import useAppDispatch from "hooks/useAppDispatch";
-import { getDashboardLinks } from "reducers/CommunityNoteReducers";
+import {
+  getMyDashboardLinkNotes,
+  getMyDashboardLinkRatings,
+} from "reducers/CommunityNoteReducers";
 import LoadingItem from "shared/LoadingItem";
 import Spinner from "shared/Spinner";
 import { IDashboardLink } from "models/CommunityNote";
-import useDashboardLinkData from "hooks/useDashboardLinkData";
 import DashboardLinkItem from "shared/DashboardLinkItem";
 import AppConfig from "common/AppConfig";
+import useMyDashboardLinkData from "hooks/useMyDashboardLinkData";
 
-interface INoteFeed {
-  filter: string;
+interface IMyFeed {
+  filter: "notes" | "ratings";
 }
 
-const NoteFeed = ({ filter }: INoteFeed) => {
+const MyFeed = ({ filter }: IMyFeed) => {
   const dispatch = useAppDispatch();
-  const feedData = useDashboardLinkData(filter);
+  const feedData = useMyDashboardLinkData(filter);
   const feeds = useMemo(() => feedData?.data || [], [feedData?.data]);
-  const feedsWithFiltered = useMemo(() => {
-    if (filter === "new") {
-      return feeds.filter((el) => !el.total_notes);
-    }
-    return feeds;
-  }, [feeds, filter]);
 
   const renderFeed = useCallback(
     (dashboardLink: IDashboardLink) => (
       <DashboardLinkItem
-        key={dashboardLink.url}
+        key={dashboardLink.note?.id}
         dashboardLink={dashboardLink}
       />
     ),
@@ -37,13 +34,21 @@ const NoteFeed = ({ filter }: INoteFeed) => {
   );
   const onPageEndReach = useCallback(() => {
     if (feedData?.canMore && !feedData?.loadMore) {
-      dispatch(
-        getDashboardLinks({
-          type: filter,
-          page: (feedData?.currentPage || 1) + 1,
-          limit: 20,
-        })
-      );
+      if (filter === "notes") {
+        dispatch(
+          getMyDashboardLinkNotes({
+            page: (feedData?.currentPage || 1) + 1,
+            limit: 20,
+          })
+        );
+      } else {
+        dispatch(
+          getMyDashboardLinkRatings({
+            page: (feedData?.currentPage || 1) + 1,
+            limit: 20,
+          })
+        );
+      }
     }
   }, [
     dispatch,
@@ -65,7 +70,11 @@ const NoteFeed = ({ filter }: INoteFeed) => {
 
   useEffect(() => {
     if (!feedData) {
-      dispatch(getDashboardLinks({ type: filter, page: 1, limit: 20 }));
+      if (filter === "notes") {
+        dispatch(getMyDashboardLinkNotes({ page: 1, limit: 20 }));
+      } else {
+        dispatch(getMyDashboardLinkRatings({ page: 1, limit: 20 }));
+      }
     }
   }, [dispatch, feedData, filter]);
   useEffect(() => {
@@ -76,9 +85,9 @@ const NoteFeed = ({ filter }: INoteFeed) => {
   }, [windowScrollListener]);
   return (
     <ol className={styles.list}>
-      {feedsWithFiltered.length > 0 ? (
+      {feeds.length > 0 ? (
         <>
-          {feedsWithFiltered.map(renderFeed)}
+          {feeds.map(renderFeed)}
           {feedData?.loadMore && <LoadingItem />}
         </>
       ) : feedData?.loading ? (
@@ -88,4 +97,4 @@ const NoteFeed = ({ filter }: INoteFeed) => {
   );
 };
 
-export default memo(NoteFeed);
+export default memo(MyFeed);

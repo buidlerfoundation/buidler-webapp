@@ -1,3 +1,5 @@
-import MyContribution from "screens/MyContribution";
+import { redirect } from "next/navigation";
 
-export default MyContribution;
+export default function Feed() {
+  redirect("/community-notes/contribute/notes");
+}

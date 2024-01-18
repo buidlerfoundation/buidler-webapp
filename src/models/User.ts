@@ -345,3 +345,8 @@ export interface IOnlineUsers {
 export interface IMagicLoginData extends IDataToken {
   user?: IFCUser;
 }
+
+export interface IPagingParams {
+  page: number;
+  limit: number;
+}

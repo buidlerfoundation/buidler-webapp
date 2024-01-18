@@ -26,6 +26,8 @@ const NavbarMobile = ({
         "/community-notes/need-context",
         "/community-notes/explore",
         "/community-notes/contribute",
+        "/community-notes/contribute/notes",
+        "/community-notes/contribute/ratings",
       ].includes(pathname);
     }
     return ["/home", "/insights", "/active", "/top"].includes(pathname);
