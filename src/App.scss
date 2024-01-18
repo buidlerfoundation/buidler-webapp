@@ -255,6 +255,9 @@ a {
     height: fit-content;
     display: flex;
     flex-direction: column;
+    .domain-input {
+      max-width: calc(100vw - 50px);
+    }
   }
   .modal-title {
     color: var(--color-secondary-text);

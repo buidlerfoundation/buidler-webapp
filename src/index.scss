@@ -232,10 +232,12 @@ code {
   justify-content: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-}
-.normal-button:hover {
-  border-radius: 10px;
-  background-color: var(--color-highlight-action);
+  @media (hover: hover) {
+    &:hover {
+      border-radius: 10px;
+      background-color: var(--color-highlight-action);    
+    }
+  }
 }
 .normal-icon {
   display: flex;

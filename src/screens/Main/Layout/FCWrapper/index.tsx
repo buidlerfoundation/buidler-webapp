@@ -68,6 +68,7 @@ import IconMenuUserRole from "shared/SVG/IconMenuUserRole";
 import PopupSignIn from "shared/PopupSignIn";
 import ModalJoinAsContributor from "shared/ModalJoinAsContributor";
 import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
+import NavbarMobile from "./NavbarMobile";
 
 interface IMenuItem {
   active?: boolean;
@@ -186,14 +187,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const inactiveColor = useMemo(() => "var(--color-mute-text)", []);
   const [resultData, setResultData] = useState<any>(null);
   const isMobile = useIsMobile();
-  const showMobileMenu = useMemo(
-    () =>
-      pathname === "/home" ||
-      pathname === "/insights" ||
-      pathname === "/active" ||
-      pathname === "/top",
-    [pathname]
-  );
   const toggleReport = useCallback(() => {
     if (metadataCreateReport) {
       dispatch(COMMUNITY_NOTE_ACTION.updateModalReport());
@@ -621,7 +614,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     toggleAddNote();
   }, [dispatch, fcUser, onLoginClick, toggleAddNote]);
   const renderMenu = useCallback(
-    () => (
+    (hideCommunityNoteFilter?: boolean) => (
       <div className={styles.menus}>
         {!communityNote ? (
           <>
@@ -652,39 +645,37 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
             <Link
               href="/community-notes/explore"
               className={styles["search-box"]}
+              onClick={onCloseSideMenu}
             >
               <IconMenuExplore fill="var(--color-mute-text)" />
-              Search
+              <span className={styles.text}>Search</span>
             </Link>
-            <MenuItemMemo
-              title="Helpful context"
-              to="/community-notes/helpful"
-              icon={<IconDot fill="var(--accent-blue)" />}
-              active={activeCommunityNoteHelpful}
-              onClick={onCloseSideMenu}
-            />
-            <MenuItemMemo
-              title="Need more rating"
-              to="/community-notes/need-rating"
-              icon={<IconDot fill="var(--accent-yellow)" />}
-              active={activeCommunityNoteNMR}
-              onClick={onCloseSideMenu}
-            />
-            <MenuItemMemo
-              title="Need add context"
-              to="/community-notes/need-context"
-              icon={<IconDot />}
-              active={activeCommunityNoteNeedContext}
-              onClick={onCloseSideMenu}
-            />
-            <div
-              style={{
-                margin: "24px 25px 4px 25px",
-                height: 2,
-                borderRadius: 1,
-                backgroundColor: "var(--color-highlight-action-high)",
-              }}
-            />
+            {!hideCommunityNoteFilter && (
+              <>
+                <MenuItemMemo
+                  title="Helpful context"
+                  to="/community-notes/helpful"
+                  icon={<IconDot fill="var(--accent-blue)" />}
+                  active={activeCommunityNoteHelpful}
+                  onClick={onCloseSideMenu}
+                />
+                <MenuItemMemo
+                  title="Need more rating"
+                  to="/community-notes/need-rating"
+                  icon={<IconDot fill="var(--accent-yellow)" />}
+                  active={activeCommunityNoteNMR}
+                  onClick={onCloseSideMenu}
+                />
+                <MenuItemMemo
+                  title="Need add context"
+                  to="/community-notes/need-context"
+                  icon={<IconDot />}
+                  active={activeCommunityNoteNeedContext}
+                  onClick={onCloseSideMenu}
+                />
+                <div className={styles["menu-separate"]} />
+              </>
+            )}
             <MenuItemMemo
               title="My Contribution"
               to="/community-notes/contribute"
@@ -823,34 +814,12 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         )}
       </aside>
       <main className={styles["page-container"]}>
-        {showMobileMenu && (
-          <div
-            className={`${styles["nav-mobile-wrap"]} ${
-              openMenu ? styles["nav-mobile-wrap-on"] : ""
-            }`}
-          >
-            <div className={styles["nav-mobile"]}>
-              <Link className={styles["mobile-brand-wrap"]} href="/home">
-                <div
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 4,
-                    overflow: "hidden",
-                  }}
-                >
-                  <IconBuidlerLogo size={30} />
-                </div>
-                <span style={{ margin: "0 10px" }}>Buidler</span>
-              </Link>
-              <div className={styles["side-menu"]} onClick={toggleMenu}>
-                <div className={styles["line-1"]} />
-                <div className={styles["line-2"]} />
-              </div>
-            </div>
-            {renderMenu()}
-          </div>
-        )}
+        <NavbarMobile
+          communityNote={communityNote}
+          openMenu={openMenu}
+          toggleMenu={toggleMenu}
+          renderMenu={renderMenu}
+        />
         {children}
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>
