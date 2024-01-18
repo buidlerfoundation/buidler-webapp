@@ -126,7 +126,7 @@ const CommunityNoteByUrlWrapper = ({
               <div className={styles["icon-wrap"]}>
                 <IconArrowBack />
               </div>
-              <span>Note</span>
+              <span>Link with notes</span>
             </div>
           )}
         </nav>
@@ -141,13 +141,6 @@ const CommunityNoteByUrlWrapper = ({
                   url={dashboardDetail?.data?.url}
                   metadata={dashboardDetail?.data?.metadata}
                 />
-                {dashboardDetail?.data?.note && (
-                  <NoteItem
-                    note={dashboardDetail?.data?.note}
-                    onOpenRateNote={onOpenRateNote}
-                    metadata={dashboardDetail?.data?.metadata}
-                  />
-                )}
                 <NoteItem
                   onOpenRateNote={onOpenRateNote}
                   metadata={dashboardDetail?.data?.metadata}
