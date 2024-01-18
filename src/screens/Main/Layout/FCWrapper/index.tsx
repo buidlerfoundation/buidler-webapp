@@ -869,6 +869,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         open={openAddNote || !!metadataCreateNote}
         handleClose={toggleAddNote}
         initialMetadata={metadataCreateNote}
+        onOpenJoinAsContributor={onLinkWithFarcaster}
       />
       <ModalRateNote
         open={!!rateNote}
