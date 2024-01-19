@@ -31,8 +31,6 @@ import ImageView from "shared/ImageView";
 import { ISignedKeyRequest } from "models/FC";
 import api from "api";
 import toast from "react-hot-toast";
-import IconDownload from "shared/SVG/FC/IconDownload";
-import useExtensionInstalled from "hooks/useExtensionInstalled";
 import { HOME_FEED_ACTIONS, getFeedByUrl } from "reducers/HomeFeedReducers";
 import ModalFCReply from "shared/ModalFCReply";
 import PopoverButton from "shared/PopoverButton";
@@ -52,7 +50,6 @@ import { IDataToken } from "models/User";
 import { MagicUserMetadata } from "magic-sdk";
 import { CircularProgress } from "@mui/material";
 import { useMagic } from "providers/MagicProvider";
-import WhiteListedModal from "shared/WhiteListedModal";
 import { Route } from "next";
 import ModalSubmitReport from "shared/ModalSubmitReport";
 import IconDot from "shared/SVG/IconDot";
@@ -164,7 +161,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const [signedKeyRequest, setSignedKeyRequest] = useState<
     ISignedKeyRequest | undefined | null
   >(null);
-  const isExtensionInstalled = useExtensionInstalled();
   const fcUser = useAppSelector((state) => state.fcUser?.data);
   const rateNote = useAppSelector((state) => state.communityNote.openRateNote);
   const metadataCreateNote = useAppSelector(
@@ -793,25 +789,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           {communityNote && <div className={styles["beta-tag"]}>beta</div>}
         </Link>
         {renderMenu()}
-        {!isExtensionInstalled && (
-          <a
-            className={styles["extension-description-container"]}
-            href="https://chrome.google.com/webstore/detail/buidler-one-extension-any/omhbdacaeafhladkifficmjmpeaijlfc"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <span className={styles["extension-description"]}>
-              Please install extension for the full experience with Buidler!
-            </span>
-            <div className={styles.cta}>
-              <IconDownload
-                fill="var(--color-mention)"
-                style={{ marginRight: 10 }}
-              />
-              <span>Download Extension</span>
-            </div>
-          </a>
-        )}
       </aside>
       <main className={styles["page-container"]}>
         <NavbarMobile
