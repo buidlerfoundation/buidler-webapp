@@ -1,4 +1,3 @@
-import useFeedFilters from "hooks/useFeedFilters";
 import { usePathname } from "next/navigation";
 import React, { memo, useEffect, useMemo, useRef } from "react";
 
@@ -6,12 +5,20 @@ const ScrollRestoration = () => {
   const pathname = usePathname();
   const timeoutScroll = useRef<any>();
   const previousPath = useRef("");
-  const filters = useFeedFilters();
   const lastScrollOffsetByPath = useRef<{ [path: string]: number }>({});
-  const saveScrollOffset = useMemo(
-    () => filters.find((el) => el.path === pathname),
-    [filters, pathname]
-  );
+  // const saveScrollOffset = useMemo(
+  //   () =>
+  //     [
+  //       "/home",
+  //       "/active",
+  //       "/top",
+  //       "/community-notes",
+  //       "/community-notes/helpful",
+  //       "/community-notes/need-rating",
+  //       "/community-notes/need-context",
+  //     ].includes(pathname),
+  //   [pathname]
+  // );
   useEffect(() => {
     const scrollEvent = () => {
       if (timeoutScroll.current) {
@@ -28,14 +35,14 @@ const ScrollRestoration = () => {
     };
   }, []);
   useEffect(() => {
-    if (pathname && pathname !== previousPath.current && saveScrollOffset) {
+    if (pathname && pathname !== previousPath.current) {
       if (lastScrollOffsetByPath.current[pathname] >= 0) {
         setTimeout(() => {
           window?.scrollTo?.({
             top: lastScrollOffsetByPath.current[pathname],
             behavior: "auto",
           });
-        }, 1000);
+        }, 0);
       }
       previousPath.current = pathname;
     } else {
@@ -44,7 +51,7 @@ const ScrollRestoration = () => {
         behavior: "auto",
       });
     }
-  }, [pathname, saveScrollOffset]);
+  }, [pathname]);
   useEffect(() => {
     lastScrollOffsetByPath.current = {};
   }, []);

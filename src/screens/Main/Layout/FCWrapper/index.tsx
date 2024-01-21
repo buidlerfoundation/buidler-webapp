@@ -66,6 +66,7 @@ import PopupSignIn from "shared/PopupSignIn";
 import ModalJoinAsContributor from "shared/ModalJoinAsContributor";
 import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
 import NavbarMobile from "./NavbarMobile";
+import ScrollRestoration from "../ScrollRestoration";
 
 interface IMenuItem {
   active?: boolean;
@@ -643,7 +644,10 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
               className={styles["search-box"]}
               onClick={onCloseSideMenu}
             >
-              <IconMenuExplore fill="var(--color-mute-text)" />
+              <IconMenuExplore
+                fill="var(--color-mute-text)"
+                style={{ padding: 3 }}
+              />
               <span className={styles.text}>Search</span>
             </Link>
             {!hideCommunityNoteFilter && (
@@ -672,17 +676,19 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
                 <div className={styles["menu-separate"]} />
               </>
             )}
-            <MenuItemMemo
-              title="My Contribution"
-              to="/community-notes/contribute"
-              icon={
-                <IconMenuUserRole
-                  fill={activeMyContributor ? activeColor : inactiveColor}
-                />
-              }
-              active={activeMyContributor}
-              onClick={onCloseSideMenu}
-            />
+            {fcUser?.fid && (
+              <MenuItemMemo
+                title="My Contribution"
+                to="/community-notes/contribute"
+                icon={
+                  <IconMenuUserRole
+                    fill={activeMyContributor ? activeColor : inactiveColor}
+                  />
+                }
+                active={activeMyContributor}
+                onClick={onCloseSideMenu}
+              />
+            )}
             <MenuItemMemo
               title="Add a note"
               icon={
@@ -861,6 +867,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
       />
       <div id="btn-share-profile" onClick={onShareProfileClick} />
       <div id="btn-bugs-report" onClick={toggleBugsReport} />
+      <ScrollRestoration />
     </div>
   );
 };
