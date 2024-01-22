@@ -1,3 +1,7 @@
-import Website from "screens/Website";
+import { defaultMetadataCN } from "common/AppConfig";
+import { Metadata } from "next";
+import WebsiteCommunityNote from "screens/WebsiteCommunityNote";
 
-export default Website;
+export const metadata: Metadata = defaultMetadataCN;
+
+export default WebsiteCommunityNote;

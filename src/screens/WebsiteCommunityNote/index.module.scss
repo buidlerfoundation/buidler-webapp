@@ -1,0 +1,83 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+  .title {
+    font-weight: 700;
+    color: var(--color-primary-text);
+    font-size: 54px;
+    line-height: 68px;
+    margin-top: 50px;
+    text-align: center;
+    width: 500px;
+  }
+  .description {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 36px;
+    text-align: center;
+    margin-top: 40px;
+    width: 630px;
+  }
+  .btn-get-started {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    padding: 0 15px 0 25px;
+    color: white;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 16px;
+    border-radius: 25px;
+    gap: 31px;
+    background: linear-gradient(180deg, #0584fe 0%, #0669ff 100%);
+    margin-top: 40px;
+  }
+  .fee-text {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 25px;
+    color: var(--color-mute-text);
+    margin-top: 15px;
+  }
+}
+
+@media only screen and (max-width: 659px) {
+  .container {
+    padding: 0 30px;
+    .title {
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 44px;
+      margin-top: 30px;
+      width: 100%;
+    }
+    .description {
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 28px;
+      margin-top: 25px;
+      width: 100%;
+    }
+    .btn-get-started {
+      margin-top: 25px;
+      height: 40px;
+      padding: 0 12px 0 16px;
+      font-family: SF UI Text;
+      font-size: 16px;
+      line-height: 22px;
+      gap: 28px;
+      :global(.icon-get-started) {
+        width: 20px;
+        height: 20px;
+      }
+    }
+    .fee-text {
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 16px;
+    }
+  }
+}
