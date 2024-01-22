@@ -19,7 +19,7 @@ const NoteFeedWrapper = ({ children }: INoteFeedWrapper) => {
   const menu = useMemo(
     () => [
       {
-        label: "Helpful Context",
+        label: "Helpful context",
         value: "/community-notes/helpful",
         renderIcon: () => (
           <IconDot fill="var(--accent-blue)" styles={{ marginRight: 10 }} />
@@ -55,7 +55,7 @@ const NoteFeedWrapper = ({ children }: INoteFeedWrapper) => {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={`${styles.title} hide-xs`}>
-          Community Notes for the internet.
+          Community Notes for the internet
         </div>
         <div className="hide-desktop">
           <PopoverButton

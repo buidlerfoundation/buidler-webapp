@@ -343,6 +343,33 @@ const communityNoteSlice = createSlice({
               });
             }
           }
+          (
+            ["notes", "ratings"] as Array<keyof typeof state.myDashboardLink>
+          ).forEach((k) => {
+            let data = state.myDashboardLink[k]?.data;
+            if (data) {
+              data = state.myDashboardLink[k]?.data?.map((link) => {
+                if (
+                  link.url === url &&
+                  link.note &&
+                  link.note?.id === action.payload.data?.note_id
+                ) {
+                  return {
+                    ...link,
+                    note: {
+                      ...link.note,
+                      rating: action.payload.data,
+                    },
+                  };
+                }
+                return link;
+              });
+              state.myDashboardLink[k] = {
+                ...state.myDashboardLink[k],
+                data,
+              };
+            }
+          });
         }
       })
       .addCase(deleteRating.fulfilled, (state, action) => {
@@ -388,6 +415,33 @@ const communityNoteSlice = createSlice({
               });
             }
           }
+          (
+            ["notes", "ratings"] as Array<keyof typeof state.myDashboardLink>
+          ).forEach((k) => {
+            let data = state.myDashboardLink[k]?.data;
+            if (data) {
+              data = state.myDashboardLink[k]?.data?.map((link) => {
+                if (
+                  link.url === url &&
+                  link.note &&
+                  link.note?.id === action.meta.arg.noteId
+                ) {
+                  return {
+                    ...link,
+                    note: {
+                      ...link.note,
+                      rating: undefined,
+                    },
+                  };
+                }
+                return link;
+              });
+              state.myDashboardLink[k] = {
+                ...state.myDashboardLink[k],
+                data,
+              };
+            }
+          });
         }
       })
       .addCase(submitNote.fulfilled, (state, action) => {

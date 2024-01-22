@@ -183,10 +183,6 @@ a {
 }
 
 .hide-scroll-bar {
-  &::-webkit-scrollbar {
-    width: 0px;
-    height: 0px;
-  }
 }
 
 .column-reverse {
@@ -195,15 +191,6 @@ a {
 }
 
 .emoji-mart-scroll {
-  &::-webkit-scrollbar-track {
-    display: none;
-  }
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  &::-webkit-scrollbar-thumb {
-    display: none;
-  }
 }
 
 .app-input-highlight {
@@ -358,18 +345,9 @@ a {
   -webkit-transition: all 200ms !important;
   border-radius: 10px !important;
   border: 1px solid var(--color-highlight-action-high);
-  &::-webkit-scrollbar-track {
-    display: none;
-  }
   .normal-button:hover {
     border-radius: 10px;
     background-color: var(--color-highlight-action);
-  }
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  &::-webkit-scrollbar-thumb {
-    display: none;
   }
 }
 
@@ -402,10 +380,6 @@ iframe {
 .MuiTabPanel-root {
   padding: 0 !important;
   overflow-y: auto;
-  &::-webkit-scrollbar {
-    width: 0px;
-    height: 0px;
-  }
 }
 
 .MuiTab-root.Mui-selected {
@@ -423,10 +397,6 @@ iframe {
 
 .MuiTabs-flexContainer {
   overflow-x: auto !important;
-  &::-webkit-scrollbar {
-    width: 0px;
-    height: 0px;
-  }
 }
 
 .popup-menu-container {
@@ -739,33 +709,4 @@ html {
   .hide-desktop {
     display: none !important;
   }
-}
-
-// @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
-//   body {
-//     transform: rotate(90deg);
-//     height: 100vw;
-//     width: 100vh;
-//   }
-// }
-
-/* width */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: var(--color-stroke);
-  border-radius: 5px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-highlight-action-high);
 }
