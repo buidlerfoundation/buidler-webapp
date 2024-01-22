@@ -242,6 +242,7 @@ a {
     height: fit-content;
     display: flex;
     flex-direction: column;
+    min-width: 0;
     .domain-input {
       max-width: calc(100vw - 50px);
     }
