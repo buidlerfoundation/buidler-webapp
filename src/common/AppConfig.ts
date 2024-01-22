@@ -193,6 +193,10 @@ const metadataTitle = "Hacker News on Farcaster | Buidler";
 const metadataDes =
   "Discover Farcaster's best daily links! Stay in the loop with vibrant discussions on your favorite web pages, supercharged by the Farcaster community.";
 
+const metadataTitleCN = "Community notes for the internet | Buidler";
+const metadataDesCN =
+  "A platform that allows everyone to add helpful notes on any link to avoid misinformation and earn rewards.";
+
 export const defaultMetadata: Metadata = {
   title: metadataTitle,
   description: metadataDes,
@@ -206,6 +210,22 @@ export const defaultMetadata: Metadata = {
     description: metadataDes,
     card: "summary_large_image",
     images: [{ url: "/img_buidler_large_promo.png" }],
+  },
+};
+
+export const defaultMetadataCN: Metadata = {
+  title: metadataTitleCN,
+  description: metadataDesCN,
+  openGraph: {
+    title: metadataTitleCN,
+    description: metadataDesCN,
+    images: [{ url: "/img_cm_promo.png" }],
+  },
+  twitter: {
+    title: metadataTitleCN,
+    description: metadataDesCN,
+    card: "summary_large_image",
+    images: [{ url: "/img_cm_promo.png" }],
   },
 };
 
