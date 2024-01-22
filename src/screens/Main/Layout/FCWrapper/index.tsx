@@ -28,7 +28,7 @@ import {
 import { logoutAction } from "reducers/actions";
 import useAppSelector from "hooks/useAppSelector";
 import ImageView from "shared/ImageView";
-import { ISignedKeyRequest } from "models/FC";
+import { ISignedKeyRequest, UserPermission } from "models/FC";
 import api from "api";
 import toast from "react-hot-toast";
 import { HOME_FEED_ACTIONS, getFeedByUrl } from "reducers/HomeFeedReducers";
@@ -603,12 +603,12 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     toggleReport();
   }, [dispatch, fcUser, onLoginClick, toggleReport]);
   const onOpenModalAddNote = useCallback(() => {
-    if (!fcUser) {
+    if (fcUser?.permissions?.includes(UserPermission.Writer)) {
+      toggleAddNote();
+    } else {
       dispatch(FC_USER_ACTIONS.updateLoginSource("Post Link"));
       onLoginClick();
-      return;
     }
-    toggleAddNote();
   }, [dispatch, fcUser, onLoginClick, toggleAddNote]);
   const renderMenu = useCallback(
     (hideCommunityNoteFilter?: boolean) => (

@@ -1,5 +1,10 @@
 import { Route } from "next";
 
+export enum UserPermission {
+  Rater = "rater",
+  Writer = "writer",
+}
+
 export interface ISignedKeyRequest {
   token?: string;
   deeplinkUrl?: string;
@@ -57,6 +62,7 @@ export interface IFCUser {
   has_active_badge?: boolean;
   is_whitelisted?: boolean;
   community_note_invitation?: ICommunityNoteInvitation;
+  permissions?: UserPermission[];
 }
 
 export interface ICast {
