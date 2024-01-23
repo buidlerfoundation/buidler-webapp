@@ -243,6 +243,8 @@ a {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    overflow: hidden;
+    position: relative;
     .domain-input {
       max-width: calc(100vw - 50px);
     }
