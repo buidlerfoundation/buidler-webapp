@@ -23,25 +23,34 @@ export const clearData = (callback = () => {}) => {
   Cookies.remove(AsyncKey.refreshTokenExpire);
   Cookies.remove(AsyncKey.refreshTokenKey);
   Cookies.remove(AsyncKey.signerIdKey);
-  window.top?.postMessage(
-    { type: "buidler-plugin-clear-cookie" },
-    { targetOrigin: "*" }
-  );
+  // temporary comment out clear cookie to extension
+  // if (typeof window !== "undefined") {
+  //   window.top?.postMessage(
+  //     { type: "buidler-plugin-clear-cookie" },
+  //     { targetOrigin: "*" }
+  //   );
+  // }
   callback();
 };
 
 export const setCookie = (key: string, val: any) => {
   return new Promise<void>((resolve, reject) => {
-    const w: any = window;
-    if (w.ReactNativeWebView) {
-      w.ReactNativeWebView?.postMessage(
-        JSON.stringify({ type: "on-set-cookie", payload: { key, value: val } })
-      );
-    }
-    window.top?.postMessage(
-      { type: "buidler-plugin-set-cookie", key, value: val },
-      { targetOrigin: "*" }
-    );
+    // temporary comment out clear cookie to extension
+    // if (typeof window !== "undefined") {
+    //   const w: any = window;
+    //   if (w.ReactNativeWebView) {
+    //     w.ReactNativeWebView?.postMessage(
+    //       JSON.stringify({
+    //         type: "on-set-cookie",
+    //         payload: { key, value: val },
+    //       })
+    //     );
+    //   }
+    //   window.top?.postMessage(
+    //     { type: "buidler-plugin-set-cookie", key, value: val },
+    //     { targetOrigin: "*" }
+    //   );
+    // }
     Cookies.set(key, val);
     return resolve();
   });

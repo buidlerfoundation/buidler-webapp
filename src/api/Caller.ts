@@ -25,13 +25,15 @@ const handleClearDataAndReload = () => {
   if (!GlobalVariable.sessionExpired) {
     GlobalVariable.sessionExpired = true;
     clearData(() => {
-      const path = window.location.pathname;
-      if (path.includes("/channels") || path.includes("/url")) {
-        toast.error("Session expired");
-        window.location.reload();
-      } else {
-        GlobalVariable.sessionExpired = false;
-        window.parent.postMessage("session-expired", "*");
+      if (typeof window !== "undefined") {
+        const path = window.location.pathname;
+        if (path.includes("/channels") || path.includes("/url")) {
+          toast.error("Session expired");
+          window.location.reload();
+        } else {
+          GlobalVariable.sessionExpired = false;
+          window.parent.postMessage("session-expired", "*");
+        }
       }
     });
   }

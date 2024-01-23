@@ -3,12 +3,14 @@ export const CustomEventName = {
 };
 
 export const dispatchChangeRoute = (path: string, push?: boolean) => {
-  const { CustomEvent } = window;
-  const event = new CustomEvent(CustomEventName.CHANGE_ROUTE, {
-    detail: {
-      path,
-      push,
-    },
-  });
-  window.dispatchEvent(event);
+  if (typeof window !== "undefined") {
+    const { CustomEvent } = window;
+    const event = new CustomEvent(CustomEventName.CHANGE_ROUTE, {
+      detail: {
+        path,
+        push,
+      },
+    });
+    window.dispatchEvent(event);
+  }
 };
