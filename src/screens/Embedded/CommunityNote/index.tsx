@@ -30,6 +30,7 @@ const CommunityNoteEmbedded = () => {
             metadata={dashboardDetail?.data?.metadata}
           />
           <NoteItem
+            note={dashboardDetail?.data?.note}
             onOpenRateNote={onOpenRateNote}
             metadata={dashboardDetail?.data?.metadata}
           />
