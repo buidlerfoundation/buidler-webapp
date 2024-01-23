@@ -707,6 +707,26 @@ html {
   .hide-xs {
     display: none !important;
   }
+  .modal-full-mobile {
+    align-items: flex-start;
+    .body-modal {
+      height: 100vh;
+      border-radius: 0;
+      padding: 15px;
+      .modal-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--color-primary-text);
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 18px;
+        min-height: 50px;
+        margin-bottom: 0;
+        margin-top: -15px;
+      }
+    }
+  }
 }
 
 @media only screen and (min-width: 575px) {
