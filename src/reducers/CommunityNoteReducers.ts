@@ -18,6 +18,7 @@ import { IPagingParams } from "models/User";
 interface IOpenRateNote {
   note?: INote;
   metadata?: ILinkMetadata;
+  detail?: boolean;
 }
 
 interface communityNoteState {

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Providers from "providers";
 import BootstrapClient from "screens/BootstrapClient";
 import "bootstrap/dist/css/bootstrap.css";
@@ -57,6 +57,13 @@ export const metadata: Metadata = {
       "Buidler is a social web annotation tool for web explorers. Comment, discuss, and connect with the community behind any webpages, fostering decentralized and open conversations on the Internet.",
   },
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL),
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+  ],
 };
 
 export default function RootLayout({

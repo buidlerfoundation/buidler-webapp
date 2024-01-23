@@ -335,6 +335,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     if (theme) {
       document.getElementsByTagName("html")?.[0]?.setAttribute("class", theme);
     }
+    // document.querySelector('link[rel="manifest"]')?.setAttribute('content', '#000000');
   }, [theme]);
   useEffect(() => {
     if (magic) {
@@ -859,6 +860,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         handleClose={onCloseModalRateNote}
         note={rateNote?.note}
         metadata={rateNote?.metadata}
+        detail={rateNote?.detail}
       />
       <ModalJoinAsContributor
         open={openLinkWithFarcaster}
