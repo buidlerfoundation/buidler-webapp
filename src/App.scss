@@ -553,6 +553,7 @@ html {
   --color-highlight-action-high: #f3f3f3;
   --color-bg-blue: #e9effd;
   --color-bg-yellow: #fef7e9;
+  --color-bg-hover: #00000003;
 
   @media (prefers-color-scheme: dark) {
     --color-darkest-background: #121212;
@@ -588,6 +589,7 @@ html {
     --color-highlight-action-high: #1e1e1e;
     --color-bg-blue: #1b2438;
     --color-bg-yellow: #191204;
+    --color-bg-hover: #ffffff0d;
   }
 }
 
@@ -650,6 +652,7 @@ html.light {
   --color-highlight-action-high: #f3f3f3;
   --color-bg-blue: #e9effd;
   --color-bg-yellow: #fef7e9;
+  --color-bg-hover: #00000003;
 }
 
 html.dark {
@@ -685,6 +688,7 @@ html.dark {
   --color-highlight-action-high: #1e1e1e;
   --color-bg-blue: #1b2438;
   --color-bg-yellow: #191204;
+  --color-bg-hover: #ffffff0d;
 }
 
 html {
