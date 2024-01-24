@@ -27,7 +27,7 @@ const handleClearDataAndReload = () => {
     clearData(() => {
       if (typeof window !== "undefined") {
         const path = window.location.pathname;
-        if (path.includes("/channels") || path.includes("/url")) {
+        if (!path.includes("/plugin-fc")) {
           toast.error("Session expired");
           window.location.reload();
         } else {
@@ -40,7 +40,7 @@ const handleClearDataAndReload = () => {
 };
 
 const handleError = (message: string, apiData: any, withoutError?: boolean) => {
-  if (message === "Failed to authenticate token") {
+  if (message.includes("Failed to authenticate token")) {
     handleClearDataAndReload();
     return;
   }
