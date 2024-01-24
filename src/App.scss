@@ -247,6 +247,9 @@ a {
     position: relative;
     .domain-input {
       max-width: calc(100vw - 50px);
+      @media only screen and (max-width: 576px) {
+        max-width: unset;
+      }
     }
   }
   .modal-title {
