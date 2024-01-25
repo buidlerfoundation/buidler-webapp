@@ -98,3 +98,6 @@ export const getMyDashboardLinkRatings = (params: IPagingParams) =>
       limit: `${params.limit}`,
     })}`
   );
+
+export const getDashboardLinkByNoteId = (noteId: string) =>
+  Caller.get<IDashboardLink>(`community-notes/dashboard/notes/${noteId}`);
