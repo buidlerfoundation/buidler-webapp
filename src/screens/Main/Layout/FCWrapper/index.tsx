@@ -139,7 +139,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const [openLinkWithFarcaster, setOpenLinkWithFarcaster] = useState(false);
   const [magicLoading, setMagicLoading] = useState(false);
   const [gettingMagicUserRedirect, setGettingMagicUserRedirect] =
-    useState(false);
+    useState(true);
   const query = useQuery();
   const router = useRouter();
   const [polling, setPolling] = useState(false);
@@ -456,8 +456,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           }
         }
       }
-      setMagicLoading(false);
-      setGettingMagicUserRedirect(false);
     },
     [
       dispatch,
@@ -493,8 +491,9 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           );
         }
       } catch (err) {
-        setGettingMagicUserRedirect(false);
+        console.error(err);
       }
+      setGettingMagicUserRedirect(false);
       setLoading(false);
     }
   }, [magic, onGetMagicUserMetadata, query, router]);
@@ -507,6 +506,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     []
   );
   const renderRight = useCallback(() => {
+    if (loading) return null;
     if (gettingMagicUserRedirect)
       return (
         <div
@@ -521,7 +521,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           {<CircularProgress color="inherit" size={20} />}
         </div>
       );
-    if (loading) return null;
     if (fcUser) {
       return (
         <>
@@ -676,7 +675,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
                   onClick={onCloseSideMenu}
                 />
                 <MenuItemMemo
-                  title="Need add context"
+                  title="Need context"
                   to="/community-notes/need-context"
                   icon={<IconDot />}
                   active={activeCommunityNoteNeedContext}
@@ -699,7 +698,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
               />
             )}
             <MenuItemMemo
-              title="Add a note"
+              title="Write a note"
               icon={
                 <IconPlus
                   size={20}
@@ -776,6 +775,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
       if (query.get("provider")) {
         finishSocialLogin();
       } else {
+        setGettingMagicUserRedirect(false);
         checkingAuth();
       }
     }
@@ -817,7 +817,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           toggleMenu={toggleMenu}
           renderMenu={renderMenu}
         />
-        {!loading && children}
+        {!gettingMagicUserRedirect && children}
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>
       {fcUser?.fid && (

@@ -33,7 +33,7 @@ const NoteFeedWrapper = ({ children }: INoteFeedWrapper) => {
         ),
       },
       {
-        label: "Need add context",
+        label: "Need context",
         value: "/community-notes/need-context",
         renderIcon: () => <IconDot styles={{ marginRight: 10 }} />,
       },
