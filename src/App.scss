@@ -458,6 +458,10 @@ iframe {
   position: relative;
   padding: 0 20px;
   padding-bottom: 20px;
+  @media only screen and (max-width: 576px) {
+    padding: 0 15px;
+    padding-bottom: 20px;
+  }
 }
 
 code {
