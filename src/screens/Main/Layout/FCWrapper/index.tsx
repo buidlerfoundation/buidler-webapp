@@ -227,6 +227,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     setSignedKeyRequest(null);
     clearData();
     dispatch(logoutAction());
+    window.location.reload();
   }, [dispatch, magic?.user]);
   const onCloseReply = useCallback(() => {
     dispatch(HOME_FEED_ACTIONS.updateReplyCast());
@@ -337,12 +338,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     }
     // document.querySelector('link[rel="manifest"]')?.setAttribute('content', '#000000');
   }, [theme]);
-  useEffect(() => {
-    if (magic) {
-      checkingAuth();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [magic]);
   useEffect(() => {
     dispatch(getFCChannels());
   }, [dispatch]);
@@ -481,15 +476,28 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   }, []);
   const finishSocialLogin = useCallback(async () => {
     if (magic) {
+      setLoading(true);
       try {
         setGettingMagicUserRedirect(true);
         const result = await magic.oauth.getRedirectResult();
-        onGetMagicUserMetadata(result.magic.userMetadata);
+        const queryUrl = query.get("url");
+        await onGetMagicUserMetadata(result.magic.userMetadata);
+        if (
+          window.location.pathname.includes("/community-notes/explore") &&
+          queryUrl
+        ) {
+          router.replace(
+            `${window.location.pathname}?url=${encodeURIComponent(
+              queryUrl
+            )}` as Route
+          );
+        }
       } catch (err) {
         setGettingMagicUserRedirect(false);
       }
+      setLoading(false);
     }
-  }, [magic, onGetMagicUserMetadata]);
+  }, [magic, onGetMagicUserMetadata, query, router]);
   const onMenuClick = useCallback(
     async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       e.stopPropagation();
@@ -499,7 +507,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     []
   );
   const renderRight = useCallback(() => {
-    if (loading) return null;
     if (gettingMagicUserRedirect)
       return (
         <div
@@ -514,6 +521,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           {<CircularProgress color="inherit" size={20} />}
         </div>
       );
+    if (loading) return null;
     if (fcUser) {
       return (
         <>
@@ -764,10 +772,15 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     };
   }, [windowScrollListener]);
   useEffect(() => {
-    if (query.get("provider")) {
-      finishSocialLogin();
+    if (magic) {
+      if (query.get("provider")) {
+        finishSocialLogin();
+      } else {
+        checkingAuth();
+      }
     }
-  }, [finishSocialLogin, query]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [magic, query]);
   useEffect(() => {
     if (action === "login") {
       setTimeout(() => {
@@ -804,7 +817,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           toggleMenu={toggleMenu}
           renderMenu={renderMenu}
         />
-        {children}
+        {!loading && children}
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>
       {fcUser?.fid && (
