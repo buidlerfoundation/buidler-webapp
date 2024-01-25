@@ -284,3 +284,7 @@ code {
     overflow-x: hidden;
   }
 }
+
+html:has(.normal-modal) {
+  overflow: hidden;
+}

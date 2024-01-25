@@ -26,7 +26,7 @@ const NoteFeedWrapper = ({ children }: INoteFeedWrapper) => {
         ),
       },
       {
-        label: "Need more rating",
+        label: "Needs more ratings",
         value: "/community-notes/need-rating",
         renderIcon: () => (
           <IconDot fill="var(--accent-yellow)" styles={{ marginRight: 10 }} />

@@ -661,7 +661,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
                   onClick={onCloseSideMenu}
                 />
                 <MenuItemMemo
-                  title="Need more rating"
+                  title="Needs more ratings"
                   to="/community-notes/need-rating"
                   icon={<IconDot fill="var(--accent-yellow)" />}
                   active={activeCommunityNoteNMR}
@@ -679,7 +679,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
             )}
             {fcUser?.fid && (
               <MenuItemMemo
-                title="My Contribution"
+                title="My contribution"
                 to="/community-notes/contribute"
                 icon={
                   <IconMenuUserRole

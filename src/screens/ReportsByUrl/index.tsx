@@ -22,14 +22,13 @@ const ReportsByUrl = ({ searchUrl }: IReportsByUrl) => {
   }, [query, searchUrl]);
   const reportsData = useReportsData(exploreUrl);
   const reports = useMemo(() => reportsData?.data || [], [reportsData?.data]);
-  const renderReport = useCallback(
-    (report: IReport) => (
+  const renderReport = useCallback((report: IReport) => {
+    return (
       <div className={styles["report-category-item"]} key={report.id}>
-        {report.category.name}
+        {report.category?.name || "Other"}
       </div>
-    ),
-    []
-  );
+    );
+  }, []);
   return (
     <div className="page-container">
       {reports.length > 0 ? (

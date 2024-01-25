@@ -81,7 +81,7 @@ export interface IReport {
   created_at: string;
   updated_at: string;
   metadata: ILinkMetadata;
-  category: IReportCategory;
+  category?: IReportCategory;
 }
 
 export interface IDashboardLink {

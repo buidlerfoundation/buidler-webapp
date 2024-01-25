@@ -56,7 +56,7 @@ const initialState: communityNoteState = {
       path: "/community-notes",
     },
     {
-      label: "Need more ratings",
+      label: "Needs more ratings",
       path: "/community-notes/nmr",
     },
     {

@@ -14,7 +14,7 @@ const MyContributorWrapper = ({ children }: IMyContributorWrapper) => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.title}>My Contribution</div>
+        <div className={styles.title}>My contribution</div>
         <nav className={styles["filter-head"]}>
           <FilterItem
             path="/community-notes/contribute/notes"
