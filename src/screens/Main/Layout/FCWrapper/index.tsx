@@ -444,7 +444,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           trackingLoginSuccess();
           await dispatch(getCurrentFCUser());
           await removeCookie(AsyncKey.requestTokenKey);
-          setGettingMagicUserRedirect(false);
           if (redirectUrl) {
             router.push(decodeURIComponent(redirectUrl) as Route);
           }
@@ -458,6 +457,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         }
       }
       setMagicLoading(false);
+      setGettingMagicUserRedirect(false);
     },
     [
       dispatch,
