@@ -861,6 +861,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         note={rateNote?.note}
         metadata={rateNote?.metadata}
         detail={rateNote?.detail}
+        onLogin={onLoginClick}
       />
       <ModalJoinAsContributor
         open={openLinkWithFarcaster}
