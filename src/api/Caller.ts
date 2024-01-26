@@ -55,7 +55,11 @@ const handleError = (message: string, apiData: any, withoutError?: boolean) => {
   if (importantApi) {
     // store dispatch something wrong
     throw new Error("Something wrong");
-  } else if (!ignoreMessageErrorApis.includes(compareUri) && !withoutError) {
+  } else if (
+    !ignoreMessageErrorApis.includes(compareUri) &&
+    !withoutError &&
+    message !== "Failed to fetch"
+  ) {
     toast.error(message);
   }
 };
