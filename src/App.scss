@@ -562,11 +562,11 @@ html {
   --color-bg-yellow: #fef7e9;
   --color-bg-hover: #00000003;
 
-  --tag-icon-margin: 5px;
+  --tag-icon-margin: 5px 5px 5px 0;
   --tag-icon-padding: 0px;
 
   @media only screen and (max-width: 576px) {
-    --tag-icon-margin: 5px 4px;
+    --tag-icon-margin: 5px 4px 5px -1px;
     --tag-icon-padding: 1px;
   }
 
