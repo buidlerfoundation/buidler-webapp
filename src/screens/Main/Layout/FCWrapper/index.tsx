@@ -474,7 +474,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   }, []);
   const finishSocialLogin = useCallback(async () => {
     if (magic) {
-      setLoading(true);
       try {
         setGettingMagicUserRedirect(true);
         const result = await magic.oauth.getRedirectResult();
@@ -494,7 +493,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         console.error(err);
       }
       setGettingMagicUserRedirect(false);
-      setLoading(false);
     }
   }, [magic, onGetMagicUserMetadata, query, router]);
   const onMenuClick = useCallback(
@@ -506,21 +504,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     []
   );
   const renderRight = useCallback(() => {
-    if (loading) return null;
-    if (gettingMagicUserRedirect)
-      return (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 65,
-            height: 60,
-          }}
-        >
-          {<CircularProgress color="inherit" size={20} />}
-        </div>
-      );
     if (fcUser) {
       return (
         <>
@@ -548,6 +531,21 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         </>
       );
     }
+    if (loading) return null;
+    if (gettingMagicUserRedirect)
+      return (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 65,
+            height: 60,
+          }}
+        >
+          {<CircularProgress color="inherit" size={20} />}
+        </div>
+      );
     return (
       <div
         id="btn-login"
@@ -774,6 +772,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     if (magic) {
       if (query.get("provider")) {
         finishSocialLogin();
+        setLoading(false);
       } else {
         setGettingMagicUserRedirect(false);
         checkingAuth();
