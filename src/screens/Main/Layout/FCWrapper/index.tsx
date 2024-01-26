@@ -469,8 +469,10 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     ]
   );
   const onLoginClick = useCallback(async () => {
-    // setOpenLogin(true);
     popupLoginRef.current.show(btnLoginRef.current);
+  }, []);
+  const onOpenLogin = useCallback(() => {
+    btnLoginRef.current?.click();
   }, []);
   const finishSocialLogin = useCallback(async () => {
     if (magic) {
@@ -873,7 +875,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
         note={rateNote?.note}
         metadata={rateNote?.metadata}
         detail={rateNote?.detail}
-        onLogin={onLoginClick}
+        onLogin={onOpenLogin}
       />
       <ModalJoinAsContributor
         open={openLinkWithFarcaster}
