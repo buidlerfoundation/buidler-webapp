@@ -46,6 +46,7 @@ export const getOGImage = async (note_id: string) => {
       )
     ).then((res) => res.arrayBuffer()),
   ]);
+  const isHelpful = dashboard.data?.note?.final_rating_status;
   return new ImageResponse(
     (
       // ImageResponse JSX element
@@ -90,13 +91,18 @@ export const getOGImage = async (note_id: string) => {
               padding: "10px 15px",
               gap: 10,
               borderBottom: "1px solid #F3F3F3",
+              backgroundColor: isHelpful ? "#E9EFFD" : "unset",
             }}
           >
-            <IconNMR fill="#FCB828" />
+            {isHelpful ? <IconLogoCircle /> : <IconNMR fill="#FCB828" />}
             <span
-              style={{ fontFamily: '"medium"', fontSize: 14, color: "#44474B" }}
+              style={{
+                fontFamily: '"medium"',
+                fontSize: 14,
+                color: isHelpful ? "#121417" : "#44474B",
+              }}
             >
-              Needs more ratings
+              {isHelpful ? "Helpful context" : "Needs more ratings"}
             </span>
           </div>
           <p
@@ -112,6 +118,7 @@ export const getOGImage = async (note_id: string) => {
               width: 540,
               height: 126,
               padding: 15,
+              margin: 0,
             }}
           >
             {dashboard.data?.note?.summary}
