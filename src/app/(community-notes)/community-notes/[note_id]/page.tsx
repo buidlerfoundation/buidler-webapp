@@ -33,7 +33,7 @@ export async function generateMetadata({
       "fc:frame": "vNext",
       "fc:frame:image": image,
       "fc:frame:button:1": "Rate it",
-      "fc:frame:post_url": `${process.env.NEXT_PUBLIC_API_BASE_URL}external/frame`
+      "fc:frame:post_url": `${process.env.NEXT_PUBLIC_API_BASE_URL}external/frame/${params.note_id}`,
     },
   };
 }
