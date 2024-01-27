@@ -52,79 +52,74 @@ export const getOGImage = async (note_id: string) => {
       // ImageResponse JSX element
       <div
         style={{
-          background: "#ffffff",
-          width: "100%",
-          height: "100%",
           display: "flex",
           flexDirection: "column",
-          padding: "20px 15px",
         }}
       >
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 5px",
+            padding: "16px 24px",
+            gap: 16,
+            borderBottom: isHelpful ? "none" : "1px solid #F3F3F3",
+            backgroundColor: isHelpful ? "#E9EFFD" : "unset",
+            borderTopLeftRadius: 7,
+            borderTopRightRadius: 7,
           }}
         >
+          {isHelpful ? (
+            <IconLogoCircle size={32} />
+          ) : (
+            <IconNMR fill="#FCB828" size={32} />
+          )}
           <span
-            style={{ fontFamily: '"bold"', fontSize: 20, color: "#121417" }}
+            style={{
+              fontFamily: '"medium"',
+              fontSize: 22,
+              color: isHelpful ? "#121417" : "#44474B",
+            }}
           >
-            Community added context
+            {isHelpful ? "Helpful context" : "Needs more ratings"}
           </span>
-          <IconLogoCircle size={35} />
         </div>
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            marginTop: 20,
-            borderRadius: 10,
-            border: "1px solid #F3F3F3",
+            padding: "24px 24px 12px 24px",
+            backgroundColor: "white",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "10px 15px",
-              gap: 10,
-              borderBottom: "1px solid #F3F3F3",
-              backgroundColor: isHelpful ? "#E9EFFD" : "unset",
-              borderTopLeftRadius: 9,
-              borderTopRightRadius: 9,
-            }}
-          >
-            {isHelpful ? <IconLogoCircle /> : <IconNMR fill="#FCB828" />}
-            <span
-              style={{
-                fontFamily: '"medium"',
-                fontSize: 14,
-                color: isHelpful ? "#121417" : "#44474B",
-              }}
-            >
-              {isHelpful ? "Helpful context" : "Needs more ratings"}
-            </span>
-          </div>
           <p
             style={{
               display: "block",
               lineClamp: 4,
               color: "#121417",
               fontFamily: '"regular"',
-              fontSize: 15,
+              fontSize: 22,
+              lineHeight: "38px",
               wordBreak: "break-word",
               whiteSpace: "pre-line",
               textOverflow: "ellipsis",
-              width: 540,
-              height: 126,
-              padding: 15,
+              width: 522,
+              height: 152,
               margin: 0,
             }}
           >
             {dashboard.data?.note?.summary}
           </p>
+          <div
+            style={{
+              lineHeight: "38px",
+              color: "#848484",
+              fontFamily: '"regular"',
+              fontSize: 22,
+              paddingBottom: 12,
+            }}
+          >
+            Click to see more
+          </div>
         </div>
       </div>
     ),
