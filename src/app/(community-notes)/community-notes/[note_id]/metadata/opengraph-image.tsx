@@ -46,7 +46,8 @@ export const getOGImage = async (note_id: string) => {
       )
     ).then((res) => res.arrayBuffer()),
   ]);
-  const isHelpful = dashboard.data?.note?.final_rating_status;
+  const isHelpful =
+    dashboard.data?.note?.final_rating_status === "Helpful context";
   return new ImageResponse(
     (
       // ImageResponse JSX element
@@ -54,6 +55,7 @@ export const getOGImage = async (note_id: string) => {
         style={{
           display: "flex",
           flexDirection: "column",
+          backgroundColor: "white",
         }}
       >
         <div
@@ -63,7 +65,7 @@ export const getOGImage = async (note_id: string) => {
             padding: "16px 24px",
             gap: 16,
             borderBottom: isHelpful ? "none" : "1px solid #F3F3F3",
-            backgroundColor: isHelpful ? "#E9EFFD" : "unset",
+            backgroundColor: isHelpful ? "#E9EFFD" : "white",
           }}
         >
           {isHelpful ? (
@@ -86,7 +88,6 @@ export const getOGImage = async (note_id: string) => {
             display: "flex",
             flexDirection: "column",
             padding: "24px 24px 12px 24px",
-            backgroundColor: "white",
           }}
         >
           <p
