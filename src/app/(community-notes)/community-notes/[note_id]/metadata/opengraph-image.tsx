@@ -92,6 +92,8 @@ export const getOGImage = async (note_id: string) => {
               gap: 10,
               borderBottom: "1px solid #F3F3F3",
               backgroundColor: isHelpful ? "#E9EFFD" : "unset",
+              borderTopLeftRadius: 9,
+              borderTopRightRadius: 9,
             }}
           >
             {isHelpful ? <IconLogoCircle /> : <IconNMR fill="#FCB828" />}
