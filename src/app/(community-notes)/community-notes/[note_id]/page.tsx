@@ -11,7 +11,7 @@ export async function generateMetadata({
   params: { note_id: string };
 }): Promise<Metadata> {
   const metadata = await CallerServer.get<IMetadataUrl>(
-    `external/metadata?url=${process.env.NEXT_PUBLIC_URL}/community-notes/${params.note_id}`
+    `external/metadata?url=${process.env.NEXT_PUBLIC_URL}/community-notes/${params.note_id}/metadata`
   );
   if (!metadata.data) return defaultMetadataCN;
   const { title, description, image = "" } = metadata.data;
