@@ -64,8 +64,6 @@ export const getOGImage = async (note_id: string) => {
             gap: 16,
             borderBottom: isHelpful ? "none" : "1px solid #F3F3F3",
             backgroundColor: isHelpful ? "#E9EFFD" : "unset",
-            borderTopLeftRadius: 7,
-            borderTopRightRadius: 7,
           }}
         >
           {isHelpful ? (
