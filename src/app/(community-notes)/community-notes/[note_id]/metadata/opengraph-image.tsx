@@ -1,6 +1,7 @@
 import CallerServer from "api/CallerServer";
 import { IDashboardLink } from "models/CommunityNote";
 import { ImageResponse } from "next/og";
+import IconCircleCheck from "shared/SVG/IconCircleCheck";
 import IconLogoCircle from "shared/SVG/IconLogoCircle";
 import IconNMR from "shared/SVG/IconNMR";
 
@@ -16,9 +17,16 @@ export const size = {
 
 export const contentType = "image/png";
 
-export const getOGImage = async (note_id: string) => {
+const getRatingStatus = (status?: string) => {
+  if (!status) return "";
+  if (status === "helpful") return "Helpful";
+  if (status === "not_helpful") return "Unhelpful";
+  return "Somewhat Helpful";
+};
+
+export const getOGImage = async (note_id: string, fid?: string) => {
   const dashboard = await CallerServer.get<IDashboardLink>(
-    `community-notes/dashboard/notes/${note_id}`
+    `community-notes/dashboard/notes/${note_id}?fid=${fid}`
   );
   const [fontBold, fontSemibold, fontMedium, fontRegular] = await Promise.all([
     fetch(
@@ -48,6 +56,9 @@ export const getOGImage = async (note_id: string) => {
   ]);
   const isHelpful =
     dashboard.data?.note?.final_rating_status === "Helpful context";
+  const ratingStatus = getRatingStatus(
+    dashboard.data?.note?.rating?.helpfulness_level
+  );
   return new ImageResponse(
     (
       // ImageResponse JSX element
@@ -87,7 +98,6 @@ export const getOGImage = async (note_id: string) => {
           style={{
             display: "flex",
             flexDirection: "column",
-            padding: "24px 24px 12px 24px",
           }}
         >
           <p
@@ -103,22 +113,49 @@ export const getOGImage = async (note_id: string) => {
               textOverflow: "ellipsis",
               width: 522,
               height: 152,
-              margin: 0,
+              margin: "24px 24px 8px 24px",
             }}
           >
-            {dashboard.data?.note?.summary}
+            {dashboard.data?.note?.summary || "efjwekfhjwekf"}
           </p>
-          <div
-            style={{
-              lineHeight: "38px",
-              color: "#848484",
-              fontFamily: '"regular"',
-              fontSize: 22,
-              paddingBottom: 12,
-            }}
-          >
-            Click to see more
-          </div>
+          {ratingStatus ? (
+            <div
+              style={{
+                display: "flex",
+                height: 50,
+                borderTop: "1px solid #F3F3F3",
+                padding: "0 24px",
+                alignItems: "center",
+                gap: 12,
+              }}
+            >
+              <IconCircleCheck size={24} fill="#F8F8F8" color="#848484" />
+              <span
+                style={{
+                  color: "#848484",
+                  fontFamily: '"regular"',
+                  fontSize: 20,
+                }}
+              >
+                You rated this note as
+                <span style={{ color: "#121417", marginLeft: 5 }}>
+                  {ratingStatus}
+                </span>
+              </span>
+            </div>
+          ) : (
+            <div
+              style={{
+                lineHeight: "38px",
+                color: "#848484",
+                fontFamily: '"regular"',
+                fontSize: 22,
+                padding: "0 24px 12px 24px",
+              }}
+            >
+              Click to see more
+            </div>
+          )}
         </div>
       </div>
     ),
