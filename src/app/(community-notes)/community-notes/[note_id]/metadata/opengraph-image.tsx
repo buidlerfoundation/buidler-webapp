@@ -24,7 +24,7 @@ const getRatingStatus = (status?: string) => {
   return "Somewhat Helpful";
 };
 
-export const getOGImage = async (note_id: string, fid?: string) => {
+export const getOGImage = async (note_id: string, fid: string = '') => {
   const dashboard = await CallerServer.get<IDashboardLink>(
     `community-notes/dashboard/notes/${note_id}?fid=${fid}`
   );
@@ -116,7 +116,7 @@ export const getOGImage = async (note_id: string, fid?: string) => {
               margin: "24px 24px 8px 24px",
             }}
           >
-            {dashboard.data?.note?.summary || "efjwekfhjwekf"}
+            {dashboard.data?.note?.summary}
           </p>
           {ratingStatus ? (
             <div
