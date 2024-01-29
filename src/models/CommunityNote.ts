@@ -67,10 +67,10 @@ export interface IReportCategory {
 }
 
 export interface ILinkMetadata {
-  metadata_id: string;
+  metadata_id?: string;
   url: string;
-  domain: string;
-  hostname: string;
+  domain?: string;
+  hostname?: string;
   data: IMetadataUrl;
 }
 
