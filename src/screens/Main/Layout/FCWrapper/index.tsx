@@ -45,7 +45,6 @@ import ModalBugsReport from "shared/ModalBugsReport";
 import GoogleAnalytics from "services/analytics/GoogleAnalytics";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import useIsMobile from "hooks/useIsMobile";
 import { IDataToken } from "models/User";
 import { MagicUserMetadata } from "magic-sdk";
 import { CircularProgress } from "@mui/material";
@@ -183,7 +182,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const activeColor = useMemo(() => "var(--color-primary-text)", []);
   const inactiveColor = useMemo(() => "var(--color-mute-text)", []);
   const [resultData, setResultData] = useState<any>(null);
-  const isMobile = useIsMobile();
   const toggleReport = useCallback(() => {
     if (metadataCreateReport) {
       dispatch(COMMUNITY_NOTE_ACTION.updateModalReport());
@@ -370,9 +368,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     }
     setLoginLoading(false);
     if (_signedKeyRequest?.token) {
-      if (isMobile && _signedKeyRequest?.deeplinkUrl) {
-        router.push(_signedKeyRequest.deeplinkUrl as Route);
-      }
       await setCookie(AsyncKey.requestTokenKey, _signedKeyRequest?.token);
       setPolling(true);
       pollingController.current = new AbortController();
@@ -396,14 +391,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     } else {
       trackingLoginFailed(errorMsg);
     }
-  }, [
-    isMobile,
-    linkWithFCAccount,
-    loginLoading,
-    router,
-    signedKeyRequest,
-    trackingLoginFailed,
-  ]);
+  }, [linkWithFCAccount, loginLoading, signedKeyRequest, trackingLoginFailed]);
   const onCloseMenu = useCallback(() => {
     popupMenuRef.current?.hide();
   }, []);
