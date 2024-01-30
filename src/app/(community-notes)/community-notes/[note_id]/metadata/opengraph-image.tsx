@@ -11,8 +11,8 @@ export const runtime = "edge";
 // Image metadata
 export const alt = "Summary";
 export const size = {
-  width: 570,
-  height: 298,
+  width: 1140,
+  height: 594,
 };
 
 export const contentType = "image/png";
@@ -24,7 +24,7 @@ const getRatingStatus = (status?: string) => {
   return "Somewhat Helpful";
 };
 
-export const getOGImage = async (note_id: string, fid: string = '') => {
+export const getOGImage = async (note_id: string, fid: string = "") => {
   const dashboard = await CallerServer.get<IDashboardLink>(
     `community-notes/dashboard/notes/${note_id}?fid=${fid}`
   );
@@ -73,21 +73,21 @@ export const getOGImage = async (note_id: string, fid: string = '') => {
           style={{
             display: "flex",
             alignItems: "center",
-            padding: "16px 24px",
-            gap: 16,
-            borderBottom: isHelpful ? "none" : "1px solid #F3F3F3",
+            padding: "32px 48px",
+            gap: 32,
+            borderBottom: isHelpful ? "none" : "2px solid #F3F3F3",
             backgroundColor: isHelpful ? "#E9EFFD" : "white",
           }}
         >
           {isHelpful ? (
-            <IconLogoCircle size={32} />
+            <IconLogoCircle size={64} />
           ) : (
-            <IconNMR fill="#FCB828" size={32} />
+            <IconNMR fill="#FCB828" size={64} />
           )}
           <span
             style={{
               fontFamily: '"medium"',
-              fontSize: 22,
+              fontSize: 44,
               color: isHelpful ? "#121417" : "#44474B",
             }}
           >
@@ -106,14 +106,14 @@ export const getOGImage = async (note_id: string, fid: string = '') => {
               lineClamp: 4,
               color: "#121417",
               fontFamily: '"regular"',
-              fontSize: 22,
-              lineHeight: "38px",
+              fontSize: 44,
+              lineHeight: "76px",
               wordBreak: "break-word",
               whiteSpace: "pre-line",
               textOverflow: "ellipsis",
-              width: 522,
-              height: 152,
-              margin: "24px 24px 8px 24px",
+              width: 1044,
+              height: 304,
+              margin: "48px 48px 16px 48px",
             }}
           >
             {dashboard.data?.note?.summary}
@@ -122,23 +122,23 @@ export const getOGImage = async (note_id: string, fid: string = '') => {
             <div
               style={{
                 display: "flex",
-                height: 50,
+                height: 100,
                 borderTop: "1px solid #F3F3F3",
-                padding: "0 24px",
+                padding: "0 48px 7px 48px",
                 alignItems: "center",
-                gap: 12,
+                gap: 24,
               }}
             >
-              <IconCircleCheck size={24} fill="#F8F8F8" color="#848484" />
+              <IconCircleCheck size={40} fill="#F8F8F8" color="#848484" />
               <span
                 style={{
                   color: "#848484",
                   fontFamily: '"regular"',
-                  fontSize: 20,
+                  fontSize: 38,
                 }}
               >
                 You rated this note as
-                <span style={{ color: "#121417", marginLeft: 5 }}>
+                <span style={{ color: "#121417", marginLeft: 10 }}>
                   {ratingStatus}
                 </span>
               </span>
@@ -146,11 +146,11 @@ export const getOGImage = async (note_id: string, fid: string = '') => {
           ) : (
             <div
               style={{
-                lineHeight: "38px",
+                lineHeight: "76px",
                 color: "#848484",
                 fontFamily: '"regular"',
-                fontSize: 22,
-                padding: "0 24px 12px 24px",
+                fontSize: 44,
+                padding: "0 48px 24px 48px",
               }}
             >
               Click to see more

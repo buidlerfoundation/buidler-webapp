@@ -10,6 +10,12 @@ export const runtime = "edge";
 
 // Image metadata
 export const alt = "Summary";
+export const size = {
+  width: 1140,
+  height: 594,
+};
+
+export const contentType = "image/png";
 
 // Image generation
 export default async function Image({
