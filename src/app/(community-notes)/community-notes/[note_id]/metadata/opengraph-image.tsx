@@ -55,7 +55,7 @@ export const getOGImage = async (note_id: string, fid: string = "") => {
     ).then((res) => res.arrayBuffer()),
   ]);
   const isHelpful =
-    dashboard.data?.note?.final_rating_status === "Helpful context";
+    dashboard.data?.note?.final_rating_status === "currently_rated_helpful";
   const ratingStatus = getRatingStatus(
     dashboard.data?.note?.rating?.helpfulness_level
   );
