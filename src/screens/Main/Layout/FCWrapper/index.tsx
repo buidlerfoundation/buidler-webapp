@@ -68,6 +68,7 @@ import NavbarMobile from "./NavbarMobile";
 import ScrollRestoration from "../ScrollRestoration";
 import BottomTabMobile from "./BottomTabMobile";
 import useIsMobile from "hooks/useIsMobile";
+import Spinner from "shared/Spinner";
 
 interface IMenuItem {
   active?: boolean;
@@ -833,6 +834,11 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
               onNewDiscussion={onOpenDiscussion}
             />
           </>
+        )}
+        {!loading && gettingMagicUserRedirect && (
+          <div className="hide-desktop">
+            <Spinner />
+          </div>
         )}
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>
