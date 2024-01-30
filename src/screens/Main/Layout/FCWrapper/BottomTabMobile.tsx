@@ -74,17 +74,17 @@ const BottomTabMobile = ({
           />
         ),
       },
-      {
-        label: "New discussion",
-        value: "new_discussion",
-        type: "secondary",
-        renderIcon: () => (
-          <IconMenuAddDiscussion
-            style={{ marginRight: 10, padding: 3 }}
-            size={24}
-          />
-        ),
-      },
+      // {
+      //   label: "New discussion",
+      //   value: "new_discussion",
+      //   type: "secondary",
+      //   renderIcon: () => (
+      //     <IconMenuAddDiscussion
+      //       style={{ marginRight: 10, padding: 3 }}
+      //       size={24}
+      //     />
+      //   ),
+      // },
     ];
     return res;
   }, []);
