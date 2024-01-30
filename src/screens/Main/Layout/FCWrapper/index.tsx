@@ -66,6 +66,8 @@ import ModalJoinAsContributor from "shared/ModalJoinAsContributor";
 import IconMenuExplore from "shared/SVG/FC/IconMenuExplore";
 import NavbarMobile from "./NavbarMobile";
 import ScrollRestoration from "../ScrollRestoration";
+import BottomTabMobile from "./BottomTabMobile";
+import useIsMobile from "hooks/useIsMobile";
 
 interface IMenuItem {
   active?: boolean;
@@ -133,6 +135,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const popupMenuRef = useRef<any>();
   const popupLoginRef = useRef<any>();
   const btnLoginRef = useRef<any>();
+  const isMobile = useIsMobile();
   const [loading, setLoading] = useState(true);
   const [loginLoading, setLoginLoading] = useState(false);
   const [openLinkWithFarcaster, setOpenLinkWithFarcaster] = useState(false);
@@ -494,6 +497,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     []
   );
   const renderRight = useCallback(() => {
+    if (isMobile) return null;
     if (fcUser) {
       return (
         <>
@@ -549,6 +553,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   }, [
     fcUser,
     gettingMagicUserRedirect,
+    isMobile,
     loading,
     onLinkWithFarcaster,
     onLoginClick,
@@ -747,6 +752,16 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const windowScrollListener = useCallback(() => {
     setOpenMenu(false);
   }, []);
+  const onUserTabClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      if (!fcUser) {
+        onLoginClick();
+      } else {
+        onMenuClick(e);
+      }
+    },
+    [fcUser, onLoginClick, onMenuClick]
+  );
   useEffect(() => {
     if (fcUser) {
       GoogleAnalytics.identify(fcUser);
@@ -806,7 +821,19 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           toggleMenu={toggleMenu}
           renderMenu={renderMenu}
         />
-        {!gettingMagicUserRedirect && children}
+        {!gettingMagicUserRedirect && (
+          <>
+            {children}
+            <BottomTabMobile
+              communityNote={communityNote}
+              onUserTabClick={onUserTabClick}
+              btnLoginRef={btnLoginRef}
+              onWriteNote={onOpenModalAddNote}
+              onReportLink={onOpenModalReport}
+              onNewDiscussion={onOpenDiscussion}
+            />
+          </>
+        )}
       </main>
       <aside className={styles["right-side"]}>{renderRight()}</aside>
       {fcUser?.fid && (

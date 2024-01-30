@@ -57,10 +57,12 @@ const NavbarMobile = ({
           <span style={{ margin: "0 10px" }}>Buidler</span>
           {communityNote && <div className={styles["beta-tag"]}>beta</div>}
         </Link>
-        <div className={styles["side-menu"]} onClick={toggleMenu}>
-          <div className={styles["line-1"]} />
-          <div className={styles["line-2"]} />
-        </div>
+        {!communityNote && (
+          <div className={styles["side-menu"]} onClick={toggleMenu}>
+            <div className={styles["line-1"]} />
+            <div className={styles["line-2"]} />
+          </div>
+        )}
       </div>
       {renderMenu(true)}
     </div>
