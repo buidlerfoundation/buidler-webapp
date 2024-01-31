@@ -216,7 +216,7 @@ const BottomTabMobile = ({
         popupOnly
         onSelected={handleSelectedMenu}
         itemWidth={275}
-        popupStyle={{ marginTop: 0 }}
+        popupStyle={{ marginTop: 0, padding: "5px 0" }}
       />
       <PopoverButton
         ref={popupMenuCreateRef}
@@ -224,7 +224,7 @@ const BottomTabMobile = ({
         popupOnly
         onSelected={handleSelectedMenuCreate}
         itemWidth={275}
-        popupStyle={{ marginTop: 0 }}
+        popupStyle={{ marginTop: 0, padding: "5px 0" }}
       />
     </>
   );
