@@ -1,7 +1,6 @@
 import CallerServer from "api/CallerServer";
 import { IDashboardLink } from "models/CommunityNote";
 import { ImageResponse } from "next/og";
-import IconCircleCheck from "shared/SVG/IconCircleCheck";
 import IconLogoCircle from "shared/SVG/IconLogoCircle";
 import IconNMR from "shared/SVG/IconNMR";
 
@@ -17,11 +16,13 @@ export const size = {
 
 export const contentType = "image/png";
 
-const getRatingStatus = (status?: string) => {
+const getRatingBadge = (status?: string) => {
   if (!status) return "";
-  if (status === "helpful") return "Helpful";
-  if (status === "not_helpful") return "Unhelpful";
-  return "Somewhat Helpful";
+  if (status === "helpful")
+    return "https://storage.googleapis.com/buidler/24439d55-3509-4e25-9ff9-362ce2f0a8c2/1706676035316.png";
+  if (status === "not_helpful")
+    return "https://storage.googleapis.com/buidler/24439d55-3509-4e25-9ff9-362ce2f0a8c2/1706676053051.png";
+  return "https://storage.googleapis.com/buidler/24439d55-3509-4e25-9ff9-362ce2f0a8c2/1706676067194.png";
 };
 
 export const getOGImage = async (note_id: string, fid: string = "") => {
@@ -56,7 +57,9 @@ export const getOGImage = async (note_id: string, fid: string = "") => {
   ]);
   const isHelpful =
     dashboard.data?.note?.final_rating_status === "currently_rated_helpful";
-  const ratingStatus = getRatingStatus(
+  // const bgBlur =
+  //   "https://storage.googleapis.com/buidler/24439d55-3509-4e25-9ff9-362ce2f0a8c2/1706674980072.png";
+  const ratingBadge = getRatingBadge(
     dashboard.data?.note?.rating?.helpfulness_level
   );
   return new ImageResponse(
@@ -118,45 +121,77 @@ export const getOGImage = async (note_id: string, fid: string = "") => {
           >
             {dashboard.data?.note?.summary}
           </p>
-          {ratingStatus ? (
+          <div
+            style={{
+              lineHeight: "76px",
+              color: "#848484",
+              fontFamily: '"regular"',
+              fontSize: 44,
+              padding: "0 48px 24px 48px",
+            }}
+          >
+            Click to see more
+          </div>
+        </div>
+        {ratingBadge && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              top: 0,
+              backgroundColor: "rgba(255, 255, 255, .5)",
+              // backgroundImage: `url(${bgBlur})`,
+              // backgroundRepeat: "no-repeat",
+              // backgroundSize: "cover",
+            }}
+          >
+            <img
+              src={ratingBadge}
+              alt="rating-badge"
+              width={472}
+              height={412}
+              style={{ objectFit: "contain" }}
+            />
             <div
               style={{
                 display: "flex",
-                height: 100,
-                borderTop: "1px solid #F3F3F3",
-                padding: "0 48px 7px 48px",
                 alignItems: "center",
-                gap: 24,
+                gap: 10,
+                marginTop: 30,
               }}
             >
-              <IconCircleCheck size={40} fill="#F8F8F8" color="#848484" />
+              {dashboard?.data?.note?.rating?.user?.pfp?.url && (
+                <img
+                  alt="avatar"
+                  src={dashboard?.data?.note?.rating?.user?.pfp?.url}
+                  style={{
+                    width: 96,
+                    height: 96,
+                    borderRadius: 48,
+                    objectFit: "cover",
+                    border: "2px solid #F3F3F3",
+                  }}
+                />
+              )}
               <span
                 style={{
-                  color: "#848484",
-                  fontFamily: '"regular"',
-                  fontSize: 38,
+                  fontFamily: '"medium"',
+                  fontSize: 44,
+                  lineHeight: "60px",
+                  color: "#121417",
                 }}
               >
-                You rated this note as
-                <span style={{ color: "#121417", marginLeft: 10 }}>
-                  {ratingStatus}
-                </span>
+                {dashboard?.data?.note?.rating?.user?.display_name}
               </span>
             </div>
-          ) : (
-            <div
-              style={{
-                lineHeight: "76px",
-                color: "#848484",
-                fontFamily: '"regular"',
-                fontSize: 44,
-                padding: "0 48px 24px 48px",
-              }}
-            >
-              Click to see more
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     ),
     // ImageResponse options
@@ -191,7 +226,7 @@ export const getOGImage = async (note_id: string, fid: string = "") => {
 };
 
 // Image generation
-export default async function Image({
+export default async function OGImage({
   params,
 }: {
   params: { note_id: string };

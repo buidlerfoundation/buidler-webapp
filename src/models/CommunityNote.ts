@@ -1,6 +1,10 @@
 import { IFCUser, IMetadataUrl } from "./FC";
 
-export type IRatingType = "helpful" | "somewhat_helpful" | "not_helpful" | undefined;
+export type IRatingType =
+  | "helpful"
+  | "somewhat_helpful"
+  | "not_helpful"
+  | undefined;
 
 export interface INote {
   id: string;
@@ -53,6 +57,7 @@ export interface IRating {
   not_helpful_note_not_needed: number;
   created_at: string;
   updated_at: string;
+  user?: IFCUser;
 }
 
 export interface ITag {
