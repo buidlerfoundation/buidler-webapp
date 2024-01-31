@@ -498,7 +498,19 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     []
   );
   const renderRight = useCallback(() => {
-    if (isMobile) return null;
+    if (isMobile) {
+      if (fcUser && !fcUser.fid) {
+        return (
+          <div
+            id="btn-login"
+            ref={btnLoginRef}
+            className={styles["btn-login"]}
+            onClick={onLinkWithFarcaster}
+          />
+        );
+      }
+      return null;
+    }
     if (fcUser) {
       return (
         <>
