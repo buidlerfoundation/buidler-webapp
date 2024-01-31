@@ -14,7 +14,7 @@ async function requestAPI<T = any>(
   serviceBaseUrl?: string,
   controller?: AbortController,
   h?: any,
-  withoutError?: boolean
+  noCache?: boolean
 ): Promise<BaseDataApi<T>> {
   let headers: any = {
     Accept: "*/*",
@@ -61,6 +61,12 @@ async function requestAPI<T = any>(
   } else {
     apiUrl = AppConfig.apiBaseUrl + uri;
   }
+  if (noCache) {
+    fetchOptions.cache = "no-store";
+    fetchOptions.next = {
+      revalidate: 0,
+    };
+  }
   return fetch(apiUrl, fetchOptions)
     .then((res) => {
       return res
@@ -99,7 +105,7 @@ const CallerServer = {
     url: string,
     baseUrl?: string,
     controller?: AbortController,
-    withoutError?: boolean
+    noCache?: boolean
   ) {
     return requestAPI<T>(
       METHOD_GET,
@@ -108,7 +114,7 @@ const CallerServer = {
       baseUrl,
       controller,
       undefined,
-      withoutError
+      noCache
     );
   },
 

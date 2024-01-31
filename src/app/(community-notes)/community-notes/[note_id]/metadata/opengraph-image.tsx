@@ -27,7 +27,10 @@ const getRatingBadge = (status?: string) => {
 
 export const getOGImage = async (note_id: string, fid: string = "") => {
   const dashboard = await CallerServer.get<IDashboardLink>(
-    `community-notes/dashboard/notes/${note_id}?fid=${fid}`
+    `community-notes/dashboard/notes/${note_id}?fid=${fid}`,
+    undefined,
+    undefined,
+    true
   );
   const [fontBold, fontSemibold, fontMedium, fontRegular] = await Promise.all([
     fetch(

@@ -3,8 +3,6 @@ import { IDashboardLink } from "models/CommunityNote";
 import { Metadata } from "next";
 import DashboardByNoteId from "screens/DashboardByNoteId";
 
-export const revalidate = 0
-
 export async function generateMetadata({
   params,
 }: {
