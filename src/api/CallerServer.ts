@@ -51,12 +51,7 @@ async function requestAPI<T = any>(
     }
   }
   // Construct fetch options
-  const fetchOptions: RequestInit = {
-    method,
-    headers,
-    body: contentBody,
-    next: { revalidate: 3600 },
-  };
+  const fetchOptions: RequestInit = { method, headers, body: contentBody };
   if (!!controller) {
     fetchOptions.signal = controller.signal;
   }
