@@ -63,9 +63,6 @@ async function requestAPI<T = any>(
   }
   if (noCache) {
     fetchOptions.cache = "no-store";
-    fetchOptions.next = {
-      revalidate: 0,
-    };
   }
   return fetch(apiUrl, fetchOptions)
     .then((res) => {
