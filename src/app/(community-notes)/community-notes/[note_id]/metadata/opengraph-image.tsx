@@ -26,9 +26,11 @@ const getRatingBadge = (status?: string) => {
 };
 
 export const getOGImage = async (note_id: string, fid: string = "") => {
-  const dashboard = await CallerServer.get<IDashboardLink>(
-    `community-notes/dashboard/notes/${note_id}?fid=${fid}`
-  );
+  let url = `community-notes/dashboard/notes/${note_id}`;
+  if (fid) {
+    url += `?fid=${fid}`;
+  }
+  const dashboard = await CallerServer.get<IDashboardLink>(url);
   const [fontBold, fontSemibold, fontMedium, fontRegular] = await Promise.all([
     fetch(
       new URL(
