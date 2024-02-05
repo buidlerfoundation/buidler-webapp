@@ -29,7 +29,8 @@ const handleClearDataAndReload = () => {
         const path = window.location.pathname;
         if (!path.includes("/plugin-fc")) {
           toast.error("Session expired");
-          window.location.reload();
+          // comment out reload
+          // window.location.reload();
         } else {
           GlobalVariable.sessionExpired = false;
           window.parent.postMessage("session-expired", "*");
