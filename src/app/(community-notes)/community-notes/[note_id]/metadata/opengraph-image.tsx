@@ -31,6 +31,7 @@ export const getOGImage = async (note_id: string, fid: string = "") => {
     url += `?fid=${fid}`;
   }
   const dashboard = await CallerServer.get<IDashboardLink>(url);
+  console.log('Response dashboard data: ', dashboard?.data);
   const [fontBold, fontSemibold, fontMedium, fontRegular] = await Promise.all([
     fetch(
       new URL(
