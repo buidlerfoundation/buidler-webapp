@@ -114,7 +114,6 @@ export const getOGImage = async (note_id: string, fid: string = "") => {
               fontFamily: '"regular"',
               fontSize: 44,
               lineHeight: "76px",
-              wordBreak: "break-word",
               whiteSpace: "pre-line",
               textOverflow: "ellipsis",
               width: 1044,
