@@ -500,7 +500,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     []
   );
   const renderRight = useCallback(() => {
-    if (isMobile) {
+    if (isMobile && !loading) {
       if (fcUser && !fcUser.fid) {
         return (
           <div
@@ -510,6 +510,9 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
             onClick={onLinkWithFarcaster}
           />
         );
+      }
+      if (!communityNote) {
+        return <div id="btn-login" ref={btnLoginRef} onClick={onLoginClick} />;
       }
       return null;
     }
@@ -566,6 +569,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
       </div>
     );
   }, [
+    communityNote,
     fcUser,
     gettingMagicUserRedirect,
     isMobile,
