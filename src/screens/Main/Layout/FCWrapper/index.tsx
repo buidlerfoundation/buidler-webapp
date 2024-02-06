@@ -429,22 +429,24 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
             signature,
           })
         ).unwrap();
-        await saveTokenCookie(res.data);
-        const linkedSignerId = res.data?.signer_id;
-        if (linkedSignerId) {
-          await setCookie(AsyncKey.signerIdKey, linkedSignerId);
-          trackingLoginSuccess();
-          await dispatch(getCurrentFCUser());
-          await removeCookie(AsyncKey.requestTokenKey);
-          if (redirectUrl) {
-            router.push(decodeURIComponent(redirectUrl) as Route);
-          }
-        } else {
-          const signerId = await getCookie(AsyncKey.signerIdKey);
-          if (signerId) {
-            await linkWithFCAccount(signerId, res.data?.token);
+        if (res.success) {
+          await saveTokenCookie(res.data);
+          const linkedSignerId = res.data?.signer_id;
+          if (linkedSignerId) {
+            await setCookie(AsyncKey.signerIdKey, linkedSignerId);
+            trackingLoginSuccess();
+            await dispatch(getCurrentFCUser());
+            await removeCookie(AsyncKey.requestTokenKey);
+            if (redirectUrl) {
+              router.push(decodeURIComponent(redirectUrl) as Route);
+            }
           } else {
-            onLinkWithFarcaster();
+            const signerId = await getCookie(AsyncKey.signerIdKey);
+            if (signerId) {
+              await linkWithFCAccount(signerId, res.data?.token);
+            } else {
+              onLinkWithFarcaster();
+            }
           }
         }
       }
