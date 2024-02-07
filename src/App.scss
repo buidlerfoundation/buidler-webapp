@@ -606,6 +606,8 @@ html {
     --color-bg-yellow: #191204;
     --color-bg-hover: #ffffff0d;
   }
+
+  scrollbar-color: var(--color-mute-text) var(--color-background-1);
 }
 
 html.light {
