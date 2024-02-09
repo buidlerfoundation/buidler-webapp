@@ -14,24 +14,24 @@ export async function generateMetadata({
     `external/metadata?url=${process.env.NEXT_PUBLIC_URL}/community-notes/${params.note_id}/metadata`
   );
   if (!metadata.data) return defaultMetadataCN;
-  const { title, description, image = "" } = metadata.data;
+  const { title, description, image = "", site_name } = metadata.data;
   return {
     title,
     description,
     openGraph: {
       title,
       description,
-      images: [image],
+      images: [`${image}&${site_name}`],
     },
     twitter: {
       title,
       description,
       card: "summary_large_image",
-      images: [image],
+      images: [`${image}&${site_name}`],
     },
     other: {
       "fc:frame": "vNext",
-      "fc:frame:image": image,
+      "fc:frame:image": `${image}&${site_name}`,
       "fc:frame:button:1": "Rate it",
       "fc:frame:post_url": `${process.env.NEXT_PUBLIC_API_BASE_URL}external/frame/${params.note_id}`,
     },

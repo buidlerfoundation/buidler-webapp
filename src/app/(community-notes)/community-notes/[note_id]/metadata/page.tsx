@@ -21,6 +21,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
+      siteName: dashboard.data?.note?.final_rating_status
     },
     twitter: {
       title,
