@@ -154,7 +154,6 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
   const initialTheme = useMemo(() => query?.get("theme"), [query]);
   const action = useMemo(() => query?.get("action"), [query]);
   const redirect = useMemo(() => query?.get("redirect"), [query]);
-  const [theme, setTheme] = useState(initialTheme);
   const filters = useFeedFilters();
   const params = useParams<{ url: string; redirect_url: string }>();
   const exploreUrl = useMemo(() => params?.url, [params?.url]);
@@ -330,18 +329,21 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     }
   }, [communityNote, dispatch]);
   useEffect(() => {
-    getCookie(AsyncKey.themeKey).then((res) => {
-      if (res) {
-        setTheme(res);
-      }
-    });
-  }, []);
-  useEffect(() => {
-    if (theme) {
-      document.getElementsByTagName("html")?.[0]?.setAttribute("class", theme);
+    if (initialTheme) {
+      document
+        .getElementsByTagName("html")?.[0]
+        ?.setAttribute("class", initialTheme);
+      setCookie(AsyncKey.themeKey, initialTheme);
+    } else {
+      getCookie(AsyncKey.themeKey).then((res) => {
+        if (res) {
+          document
+            .getElementsByTagName("html")?.[0]
+            ?.setAttribute("class", res);
+        }
+      });
     }
-    // document.querySelector('link[rel="manifest"]')?.setAttribute('content', '#000000');
-  }, [theme]);
+  }, [initialTheme]);
   useEffect(() => {
     dispatch(getFCChannels());
   }, [dispatch]);
