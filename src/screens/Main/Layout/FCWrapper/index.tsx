@@ -302,26 +302,28 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
     }
   }, [saveTokenCookie]);
   const checkingAuth = useCallback(async () => {
-    setLoading(true);
-    await handleRefresh();
-    const reqToken = await getCookie(AsyncKey.requestTokenKey);
-    const accessToken = await getCookie(AsyncKey.accessTokenKey);
-    if (accessToken) {
-      let alreadyGetUser = false;
-      if (reqToken) {
-        const res = await api.checkRequestToken(reqToken);
-        if (res.data?.state === "completed" && res.data?.signer_id) {
-          await setCookie(AsyncKey.signerIdKey, res?.data?.signer_id);
-          await linkWithFCAccount(res.data?.signer_id, accessToken);
-          alreadyGetUser = true;
+    if (!fcUser) {
+      setLoading(true);
+      await handleRefresh();
+      const reqToken = await getCookie(AsyncKey.requestTokenKey);
+      const accessToken = await getCookie(AsyncKey.accessTokenKey);
+      if (accessToken) {
+        let alreadyGetUser = false;
+        if (reqToken) {
+          const res = await api.checkRequestToken(reqToken);
+          if (res.data?.state === "completed" && res.data?.signer_id) {
+            await setCookie(AsyncKey.signerIdKey, res?.data?.signer_id);
+            await linkWithFCAccount(res.data?.signer_id, accessToken);
+            alreadyGetUser = true;
+          }
+        }
+        if (!alreadyGetUser) {
+          await dispatch(getCurrentFCUser());
         }
       }
-      if (!alreadyGetUser) {
-        await dispatch(getCurrentFCUser());
-      }
+      setLoading(false);
     }
-    setLoading(false);
-  }, [handleRefresh, linkWithFCAccount, dispatch]);
+  }, [fcUser, handleRefresh, linkWithFCAccount, dispatch]);
   useEffect(() => {
     if (communityNote) {
       dispatch(getReportCategories());
@@ -840,7 +842,7 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           toggleMenu={toggleMenu}
           renderMenu={renderMenu}
         />
-        {!gettingMagicUserRedirect && (
+        {!gettingMagicUserRedirect && !loading && (
           <>
             {children}
             <BottomTabMobile
