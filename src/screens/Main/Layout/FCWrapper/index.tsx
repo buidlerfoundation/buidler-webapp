@@ -321,8 +321,8 @@ const FCWrapper = ({ children, communityNote }: IFCWrapper) => {
           await dispatch(getCurrentFCUser());
         }
       }
-      setLoading(false);
     }
+    setLoading(false);
   }, [fcUser, handleRefresh, linkWithFCAccount, dispatch]);
   useEffect(() => {
     if (communityNote) {
