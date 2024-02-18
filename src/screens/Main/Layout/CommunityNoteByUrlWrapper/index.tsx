@@ -59,13 +59,13 @@ const CommunityNoteByUrlWrapper = ({
   );
   const [searchUrl, setSearchUrl] = useState("");
   const router = useRouter();
-  const query = useQuery();
+  const params = useParams<{ url: string }>();
   const exploreUrl = useMemo(() => {
     if (isExplore) return searchUrl || "";
-    const url = query.get("url");
+    const url = params.url;
     if (!url) return "";
     return decodeURIComponent(url);
-  }, [query, isExplore, searchUrl]);
+  }, [isExplore, searchUrl, params.url]);
   const dashboardDetail = useDashboardLinkDetailData(exploreUrl);
   const goBack = useCallback(() => {
     if (window.history.length > 1) {
@@ -151,7 +151,7 @@ const CommunityNoteByUrlWrapper = ({
               <div className={styles.tabs}>
                 {totalNotes > 0 && (
                   <Link
-                    href={`/community-notes/explore/notes?url=${encodeURIComponent(
+                    href={`/community-notes/explore/notes/${encodeURIComponent(
                       exploreUrl
                     )}`}
                     className={`${styles["btn-tab"]} ${
@@ -164,7 +164,7 @@ const CommunityNoteByUrlWrapper = ({
                 )}
                 {totalReports > 0 && (
                   <Link
-                    href={`/community-notes/explore/reports?url=${encodeURIComponent(
+                    href={`/community-notes/explore/reports/${encodeURIComponent(
                       exploreUrl
                     )}`}
                     className={`${styles["btn-tab"]} ${
