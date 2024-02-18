@@ -119,7 +119,7 @@ const CommunityNoteByUrlWrapper = ({
         <nav className={styles.head}>
           {isExplore ? (
             <div className={styles["btn-back"]} onClick={goBack}>
-              <span>Search notes on link.</span>
+              <span>Search notes on link</span>
             </div>
           ) : (
             <div className={styles["btn-back"]} onClick={goBack}>
