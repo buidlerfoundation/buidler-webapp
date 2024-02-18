@@ -1,6 +1,5 @@
 import CallerServer from "api/CallerServer";
 import { defaultMetadataCN } from "common/AppConfig";
-import { IDashboardLink } from "models/CommunityNote";
 import { IMetadataUrl } from "models/FC";
 import { Metadata } from "next";
 import DashboardByNoteId from "screens/DashboardByNoteId";
@@ -11,7 +10,10 @@ export async function generateMetadata({
   params: { note_id: string };
 }): Promise<Metadata> {
   const metadata = await CallerServer.get<IMetadataUrl>(
-    `external/metadata?url=${process.env.NEXT_PUBLIC_URL}/community-notes/${params.note_id}/metadata`
+    `external/metadata?url=${process.env.NEXT_PUBLIC_FRAME_METADATA_URL}/community-notes/${params.note_id}`,
+    undefined,
+    undefined,
+    true
   );
   if (!metadata.data) return defaultMetadataCN;
   const { title, description, image = "", site_name } = metadata.data;
