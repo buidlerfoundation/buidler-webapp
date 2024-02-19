@@ -12,7 +12,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const url = `${process.env.NEXT_PUBLIC_FRAME_METADATA_URL}/community-notes/explore/${params.url}`;
   const metadata = await getMetadataFromServer(url);
-  if (!metadata.image) return defaultMetadataCN;
+  if (!metadata.image || !metadata.title) return defaultMetadataCN;
   const { title, description, image = "" } = metadata;
   return {
     title,
