@@ -13,7 +13,10 @@ export async function generateMetadata({
     `${process.env.NEXT_PUBLIC_FRAME_METADATA_URL}/community-notes/explore/${params.url}`
   );
   const metadata = await CallerServer.get<IMetadataUrl>(
-    `external/metadata?url=${url}`
+    `external/metadata?url=${url}`,
+    undefined,
+    undefined,
+    true
   );
   if (!metadata.data) return defaultMetadataCN;
   const { title, description, image = "" } = metadata.data;
