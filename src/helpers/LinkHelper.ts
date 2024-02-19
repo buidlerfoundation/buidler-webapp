@@ -1,3 +1,7 @@
+import { IMetadataUrl } from "models/FC";
+
+const { parser } = require("html-metadata-parser");
+
 export const OpenSeaURL = "https://opensea.io";
 
 export const buildLinkOpenSea = (slugName: string) =>
@@ -77,4 +81,26 @@ export const getParamsFromPath = () => {
 
 export const getShareIdFromPath = () => {
   return {};
+};
+
+export const getMetadataFromServer: (
+  url: string
+) => Promise<IMetadataUrl> = async (url: string) => {
+  const res = await parser(url);
+  const urlObj = new URL(url);
+  const domain = urlObj.origin;
+  const { meta, og } = res;
+  const metadata: IMetadataUrl = {
+    image: og?.image
+      ? og?.image?.includes("http")
+        ? og?.image
+        : `https://${domain}${og?.image}`
+      : null,
+    title: og?.title || meta?.title || null,
+    description: og?.description || meta?.description || null,
+    card: og?.card || null,
+    logo: og?.logo || null,
+    site_name: og?.site_name || null,
+  };
+  return metadata;
 };
