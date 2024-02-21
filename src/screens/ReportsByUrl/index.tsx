@@ -7,19 +7,20 @@ import useReportsData from "hooks/useReportsData";
 import { IReport } from "models/CommunityNote";
 import LoadingItem from "shared/LoadingItem";
 import Spinner from "shared/Spinner";
+import { useParams } from "next/navigation";
 
 interface IReportsByUrl {
   searchUrl?: string;
 }
 
 const ReportsByUrl = ({ searchUrl }: IReportsByUrl) => {
-  const query = useQuery();
+  const params = useParams<{ url: string }>();
   const exploreUrl = useMemo(() => {
     if (searchUrl !== undefined) return searchUrl;
-    const url = query.get("url");
+    const url = params.url;
     if (!url) return "";
     return decodeURIComponent(url);
-  }, [query, searchUrl]);
+  }, [params.url, searchUrl]);
   const reportsData = useReportsData(exploreUrl);
   const reports = useMemo(() => reportsData?.data || [], [reportsData?.data]);
   const renderReport = useCallback((report: IReport) => {

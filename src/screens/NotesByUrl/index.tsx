@@ -11,6 +11,7 @@ import NoteItem from "shared/DashboardLinkItem/NoteItem";
 import useAppDispatch from "hooks/useAppDispatch";
 import { COMMUNITY_NOTE_ACTION } from "reducers/CommunityNoteReducers";
 import useDashboardLinkDetailData from "hooks/useDashboardLinkDetailData";
+import { useParams } from "next/navigation";
 
 interface INotesByUrl {
   searchUrl?: string;
@@ -18,13 +19,13 @@ interface INotesByUrl {
 
 const NotesByUrl = ({ searchUrl }: INotesByUrl) => {
   const dispatch = useAppDispatch();
-  const query = useQuery();
+  const params = useParams<{ url: string }>();
   const exploreUrl = useMemo(() => {
     if (searchUrl !== undefined) return searchUrl;
-    const url = query.get("url");
+    const url = params.url;
     if (!url) return "";
     return decodeURIComponent(url);
-  }, [query, searchUrl]);
+  }, [params.url, searchUrl]);
   const notesData = useNotesData(exploreUrl);
   const dashboardDetail = useDashboardLinkDetailData(exploreUrl);
   const notes = useMemo(() => notesData?.data || [], [notesData?.data]);
