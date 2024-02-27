@@ -31,7 +31,7 @@ export async function generateMetadata({
       "fc:frame:image": image,
       "fc:frame:button:1": "👀 Read notes",
       "fc:frame:button:2": "📝 Write note",
-      "fc:frame:post_url": `${process.env.NEXT_PUBLIC_API_BASE_URL}frame/note/explore`,
+      "fc:frame:post_url": `${process.env.NEXT_PUBLIC_API_BASE_URL}external/frame/note/explore`,
     },
   };
 }
